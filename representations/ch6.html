@@ -52,6 +52,8 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Theoretical Results" href="ch7.html" />
@@ -283,9 +285,21 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#covariate-assisted-spectral-clustering">
-     Covariate-Assisted Spectral Clustering
+    <a class="reference internal nav-link" href="#covariate-assisted-spectral-embedding">
+     Covariate-Assisted Spectral Embedding
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#using-graspologic">
+       Using Graspologic
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#references">
+       References
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
@@ -326,12 +340,14 @@ cluster by region.</p>
 <p>&lt;more stuff here, tbd&gt;</p>
 <div class="section" id="generating-data">
 <h3>Generating Data<a class="headerlink" href="#generating-data" title="Permalink to this headline">¶</a></h3>
-<p>Let’s try making a network along with its covariates. First, let’s generate a network using a Stochastic Block Model with 1500 nodes and 3 communities.</p>
+<p>We need a graph and some covariates. To start off, we’ll make a pretty straightforward Stochastic Block Model with 1500 nodes and 3 communities.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># TODO: don&#39;t do this, fix scatterplot</span>
 
 <span class="c1"># Start with some simple parameters</span>
 <span class="n">N</span> <span class="o">=</span> <span class="mi">1500</span>
@@ -351,7 +367,7 @@ cluster by region.</p>
 <img alt="../_images/ch6_8_0.png" src="../_images/ch6_8_0.png" />
 </div>
 </div>
-<p>Now, let’s generate some covariates. Remember, each node is associated with its own vector of covariates that provide information about the node. We’ll organize these into a matrix, where each row contains the covariates associated with a particular node.</p>
+<p>Now, let’s generate some covariates. Remember, each node is associated with its own group of covariates that provide information about the node. We’ll organize these into a matrix, where each row contains the covariates associated with a particular node.</p>
 <p>To keep things simple, we’ll have our covariates only take on true/false values - or, more specifically, 0 and 1. We’d also like a node’s covariates to look different depending on which community it belongs to. To that end, we’ll give each node 30 covariates, with the first 10 having a higher probability of 1 in the first community, the second having a higher probability of 1 in the second community, and the third having a higher probability of 1 in the third community.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -383,75 +399,90 @@ cluster by region.</p>
 </div>
 </div>
 </div>
-<div class="section" id="covariate-assisted-spectral-clustering">
-<h3>Covariate-Assisted Spectral Clustering<a class="headerlink" href="#covariate-assisted-spectral-clustering" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="covariate-assisted-spectral-embedding">
+<h3>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h3>
+<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our graph and our covariates into a single model. In the most straightforward version of CASE, we use the graph’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^T\)</span> (where <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>).</p>
+<p>Remember that, in our case, <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
+<p>&lt;explanatory figure for $XX^T here&gt;</p>
+<p>If there are two overlapping 1’s in the same place in rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, then <span class="math notranslate nohighlight">\(XX^T\)</span> will have a 1 in location <span class="math notranslate nohighlight">\(i, j\)</span> (and will have a 0 otherwise). So, the <span class="math notranslate nohighlight">\((i, j)_{th}\)</span> element of <span class="math notranslate nohighlight">\(XX^T\)</span> can be interpreted as measuring the “agreement” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span>. The result is a matrix that looks fairly similar to our Laplacian!</p>
+<p>The following Python code generates both matrices and visualizes them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="n">LL</span> <span class="o">=</span> <span class="n">L</span><span class="nd">@L</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
 <span class="n">XXt</span> <span class="o">=</span> <span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span>
 
 <span class="c1"># plot</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">LL</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Regularized Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">XXt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Covariate matrix times itself&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Covariate matrix times itself&#39;}&gt;
-</pre></div>
-</div>
-<img alt="../_images/ch6_12_1.png" src="../_images/ch6_12_1.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top_eigval_L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">LL</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">top_eigval_XXt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">XXt</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">top_eigval_L</span> <span class="o">/</span> <span class="n">top_eigval_XXt</span><span class="p">)</span>
-
-<span class="n">L_</span> <span class="o">=</span> <span class="n">L</span><span class="nd">@L</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Combined Laplacian and covariates matrix&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Our Combined Laplacian and covariates matrix&#39;}&gt;
-</pre></div>
-</div>
-<img alt="../_images/ch6_13_1.png" src="../_images/ch6_13_1.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
-
-<span class="n">U</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">selectSVD</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">)</span>
-<span class="n">svd_plot</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding our model&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/ch6_14_0.png" src="../_images/ch6_14_0.png" />
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">CovariateAssistedEmbedding</span> <span class="k">as</span> <span class="n">CASE</span>
-
-<span class="n">casc</span> <span class="o">=</span> <span class="n">CASE</span><span class="p">(</span><span class="n">embedding_alg</span><span class="o">=</span><span class="s2">&quot;non-assortative&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">casc_plot</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">casc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="n">X</span><span class="p">),</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Using graspologic&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Regularized Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">XXt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Covariate matrix times itself&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="../_images/ch6_15_0.png" src="../_images/ch6_15_0.png" />
 </div>
+</div>
+<p>CASE simply sums these two matrices together, using a weight for <span class="math notranslate nohighlight">\(XX^T\)</span> so that they both contribute equally to the result.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top_eigval_L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">LL</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">top_eigval_XXt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">XXt</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="n">top_eigval_L</span> <span class="o">/</span> <span class="n">top_eigval_XXt</span><span class="p">)</span>
+
+<span class="n">L_</span> <span class="o">=</span> <span class="n">L</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Combined Laplacian and covariates matrix&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ch6_17_0.png" src="../_images/ch6_17_0.png" />
+</div>
+</div>
+<p>Everything works as usual from there: we decompose our matrix using an SVD, extracting the first two eigenvectors, and then plot the rows to visualize our clustering.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+
+<span class="k">def</span> <span class="nf">plot_latents</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">latent_positions</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> 
+                           <span class="n">hue</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Set1&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">);</span>
+    
+
+<span class="n">latents</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">selectSVD</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;full&quot;</span><span class="p">)</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="s2">&quot;Embedding our model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ch6_19_0.png" src="../_images/ch6_19_0.png" />
+</div>
+</div>
+<div class="section" id="using-graspologic">
+<h4>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h4>
+<p>Graspologic’s CovariateAssistedSpectralEmbedding class uses SVD decomposition to implement CASE, just like we just did earlier. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aXX^T\)</span> down to three dimensions, and then plots the second dimension against the third to show the clustering.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">CovariateAssistedEmbedding</span> <span class="k">as</span> <span class="n">CASE</span>
+
+<span class="n">casc</span> <span class="o">=</span> <span class="n">CASE</span><span class="p">(</span><span class="n">embedding_alg</span><span class="o">=</span><span class="s2">&quot;assortative&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">casc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="s2">&quot;Embedding our model using graspologic&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ch6_22_0.png" src="../_images/ch6_22_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="references">
+<h4>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h4>
+<p>[1] N. Binkiewicz, J. T. Vogelstein, K. Rohe, Covariate-assisted spectral clustering, Biometrika, Volume 104, Issue 2, June 2017, Pages 361–377, <a class="reference external" href="https://doi.org/10.1093/biomet/asx008">https://doi.org/10.1093/biomet/asx008</a></p>
 </div>
 </div>
 </div>
