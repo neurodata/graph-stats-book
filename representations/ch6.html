@@ -397,28 +397,29 @@ cluster by region.</p>
 </div>
 <div class="section" id="covariate-assisted-spectral-embedding">
 <h3>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h3>
-<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our graph and our covariates into a single model. In the most straightforward version of CASE, we use the graph’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^T\)</span> (where <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>).</p>
-<p>Remember that, in our case, <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
+<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our graph and our covariates into a single model. In the most straightforward version of CASE, we use the graph’s regularized Laplacian matrix $L$ and a function of our covariate matrix $XX^T$ (where $X$ is just our covariate matrix, in which row $i$ contains the covariates associated with node $i$).</p>
+<p>Remember that, in our case, $X$ only contains 0’s and 1’s. To interpret $XX^T$, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
 <p><strong>NOTE:: TEMPORARY, MAKE A BETTER EXPLANATORY FIGURE</strong></p>
-<p>\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-b933b57e-0302-4063-8cab-2e5f0bcbd302">
+<span class="eqno">(1)<a class="headerlink" href="#equation-b933b57e-0302-4063-8cab-2e5f0bcbd302" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
-1 \
-0 \
-1 \
-\end{bmatrix} \times
+1 \\
+0 \\
+1 \\
+\end{bmatrix} \times 
 \begin{bmatrix}
-0 \
-1 \
-1 \
+0 \\
+1 \\
+1 \\
 \end{bmatrix} =
 \begin{bmatrix}
-0 \
-0 \
-1 \
+0 \\
+0 \\
+1 \\
 \end{bmatrix}
-\end{align}</p>
+\end{align}\]</div>
 <p><strong>NOTE:: the below explanation might be more technical than we want?</strong></p>
-<p>If there are two overlapping 1’s in the same place in rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, then their weighted sum will have a 1 in that place. The resulting value, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span> will be equal to the number of positions in which rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones. So, a position of <span class="math notranslate nohighlight">\(XX^T\)</span> can be interpreted as measuring the “agreement” between rows <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span>. The result is a matrix that looks fairly similar to our Laplacian!</p>
+<p>If there are two overlapping 1’s in the same place in rows $i$ and $j$, then their weighted sum will have a 1 in that place. The resulting value, $XX^T_{i, j}$ will be equal to the number of positions in which rows $i$ and $j$ both have ones. So, a position of $XX^T$ can be interpreted as measuring the “agreement” between rows $i$ and row $j$. The result is a matrix that looks fairly similar to our Laplacian!</p>
 <p>The following Python code generates both matrices and visualizes them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -439,7 +440,7 @@ cluster by region.</p>
 <img alt="../_images/ch6_14_0.png" src="../_images/ch6_14_0.png" />
 </div>
 </div>
-<p>CASE simply sums these two matrices together, using a weight for <span class="math notranslate nohighlight">\(XX^T\)</span> so that they both contribute equally to the result.</p>
+<p>CASE simply sums these two matrices together, using a weight for $XX^T$ so that they both contribute equally to the result.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top_eigval_L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvalsh</span><span class="p">(</span><span class="n">LL</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -478,7 +479,7 @@ cluster by region.</p>
 </div>
 <div class="section" id="using-graspologic">
 <h4>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h4>
-<p>Graspologic’s CovariateAssistedSpectralEmbedding class uses SVD decomposition to implement CASE, just like we just did earlier. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aXX^T\)</span> down to three dimensions, and then plots the second dimension against the third to show the clustering.</p>
+<p>Graspologic’s CovariateAssistedSpectralEmbedding class uses SVD decomposition to implement CASE, just like we just did earlier. The following code applies CASE to reduce the dimensionality of $L + aXX^T$ down to three dimensions, and then plots the second dimension against the third to show the clustering.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">CovariateAssistedEmbedding</span> <span class="k">as</span> <span class="n">CASE</span>
@@ -496,7 +497,7 @@ cluster by region.</p>
 </div>
 <div class="section" id="references">
 <h4>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h4>
-<p>[1] N. Binkiewicz, J. T. Vogelstein, K. Rohe, Covariate-assisted spectral clustering, Biometrika, Volume 104, Issue 2, June 2017, Pages 361–377, <a class="reference external" href="https://doi.org/10.1093/biomet/asx008">https://doi.org/10.1093/biomet/asx008</a></p>
+<p>[1] N. Binkiewicz, J. T. Vogelstein, K. Rohe, Covariate-assisted spectral clustering, Biometrika, Volume 104, Issue 2, June 2017, Pages 361–377, https://doi.org/10.1093/biomet/asx008</p>
 </div>
 </div>
 </div>
