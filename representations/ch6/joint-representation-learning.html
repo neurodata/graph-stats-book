@@ -508,7 +508,18 @@ cluster by region.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_5_0.png" src="../../_images/joint-representation-learning_5_0.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">a81a4fceab74</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># TODO: don&#39;t do this, fix scatterplot</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;graspologic&#39;
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -539,8 +550,14 @@ cluster by region.</p>
 
 <span class="c1"># Generate a covariate matrix</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">gen_covariates</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
-
-<span class="c1"># Plot and make the axis look nice</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see a visualization of the covariates below.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot and make the axis look nice</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Visualization of the covariates&quot;</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> 
@@ -557,7 +574,7 @@ cluster by region.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_8_0.png" src="../../_images/joint-representation-learning_8_0.png" />
+<img alt="../../_images/joint-representation-learning_10_0.png" src="../../_images/joint-representation-learning_10_0.png" />
 </div>
 </div>
 </div>
@@ -566,8 +583,8 @@ cluster by region.</p>
 <h2>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h2>
 <p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our graph and our covariates into a single model. In the most straightforward version of CASE, we use the graph’s regularized Laplacian matrix $L$ and a function of our covariate matrix $XX^T$ (where $X$ is just our covariate matrix, in which row $i$ contains the covariates associated with node $i$). Notice the word “regularized” - This means (from the Laplacian section earlier) that we are using $L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}$.</p>
 <p>Remember that, in our case, $X$ only contains 0’s and 1’s. To interpret $XX^T$, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-0daab29b-2382-4918-8cf3-e0cf50dca5d9">
-<span class="eqno">(2)<a class="headerlink" href="#equation-0daab29b-2382-4918-8cf3-e0cf50dca5d9" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-89147adb-d8ef-419c-9ead-c6ae1535a7cf">
+<span class="eqno">(2)<a class="headerlink" href="#equation-89147adb-d8ef-419c-9ead-c6ae1535a7cf" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
@@ -597,7 +614,7 @@ cluster by region.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_13_0.png" src="../../_images/joint-representation-learning_13_0.png" />
+<img alt="../../_images/joint-representation-learning_15_0.png" src="../../_images/joint-representation-learning_15_0.png" />
 </div>
 </div>
 <p>CASE simply sums these two matrices together, using a weight for $XX^T$ so that they both contribute equally to the result. Here, we’ll just use the ratio of the leading eigenvalues of our two matrices as our weight (henceforth known as $\alpha$). Later on, we’ll explore ways to pick a better $\alpha$.</p>
@@ -617,7 +634,7 @@ cluster by region.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_15_0.png" src="../../_images/joint-representation-learning_15_0.png" />
+<img alt="../../_images/joint-representation-learning_17_0.png" src="../../_images/joint-representation-learning_17_0.png" />
 </div>
 </div>
 <p>Everything works as usual from here: we decompose our matrix using an SVD, extracting the first two eigenvectors, and then we plot the rows to visualize our clustering.</p>
@@ -643,7 +660,7 @@ cluster by region.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_17_0.png" src="../../_images/joint-representation-learning_17_0.png" />
+<img alt="../../_images/joint-representation-learning_19_0.png" src="../../_images/joint-representation-learning_19_0.png" />
 </div>
 </div>
 <div class="section" id="setting-a-better-weight">
@@ -722,7 +739,7 @@ Our maximum weight is 0.00043756.
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Our best alpha-value is 0.00000795
 </pre></div>
 </div>
-<img alt="../../_images/joint-representation-learning_28_1.png" src="../../_images/joint-representation-learning_28_1.png" />
+<img alt="../../_images/joint-representation-learning_30_1.png" src="../../_images/joint-representation-learning_30_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -735,7 +752,7 @@ Our maximum weight is 0.00043756.
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../../_images/joint-representation-learning_29_1.png" src="../../_images/joint-representation-learning_29_1.png" />
+<img alt="../../_images/joint-representation-learning_31_1.png" src="../../_images/joint-representation-learning_31_1.png" />
 </div>
 </div>
 </div>
@@ -762,7 +779,7 @@ Since the tuning procedure is computationally expensive, you wouldn’t want to 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_34_0.png" src="../../_images/joint-representation-learning_34_0.png" />
+<img alt="../../_images/joint-representation-learning_36_0.png" src="../../_images/joint-representation-learning_36_0.png" />
 </div>
 </div>
 <div class="section" id="references">
