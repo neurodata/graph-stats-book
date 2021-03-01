@@ -15,7 +15,7 @@ If you'd like to develop on and build the Network Machine Learning in Python boo
 - Clone this repository and run
 - Run `pip install -r requirements.txt` (it is recommended you do this within a virtual environment)
 - (Recommended) Remove the existing `network_machine_learning_in_python/_build/` directory
-- Run `jupyter-book build Network Machine Learning in Python/`
+- Run `jupyter-book build network_machine_learning_in_python/`
 
 A fully-rendered HTML version of the book will be built in `Network Machine Learning in Python/_build/html/`.
 
