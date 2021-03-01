@@ -211,35 +211,6 @@
 </p>
 <ul class="current nav sidenav_l1">
  <li class="toctree-l1 collapsible-parent">
-  <a class="reference internal" href="../../foundations/ch4/ch4.html">
-   Properties of Networks as a Statistical Object
-  </a>
-  <ul class="collapse-ul">
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch4/matrix-representations.html">
-     Matrix Representations
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch4/network-representations.html">
-     Network Representations
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch4/regularization.html">
-     Regularization
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch4/properties-of-networks.html">
-     Properties of Networks
-    </a>
-   </li>
-  </ul>
-  <i class="fas fa-chevron-down">
-  </i>
- </li>
- <li class="toctree-l1 collapsible-parent">
   <a class="reference internal" href="../ch5/ch5.html">
    Why Use Statistical Models?
   </a>
@@ -505,8 +476,8 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#generating-data">
-   Generating Data
+  <a class="reference internal nav-link" href="#making-a-model">
+   Making a Model
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -576,11 +547,11 @@
                 
   <div class="section" id="network-and-vertex-feature-joint-representation-learning">
 <h1>Network and Vertex feature joint representation learning<a class="headerlink" href="#network-and-vertex-feature-joint-representation-learning" title="Permalink to this headline">¶</a></h1>
-<p>In many network problems, you might have access to much more information than just the
-collection of nodes and edges in the network. If you were investigating a social
-network, for instance, you might have access to extra information about each
-person – their gender, for instance, or their age. When we you embed a network, it seems
-like you should be able to use this information - called “features” or “covariates” - to somehow improve your analysis.
+<p>In many network problems, we might have access to much more information than just the
+collection of nodes and edges in the network. If we were investigating a social
+network, for instance, we might have access to extra information about each
+person – their gender, for instance, or their age. When we we embed a network, it seems
+like we should be able to use this information - called “features” or “covariates” - to somehow improve our analysis.
 Many of the techniques and tools that we’ll explore in this section use both the covariates and the network to
 learn from new, holistic representations of the data available to us, jointly using both the network and the covariates.
 These techniques are called joint representation learning.</p>
@@ -592,9 +563,11 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 gives us to access to a natural structure. If we’re clustering brain networks, for instance,
 covariate information telling us a location in the brain and name of brain region for each node might let us better
 cluster by region.</p>
-<div class="section" id="generating-data">
-<h2>Generating Data<a class="headerlink" href="#generating-data" title="Permalink to this headline">¶</a></h2>
-<p>We need a graph and some covariates. To start off, we’ll make a pretty straightforward Stochastic Block Model with 1500 nodes and 3 communities.</p>
+<p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates in addition to our network. We’ll learn by example by making a toy network with its covariates.<br />
+We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on spectral embedding. In CASE, instead of embedding the adjacency matrix or one of the many versions of the laplacian, we’ll combine the laplacian and our covariates into a new matrix and embed that.</p>
+<div class="section" id="making-a-model">
+<h2>Making a Model<a class="headerlink" href="#making-a-model" title="Permalink to this headline">¶</a></h2>
+<p>First, we need a network model, and we also need some covariates to go along with it. The network part is pretty easy - we already have tools for simulating different networks, and so we’ll just use our go-to: the ever-popular Stochastic Block Model. For our SBM, we’ll use 1500 nodes and 3 communities, with pretty low connection probabilities both between and within nodes. To keep things simple, we’ll just use a single connection probability for all within-community edges ($p$), and another one for all between-community edges ($q$). Remember from chapter 4 that this is called a Planted Partition SBM.</p>
 <div class="section" id="stochastic-block-model">
 <h3>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h3>
 <div class="cell tag_hide-cell docutils container">
@@ -710,8 +683,8 @@ cluster by region.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Remember that, in our case, $X$ only contains 0’s and 1’s. To interpret $XX^T$, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-cdd19365-02bd-4f57-bde0-238773a72c59">
-<span class="eqno">(2)<a class="headerlink" href="#equation-cdd19365-02bd-4f57-bde0-238773a72c59" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-18c049dd-f6af-4fe1-9eba-d742a1e37944">
+<span class="eqno">(2)<a class="headerlink" href="#equation-18c049dd-f6af-4fe1-9eba-d742a1e37944" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
