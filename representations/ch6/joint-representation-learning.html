@@ -586,18 +586,6 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">716</span><span class="n">f82802c82</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;graspologic&#39;
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -683,8 +671,8 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Remember that, in our case, $X$ only contains 0’s and 1’s. To interpret $XX^T$, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-1a1b8a4f-d0fc-4fd9-846c-f08addb19726">
-<span class="eqno">(2)<a class="headerlink" href="#equation-1a1b8a4f-d0fc-4fd9-846c-f08addb19726" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-cb1435c2-e19e-4d0e-9210-55b692a352f3">
+<span class="eqno">(2)<a class="headerlink" href="#equation-cb1435c2-e19e-4d0e-9210-55b692a352f3" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
@@ -761,10 +749,12 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 </div>
 </div>
 </div>
-<p>Below, you can see three figures: the first is our embedding when we combine $XX^T$ and $$L$$, the second is our embedding when we only use $$L$$, and the third is our embedding when we only use $$XX^T$$.</p>
-<div class="cell tag_hide-cell docutils container">
+<p>Below, you can see three figures: the first is our embedding when we combine $XX^T$ and $L$, the second is our embedding when we only use $L$, and the third is our embedding when we only use $XX^T$.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_latents</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
+
+<span class="k">def</span> <span class="nf">plot_latents</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
     <span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">latent_positions</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">hue</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
                            <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Set1&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
     <span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
@@ -773,17 +763,25 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
     
     <span class="k">return</span> <span class="n">plot</span>
     
+<span class="n">lse</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">L_latents</span> <span class="o">=</span> <span class="n">lse</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="n">X_latents</span> <span class="o">=</span> <span class="n">lse</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">XXt</span><span class="p">)</span>
+
+<span class="c1"># Plot</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we combine</span><span class="se">\n</span><span class="s2"> our network and our covariates&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">L_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we only use the Laplacian&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we only use $XX^T$&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Latent positions when we combine\n our network and our covariates&#39;}&gt;
-</pre></div>
-</div>
-<img alt="../../_images/joint-representation-learning_25_1.png" src="../../_images/joint-representation-learning_25_1.png" />
+<img alt="../../_images/joint-representation-learning_25_0.png" src="../../_images/joint-representation-learning_25_0.png" />
 </div>
 </div>
 <div class="section" id="setting-a-better-weight">
@@ -817,8 +815,8 @@ $\alpha_{max} = \frac{\lambda_1(L)}{\lambda_K(XX^T) -\lambda_{K+1} (XX^T)}$</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Our minimum weight is 0.00000774.
-Our maximum weight is 0.00042498.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Our minimum weight is 0.00000004.
+Our maximum weight is 0.05416043.
 </pre></div>
 </div>
 </div>
@@ -859,10 +857,18 @@ Our maximum weight is 0.00042498.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Our best alpha-value is 0.00000774
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">16</span><span class="n">dcc83a7a00</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span> <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">tuning_range</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>     <span class="n">L_</span> <span class="o">=</span> <span class="n">L</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">XXt</span>
+<span class="ne">---&gt; </span><span class="mi">16</span>     <span class="n">latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="n">K</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span>     <span class="n">kmeans</span> <span class="o">=</span> <span class="n">MiniBatchKMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">K</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
+
+<span class="ne">TypeError</span>: embed() got an unexpected keyword argument &#39;n_clusters&#39;
 </pre></div>
 </div>
-<img alt="../../_images/joint-representation-learning_36_1.png" src="../../_images/joint-representation-learning_36_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
