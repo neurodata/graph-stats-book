@@ -17,14 +17,60 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-alpha_ = alpha
-print(f"alpha is {alpha_}").
+from sklearn.cluster import MiniBatchKMeans
+from graspologic.utils import remap_labels
+from scipy.optimize import golden, line_search
+import time
+
+def cluster(alpha, L, XXt, *, n_clusters):
+    L_ = L + alpha*XXt
+    latents, _, _ = scipy.linalg.svd(L_)
+    latents = latents[:, :n_clusters]
+    return latents
+
+def get_misclustering(labels, labels_):
+    labels_ = remap_labels(labels, labels_)
+    return np.count_nonzero(labels-labels_)/len(labels)
+
+def tuning_alg(alpha, latents, labels, L_, XXt):
+    kmeans = MiniBatchKMeans(n_clusters=3)
+    L_ = L + alpha*XXt
+    latents = embed(L_, dimension=2)
+    labels_ = kmeans.fit_predict(latents)
+    misclustering = get_misclustering(labels, labels_)
+    return misclustering
+    
+best_alpha = golden(tuning_alg, args=(latents, labels, L_, XXt), maxiter=10)
+    
+
+# tuning_range = np.geomspace(amin, amax, num=100)
+# alphas = {}
+# for alpha in tuning_range:
+#     L_ = L + alpha*XXt
+#     latents = embed(L_, dimension=2)
+# #     pairplot(latents, labels=labels)
+#     kmeans = MiniBatchKMeans(n_clusters=3)
+#     labels_ = kmeans.fit_predict(latents)
+#     misclustering = get_misclustering(labels, labels_)
+#     alphas[alpha] = misclustering
+#     print(f"{alpha}: {misclustering}")
+
+best_alpha = min(alphas, key=alphas.get)
+print(f"Our best alpha-value is {best_alpha:0.8f} with misclustering {alphas[best_alpha]}")
+
+latents = embed(L+best_alpha*XXt, dimension=2)
+plot_latents(latents, title="Our embedding after tuning", labels=labels)
 ------------------
 
-[0;36m  File [0;32m"<ipython-input-8-bd5736c780e9>"[0;36m, line [0;32m2[0m
-[0;31m    print(f"alpha is {alpha_}").[0m
-[0m                                ^[0m
-[0;31mSyntaxError[0m[0;31m:[0m invalid syntax
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+[0;32m<ipython-input-12-001a24a2a8d9>[0m in [0;36m<module>[0;34m[0m
+[1;32m     37[0m [0;31m#     print(f"{alpha}: {misclustering}")[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     38[0m [0;34m[0m[0m
+[0;32m---> 39[0;31m [0mbest_alpha[0m [0;34m=[0m [0mmin[0m[0;34m([0m[0malphas[0m[0;34m,[0m [0mkey[0m[0;34m=[0m[0malphas[0m[0;34m.[0m[0mget[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     40[0m [0mprint[0m[0;34m([0m[0;34mf"Our best alpha-value is {best_alpha:0.8f} with misclustering {alphas[best_alpha]}"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     41[0m [0;34m[0m[0m
 
-SyntaxError: invalid syntax (<ipython-input-8-bd5736c780e9>, line 2)
+[0;31mNameError[0m: name 'alphas' is not defined
+NameError: name 'alphas' is not defined
 

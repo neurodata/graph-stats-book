@@ -500,21 +500,14 @@
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#making-a-model">
-   Making a Model
+  <a class="reference internal nav-link" href="#stochastic-block-model">
+   Stochastic Block Model
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#stochastic-block-model">
-     Stochastic Block Model
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#covariates">
-     Covariates
-    </a>
-   </li>
-  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#covariates">
+   Covariates
+  </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#covariate-assisted-spectral-embedding">
@@ -588,12 +581,10 @@ gives us to access to a natural structure. Covariate information telling us a lo
 cluster by region.</p>
 <p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates in addition to our network. We’ll learn by example by making a toy network with its covariates.<br />
 We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on spectral embedding. In CASE, instead of embedding the adjacency matrix or one of the many versions of the Laplacian, we’ll combine the laplacian and our covariates into a new matrix and embed that.</p>
-<div class="section" id="making-a-model">
-<h2>Making a Model<a class="headerlink" href="#making-a-model" title="Permalink to this headline">¶</a></h2>
-<p>The best way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates, and some is in our network. Making a toy network is pretty easy for us at this point - we already have tools for simulating different networks, and so we’ll just use our go-to: the ever-popular Stochastic Block Model (SBM). We’ll use a 3-block structure: the first and second block will be hard to separate in the network itself, and the second and third block will be hard to separate in our covariates. By combining the network and the covariates, we get a nice embedding that lets us find three distinct community clusters.</p>
+<p>The best way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates, and some is in our network. Making a toy network is pretty easy for us at this point - we already have tools for simulating different networks, and so we’ll just use our go-to: the ever-popular Stochastic Block Model (SBM). We’ll use three communities: the first and second block will be indistinguishable in the network itself, and the second and third communities will be indistinguishable in our covariates. By combining the network and the covariates, we get a nice embedding that lets us find three distinct community clusters.</p>
 <div class="section" id="stochastic-block-model">
-<h3>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h3>
-<p>Say we have a Stochastic Block Model that looks like this.</p>
+<h2>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<p>For instance, suppose we have a Stochastic Block Model that looks like this.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
@@ -615,12 +606,12 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 
 <span class="c1"># Make and visualize our Stochastic Block Model</span>
 <span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Stochastic Block Model&quot;</span><span class="p">);</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;A Stochastic Block Model&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_6_0.png" src="../../_images/joint-representation-learning_6_0.png" />
+<img alt="../../_images/joint-representation-learning_5_0.png" src="../../_images/joint-representation-learning_5_0.png" />
 </div>
 </div>
 <p>There are three communities, but the first two are impossible to distinguish between. The third community is distinct: nodes belonging to it aren’t likely to connect to nodes in the first two communities, and are very likely to connect to each other. If we wanted to embed this graph using our Laplacian embedding or our Adjacency embedding methods, we’d find the first and second communities layered on top of each other.</p>
@@ -646,21 +637,21 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 <span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
 <span class="n">lse</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">L_latents</span> <span class="o">=</span> <span class="n">lse</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">L_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only use the Laplacian&quot;</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">L_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed the Laplacian&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_8_0.png" src="../../_images/joint-representation-learning_8_0.png" />
+<img alt="../../_images/joint-representation-learning_7_0.png" src="../../_images/joint-representation-learning_7_0.png" />
 </div>
 </div>
 <p>We’d like to use extra information to more clearly distinguish between the first and second community. We don’t have this information in our network: it needs to come from somewhere else.</p>
 </div>
 <div class="section" id="covariates">
-<h3>Covariates<a class="headerlink" href="#covariates" title="Permalink to this headline">¶</a></h3>
-<p>But we’re in luck - we have a set of covariates for each node! These covariates contain the extra information we need that allows us to separate our first and second community. Unfortunately, with only these extra covariate features, we can no longer distinguish between the first community and the last two - the first community is entirely distinct, but the last two contain the same information.</p>
-<p>Below is a visualization of our covariates. Remember, each node is associated with its own group of covariates that provide information about that node. We’ll organize this information into a matrix, where the <span class="math notranslate nohighlight">\(i_{th}\)</span> row contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<h2>Covariates<a class="headerlink" href="#covariates" title="Permalink to this headline">¶</a></h2>
+<p>But we’re in luck - we have a set of covariates for each node! These covariates contain the extra information we need that allows us to separate our first and second community. Unfortunately, with only these extra covariate features, we can no longer distinguish between the last two communities - they contain the same information.</p>
+<p>Below is a visualization of our covariates. Remember, each node is associated with its own group of covariates that provide information about that node. We’ll organize this information into a matrix, where the <span class="math notranslate nohighlight">\(i_{th}\)</span> row contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. For simplicity, the only values in this matrix will be 1 and 0.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -704,34 +695,33 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_12_0.png" src="../../_images/joint-representation-learning_12_0.png" />
+<img alt="../../_images/joint-representation-learning_11_0.png" src="../../_images/joint-representation-learning_11_0.png" />
 </div>
 </div>
-<p>We can play almost the same game here. If we embed the information contained in this matrix of covariates into lower dimensions, we can see the reverse situation as before - the first community is separate, but the last two are overlayed on top of each other.</p>
+<p>We can play almost the same game here as we did with the Laplacian. If we embed the information contained in this matrix of covariates into lower dimensions, we can see the reverse situation as before - the first community is separate, but the last two are overlayed on top of each other.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">XXt</span> <span class="o">=</span> <span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span>
 <span class="n">X_latents</span> <span class="o">=</span> <span class="n">lse</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">XXt</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">X_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only use our covariates&quot;</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed our covariates&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_14_0.png" src="../../_images/joint-representation-learning_14_0.png" />
+<img alt="../../_images/joint-representation-learning_13_0.png" src="../../_images/joint-representation-learning_13_0.png" />
 </div>
 </div>
 <p>We need a solution. This is where CASE comes in.</p>
-</div>
 </div>
 <div class="section" id="covariate-assisted-spectral-embedding">
 <h2>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h2>
 <p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our graph and our covariates into a single model. In the most straightforward version of CASE, we combine the graph’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^T\)</span> (where <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>). Notice the word “regularized” - This means (from the Laplacian section earlier) that we are using <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, remember from linear algebra that we’re taking the weighted sum (or, in math parlance, the dot product) of each row with each other row, as shown below:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-57796e21-e1b0-40ef-91d8-290827dfa5ba">
-<span class="eqno">(2)<a class="headerlink" href="#equation-57796e21-e1b0-40ef-91d8-290827dfa5ba" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, remember from linear algebra that we’re taking the weighted sum - or, in math parlance, the dot product - of each row with each other row, as shown below (where each of these vectors represent rows of <span class="math notranslate nohighlight">\(X\)</span>):</p>
+<div class="amsmath math notranslate nohighlight" id="equation-59452e56-c3d7-4d32-b9dd-4b1eb6786e28">
+<span class="eqno">(2)<a class="headerlink" href="#equation-59452e56-c3d7-4d32-b9dd-4b1eb6786e28" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
@@ -743,9 +733,9 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 1 \\
 \end{bmatrix} = 1\times 0 + 1\times 1 + 1\times 1 = 2
 \end{align}\]</div>
-<p>If there are two overlapping 1’s in the same element of vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, then their weighted sum will also have a 1 in that place. The resulting value, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span>, will be equal to the number of columns in which rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
+<p>If there are two overlapping 1’s in the same position of the left vector <span class="math notranslate nohighlight">\(i\)</span> and the right vector <span class="math notranslate nohighlight">\(j\)</span>, then there will be an additional 1 added to their weighted sum. The resulting value, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
 </div>
-<p>A particular value in <span class="math notranslate nohighlight">\(XX^T\)</span>, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same place. The result is a matrix that looks fairly similar to our Laplacian!</p>
+<p>A particular value in <span class="math notranslate nohighlight">\(XX^T\)</span>, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same column. The result is a matrix that looks fairly similar to our Laplacian!</p>
 <p>The following Python code generates both our SBM and our covariate matrices. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this will be useful later.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -801,7 +791,7 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_22_0.png" src="../../_images/joint-representation-learning_22_0.png" />
+<img alt="../../_images/joint-representation-learning_21_0.png" src="../../_images/joint-representation-learning_21_0.png" />
 </div>
 </div>
 <p>CASE simply sums these two matrices together, using a weight for <span class="math notranslate nohighlight">\(XX^T\)</span> so that they both contribute equally to the result. Here, we’ll just use the ratio of the leading eigenvalues of our two matrices as our weight (henceforth known as <span class="math notranslate nohighlight">\(\alpha\)</span>). Later on, we’ll explore ways to pick a better <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
@@ -822,25 +812,12 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_</span> <span class="o">=</span> <span class="n">alpha</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha is </span><span class="si">{</span><span class="n">alpha_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Combined Laplacian and covariates matrix&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">  File</span><span class="nn"> &quot;&lt;ipython-input-8-bd5736c780e9&gt;&quot;</span><span class="gt">, line </span><span class="mi">2</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;alpha is </span><span class="si">{</span><span class="n">alpha_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span>
-                                <span class="o">^</span>
-<span class="ne">SyntaxError</span>: invalid syntax
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Combined Laplacian and covariates matrix&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
+<img alt="../../_images/joint-representation-learning_24_0.png" src="../../_images/joint-representation-learning_24_0.png" />
 </div>
 </div>
 <p>As you can see, the combined matrix has some separation between all three groups. Because we used an imperfect weight, the Laplacian is clearly contributing more to the sum – but it’s good enough for now!</p>
@@ -883,6 +860,9 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_28_0.png" src="../../_images/joint-representation-learning_28_0.png" />
+</div>
 </div>
 <div class="section" id="setting-a-better-weight">
 <h3>Setting A Better Weight<a class="headerlink" href="#setting-a-better-weight" title="Permalink to this headline">¶</a></h3>
@@ -924,6 +904,12 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
     
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">amin</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">amax</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amin=1.8409691071252415e-05
+amax=40.00562586174296
 </pre></div>
 </div>
 </div>
@@ -981,6 +967,20 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 
 <span class="n">latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">best_alpha</span><span class="o">*</span><span class="n">XXt</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our embedding after tuning&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">001</span><span class="n">a24a2a8d9</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">37</span> <span class="c1">#     print(f&quot;{alpha}: {misclustering}&quot;)</span>
+<span class="g g-Whitespace">     </span><span class="mi">38</span> 
+<span class="ne">---&gt; </span><span class="mi">39</span> <span class="n">best_alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">alphas</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Our best alpha-value is </span><span class="si">{</span><span class="n">best_alpha</span><span class="si">:</span><span class="s2">0.8f</span><span class="si">}</span><span class="s2"> with misclustering </span><span class="si">{</span><span class="n">alphas</span><span class="p">[</span><span class="n">best_alpha</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">41</span> 
+
+<span class="ne">NameError</span>: name &#39;alphas&#39; is not defined
 </pre></div>
 </div>
 </div>
