@@ -720,8 +720,8 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, remember from linear algebra that we’re taking the weighted sum - or, in math parlance, the dot product - of each row with each other row, as shown below (where each of these vectors represent rows of <span class="math notranslate nohighlight">\(X\)</span>):</p>
-<div class="amsmath math notranslate nohighlight" id="equation-59452e56-c3d7-4d32-b9dd-4b1eb6786e28">
-<span class="eqno">(2)<a class="headerlink" href="#equation-59452e56-c3d7-4d32-b9dd-4b1eb6786e28" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-f439fbe8-d7a5-4ff1-8d38-458a4c27b3c3">
+<span class="eqno">(2)<a class="headerlink" href="#equation-f439fbe8-d7a5-4ff1-8d38-458a4c27b3c3" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
@@ -820,8 +820,8 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 <img alt="../../_images/joint-representation-learning_24_0.png" src="../../_images/joint-representation-learning_24_0.png" />
 </div>
 </div>
-<p>As you can see, the combined matrix has some separation between all three groups. Because we used an imperfect weight, the Laplacian is clearly contributing more to the sum – but it’s good enough for now!</p>
-<p>Time to embed and see what the results look like. Our embedding works as usual from here, the same as it works in Laplacian Spectral Embedding: we decompose our combined matrix using an SVD, truncating the columns, and then we look at the results. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
+<p>As you can see, the combined matrix has some separation between all three groups. Because we used an imperfect weight, the Laplacian is clearly contributing more to the sum – but it’s good enough for now.</p>
+<p>Time to embed and see what the results look like. Our embedding works the same as it does in Laplacian Spectral Embedding from here: we decompose our combined matrix using an SVD, truncating the columns, and then we plot the rows of the result. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
@@ -874,9 +874,9 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
 <p>For somewhat complicated linear algebra reasons<sup>1</sup>, it’s fairly straightforward to get a good range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values: a good minimum and maximum is described by only two equations. In the below equations, <span class="math notranslate nohighlight">\(K\)</span> is the number of communities present in our network, <span class="math notranslate nohighlight">\(R\)</span> is the number of covariate values each node has, and <span class="math notranslate nohighlight">\(\lambda_i(L)\)</span> is the <span class="math notranslate nohighlight">\(i_{th}\)</span> eigenvalue of L (where <span class="math notranslate nohighlight">\(\lambda_1(L)\)</span> is our Laplacian’s highest, or “leading”, eigenvalue).</p>
 <div class="admonition-equations-for-getting-our-alpha-range admonition">
 <p class="admonition-title">Equations for getting our <span class="math notranslate nohighlight">\(\alpha\)</span> range</p>
-<p><span class="math notranslate nohighlight">\(\alpha_{min} = \frac{\lambda_K(L) - \lambda_{K+1}(L)}{\lambda_1(XX^T)}\)</span> where <span class="math notranslate nohighlight">\(K\)</span> is the number of embedding clusters, <span class="math notranslate nohighlight">\(\lambda_i(L)\)</span> is the <span class="math notranslate nohighlight">\(i_{th}\)</span> eigenvalue of <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(\alpha_{min} = \frac{\lambda_K(L) - \lambda_{K+1}(L)}{\lambda_1(XX^T)}\)</span></p>
 <p>If the number of covariate dimensions is less than or equal to the number of clusters, then<br />
-<span class="math notranslate nohighlight">\(\alpha_{max} = \frac{\lambda_1 (L)}{\lambda_R (XX^T)}\)</span> where <span class="math notranslate nohighlight">\(R\)</span> is the number of covariate dimensions</p>
+<span class="math notranslate nohighlight">\(\alpha_{max} = \frac{\lambda_1 (L)}{\lambda_R (XX^T)}\)</span></p>
 <p>Otherwise, if the number of covariate dimensions is greater than the number of clusters, then<br />
 <span class="math notranslate nohighlight">\(\alpha_{max} = \frac{\lambda_1(L)}{\lambda_K(XX^T) -\lambda_{K+1} (XX^T)}\)</span></p>
 </div>
@@ -901,20 +901,10 @@ We’ll then explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a va
     <span class="n">amax</span> <span class="o">=</span> <span class="n">L_top</span> <span class="o">/</span> <span class="p">(</span><span class="n">X_eigvals</span><span class="p">[</span><span class="n">n_clusters</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">X_eigvals</span><span class="p">[</span><span class="n">n_clusters</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">amax</span> <span class="o">=</span> <span class="n">L_top</span> <span class="o">/</span> <span class="n">X_eigvals</span><span class="p">[</span><span class="n">n_cov</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
-    
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">amin</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">amax</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amin=1.8409691071252415e-05
-amax=40.00562586174296
 </pre></div>
 </div>
 </div>
 </div>
-<p>Using these equations, our minimum <span class="math notranslate nohighlight">\(\alpha\)</span> value is around <span class="math notranslate nohighlight">\(4*10^{-5}\)</span>, and our maximum <span class="math notranslate nohighlight">\(\alpha\)</span> value is around 13.</p>
 </div>
 <div class="section" id="k-means">
 <h4>K-Means<a class="headerlink" href="#k-means" title="Permalink to this headline">¶</a></h4>
