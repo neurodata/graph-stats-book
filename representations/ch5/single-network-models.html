@@ -506,7 +506,7 @@
   <ul class="nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
     <a class="reference internal nav-link" href="#erdos-renyi-er">
-     Erdos-Renyi (ER)
+     Erdös-Rényi (ER)
     </a>
    </li>
    <li class="toc-h2 nav-item toc-entry">
@@ -560,21 +560,29 @@
                 
   <div class="section" id="single-network-models">
 <h1>Single-Network Models<a class="headerlink" href="#single-network-models" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="erdos-renyi-er">
-<h2>Erdos-Renyi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
-<p>The simplest random graph model is the Erdös Rényi (ER) model<sup>1</sup>. The ER model is simple in that it requires the minimum number of parameters for a random graph model:</p>
+<p>To understand a network as an analytical object, we must clarify the set of behaviors (the <em>statistical properties</em>) we expect that the network might, reasonably, obey. In the case where we have a single network we wish to investigate, we call this set of properties the statistical model for a single network, or the single-network model, for short. The network is assumed to have <span class="math notranslate nohighlight">\(n\)</span> vertices, with <span class="math notranslate nohighlight">\(n^2\)</span> possible edges, and we are interested in conveying information about a hypothetical generative procedure that could produce a network with edges that behaves similarly to our own. These models are generative, in that we describe the properties of the observable data in the network, the edges and vertices, in a statistical way. For instance, consider a social network with <span class="math notranslate nohighlight">\(n\)</span> people, where edges clarify whether a pair of people are connected on the social network. If we know nothing about any of the <span class="math notranslate nohighlight">\(n\)</span> people, a reasonable model might be to simply expect that a pair of people are connected with some arbitrary probability, and that probability is identical for all of the possible pairs of people. On the other hand, if we know that <span class="math notranslate nohighlight">\(n/2\)</span> of the people are in each of <span class="math notranslate nohighlight">\(2\)</span> possible schools, we might anticipate that people within a school will have a higher probability of being connected than people between two schools. This distinction as to how we expect the network to be realized in practice is conveyed by the single-network model that is selected for further analysis.</p>
+<p>Before we get started, it is important to clarify that, as scientists, we must pay careful attention to an age old aphorism attributed to George Box, stating: “all models are wrong, but some are useful.” In this sense, it is important to note that the statistical model selected is, in practice, virtually <em>never</em> the correct model. In the context of network statistics, this means that the generative model we select for our network will not be the true generative model that underlies our network. We will almost never have all of the information needed to convey the complex structure of a network; we may lack obvious things such as knowing every possible piece of information that governs whether a pair of vertices is connected or not, or we may lack more subtle nuances such as even having an effective way to measure an edge that is modellable in a statistical way. Rather, we select a model which is appropriate from a family of candidate models on the basis of two primary factors:</p>
 <ol class="simple">
-<li><p><span class="math notranslate nohighlight">\(n\)</span>: the number of vertices in the graph, and</p></li>
+<li><p>The model possesses the level of refinement needed to answer our question of interest, and</p></li>
+<li><p>The model is appropriate for the data we are given.</p></li>
+</ol>
+<p>The remainder of this section will deal with developing intuition for 1., and a later selection on model selection will cover 2.</p>
+<div class="section" id="erdos-renyi-er">
+<h2>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
+<p>The simplest random network model is the Erdös Rényi (ER) model<sup>1</sup>. Consider the social network example explained above. If we do not know anything about how people may, or may not, be connected, the simplest possible thing to do with our network would be to assume that a given pair of people within our network have the same chance of being connected as any other selected pair of people. The <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model formalizes this relatively  situation with a single parameter:</p>
+<ol class="simple">
 <li><p><span class="math notranslate nohighlight">\(p\)</span>: an edge existence probability parameter governing how edges are connected.</p></li>
 </ol>
-<p>If the graph <span class="math notranslate nohighlight">\(G = (\mathcal V, \mathcal E)\)</span> is an Erdös Rényi with <span class="math notranslate nohighlight">\(n\)</span> vertices and probability <span class="math notranslate nohighlight">\(p\)</span>, we say that the adjacency matrix <span class="math notranslate nohighlight">\(\pmb A\)</span> associated with <span class="math notranslate nohighlight">\(G\)</span> is distributed as <span class="math notranslate nohighlight">\(ER_n(p)\)</span>, which we denote by <span class="math notranslate nohighlight">\(\pmb A \sim ER_n(p)\)</span>. To describe the vertices and edges of <span class="math notranslate nohighlight">\(G\)</span> in more detail, note that a graph with <span class="math notranslate nohighlight">\(n\)</span> vertices has the vertex set <span class="math notranslate nohighlight">\(\mathcal V = \{v_i\}_{i = 1}^n\)</span>. Next, we consider the stochastic element of <span class="math notranslate nohighlight">\(G\)</span>: the adjacencies. Recall that in a binary graph, that the following relationships hold:</p>
+<p>In words, a network with <span class="math notranslate nohighlight">\(n\)</span> vertices which is supposed to be <span class="math notranslate nohighlight">\(ER_n(p)\)</span> has thte property that each pair of vertices is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>, and that no other properties of the network (including which vertices an edge is incident, other edges within the graph, nor other factors) influence whether a pair of vertices are connected. Statistically, we write that for each edge <span class="math notranslate nohighlight">\(A_{ij}\)</span>, that <span class="math notranslate nohighlight">\(A_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span> distribution, for all <span class="math notranslate nohighlight">\(i, j\)</span> from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>. The word “independent” clarifies that the occurence or not occurence of other edges in the network does not impact the probability of occurence of a given edge, and the word “identical” clarifies that the edge probability <span class="math notranslate nohighlight">\(p\)</span> (or the probability of no edge, <span class="math notranslate nohighlight">\(1-p\)</span>) is the same for all edges within the network.</p>
+<p>In practice, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model may seem too simple to be of practical value, but it holds a fundamental role in network statistical theory. Being simple, it is a straightforward exercise to compute many useful statistical properties of a network which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span>. Consider, for instance, the vertex degree of an undirected graph, <span class="math notranslate nohighlight">\(deg(v_i) = \sum_{j \neq i}A_{ij}\)</span>. Computing the expected vertex degree of a vertex <span class="math notranslate nohighlight">\(v_i\)</span> is a trivial exercise:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    A_{ij} = 1\iff e_{ij} \in \mathcal E \\
-    A_{ij} = 0 \iff e_{ij} \not\in \mathcal E
+    \mathbb E[deg(v_i)] &amp;= \mathbb E\left[\sum_{j \neq i} A_{ij}\right] \\
+    &amp;= \sum_{j \neq i} \mathbb E[A_{ij}]\;\;\;\;\textrm{Expectation of a finite sum is the sum of the expectations} \\
+    &amp;= (n-1) p
 \end{align*}\]</div>
-<p>That is, an adjacency <span class="math notranslate nohighlight">\(A_{ij}\)</span> is <span class="math notranslate nohighlight">\(1\)</span> precisely when an edge adjoins <span class="math notranslate nohighlight">\(v_i\)</span> and <span class="math notranslate nohighlight">\(v_j\)</span>, and is <span class="math notranslate nohighlight">\(0\)</span> when an edge does not adjoin <span class="math notranslate nohighlight">\(v_i\)</span> and <span class="math notranslate nohighlight">\(v_j\)</span>. In an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> graph, the adjacencies <span class="math notranslate nohighlight">\(A_{ij}\)</span> take the value <span class="math notranslate nohighlight">\(1\)</span> with probability <span class="math notranslate nohighlight">\(p\)</span> (that is, an edge exists between <span class="math notranslate nohighlight">\(v_i\)</span> and <span class="math notranslate nohighlight">\(v_j\)</span> with probability <span class="math notranslate nohighlight">\(p\)</span>) and takes the value <span class="math notranslate nohighlight">\(0\)</span> with probability <span class="math notranslate nohighlight">\(1-p\)</span> (that is, an edge does not exist between <span class="math notranslate nohighlight">\(v_i\)</span> and <span class="math notranslate nohighlight">\(v_j\)</span> with probability <span class="math notranslate nohighlight">\(1-p\)</span>). The probability of an edge existing which is incident a given pair of vertices cannot be stochastically described in more detail than that an incidence exists with probability <span class="math notranslate nohighlight">\(p\)</span>. In this sense, we write that <span class="math notranslate nohighlight">\(A_{ij} \sim Bernoulli(p)\)</span>, for all adjacencies <span class="math notranslate nohighlight">\(i, j = 1, ..., n\)</span>. While the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random graph model tends to be rather overly simplistic in that it is unable to describe relationships more complex than the probability of existence or not existence of an edge, it tends to be useful in that more complex properties of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> graph tend to be solveable explicitly.</p>
-<p>The following python code can be used to generate and visualize the adjacency matrices describing a graph which has the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> distribution.</p>
+<p>Which follows by using the fact that all of the <span class="math notranslate nohighlight">\(n-1\)</span> possible edges which are incident vertex <span class="math notranslate nohighlight">\(v_i\)</span> have the same expected probability of occurence, <span class="math notranslate nohighlight">\(p\)</span>, governed by the parameter for the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model. This tractability of theoretical results makes the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> an ideal candidate graph to study in describing properties of networks to be expected if the network is <span class="math notranslate nohighlight">\(ER_n(p)\)</span>. Similarly, we can easily invert the properties of <span class="math notranslate nohighlight">\(ER_n(p)\)</span> networks, to study when a graph is <em>not</em> an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random graph, and may merit more careful inferential tasks. On another front, when one wishes to devise new computational techniques and deduce the efficiency or effectiveness of a technique on a network with a given number of nodes and a given number of edges, and is not concerned with how efficient the technique is if the network displays other (potentially exploitable) properties, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model also makes a good candidate for analysis. This is particularly common when dealing with graphs which are known to be sparse; that is, <span class="math notranslate nohighlight">\(p\)</span> is very small (usually, on the order or less than <span class="math notranslate nohighlight">\(1/n\)</span>).</p>
+<p>The following python code can be used to generate and visualize a graph which is generated by the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model. Here, we let <span class="math notranslate nohighlight">\(n=50\)</span> vertices, and the probability of an edge <span class="math notranslate nohighlight">\(p=.3\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
@@ -584,7 +592,7 @@
 <span class="n">ps</span> <span class="o">=</span> <span class="o">.</span><span class="mi">3</span>  <span class="c1"># probability of an edge existing is .3</span>
 
 <span class="c1"># sample a single adj. mtx from ER(50, .3)</span>
-<span class="n">As</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">ps</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">As</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">ps</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># and plot it</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(50, .3) Simulation&quot;</span><span class="p">)</span>
@@ -598,16 +606,35 @@
 <img alt="../../_images/single-network-models_2_1.png" src="../../_images/single-network-models_2_1.png" />
 </div>
 </div>
-<p>In the simple simulation above, we sample a single graph, <span class="math notranslate nohighlight">\(G_{s}\)</span>, with the adjacency matrix <span class="math notranslate nohighlight">\(\pmb A_{s}\)</span> taking the distribution <span class="math notranslate nohighlight">\(ER_{50}(.3)\)</span>. Visually, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model tends to be characterized by a lack of “structure” to the edges, wherein the edges do not appear to be more tightly or loosely packed around particular vertices, sets of vertices, sets of edges, or otherwise. This is a consequence of the fact that the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model is a very simple description of a random graph.</p>
-<p>Note that the estimated probability <span class="math notranslate nohighlight">\(\hat p_{s}\)</span> of an adjacency in <span class="math notranslate nohighlight">\(A_{s}\)</span> (and correspondingly, the probability of an edge existing in <span class="math notranslate nohighlight">\(G_{s}\)</span>) is:</p>
+<p>In the simple simulation above, we sample a single, undirected, network with loops, with adjacency matrix <span class="math notranslate nohighlight">\(\pmb A^{(s)}\)</span>. We visualize the network using a heatmap, where we recall that a square is dark red if an edge is present, and white if no edge is present.</p>
+<p>Given a graph with an adjacency matrix <span class="math notranslate nohighlight">\(\pmb A^{(s)}\)</span>, we can also use graspologic to estimate the probability parameter of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;phat_small = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">As</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">EREstimator</span>
+
+<span class="c1"># instantiate an ER Estimator which is directed with loops</span>
+<span class="n">er</span> <span class="o">=</span> <span class="n">EREstimator</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># fit an ER model to As</span>
+<span class="n">er</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">As</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ER </span><span class="se">\&quot;</span><span class="s2">p</span><span class="se">\&quot;</span><span class="s2"> parameter: </span><span class="si">{</span><span class="n">er</span><span class="o">.</span><span class="n">p_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>phat_small = 0.3144
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ER &quot;p&quot; parameter: 0.304
+</pre></div>
+</div>
+</div>
+</div>
+<p>As we can see, the probability parameter for a directed network with loops is simply the average edge weight within the network:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average edge weight: </span><span class="si">{</span><span class="n">As</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Average edge weight: 0.304
 </pre></div>
 </div>
 </div>
@@ -618,7 +645,7 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pl</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span>  <span class="c1"># graph has an edge probability of .7</span>
 
 <span class="c1"># sample a single adj. mtx from ER(50, .7)</span>
-<span class="n">Al</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pl</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">Al</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pl</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># and plot it</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">Al</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(50, .7) Simulation&quot;</span><span class="p">)</span>
@@ -629,7 +656,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;ER(50, .7) Simulation&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/single-network-models_6_1.png" src="../../_images/single-network-models_6_1.png" />
+<img alt="../../_images/single-network-models_8_1.png" src="../../_images/single-network-models_8_1.png" />
 </div>
 </div>
 <p>As the edge existence probability increases, the sampled adjacency matrix tends to have more adjacencies with values of <span class="math notranslate nohighlight">\(1\)</span>. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
@@ -667,7 +694,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_9_0.png" src="../../_images/single-network-models_9_0.png" />
+<img alt="../../_images/single-network-models_11_0.png" src="../../_images/single-network-models_11_0.png" />
 </div>
 </div>
 <p>In the above simulation, we can clearly see an apparent <span class="math notranslate nohighlight">\(4\)</span>-“block structure”, which describes the fact that the probability of an edge existing depends upon which of the <span class="math notranslate nohighlight">\(4\)</span> “blocks” the edge falls into. These blocks are the apparent “subgraphs”, or square patterns, observed in the above graph. The block structure is clearly delineated by the first <span class="math notranslate nohighlight">\(50\)</span> vertices being from a single community, and the second <span class="math notranslate nohighlight">\(50\)</span> vertices being from a different community.</p>
@@ -693,7 +720,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../../_images/single-network-models_11_2.png" src="../../_images/single-network-models_11_2.png" />
+<img alt="../../_images/single-network-models_13_2.png" src="../../_images/single-network-models_13_2.png" />
 </div>
 </div>
 <p>In this sense, it becomes quite difficult in practice to determine whether community structure exists simply by looking at a graph, unless you are looking at a graph in which the vertices are already arranged in an order which respects the community struucture.</p>
