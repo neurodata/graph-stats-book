@@ -7,4 +7,11 @@
 
 
 what-is-a-network
+why-study-networks
+examples-of-applications
+types-of-networks
+types-of-learning-probs
+main-challenges
+probability-overview
+exercises
 ```
