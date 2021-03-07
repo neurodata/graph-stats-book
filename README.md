@@ -17,7 +17,7 @@ If you'd like to develop on and build the Network Machine Learning in Python boo
 - (Recommended) Remove the existing `network_machine_learning_in_python/_build/` directory
 - Run `jupyter-book build network_machine_learning_in_python/`
 
-A fully-rendered HTML version of the book will be built in `Network Machine Learning in Python/_build/html/`.
+A fully-rendered HTML version of the book will be built in `network_machine_learning_in_python/_build/html/index.html`.
 
 ### Hosting the book
 
