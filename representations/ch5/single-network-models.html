@@ -592,7 +592,7 @@
 \end{align*}\]</div>
 <p>Since all of the <span class="math notranslate nohighlight">\(n\)</span> terms being summed have the same expected value. This holds for <em>every</em> node <span class="math notranslate nohighlight">\(v_i\)</span>, which means that the expected degree of all nodes is an undirected ER network is the same.</p>
 </div>
-<p>Further, the ER model is useful for the development of new computational techniques to use on random networks. This is because even if the “best” model for a network is something much more complex, we can still calculate an edge probability <span class="math notranslate nohighlight">\(p\)</span> for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. This is an especially common approach when people deal with networks that are said to be <em>sparse</em>, or where <span class="math notranslate nohighlight">\(p\)</span> is very small (and consequently, there aren’t many edges).</p>
+<p>The ER model is also useful for the development of new computational techniques to use on random networks. This is because even if the “best” model for a network is something much more complex, we can still calculate an edge probability <span class="math notranslate nohighlight">\(p\)</span> for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. This is an especially common approach when people deal with networks that are said to be <em>sparse</em>, or where <span class="math notranslate nohighlight">\(p\)</span> is very small (and consequently, there aren’t many edges).</p>
 <p>In the next code block, we look to sample a single ER network with <span class="math notranslate nohighlight">\(50\)</span> nodes and an edge probability <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(0.3\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -618,7 +618,7 @@
 </div>
 </div>
 <p>Above, we visualize the network using a heatmap. The dark red squares indicate that an edge exists between a pair of vertices, and white squares indicate that an edge does not exist between a pair of vertices.</p>
-<p>If we already have a network, we might want to assume that the network is an ER network, and investigate the edge probability parameter. Next, we use graspologic to estimate it:</p>
+<p>If we already have a network, we might want to assume that the network is an ER network, and investigate the edge probability parameter. Next, we use graspologic to estimate the edge probability:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">EREstimator</span>
@@ -632,12 +632,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ER &quot;p&quot; parameter: 0.302
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ER &quot;p&quot; parameter: 0.3076
 </pre></div>
 </div>
 </div>
 </div>
-<p>As we can see, the edge probability parameter in a directed network with loops is just the average fraction of adjacencies in <span class="math notranslate nohighlight">\(\pmb A\)</span> which have a value of <span class="math notranslate nohighlight">\(1\)</span>:</p>
+<p>As we can see, the edge probability parameter in a directed network with loops is just the average fraction of times <span class="math notranslate nohighlight">\(\pmb A\)</span> has a value of <span class="math notranslate nohighlight">\(1\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average edge weight: </span><span class="si">{</span><span class="n">As</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -645,12 +645,13 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Average edge weight: 0.302
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Average edge weight: 0.3076
 </pre></div>
 </div>
 </div>
 </div>
-<p>Note that the <span class="math notranslate nohighlight">\(p\)</span> parameter will be computed differently depending on whether the network is assumed to be directed or</p>
+<p>Note that the <span class="math notranslate nohighlight">\(p\)</span> parameter will be computed differently depending on whether the network is assumed to be directed or undirected, and loopy or hollow. Be careful to specify the appropriate model for the network you have.</p>
+<p>Next, let’s see what happens when we use a higher edge probability, like <span class="math notranslate nohighlight">\(p=0.7\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pl</span> <span class="o">=</span> <span class="mf">0.7</span>  <span class="c1"># graph has an edge probability of 0.7</span>
@@ -670,7 +671,7 @@
 <img alt="../../_images/single-network-models_8_1.png" src="../../_images/single-network-models_8_1.png" />
 </div>
 </div>
-<p>As the edge existence probability increases, the sampled adjacency matrix tends to have more adjacencies with values of <span class="math notranslate nohighlight">\(1\)</span>. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
+<p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
 </div>
 <div class="section" id="stochastic-block-model-sbm">
 <h2>Stochastic Block Model (SBM)<a class="headerlink" href="#stochastic-block-model-sbm" title="Permalink to this headline">¶</a></h2>
@@ -724,7 +725,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-11-8581568507e8&gt;:8: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-6-8581568507e8&gt;:8: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
   heatmap(A[[vtx_perm]] [:,vtx_perm])
 </pre></div>
 </div>
