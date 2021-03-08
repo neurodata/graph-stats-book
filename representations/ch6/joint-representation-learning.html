@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Network and Vertex feature joint representation learning &#8212; Network Machine Learning in Python</title>
+    <title>Joint Representation Learning &#8212; Network Machine Learning in Python</title>
     
   <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -271,7 +271,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     Network and Vertex feature joint representation learning
+     Joint Representation Learning
     </a>
    </li>
   </ul>
@@ -562,22 +562,12 @@
         
               <div>
                 
-  <div class="section" id="network-and-vertex-feature-joint-representation-learning">
-<h1>Network and Vertex feature joint representation learning<a class="headerlink" href="#network-and-vertex-feature-joint-representation-learning" title="Permalink to this headline">¶</a></h1>
-<p>In many network problems, we might have access to much more information than just the
-collection of nodes and edges in the network. If we were investigating a social
-network, for instance, we might have access to extra information about each
-person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems
-like we should be able to use these extra bits of information - called “features” or “covariates” - to somehow improve our analysis.
-Many of the techniques and tools that we’ll explore in this section use both the covariates and the network to
-learn from new, holistic representations of the data available to us. Because our new representations jointly use both the network and our extra covariate information, these techniques are called joint representation learning.</p>
-<p>There are two primary reasons that we might want to explore using node covariates in addition to networks. First, they might improve our
-standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding.
-For example, if the latent structure of the covariates lines up with the latent structure
-of our network, then we could conceivably reduce noise, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second,
-figuring out what the clusters of an embedding actually mean can sometimes be difficult, and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better cluster our network by brain region.</p>
-<p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates in addition to our network. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
-<p>The best way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates and some is in our network. Using the Stochastic Block Model, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the network itself, and the second and third community will be indistinguishable in our covariates. By combining the network and the covariates, we get a nice embedding that lets us find three distinct community clusters.</p>
+  <div class="section" id="joint-representation-learning">
+<h1>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
+<p>In many network problems, our network might be more than just its topology, or its collection of nodes and edges. If we were investigating a social network, for instance, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of our network. Because these new representations jointly use both the topology of our network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
+<p>There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
+<p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
+<p>A good way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates and some is in our topology. Using the Stochastic Block Model, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in its covariates. By combining the topology and the covariates, we’ll get a nice embedding that lets us find three distinct community clusters.</p>
 <div class="section" id="stochastic-block-model">
 <h2>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h2>
 <p>Suppose we have a Stochastic Block Model that looks like this.</p>
@@ -610,7 +600,7 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 <img alt="../../_images/joint-representation-learning_5_0.png" src="../../_images/joint-representation-learning_5_0.png" />
 </div>
 </div>
-<p>There are three communities (we promise), but the first two are impossible to distinguish between using only our network. The third community is distinct: nodes belonging to it aren’t likely to connect to nodes in the first two communities, and are very likely to connect to each other. If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other. The python code below embeds our latent positions down to two dimensions with a Laplacian Spectral Embedding, and then plots them.</p>
+<p>There are three communities (we promise), but the first two are impossible to distinguish between using only our adjacency matrix (which only stores the topological structure of a network). The third community is distinct: nodes belonging to it aren’t likely to connect to nodes in the first two communities, and are very likely to connect to each other. If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other (though we wouldn’t be able to figure that out from our embedding). The python code below embeds our latent positions down to two dimensions with a Laplacian Spectral Embedding, and then plots the results, color-coding each node by its true community.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
@@ -717,8 +707,8 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, remember from linear algebra that we’re taking the weighted sum - or, in math parlance, the dot product - of each row with each other row, as shown below (where each of these vectors represent rows of <span class="math notranslate nohighlight">\(X\)</span>):</p>
-<div class="amsmath math notranslate nohighlight" id="equation-fbd758f3-7bf2-40d8-a40f-bd84a948529e">
-<span class="eqno">(2)<a class="headerlink" href="#equation-fbd758f3-7bf2-40d8-a40f-bd84a948529e" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-f0fdf9a0-fe38-4470-bd84-1af7baf02ef0">
+<span class="eqno">(2)<a class="headerlink" href="#equation-f0fdf9a0-fe38-4470-bd84-1af7baf02ef0" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
@@ -730,10 +720,10 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 1 \\
 \end{bmatrix} = 1\times 0 + 1\times 1 + 1\times 1 = 2
 \end{align}\]</div>
-<p>If there are two overlapping 1’s in the same position of the left vector <span class="math notranslate nohighlight">\(i\)</span> and the right vector <span class="math notranslate nohighlight">\(j\)</span>, then there will be an additional 1 added to their weighted sum. The resulting value, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
+<p>If there are two overlapping 1’s in the same position of the left vector <span class="math notranslate nohighlight">\(i\)</span> and the right vector <span class="math notranslate nohighlight">\(j\)</span>, then there will be an additional 1 added to their weighted sum. The resulting value, <span class="math notranslate nohighlight">\((XX^T)_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
 </div>
-<p>A particular value in <span class="math notranslate nohighlight">\(XX^T\)</span>, <span class="math notranslate nohighlight">\(XX^T_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same column. The result is a matrix that looks fairly similar to our Laplacian!</p>
-<p>The following Python code generates both our SBM and our covariate matrices. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this will be useful later.</p>
+<p>A particular value in <span class="math notranslate nohighlight">\(XX^T\)</span>, <span class="math notranslate nohighlight">\((XX^T)_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same column. The result is a matrix that looks fairly similar to our Laplacian!</p>
+<p>The following Python code generates both our SBM and our covariate matrices. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this is because we want the scale for our covariate matrix to be roughly the same as the scale for our adjacency matrix. Later, we’ll use a tuning coefficient to help with this as well.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -791,7 +781,7 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 <img alt="../../_images/joint-representation-learning_21_0.png" src="../../_images/joint-representation-learning_21_0.png" />
 </div>
 </div>
-<p>CASE simply sums these two matrices together, using a weight for <span class="math notranslate nohighlight">\(XX^T\)</span> so that they both contribute an equal amount of useful information to the result. Here, we’ll just use the ratio of the leading eigenvalues of our two matrices as our weight (henceforth known as <span class="math notranslate nohighlight">\(\alpha\)</span>). Later on, we’ll explore ways to pick a better <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
+<p>CASE is simply a weighted sum of these two matrices. The weight is multiplied by <span class="math notranslate nohighlight">\(XX^T\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding. Here, we’ll just use the ratio of the two biggest eigenvalues (called the “leading eigenvalues”) of our two matrices as the weight (henceforth known as <span class="math notranslate nohighlight">\(\alpha\)</span>). Later on, we’ll explore ways to pick a better <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Find the eigenvalues of L and XX^T (in ascending order)</span>
@@ -818,7 +808,7 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 </div>
 </div>
 <p>As you can see, the combined matrix has some separation between all three groups. Because we used an imperfect weight, the Laplacian is clearly contributing more to the sum – but it’s good enough for now.</p>
-<p>Now we can embed this network and see what the results look like. Our embedding works the same as it does in Laplacian Spectral Embedding from here: we decompose our combined matrix using an SVD, truncating the columns, and then we visualize the rows of the result. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
+<p>Now we can embed this network and see what the results look like. Our embedding works the same as it does in Laplacian Spectral Embedding from here: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
@@ -899,16 +889,27 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
     <span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">amax</span> <span class="o">=</span> <span class="n">L_top</span> <span class="o">/</span> <span class="n">X_eigvals</span><span class="p">[</span><span class="n">n_covariates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-    
-<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;amin&quot;</span><span class="p">,</span> <span class="n">amin</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;amax&quot;</span><span class="p">,</span> <span class="n">amax</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;amin&quot;</span><span class="p">,</span> <span class="n">amin</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;amax&quot;</span><span class="p">,</span> <span class="n">amax</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">IndexError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="n">cc25d372bb80</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">20</span>     <span class="n">amax</span> <span class="o">=</span> <span class="n">L_top</span> <span class="o">/</span> <span class="n">X_eigvals</span><span class="p">[</span><span class="n">n_covariates</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+<span class="g g-Whitespace">     </span><span class="mi">21</span> 
+<span class="ne">---&gt; </span><span class="mi">22</span> <span class="n">glue</span><span class="p">(</span><span class="s2">&quot;amin&quot;</span><span class="p">,</span> <span class="n">amin</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">glue</span><span class="p">(</span><span class="s2">&quot;amax&quot;</span><span class="p">,</span> <span class="n">amax</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="ne">IndexError</span>: invalid index to scalar variable.
+</pre></div>
 </div>
 </div>
-<p>Using these equations, we get a minimum weight of <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">4.2359312775571826e-05</span></code></span> and a maximum weight of <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">40.00562586173658</span></code></span>.</p>
+</div>
+<p>Using these equations, we get a minimum weight of  and a maximum weight of .</p>
 </div>
 <div class="section" id="searching-with-k-means">
 <h4>Searching with K-Means<a class="headerlink" href="#searching-with-k-means" title="Permalink to this headline">¶</a></h4>
@@ -916,7 +917,7 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 <p>To figure out which <span class="math notranslate nohighlight">\(\alpha\)</span> is best, we need to cluster our data using a machine learning algorithm. The algorithm of choice will be scikit-learn’s faster implementation of k-means. K-means is a simple algorithm capable of clustering most datasets very quickly and efficiently, often in only a few iterations. It works by initially sticking some number of predetermined cluster centers in essentially random places in our data, and then iterating through a searching procedure until all the cluster centers are in nice places. If you want more information, you can check out the original paper by Stuart Lloyd<sup>2</sup>, or scikit-learn’s tutorial describing K-means<sup>3</sup>.</p>
 <p>We also need to define exactly what it means to check which values produce the best clustering. Fortunately, K-means comes out-of-the-box with a fine definition: its objective function, the sum of squared distances of each point from its cluster center. In KMeans, this is called the “inertia”.</p>
 <p>Below is Python code which searches through our range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values, and then tests a clustering using each value. Because it’s quicker, we’ll only look through ten values, but in principle the more values you test the better (and the slower).</p>
-<div class="cell tag_hide-cell docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
     
@@ -936,59 +937,18 @@ figuring out what the clusters of an embedding actually mean can sometimes be di
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Our best alpha-value is </span><span class="si">{</span><span class="n">best_alpha</span><span class="si">:</span><span class="s2">0.8f</span><span class="si">}</span><span class="s2"> with inertia </span><span class="si">{</span><span class="n">alphas</span><span class="p">[</span><span class="n">best_alpha</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="n">new_latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="n">best_alpha</span><span class="o">*</span><span class="n">XXt</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">new_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our embedding after tuning&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.2359312775571826e-05: 0.017149083444858527
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00019536957141698307: 0.017126149668054324
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0009010833022217367: 0.017044913788664826
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.004155975322328253: 0.017294208713800937
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.01916818438119404: 0.027389678814752433
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0884074769398814: 0.08186263117598683
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.40775285877069484: 0.0860074300437393
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.880637244616039: 0.09025788904156229
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8.673872836844938: 0.09136419645543321
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>40.00562586173658: 0.09161704113449823
-Our best alpha-value is 0.00090108 with inertia 0.017044913788664826
-</pre></div>
-</div>
-<img alt="../../_images/joint-representation-learning_38_10.png" src="../../_images/joint-representation-learning_38_10.png" />
 </div>
 </div>
 <p>Tuning the weight noticeably improved our clustering. Below, you can see the difference between our embedding prior to tuning and our embedding after tuning.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our embedding prior to tuning&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">new_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our embedding after tuning&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our embedding prior to tuning&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">new_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our embedding after tuning&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Our embedding after tuning&#39;}&gt;
-</pre></div>
-</div>
-<img alt="../../_images/joint-representation-learning_40_1.png" src="../../_images/joint-representation-learning_40_1.png" />
 </div>
 </div>
 </div>
@@ -1010,60 +970,9 @@ Since the tuning procedure is computationally expensive, you wouldn’t want to 
 
 <span class="n">casc</span> <span class="o">=</span> <span class="n">CASE</span><span class="p">(</span><span class="n">embedding_alg</span><span class="o">=</span><span class="s2">&quot;assortative&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">latents</span> <span class="o">=</span> <span class="n">casc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding our model using graspologic&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding our model using graspologic&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.01780: 0.05409
-inertia at 0.00664: 0.02904
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.02897: 0.11136
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.04013: 0.19520
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.05129: 0.27008
-inertia at 0.06246: 0.24052
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.07362: 0.20933
-inertia at 0.08479: 0.18783
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.09595: 0.17371
-inertia at 0.10711: 0.16450
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.11828: 0.15838
-inertia at 0.12944: 0.15432
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.14060: 0.15152
-inertia at 0.15177: 0.14955
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.16293: 0.14819
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.17409: 0.14729
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.18526: 0.14670
-inertia at 0.19642: 0.14629
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 0.20759: 0.14603
-inertia at 0.21875: 0.14588
-Best inertia at alpha=0.006640: 0.029037
-</pre></div>
-</div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Embedding our model using graspologic&#39;}&gt;
-</pre></div>
-</div>
-<img alt="../../_images/joint-representation-learning_45_13.png" src="../../_images/joint-representation-learning_45_13.png" />
 </div>
 </div>
 <div class="section" id="references">
