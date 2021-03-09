@@ -17,39 +17,46 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from scipy.linalg import eigvalsh
-from myst_nb import glue
+import warnings
+warnings.filterwarnings("ignore")  # TODO: don't do this, fix scatterplot
 
-def get_eigvals(M, n_eigvals):
-    N = M.shape[0]
-    top_eigvals = eigvalsh(M, subset_by_index=[N-n_eigvals, N-1])
-    return np.flip(top_eigvals)
+import numpy as np
+np.random.seed(42)
 
-X_eigvals = get_eigvals(XXt, n_eigvals=4)
-L_eigvals = get_eigvals(L, n_eigvals=4)
-n_covariates = X.shape[1]
-n_components = 3
+from graspologic.simulations import sbm
+from graspologic.plot import heatmap
+import matplotlib
 
-amin = (L_eigvals[n_components - 1] - L_eigvals[n_components]) / X_eigvals[0]
-if n_covariates > n_components:
-    amax = L_eigvals[0] / (
-        X_eigvals[n_components - 1] - X_eigvals[n_components]
-    )
-else:
-    amax = L_top / X_eigvals[n_covariates - 1]
+# Start with some simple parameters
+N = 1500  # Total number of nodes
+n = N // 3  # Nodes per community
+p, q = .3, .15
+B = np.array([[.3, .3, .15],
+              [.3, .3, .15],
+              [.15, .15, .3]])  # Our block probability matrix
 
-glue("amin", amin[:2], display=False)
-glue("amax", amax[:2], display=False)
+# Make and visualize our Stochastic Block Model
+A, labels = sbm([n, n, n], B, return_labels = True)
+
+# make the colorbar look nice
+fig, ax = plt.subplots(figsize=(10,10))
+matplotlib.colors.ListedColormap(['white', 'black'])
+ax = heatmap(A, title="A Stochastic Block Model", cmap=cmap, ax=ax);
+cbar = ax.collections[0].colorbar
+cbar.set_ticks([0.25, .75])
+cbar.set_ticklabels(['0', '1'])
+cbar.ax.set_frame_on(True)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mIndexError[0m                                Traceback (most recent call last)
-[0;32m<ipython-input-11-cc25d372bb80>[0m in [0;36m<module>[0;34m[0m
-[1;32m     20[0m     [0mamax[0m [0;34m=[0m [0mL_top[0m [0;34m/[0m [0mX_eigvals[0m[0;34m[[0m[0mn_covariates[0m [0;34m-[0m [0;36m1[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+[0;32m<ipython-input-1-5066cbaef4aa>[0m in [0;36m<module>[0;34m[0m
 [1;32m     21[0m [0;34m[0m[0m
-[0;32m---> 22[0;31m [0mglue[0m[0;34m([0m[0;34m"amin"[0m[0;34m,[0m [0mamin[0m[0;34m[[0m[0;34m:[0m[0;36m2[0m[0;34m][0m[0;34m,[0m [0mdisplay[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m     23[0m [0mglue[0m[0;34m([0m[0;34m"amax"[0m[0;34m,[0m [0mamax[0m[0;34m[[0m[0;34m:[0m[0;36m2[0m[0;34m][0m[0;34m,[0m [0mdisplay[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     22[0m [0;31m# make the colorbar look nice[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 23[0;31m [0mfig[0m[0;34m,[0m [0max[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m10[0m[0;34m,[0m[0;36m10[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     24[0m [0mmatplotlib[0m[0;34m.[0m[0mcolors[0m[0;34m.[0m[0mListedColormap[0m[0;34m([0m[0;34m[[0m[0;34m'white'[0m[0;34m,[0m [0;34m'black'[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     25[0m [0max[0m [0;34m=[0m [0mheatmap[0m[0;34m([0m[0mA[0m[0;34m,[0m [0mtitle[0m[0;34m=[0m[0;34m"A Stochastic Block Model"[0m[0;34m,[0m [0mcmap[0m[0;34m=[0m[0mcmap[0m[0;34m,[0m [0max[0m[0;34m=[0m[0max[0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
 
-[0;31mIndexError[0m: invalid index to scalar variable.
-IndexError: invalid index to scalar variable.
+[0;31mNameError[0m: name 'plt' is not defined
+NameError: name 'plt' is not defined
 
