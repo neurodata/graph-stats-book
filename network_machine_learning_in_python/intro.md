@@ -1,6 +1,6 @@
 # Network Machine Learning in Python
 
-```{figure} ../umap_pedigo.png
+```{figure} .images/umap_pedigo_small.jpg
 ---
 height: 1000px
 name: worm-connectome
