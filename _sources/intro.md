@@ -1,14 +1,9 @@
-Preface
-============================
+# Network Machine Learning in Python
 
-## About the authors
-
-## The World of Networks
-
-## Objective and Approach
-
-## Prerequisites
-
-## Roadmap
-
-## Other Resources
+```{figure} umap_pedigo.png
+---
+height: 1000px
+name: worm-connectome
+---
+Model of a C. Elegans connectome network. Credit to Ben Pedigo, PhD student at Johns Hopkins University.
+```
