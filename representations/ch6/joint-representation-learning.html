@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Joint Representation Learning &#8212; Network Machine Learning in Python</title>
+    <title>3.6. Joint Representation Learning &#8212; Network Machine Learning in Python</title>
     
   <link rel="stylesheet" href="../../_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
 
@@ -58,7 +58,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="4. Theoretical Results" href="../ch7/ch7.html" />
-    <link rel="prev" title="Multigraph Representation Learning" href="multigraph-representation-learning.html" />
+    <link rel="prev" title="3.5. Multigraph Representation Learning" href="multigraph-representation-learning.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -279,28 +279,33 @@
   </a>
   <ul class="current collapse-ul">
    <li class="toctree-l2">
+    <a class="reference internal" href="estimating-parameters.html">
+     3.1. Estimating Parameters in Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="why-embed-networks.html">
-     Why embed networks?
+     3.2. Why embed networks?
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="random-walk-diffusion-methods.html">
-     Random-Walk and Diffusion-based Methods
+     3.3. Random-Walk and Diffusion-based Methods
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="graph-neural-networks.html">
-     Graph Neural Networks
+     3.4. Graph Neural Networks
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="multigraph-representation-learning.html">
-     Multigraph Representation Learning
+     3.5. Multigraph Representation Learning
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     Joint Representation Learning
+     3.6. Joint Representation Learning
     </a>
    </li>
   </ul>
@@ -593,7 +598,7 @@
               <div>
                 
   <div class="section" id="joint-representation-learning">
-<h1>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">3.6. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
 <p>In many network problems, our network might be more than just its topology (its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of our network. Because these new representations jointly use both the topology of our network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
 <p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
@@ -601,6 +606,13 @@
 <div class="section" id="stochastic-block-model">
 <h2>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h2>
 <p>Suppose we have a Stochastic Block Model that looks like this.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
@@ -642,7 +654,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_5_0.png" src="../../_images/joint-representation-learning_5_0.png" />
+<img alt="../../_images/joint-representation-learning_6_0.png" src="../../_images/joint-representation-learning_6_0.png" />
 </div>
 </div>
 <p>There are three communities (we promise), but the first two are impossible to distinguish between using only our adjacency matrix (which only stores the topological structure of a network). The third community is distinct: nodes belonging to it aren’t likely to connect to nodes in the first two communities, and are very likely to connect to each other. If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other (though we wouldn’t be able to figure that out from our embedding). The python code below embeds our latent positions down to two dimensions with a Laplacian Spectral Embedding, and then plots the results, color-coding each node by its true community.</p>
@@ -675,7 +687,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_7_0.png" src="../../_images/joint-representation-learning_7_0.png" />
+<img alt="../../_images/joint-representation-learning_8_0.png" src="../../_images/joint-representation-learning_8_0.png" />
 </div>
 </div>
 <p>We’d like to use extra information to more clearly distinguish between the first and second community. We don’t have this information in our network: it needs to come from somewhere else.</p>
@@ -715,7 +727,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_11_0.png" src="../../_images/joint-representation-learning_11_0.png" />
+<img alt="../../_images/joint-representation-learning_12_0.png" src="../../_images/joint-representation-learning_12_0.png" />
 </div>
 </div>
 <p>We can play almost the same game here as we did with the Laplacian. If we embed the information contained in this matrix of covariates into lower dimensions, we can see the reverse situation as before - the first community is separate, but the last two are overlayed on top of each other.</p>
@@ -729,7 +741,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_13_0.png" src="../../_images/joint-representation-learning_13_0.png" />
+<img alt="../../_images/joint-representation-learning_14_0.png" src="../../_images/joint-representation-learning_14_0.png" />
 </div>
 </div>
 <p>We want full separation between all three communities, so we need some kind of representation of our network that allows us to use both the information in the topology and the information in the covariates. This is where CASE comes in.</p>
@@ -740,8 +752,8 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, notice from linear algebra that we’re effectively taking the weighted sum - or, in math parlance, the dot product - of each row of <span class="math notranslate nohighlight">\(X\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-14ba2be7-ab28-49ce-bd9a-65827d67cd91">
-<span class="eqno">(3.2)<a class="headerlink" href="#equation-14ba2be7-ab28-49ce-bd9a-65827d67cd91" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-07ff50e3-4e1b-4a95-b40a-45df1a0e4bf7">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-07ff50e3-4e1b-4a95-b40a-45df1a0e4bf7" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 \\
 1 \\
@@ -805,7 +817,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_21_0.png" src="../../_images/joint-representation-learning_21_0.png" />
+<img alt="../../_images/joint-representation-learning_22_0.png" src="../../_images/joint-representation-learning_22_0.png" />
 </div>
 </div>
 <p>CASE is simply a weighted sum of these two matrices. The weight is multiplied by <span class="math notranslate nohighlight">\(XX^T\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding. Here, we’ll just use the ratio of the two biggest eigenvalues (called the “leading eigenvalues”) of our two matrices as the weight (henceforth known as <span class="math notranslate nohighlight">\(\alpha\)</span>). Later on, we’ll explore ways to pick a better <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
@@ -831,7 +843,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_24_0.png" src="../../_images/joint-representation-learning_24_0.png" />
+<img alt="../../_images/joint-representation-learning_25_0.png" src="../../_images/joint-representation-learning_25_0.png" />
 </div>
 </div>
 <p>As you can see, the combined matrix has some separation between all three groups. Because we used an imperfect weight, the Laplacian is clearly contributing more to the sum – but it’s good enough for now.</p>
@@ -873,7 +885,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_28_0.png" src="../../_images/joint-representation-learning_28_0.png" />
+<img alt="../../_images/joint-representation-learning_29_0.png" src="../../_images/joint-representation-learning_29_0.png" />
 </div>
 </div>
 <div class="section" id="setting-a-better-weight">
@@ -998,7 +1010,7 @@ Our best alpha-value is 0.00077000 with inertia 0.017006766507591746
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_40_0.png" src="../../_images/joint-representation-learning_40_0.png" />
+<img alt="../../_images/joint-representation-learning_41_0.png" src="../../_images/joint-representation-learning_41_0.png" />
 </div>
 </div>
 </div>
@@ -1054,7 +1066,7 @@ Since the tuning procedure is computationally expensive, you wouldn’t want to 
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 6.63162: 0.43381
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 7.46005: 0.43408
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 7.46005: 0.43407
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 8.28849: 0.43426
@@ -1070,31 +1082,26 @@ Since the tuning procedure is computationally expensive, you wouldn’t want to 
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 11.60223: 0.43474
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 12.43067: 0.43482
+inertia at 12.43067: 0.43482
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 13.25910: 0.43490
+inertia at 14.08754: 0.43497
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 14.08754: 0.43496
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 14.91598: 0.43507
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 14.91598: 0.43502
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 15.74441: 0.43507
-inertia at 16.57285: 0.43512
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 17.40128: 0.43519
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 16.57285: 0.43512
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 17.40128: 0.43521
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 18.22972: 0.43521
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 19.05816: 0.43525
 </pre></div>
 </div>
 </div>
@@ -1135,7 +1142,7 @@ inertia at 16.57285: 0.43512
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="multigraph-representation-learning.html" title="previous page">Multigraph Representation Learning</a>
+    <a class='left-prev' id="prev-link" href="multigraph-representation-learning.html" title="previous page"><span class="section-number">3.5. </span>Multigraph Representation Learning</a>
     <a class='right-next' id="next-link" href="../ch7/ch7.html" title="next page"><span class="section-number">4. </span>Theoretical Results</a>
 
         </div>
