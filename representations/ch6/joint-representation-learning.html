@@ -599,13 +599,13 @@
                 
   <div class="section" id="joint-representation-learning">
 <h1><span class="section-number">3.6. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
-<p>In many network problems, our network might be more than just its topology (its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of our network. Because these new representations jointly use both the topology of our network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
+<p>In many network problems, our network might be more than just its topology (its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of our network. Because they jointly use both the topology of our network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
 <p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
 <p>A good way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates and some is in our topology. Using the Stochastic Block Model, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in its covariates. By combining the topology and the covariates, we’ll get a nice embedding that lets us find three distinct community clusters.</p>
 <div class="section" id="stochastic-block-model">
 <h2>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h2>
-<p>Suppose we have a Stochastic Block Model that looks like this.</p>
+<p>Suppose we have a network generated from a Stochastic Block Model (or, commonly, SBM) with three communities (we promise). There are 1500 nodes, with 500 in each community. Because the <span class="math notranslate nohighlight">\(3 \times 3\)</span> block probability matrix that generated this SBM has the same probability values (.3) in its upper-left <span class="math notranslate nohighlight">\(2 \times 2\)</span> square, the first two communities are completely indistinguishable: Any random node in the first community will have exactly the same 15% chance of being connected to another node in the first community and to a node in the second community. As a result, in our adjacency matrix, we’ll see the nodes in communities one and two as a single giant block. The third community will be distinct, with only a small probability (.15) that nodes in it will connect to nodes in either of the other two communities. The topological structure shown by the adjacency matrix can’t separate three groups by itself.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
@@ -651,7 +651,7 @@
 <img alt="../../_images/joint-representation-learning_5_0.png" src="../../_images/joint-representation-learning_5_0.png" />
 </div>
 </div>
-<p>There are three communities (we promise), but the first two are impossible to distinguish between using only our adjacency matrix (which only stores the topological structure of a network). The third community is distinct: nodes belonging to it aren’t likely to connect to nodes in the first two communities, and are very likely to connect to each other. If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other (though we wouldn’t be able to figure that out from our embedding). The python code below embeds our latent positions down to two dimensions with a Laplacian Spectral Embedding, and then plots the results, color-coding each node by its true community.</p>
+<p>If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other (though we wouldn’t be able to figure that out from our embedding if we didn’t cheat by knowing in advance which community each node is supposed to belong to). The python code below embeds our latent positions down to two dimensions with a Laplacian Spectral Embedding, and then plots the results, color-coding each node by its true community.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
@@ -669,14 +669,15 @@
     <span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">plot</span>
 
 <span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
 <span class="n">lse</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">L_latents</span> <span class="o">=</span> <span class="n">lse</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">L_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed the Laplacian&quot;</span><span class="p">,</span> 
-             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">L_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed the Laplacian&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -688,8 +689,8 @@
 </div>
 <div class="section" id="covariates">
 <h2>Covariates<a class="headerlink" href="#covariates" title="Permalink to this headline">¶</a></h2>
-<p>But we’re in luck - we have a set of covariates for each node! These covariates contain the extra information we need that allows us to separate our first and second community. However, with only these extra covariate features, we can no longer distinguish between the last two communities - they contain the same information.</p>
-<p>Below is a visualization of our covariates. Each node is associated with its own group of covariates. We’ll organize this information into a matrix, where the <span class="math notranslate nohighlight">\(i_{th}\)</span> row contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. We’ll draw the elements of each row from a Beta distribution, from statistics. The first community is represented by the lighter-colored rows, and the last two are represented by the darker-colored rows.</p>
+<p>But we’re in luck - we have extra in a set of covariates for each node! These covariates contain the extra information we need that allows us to separate our first and second community. However, with only these extra covariate features, we can no longer distinguish between the last two communities - they contain the same information.</p>
+<p>Below is a visualization of our covariates. Each node is associated with its own group of 30 covariates (thirty being chosen primarily to visualize what’s happening more clearly). We’ll organize this information into a matrix, where the <span class="math notranslate nohighlight">\(i_{th}\)</span> row contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Remember that we have 1500 nodes in our network, so there will be 1500 rows. We’ll draw all the covariates for each node from the same Beta distribution (with values ranging from 0 to 1), but the nodes in the first community will be drawn from a different Beta distribution than the nodes in the last two. As a result, the first community is represented by the lighter-colored rows, and the last two are represented by the darker-colored rows.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -742,16 +743,14 @@
 </div>
 <div class="section" id="covariate-assisted-spectral-embedding">
 <h2>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h2>
-<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our network and our covariates into a single model. In the most straightforward version of CASE, we combine the network’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^T\)</span>. Here, <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Notice the word “regularized” - This means (from the Laplacian section earlier) that our Laplacian looks like <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span>.</p>
+<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our network and our covariates into a single model. In the most straightforward version of CASE, we combine the network’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. Here, <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Notice the word “regularized” - This means (from the Laplacian section earlier) that our Laplacian looks like <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, notice from linear algebra that we’re effectively taking the weighted sum - or, in math parlance, the dot product - of each row of <span class="math notranslate nohighlight">\(X\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-c7164f57-4d56-4f3c-ab3e-c349cd35c9fa">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-c7164f57-4d56-4f3c-ab3e-c349cd35c9fa" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-400ac110-fad6-445a-a713-d8d9d355f760">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-400ac110-fad6-445a-a713-d8d9d355f760" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
-1 \\
-1 \\
-1 \\
+1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
 \begin{bmatrix}
 0 \\
@@ -761,8 +760,8 @@
 \end{align}\]</div>
 <p>If there are two overlapping 1’s in the same position of the left vector and the right vector, then there will be an additional 1 added to their weighted sum. So, in the case of the binary <span class="math notranslate nohighlight">\(XX^T\)</span>, when we matrix-multiply a row of <span class="math notranslate nohighlight">\(X\)</span> by a column of <span class="math notranslate nohighlight">\(X^T\)</span>, the resulting value, <span class="math notranslate nohighlight">\((XX^T)_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
 </div>
-<p>A particular value in <span class="math notranslate nohighlight">\(XX^T\)</span>, <span class="math notranslate nohighlight">\((XX^T)_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same column. The result is a matrix that looks fairly similar to our Laplacian!</p>
-<p>The following Python code generates both our SBM and our covariate similarity matrix <span class="math notranslate nohighlight">\(XX^T\)</span>. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this is because we want the scale for our covariate matrix to be roughly the same as the scale for our adjacency matrix. Later, we’ll use a tuning coefficient to help with this as well.</p>
+<p>A particular value in <span class="math notranslate nohighlight">\(XX^\top\)</span>, <span class="math notranslate nohighlight">\((XX^\top)_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same column. The result is a matrix that looks fairly similar to our Laplacian!</p>
+<p>The following Python code generates both our SBM and our covariate similarity matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this is because we want the scale for our covariate matrix to be roughly the same as the scale for our adjacency matrix. Later, we’ll use a tuning coefficient to help with this as well.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -830,6 +829,8 @@
 </div>
 </div>
 </div>
+<p>As you can see below, the combined matrix has some separation between all three groups. Because we used an imperfect weight for <span class="math notranslate nohighlight">\(XX^\top\)</span>, the community separation is probably not perfect - but it’s good enough for now.</p>
+<p>Now we can embed this network and see what the results look like. Our embedding works the same as it does in Laplacian Spectral Embedding from here: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Combined Laplacian and covariates matrix&quot;</span><span class="p">);</span>
@@ -837,11 +838,9 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_24_0.png" src="../../_images/joint-representation-learning_24_0.png" />
+<img alt="../../_images/joint-representation-learning_25_0.png" src="../../_images/joint-representation-learning_25_0.png" />
 </div>
 </div>
-<p>As you can see, the combined matrix has some separation between all three groups. Because we used an imperfect weight, the Laplacian is clearly contributing more to the sum – but it’s good enough for now.</p>
-<p>Now we can embed this network and see what the results look like. Our embedding works the same as it does in Laplacian Spectral Embedding from here: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">randomized_svd</span>
@@ -887,7 +886,7 @@
 <h3>Setting A Better Weight<a class="headerlink" href="#setting-a-better-weight" title="Permalink to this headline">¶</a></h3>
 <p>Our simple choice of the ratio of leading eigenvalues for our weight <span class="math notranslate nohighlight">\(\alpha\)</span> is straightforward, but we can probably do better. If our covariate matrix doesn’t tell us much about our communities, then we’d want to give it a smaller weight so we use more of the information in our Laplacian when we embed. If our Laplacian is similarly uninformative, we’d like a larger weight to emphasize the covariates.</p>
 <p>In general, we’d simply like to embed in a way that makes our clustering better - meaning, if we label our communities, we’d like to be able to correctly retrieve as many labels after the embedding as possible with a clustering algorithm, and for our clusters to be as distinct as possible.</p>
-<p>One reasonable way of accomplishing this goal is to simply find a range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values, embed our combined matrix for every value in this range, and then to simply check which values produce the best clustering.</p>
+<p>One reasonable way of accomplishing this goal is to simply find a range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values, embed our combined matrix for every value in this range, and then to simply check which values produce the kind of clustering we want.</p>
 <div class="section" id="getting-a-good-range">
 <h4>Getting A Good Range<a class="headerlink" href="#getting-a-good-range" title="Permalink to this headline">¶</a></h4>
 <p>For somewhat complicated linear algebra reasons<sup>1</sup>, it’s fairly straightforward to get a good range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values: a good minimum and maximum is described by only two equations. In the below equations, <span class="math notranslate nohighlight">\(K\)</span> is the number of communities present in our network, <span class="math notranslate nohighlight">\(R\)</span> is the number of covariate values each node has, and <span class="math notranslate nohighlight">\(\lambda_i(L)\)</span> is the <span class="math notranslate nohighlight">\(i_{th}\)</span> eigenvalue of L (where <span class="math notranslate nohighlight">\(\lambda_1(L)\)</span> is our Laplacian’s highest, or “leading”, eigenvalue).</p>
@@ -937,9 +936,9 @@
 <div class="section" id="searching-with-k-means">
 <h4>Searching with K-Means<a class="headerlink" href="#searching-with-k-means" title="Permalink to this headline">¶</a></h4>
 <p>We have a range of possible weights to search through, but we don’t have the best one. To find it, we’ll embed with Covariate-Assisted Clustering, using all the tricks described previously, for as many alpha-values in our range as we’re willing to test. Then, we’ll simply pick the value which best lets us distinguish between the different communities in our network.</p>
-<p>To figure out which <span class="math notranslate nohighlight">\(\alpha\)</span> is best, we need to cluster our data using a machine learning algorithm. The algorithm of choice will be scikit-learn’s faster implementation of k-means. K-means is a simple algorithm capable of clustering most datasets very quickly and efficiently, often in only a few iterations. It works by initially sticking some number of predetermined cluster centers in essentially random places in our data, and then iterating through a searching procedure until all the cluster centers are in nice places. If you want more information, you can check out the original paper by Stuart Lloyd<sup>2</sup>, or scikit-learn’s tutorial describing K-means<sup>3</sup>.</p>
+<p>To figure out which <span class="math notranslate nohighlight">\(\alpha\)</span> is best, we need to cluster our data using a machine learning algorithm. The algorithm of choice will be scikit-learn’s implementation of k-means. K-means is a simple algorithm capable of clustering most datasets very quickly and efficiently, often in only a few iterations. It works by initially sticking some number of predetermined cluster centers far apart from each other, and then iterating through a cluster-searching procedure until the cluster centers no longer move from one iteration to the next. If you want more information, you can check out the original paper by John Stuart Lloyd’s original algorithm<sup>2</sup>, or scikit-learn’s tutorial describing k-means<sup>3</sup>.</p>
 <p>We also need to define exactly what it means to check which tuning values produce the best clustering. We want a metric that emphasizes clusters that are small and far apart; that way, our clusters will be distinct and we’ll be able to see our community structure better. Scikit-learn has exactly the metric we need: the <em>silhouette score</em>. This metric outputs a large number if our clusters are far apart, and a small number if our clusters are close together. For more details, see the scikit-learn documentation<sup>4</sup>.</p>
-<p>Below is Python code which searches through our range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values, and then tests a clustering using each value. We’ll use a golden-section search<sup>5</sup>, which will speed up the searching processes.</p>
+<p>Below is Python code which searches through our range of possible <span class="math notranslate nohighlight">\(\alpha\)</span> values, and then tests a clustering using each value. We’ll use scipy’s bracket search, which is a computationally efficient searching approach which will speed up how long it takes to find a good <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
@@ -980,7 +979,7 @@
 <h3>Variations on CASE<a class="headerlink" href="#variations-on-case" title="Permalink to this headline">¶</a></h3>
 <p>There are situations where changing the matrix that you embed is useful.</p>
 <p><em>non-assortative</em><br />
-If your graph is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block communities - it’s better to square your Laplacian. You end up embedding <span class="math notranslate nohighlight">\(LL + aXX^T\)</span>.</p>
+If your graph is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square your Laplacian. This gets rid of a lot of annoying negative eigenvalues, and you end up embedding <span class="math notranslate nohighlight">\(LL + aXX^\top\)</span>.</p>
 <p><em>big graphs</em><br />
 Since the tuning procedure is computationally expensive, you wouldn’t want to spend the time tuning <span class="math notranslate nohighlight">\(\alpha\)</span> for larger graphs. There are a few options here: you can use a non-tuned version of alpha, or you can use a variant on classical correlation analysis<sup>4</sup> and simply embed <span class="math notranslate nohighlight">\(LX\)</span>.</p>
 </div>
@@ -1004,10 +1003,10 @@ Since the tuning procedure is computationally expensive, you wouldn’t want to 
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 9.11692: 0.43441
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 18.22972: 0.43520
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 18.22972: 0.43521
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 27.34252: 0.43547
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 27.34252: 0.43548
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>inertia at 36.45531: 0.43561
@@ -1036,8 +1035,7 @@ Best inertia at alpha=0.004129: 0.027265
 [2] Lloyd, S. (1982). Least squares quantization in PCM. IEEE transactions on information theory, 28(2), 129-137.<br />
 [3] https://scikit-learn.org/stable/modules/clustering.html#k-means
 [4] Hotelling, H. (1936). Relations between two sets of variates. Biometrika 28, 321–77.<br />
-[4] https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html<br />
-[5] https://en.wikipedia.org/wiki/Golden-section_search</p>
+[4] https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html</p>
 </div>
 </div>
 </div>
