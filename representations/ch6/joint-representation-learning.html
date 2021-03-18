@@ -550,8 +550,13 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#finding-a-weight">
-     Finding a Weight
+    <a class="reference internal nav-link" href="#exploring-possible-weights">
+     Exploring Possible Weights
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#finding-a-reasonable-weight-automatically">
+     Finding a Reasonable Weight Automatically
     </a>
    </li>
   </ul>
@@ -746,8 +751,8 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, notice from linear algebra that we’re effectively taking the weighted sum - or, in math parlance, the dot product - of each row of <span class="math notranslate nohighlight">\(X\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-8339ebbf-ee61-49d3-a471-e431c9cb1865">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-8339ebbf-ee61-49d3-a471-e431c9cb1865" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-e25a527b-29c9-4ab4-8c36-ab0e7bb4df13">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-e25a527b-29c9-4ab4-8c36-ab0e7bb4df13" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -812,8 +817,14 @@
 <img alt="../../_images/joint-representation-learning_21_0.png" src="../../_images/joint-representation-learning_21_0.png" />
 </div>
 </div>
-<p>CASE is simply a weighted sum of these two matrices. The weight is multiplied by <span class="math notranslate nohighlight">\(XX^\top\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding.</p>
-<p>An obvious question here, is how to pick the weight. If we simply summed the two matrices without a weight, we’d unfortunately be in a situation where whichever matrix contained larger numbers would dominate over the other. As you can see below, without weighting <span class="math notranslate nohighlight">\(XX^\top\)</span>, the covariates of our network simply dominate over its topology. And when we embed, because we aren’t using enough topological information, we’ll find a situation just like we found when we only used covariates: we can’t distinguish between the second and third communities.</p>
+<p>CASE is simply a weighted sum of these two matrices. The weight (here called <span class="math notranslate nohighlight">\(\alpha\)</span>) is multiplied by <span class="math notranslate nohighlight">\(XX^\top\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding.</p>
+<div class="math notranslate nohighlight">
+\[
+L + aXX^\top
+\]</div>
+<div class="section" id="exploring-possible-weights">
+<h3>Exploring Possible Weights<a class="headerlink" href="#exploring-possible-weights" title="Permalink to this headline">¶</a></h3>
+<p>An obvious question here is how to weight the covariates. If we simply summed the two matrices by themselves, we’d unfortunately be in a situation where whichever matrix contained larger numbers would dominate over the other. In our current setup, without a weight on <span class="math notranslate nohighlight">\(XX^\top\)</span>, the covariates of our network would dominate over its topology.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
@@ -824,10 +835,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_23_0.png" src="../../_images/joint-representation-learning_23_0.png" />
+<img alt="../../_images/joint-representation-learning_25_0.png" src="../../_images/joint-representation-learning_25_0.png" />
 </div>
 </div>
-<p>Below, you can see a comparison of what the embeddings would look like for 9 possible values of weight on <span class="math notranslate nohighlight">\(XX\top\)</span>, ranging between <span class="math notranslate nohighlight">\(10^{-5}\)</span> and 100. As you can see, we’d probably want a weight somewhere between 0.01 and 0.5  - this looks like it produces three communities which are fairly distinct from each other, which implies that we’re pulling good information from both our network’s topology and its covariates. We could just pick our weight manually, but it would be nice to have some kind of algorithm or equation which lets us pick a reasonable value automatically.</p>
+<p>What do different potential weights look like? Let’s do a comparison. Below you can see 9 possible weights on <span class="math notranslate nohighlight">\(XX^\top\)</span>, ranging between <span class="math notranslate nohighlight">\(10^{-5}\)</span> and 100.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
@@ -842,20 +853,22 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_25_0.png" src="../../_images/joint-representation-learning_25_0.png" />
+<img alt="../../_images/joint-representation-learning_27_0.png" src="../../_images/joint-representation-learning_27_0.png" />
 </div>
 </div>
-<div class="section" id="finding-a-weight">
-<h3>Finding a Weight<a class="headerlink" href="#finding-a-weight" title="Permalink to this headline">¶</a></h3>
-<p>If our covariate matrix doesn’t tell us much about our communities, then we’d want to give it a smaller weight so we use more of the information in our Laplacian when we embed. If our Laplacian is similarly uninformative, we’d like a larger weight to emphasize the covariates.</p>
-<p>In general, we’d simply like to embed in a way that lets us distinguish between communities better - meaning, if we label our communities, we’d like to be able to correctly retrieve as many labels after the embedding as possible with a clustering algorithm, and for their clusters to be as distinct as possible.</p>
-<p>We already found a range of possible weights, embedded our combined matrix for every value in this range, and looked at which values produced the best clustering. But, how do we find a weight which lets us consistently use useful information from both the Laplacian matrix and <span class="math notranslate nohighlight">\(XX^\top\)</span>?</p>
-<p>When we embed symmetric matrices, keep in mind that the actual points we’re plotting are the components of the eigenvectors with the biggest eigenvalues. When we embed into two-dimensional space, for instance, the X-axis values of our points are the components of the eigenvector with the biggest eigenvalue, and their Y-axis values are the components of the eigenvector with the second-biggest eigenvalue. Because of this, we should be thinking about how much information the Laplacian and <span class="math notranslate nohighlight">\(XX^\top\)</span> contributes to the biggest eigenvalue/eigenvector pairs. If we have a small weight, <span class="math notranslate nohighlight">\(XX^\top\)</span> will contribute only a small amount to the biggest pair, and if we have a large weight, <span class="math notranslate nohighlight">\(XX^\top\)</span> will contribute a large amount. The weight that causes the Laplacian and <span class="math notranslate nohighlight">\(XX^\top\)</span> to contribute the same amount of information to the top eigenvalue/eigenvector pair, then, is just the ratio of the leading eigenvalue of <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(XX^\top\)</span>:</p>
+<p>It looks like we’d probably want a weight somewhere between 0.01 and 0.5  - then, we’ll have three communities which are fairly distinct from each other, implying that we’re pulling good information from both our network’s topology and its covariates. We could just pick our weight manually, but it would be nice to have some kind of algorithm or equation which lets us pick a reasonable value automatically.</p>
+</div>
+<div class="section" id="finding-a-reasonable-weight-automatically">
+<h3>Finding a Reasonable Weight Automatically<a class="headerlink" href="#finding-a-reasonable-weight-automatically" title="Permalink to this headline">¶</a></h3>
+<p>In general, we’d like to embed in a way that lets us distinguish between communities. This means that if we knew which community each node belonged to, we’d like to be able to correctly retrieve the correct commmunities for each node as possible with a clustering algorithm after embedding. This also implies that the communities will be as distinct as possible.</p>
+<p>We already found a range of possible weights, embedded our combined matrix for every value in this range, and then looked at which values produced the best clustering. But, how do we find a weight which lets us consistently use useful information from both the topology and the covariates?</p>
+<p>When we embed symmetric matrices, keep in mind that the actual points we’re plotting are the components of the eigenvectors with the biggest eigenvalues. When we embed into two-dimensional space, for instance, the X-axis values of our points are the components of the eigenvector with the biggest eigenvalue, and the Y-axis values are the components of the eigenvector with the second-biggest eigenvalue. This means that we should probably be thinking about how much information the Laplacian and <span class="math notranslate nohighlight">\(XX^\top\)</span> contributes to the biggest eigenvalue/eigenvector pairs.</p>
+<p>Thinking about this more, if we have a small weight, <span class="math notranslate nohighlight">\(XX^\top\)</span> will contribute only a small amount to the biggest eigenvalue/vector pair. If we have a large weight, <span class="math notranslate nohighlight">\(XX^\top\)</span> will contribute a large amount to the biggest eigenvalue/vector pair. The weight that causes the Laplacian and <span class="math notranslate nohighlight">\(XX^\top\)</span> to contribute the same amount of information, then, is just the ratio of the biggest eigenvalue of <span class="math notranslate nohighlight">\(L\)</span> and the biggest eigenvalue of <span class="math notranslate nohighlight">\(XX^\top\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
 weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 \]</div>
-<p>Now, we can check to see what happens when we combine our Laplacian and covariates matrix using the weight described in the equation above by embedding. Our embedding works the same as it does in Laplacian Spectral Embedding: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. We’ll embed all the way down to two dimensions, just to make visualization simpler. As you can see, the combined matrix has good separation between all three communities.</p>
+<p>Let’s check what happens when we combine our Laplacian and covariates matrix using the weight described in the equation above. Our embedding works the same as it does in Laplacian Spectral Embedding: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. Remember, we’ll be embedding <span class="math notranslate nohighlight">\(L + \alpha XX^\top\)</span>. We’ll embed all the way down to two dimensions, just to make visualization simpler. As you can see, the combined matrix has good separation between all three communities.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">eigsh</span>
@@ -878,10 +891,10 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_29_0.png" src="../../_images/joint-representation-learning_29_0.png" />
+<img alt="../../_images/joint-representation-learning_32_0.png" src="../../_images/joint-representation-learning_32_0.png" />
 </div>
 </div>
-<p>Below is a comparison of our network’s latent position when we only use its topological information, when we only use the information contained in its covariates, and finally our embedding using the weight we found on the right.</p>
+<p>Success! Just to see how big the difference is, below we can see (from left to right) a comparison of our network’s latent position when we only use its topological information, when we only use the information contained in its covariates, and finally our embedding using the weight we found.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
@@ -913,18 +926,18 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 <span class="ne">NameError</span>: name &#39;latents_&#39; is not defined
 </pre></div>
 </div>
-<img alt="../../_images/joint-representation-learning_31_1.png" src="../../_images/joint-representation-learning_31_1.png" />
+<img alt="../../_images/joint-representation-learning_34_1.png" src="../../_images/joint-representation-learning_34_1.png" />
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="variations-on-case">
 <h2>Variations on CASE<a class="headerlink" href="#variations-on-case" title="Permalink to this headline">¶</a></h2>
-<p>There are situations where changing the matrix that we embed is useful.</p>
+<p>We don’t always want to embed <span class="math notranslate nohighlight">\(L + \alpha XX^\top\)</span>. Using the regularized Laplacian by itself, for instance, isn’t always best. Here are some situations where we might consider using a different equation to combine the topological and the covariate information in our network.</p>
 <p><em>non-assortative</em><br />
-If your graph is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square your Laplacian. This gets rid of a lot of annoying negative eigenvalues, and you end up embedding <span class="math notranslate nohighlight">\(LL + aXX^\top\)</span>.</p>
+If your graph is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square our Laplacian. This gets rid of a lot of annoying negative eigenvalues, and we end up embedding <span class="math notranslate nohighlight">\(LL + aXX^\top\)</span>.</p>
 <p><em>big graphs</em><br />
-Since the tuning procedure is computationally expensive, you wouldn’t want to spend the time tuning <span class="math notranslate nohighlight">\(\alpha\)</span> for larger graphs. There are a few options here: you can use a non-tuned version of alpha, or you can use a variant on classical correlation analysis<sup>4</sup> and simply embed <span class="math notranslate nohighlight">\(LX\)</span>.</p>
+In large graphs, we’d like to perform as few operations on our two matrices as possible prior to embedding (since any computation we do on huge matrices is pretty expensive and can take awhile). Here, we can use a variant on classical correlation analysis<sup>4</sup> and simply embed <span class="math notranslate nohighlight">\(LX\)</span>.</p>
 </div>
 <div class="section" id="using-graspologic">
 <h2>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h2>
@@ -945,8 +958,7 @@ Since the tuning procedure is computationally expensive, you wouldn’t want to 
 <p>[1] N. Binkiewicz, J. T. Vogelstein, K. Rohe, Covariate-assisted spectral clustering, Biometrika, Volume 104, Issue 2, June 2017, Pages 361–377, https://doi.org/10.1093/biomet/asx008<br />
 [2] Lloyd, S. (1982). Least squares quantization in PCM. IEEE transactions on information theory, 28(2), 129-137.<br />
 [3] https://scikit-learn.org/stable/modules/clustering.html#k-means
-[4] Hotelling, H. (1936). Relations between two sets of variates. Biometrika 28, 321–77.<br />
-[4] https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html</p>
+[4] Hotelling, H. (1936). Relations between two sets of variates. Biometrika 28, 321–77.</p>
 </div>
 </div>
 </div>
