@@ -17,30 +17,214 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graspologic.embed import LaplacianSpectralEmbed as LSE
+import matplotlib.pyplot as plt
+from graspologic.plot import heatmap
+import seaborn as sns
+import matplotlib
+plt.rcParams.update({
+    "text.usetex": True,})
 
+# visualize
+fig, ax = plt.subplots(figsize=(10,10))
 
-# Plot
-fig, axs = plt.subplots(1, 3, figsize=(15,5))
-plot_latents(L_latents, title="Latent positions when we only use the Laplacian", 
-             labels=labels, ax=axs[0])
-plot_latents(X_latents, title="Latent positions when we only use our covariates", 
-             labels=labels, ax=axs[1]);
-plot_latents(latents_, title="Latent positions when we combine\n our network and its covariates", 
-             labels=labels, ax=axs[2])
-
-plt.tight_layout()
+def plot_heatmap(A, ax, title="A Stochastic Block Model With 3 Communities", show_cbar=True):
+    cmap = matplotlib.colors.ListedColormap(["white", 'black'])
+    with sns.plotting_context("talk", font_scale=1):
+        ax = sns.heatmap(A, cmap=cmap, ax=ax, square=True,
+                         cbar_kws=dict(shrink=0.7), xticklabels=False,
+                         yticklabels=False)
+        ax.set_title(title)
+        cbar = ax.collections[0].colorbar
+        if show_cbar:
+            cbar.set_ticks([0.25, .75])
+            cbar.set_ticklabels(['No Edge', 'Edge'])
+            cbar.ax.set_frame_on(True)
+        else:
+            cbar.remove()
+            
+        
+plot_heatmap(A, ax)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m<ipython-input-10-5d6ab5827772>[0m in [0;36m<module>[0;34m[0m
-[1;32m      8[0m plot_latents(X_latents, title="Latent positions when we only use our covariates", 
-[1;32m      9[0m              labels=labels, ax=axs[1]);
-[0;32m---> 10[0;31m plot_latents(latents_, title="Latent positions when we combine\n our network and its covariates", 
-[0m[1;32m     11[0m              labels=labels, ax=axs[2])
-[1;32m     12[0m [0;34m[0m[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py[0m in [0;36m_run_checked_subprocess[0;34m(self, command, tex)[0m
+[1;32m    274[0m         [0;32mtry[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 275[0;31m             report = subprocess.check_output(command,
+[0m[1;32m    276[0m                                              [0mcwd[0m[0;34m=[0m[0mself[0m[0;34m.[0m[0mtexcache[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
 
-[0;31mNameError[0m: name 'latents_' is not defined
-NameError: name 'latents_' is not defined
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py[0m in [0;36mcheck_output[0;34m(timeout, *popenargs, **kwargs)[0m
+[1;32m    414[0m [0;34m[0m[0m
+[0;32m--> 415[0;31m     return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+[0m[1;32m    416[0m                **kwargs).stdout
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py[0m in [0;36mrun[0;34m(input, capture_output, timeout, check, *popenargs, **kwargs)[0m
+[1;32m    492[0m [0;34m[0m[0m
+[0;32m--> 493[0;31m     [0;32mwith[0m [0mPopen[0m[0;34m([0m[0;34m*[0m[0mpopenargs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m [0;32mas[0m [0mprocess[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    494[0m         [0;32mtry[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py[0m in [0;36m__init__[0;34m(self, args, bufsize, executable, stdin, stdout, stderr, preexec_fn, close_fds, shell, cwd, env, universal_newlines, startupinfo, creationflags, restore_signals, start_new_session, pass_fds, encoding, errors, text)[0m
+[1;32m    857[0m [0;34m[0m[0m
+[0;32m--> 858[0;31m             self._execute_child(args, executable, preexec_fn, close_fds,
+[0m[1;32m    859[0m                                 [0mpass_fds[0m[0;34m,[0m [0mcwd[0m[0;34m,[0m [0menv[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py[0m in [0;36m_execute_child[0;34m(self, args, executable, preexec_fn, close_fds, pass_fds, cwd, env, startupinfo, creationflags, shell, p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite, restore_signals, start_new_session)[0m
+[1;32m   1705[0m                         [0merr_msg[0m [0;34m=[0m [0mos[0m[0;34m.[0m[0mstrerror[0m[0;34m([0m[0merrno_num[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 1706[0;31m                     [0;32mraise[0m [0mchild_exception_type[0m[0;34m([0m[0merrno_num[0m[0;34m,[0m [0merr_msg[0m[0;34m,[0m [0merr_filename[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   1707[0m                 [0;32mraise[0m [0mchild_exception_type[0m[0;34m([0m[0merr_msg[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: 'latex'
+
+The above exception was the direct cause of the following exception:
+
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/IPython/core/formatters.py[0m in [0;36m__call__[0;34m(self, obj)[0m
+[1;32m    339[0m                 [0;32mpass[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    340[0m             [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 341[0;31m                 [0;32mreturn[0m [0mprinter[0m[0;34m([0m[0mobj[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    342[0m             [0;31m# Finally look for special method names[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    343[0m             [0mmethod[0m [0;34m=[0m [0mget_real_method[0m[0;34m([0m[0mobj[0m[0;34m,[0m [0mself[0m[0;34m.[0m[0mprint_method[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/IPython/core/pylabtools.py[0m in [0;36m<lambda>[0;34m(fig)[0m
+[1;32m    246[0m [0;34m[0m[0m
+[1;32m    247[0m     [0;32mif[0m [0;34m'png'[0m [0;32min[0m [0mformats[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 248[0;31m         [0mpng_formatter[0m[0;34m.[0m[0mfor_type[0m[0;34m([0m[0mFigure[0m[0;34m,[0m [0;32mlambda[0m [0mfig[0m[0;34m:[0m [0mprint_figure[0m[0;34m([0m[0mfig[0m[0;34m,[0m [0;34m'png'[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    249[0m     [0;32mif[0m [0;34m'retina'[0m [0;32min[0m [0mformats[0m [0;32mor[0m [0;34m'png2x'[0m [0;32min[0m [0mformats[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    250[0m         [0mpng_formatter[0m[0;34m.[0m[0mfor_type[0m[0;34m([0m[0mFigure[0m[0;34m,[0m [0;32mlambda[0m [0mfig[0m[0;34m:[0m [0mretina_figure[0m[0;34m([0m[0mfig[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/IPython/core/pylabtools.py[0m in [0;36mprint_figure[0;34m(fig, fmt, bbox_inches, **kwargs)[0m
+[1;32m    130[0m         [0mFigureCanvasBase[0m[0;34m([0m[0mfig[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    131[0m [0;34m[0m[0m
+[0;32m--> 132[0;31m     [0mfig[0m[0;34m.[0m[0mcanvas[0m[0;34m.[0m[0mprint_figure[0m[0;34m([0m[0mbytes_io[0m[0;34m,[0m [0;34m**[0m[0mkw[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    133[0m     [0mdata[0m [0;34m=[0m [0mbytes_io[0m[0;34m.[0m[0mgetvalue[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    134[0m     [0;32mif[0m [0mfmt[0m [0;34m==[0m [0;34m'svg'[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/backend_bases.py[0m in [0;36mprint_figure[0;34m(self, filename, dpi, facecolor, edgecolor, orientation, format, bbox_inches, pad_inches, bbox_extra_artists, backend, **kwargs)[0m
+[1;32m   2191[0m                            else suppress())
+[1;32m   2192[0m                     [0;32mwith[0m [0mctx[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 2193[0;31m                         [0mself[0m[0;34m.[0m[0mfigure[0m[0;34m.[0m[0mdraw[0m[0;34m([0m[0mrenderer[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   2194[0m [0;34m[0m[0m
+[1;32m   2195[0m                     bbox_inches = self.figure.get_tightbbox(
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py[0m in [0;36mdraw_wrapper[0;34m(artist, renderer, *args, **kwargs)[0m
+[1;32m     39[0m                 [0mrenderer[0m[0;34m.[0m[0mstart_filter[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     40[0m [0;34m[0m[0m
+[0;32m---> 41[0;31m             [0;32mreturn[0m [0mdraw[0m[0;34m([0m[0martist[0m[0;34m,[0m [0mrenderer[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     42[0m         [0;32mfinally[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     43[0m             [0;32mif[0m [0martist[0m[0;34m.[0m[0mget_agg_filter[0m[0;34m([0m[0;34m)[0m [0;32mis[0m [0;32mnot[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/figure.py[0m in [0;36mdraw[0;34m(self, renderer)[0m
+[1;32m   1861[0m [0;34m[0m[0m
+[1;32m   1862[0m             [0mself[0m[0;34m.[0m[0mpatch[0m[0;34m.[0m[0mdraw[0m[0;34m([0m[0mrenderer[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 1863[0;31m             mimage._draw_list_compositing_images(
+[0m[1;32m   1864[0m                 renderer, self, artists, self.suppressComposite)
+[1;32m   1865[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/image.py[0m in [0;36m_draw_list_compositing_images[0;34m(renderer, parent, artists, suppress_composite)[0m
+[1;32m    130[0m     [0;32mif[0m [0mnot_composite[0m [0;32mor[0m [0;32mnot[0m [0mhas_images[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    131[0m         [0;32mfor[0m [0ma[0m [0;32min[0m [0martists[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 132[0;31m             [0ma[0m[0;34m.[0m[0mdraw[0m[0;34m([0m[0mrenderer[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    133[0m     [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    134[0m         [0;31m# Composite any adjacent images together[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py[0m in [0;36mdraw_wrapper[0;34m(artist, renderer, *args, **kwargs)[0m
+[1;32m     39[0m                 [0mrenderer[0m[0;34m.[0m[0mstart_filter[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     40[0m [0;34m[0m[0m
+[0;32m---> 41[0;31m             [0;32mreturn[0m [0mdraw[0m[0;34m([0m[0martist[0m[0;34m,[0m [0mrenderer[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     42[0m         [0;32mfinally[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     43[0m             [0;32mif[0m [0martist[0m[0;34m.[0m[0mget_agg_filter[0m[0;34m([0m[0;34m)[0m [0;32mis[0m [0;32mnot[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/cbook/deprecation.py[0m in [0;36mwrapper[0;34m(*inner_args, **inner_kwargs)[0m
+[1;32m    409[0m                          [0;32melse[0m [0mdeprecation_addendum[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    410[0m                 **kwargs)
+[0;32m--> 411[0;31m         [0;32mreturn[0m [0mfunc[0m[0;34m([0m[0;34m*[0m[0minner_args[0m[0;34m,[0m [0;34m**[0m[0minner_kwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    412[0m [0;34m[0m[0m
+[1;32m    413[0m     [0;32mreturn[0m [0mwrapper[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axes/_base.py[0m in [0;36mdraw[0;34m(self, renderer, inframe)[0m
+[1;32m   2746[0m             [0mrenderer[0m[0;34m.[0m[0mstop_rasterizing[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   2747[0m [0;34m[0m[0m
+[0;32m-> 2748[0;31m         [0mmimage[0m[0;34m.[0m[0m_draw_list_compositing_images[0m[0;34m([0m[0mrenderer[0m[0;34m,[0m [0mself[0m[0;34m,[0m [0martists[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   2749[0m [0;34m[0m[0m
+[1;32m   2750[0m         [0mrenderer[0m[0;34m.[0m[0mclose_group[0m[0;34m([0m[0;34m'axes'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/image.py[0m in [0;36m_draw_list_compositing_images[0;34m(renderer, parent, artists, suppress_composite)[0m
+[1;32m    130[0m     [0;32mif[0m [0mnot_composite[0m [0;32mor[0m [0;32mnot[0m [0mhas_images[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    131[0m         [0;32mfor[0m [0ma[0m [0;32min[0m [0martists[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 132[0;31m             [0ma[0m[0;34m.[0m[0mdraw[0m[0;34m([0m[0mrenderer[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    133[0m     [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    134[0m         [0;31m# Composite any adjacent images together[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py[0m in [0;36mdraw_wrapper[0;34m(artist, renderer, *args, **kwargs)[0m
+[1;32m     39[0m                 [0mrenderer[0m[0;34m.[0m[0mstart_filter[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     40[0m [0;34m[0m[0m
+[0;32m---> 41[0;31m             [0;32mreturn[0m [0mdraw[0m[0;34m([0m[0martist[0m[0;34m,[0m [0mrenderer[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     42[0m         [0;32mfinally[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     43[0m             [0;32mif[0m [0martist[0m[0;34m.[0m[0mget_agg_filter[0m[0;34m([0m[0;34m)[0m [0;32mis[0m [0;32mnot[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py[0m in [0;36mdraw[0;34m(self, renderer, *args, **kwargs)[0m
+[1;32m   1163[0m [0;34m[0m[0m
+[1;32m   1164[0m         [0mticks_to_draw[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_update_ticks[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 1165[0;31m         ticklabelBoxes, ticklabelBoxes2 = self._get_tick_bboxes(ticks_to_draw,
+[0m[1;32m   1166[0m                                                                 renderer)
+[1;32m   1167[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py[0m in [0;36m_get_tick_bboxes[0;34m(self, ticks, renderer)[0m
+[1;32m   1091[0m         return ([tick.label1.get_window_extent(renderer)
+[1;32m   1092[0m                  for tick in ticks if tick.label1.get_visible()],
+[0;32m-> 1093[0;31m                 [tick.label2.get_window_extent(renderer)
+[0m[1;32m   1094[0m                  for tick in ticks if tick.label2.get_visible()])
+[1;32m   1095[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py[0m in [0;36m<listcomp>[0;34m(.0)[0m
+[1;32m   1091[0m         return ([tick.label1.get_window_extent(renderer)
+[1;32m   1092[0m                  for tick in ticks if tick.label1.get_visible()],
+[0;32m-> 1093[0;31m                 [tick.label2.get_window_extent(renderer)
+[0m[1;32m   1094[0m                  for tick in ticks if tick.label2.get_visible()])
+[1;32m   1095[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/text.py[0m in [0;36mget_window_extent[0;34m(self, renderer, dpi)[0m
+[1;32m    898[0m [0;34m[0m[0m
+[1;32m    899[0m         [0;32mwith[0m [0mcbook[0m[0;34m.[0m[0m_setattr_cm[0m[0;34m([0m[0mself[0m[0;34m.[0m[0mfigure[0m[0;34m,[0m [0mdpi[0m[0;34m=[0m[0mdpi[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 900[0;31m             [0mbbox[0m[0;34m,[0m [0minfo[0m[0;34m,[0m [0mdescent[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_get_layout[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m_renderer[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    901[0m             [0mx[0m[0;34m,[0m [0my[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0mget_unitless_position[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    902[0m             [0mx[0m[0;34m,[0m [0my[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0mget_transform[0m[0;34m([0m[0;34m)[0m[0;34m.[0m[0mtransform[0m[0;34m([0m[0;34m([0m[0mx[0m[0;34m,[0m [0my[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/text.py[0m in [0;36m_get_layout[0;34m(self, renderer)[0m
+[1;32m    283[0m [0;34m[0m[0m
+[1;32m    284[0m         [0;31m# Full vertical extent of font, including ascenders and descenders:[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 285[0;31m         _, lp_h, lp_d = renderer.get_text_width_height_descent(
+[0m[1;32m    286[0m             [0;34m"lp"[0m[0;34m,[0m [0mself[0m[0;34m.[0m[0m_fontproperties[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    287[0m             ismath="TeX" if self.get_usetex() else False)
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/backends/backend_agg.py[0m in [0;36mget_text_width_height_descent[0;34m(self, s, prop, ismath)[0m
+[1;32m    225[0m             [0mtexmanager[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0mget_texmanager[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    226[0m             [0mfontsize[0m [0;34m=[0m [0mprop[0m[0;34m.[0m[0mget_size_in_points[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 227[0;31m             w, h, d = texmanager.get_text_width_height_descent(
+[0m[1;32m    228[0m                 s, fontsize, renderer=self)
+[1;32m    229[0m             [0;32mreturn[0m [0mw[0m[0;34m,[0m [0mh[0m[0;34m,[0m [0md[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py[0m in [0;36mget_text_width_height_descent[0;34m(self, tex, fontsize, renderer)[0m
+[1;32m    421[0m         [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    422[0m             [0;31m# use dviread.[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 423[0;31m             [0mdvifile[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0mmake_dvi[0m[0;34m([0m[0mtex[0m[0;34m,[0m [0mfontsize[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    424[0m             [0;32mwith[0m [0mdviread[0m[0;34m.[0m[0mDvi[0m[0;34m([0m[0mdvifile[0m[0;34m,[0m [0;36m72[0m [0;34m*[0m [0mdpi_fraction[0m[0;34m)[0m [0;32mas[0m [0mdvi[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    425[0m                 [0mpage[0m[0;34m,[0m [0;34m=[0m [0mdvi[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py[0m in [0;36mmake_dvi[0;34m(self, tex, fontsize)[0m
+[1;32m    307[0m             [0mtexfile[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0mmake_tex[0m[0;34m([0m[0mtex[0m[0;34m,[0m [0mfontsize[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    308[0m             [0;32mwith[0m [0mcbook[0m[0;34m.[0m[0m_lock_path[0m[0;34m([0m[0mtexfile[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 309[0;31m                 self._run_checked_subprocess(
+[0m[1;32m    310[0m                     ["latex", "-interaction=nonstopmode", "--halt-on-error",
+[1;32m    311[0m                      texfile], tex)
+
+[0;32m/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py[0m in [0;36m_run_checked_subprocess[0;34m(self, command, tex)[0m
+[1;32m    277[0m                                              stderr=subprocess.STDOUT)
+[1;32m    278[0m         [0;32mexcept[0m [0mFileNotFoundError[0m [0;32mas[0m [0mexc[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 279[0;31m             raise RuntimeError(
+[0m[1;32m    280[0m                 [0;34m'Failed to process string with tex because {} could not be '[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    281[0m                 'found'.format(command[0])) from exc
+
+[0;31mRuntimeError[0m: Failed to process string with tex because latex could not be found
+RuntimeError: Failed to process string with tex because latex could not be found
 

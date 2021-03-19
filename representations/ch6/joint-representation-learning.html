@@ -592,27 +592,29 @@
                 
   <div class="section" id="joint-representation-learning">
 <h1><span class="section-number">3.6. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
-<p>In many network problems, our network might be more than just its topology (its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of our network. Because they jointly use both the topology of our network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
+<p>In many network problems, our network might be more than just the information contained in its adjacency network (called its topology, or its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of the network. Because they jointly use both the topology of the network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
-<p>In this section, we’ll explore different ways to learn from our data when we have access to these covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
+<p>In this section, we’ll explore different ways to learn from our data when we have access to the covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
 <p>A good way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates and some is in our topology. Using the Stochastic Block Model, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in its covariates. By combining the topology and the covariates, we’ll get a nice embedding that lets us find three distinct community clusters.</p>
 <div class="section" id="stochastic-block-model">
 <h2>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h2>
-<p>Suppose we have a network generated from a Stochastic Block Model (or, commonly, SBM) with three communities (we promise). There are 1500 nodes, with 500 in each community. Because the <span class="math notranslate nohighlight">\(3 \times 3\)</span> block probability matrix that generated this SBM has the same probability values (.3) in its upper-left <span class="math notranslate nohighlight">\(2 \times 2\)</span> square, the first two communities are completely indistinguishable: Any random node in the first community will have exactly the same 15% chance of being connected to another node in the first community and to a node in the second community. As a result, in our adjacency matrix, we’ll see the nodes in communities one and two as a single giant block. The third community will be distinct, with only a small probability (.15) that nodes in it will connect to nodes in either of the other two communities. The topological structure shown by the adjacency matrix can’t separate three groups by itself.</p>
-<div class="cell tag_hide-input docutils container">
+<p>Suppose we have a network generated from a Stochastic Block Model (or, commonly, SBM) with three communities. In our adjacency matrix, which contains only our network’s topological information, we’d like to create a situation where the first two communities are completely indistinguishable: Any random node in the first community will have exactly the same chance of being connected to another node in the first community or to a node in the second community. We’d like the third community to be distinct, with only a small probability that nodes in it will connect to nodes in either of the other two communities.</p>
+<p>The Python code below generates a matrix that looks like this. There are 1500 nodes, with 500 nodes per community. Because the <span class="math notranslate nohighlight">\(3 \times 3\)</span> block probability matrix that generated this SBM has the same probability values (.3) in its upper-left <span class="math notranslate nohighlight">\(2 \times 2\)</span> square, a node in community 1 has a 30% chance of being connected to either another node in community 1 or a node in community 2. As a result, in our adjacency matrix, we’ll see the nodes in communities one and two as a single giant block. On the other hand, nodes in community three only have a 15% chance to connect to nodes in the first community. So, the end result is that we’ve created a situation where we have three communities that we’d like to separate into distinct clusters, but the topological structure in the adjacency matrix can’t separate the three groups by itself.</p>
+<div class="cell tag_hide-input tag_hide-cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># TODO: don&#39;t do this, fix scatterplot</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
 
 <span class="c1"># Start with some simple parameters</span>
 <span class="n">N</span> <span class="o">=</span> <span class="mi">1500</span>  <span class="c1"># Total number of nodes</span>
@@ -622,13 +624,26 @@
               <span class="p">[</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">15</span><span class="p">],</span>
               <span class="p">[</span><span class="o">.</span><span class="mi">15</span><span class="p">,</span> <span class="o">.</span><span class="mi">15</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">]])</span>  <span class="c1"># Our block probability matrix</span>
 
-<span class="c1"># Make and visualize our Stochastic Block Model</span>
+<span class="c1"># Make our Stochastic Block Model</span>
 <span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here you can see what our adjacency matrix looks like. Notice the giant block in the top-left: this block contains both nodes in both of the first two communities, and they’re indistinguishable from each other.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+    <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,})</span>
 
-<span class="c1"># make the colorbar look nice</span>
+<span class="c1"># visualize</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">plot_heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;A Stochastic Block Model&quot;</span><span class="p">,</span> <span class="n">show_cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">plot_heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;A Stochastic Block Model With 3 Communities&quot;</span><span class="p">,</span> <span class="n">show_cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">([</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">])</span>
     <span class="k">with</span> <span class="n">sns</span><span class="o">.</span><span class="n">plotting_context</span><span class="p">(</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -649,24 +664,395 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_5_0.png" src="../../_images/joint-representation-learning_5_0.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">_run_checked_subprocess</span><span class="nt">(self, command, tex)</span>
+<span class="g g-Whitespace">    </span><span class="mi">274</span>         <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">275</span>             <span class="n">report</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">276</span>                                              <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">texcache</span><span class="p">,</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">check_output</span><span class="nt">(timeout, *popenargs, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">414</span> 
+<span class="ne">--&gt; </span><span class="mi">415</span>     <span class="k">return</span> <span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">popenargs</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span>                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">stdout</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">run</span><span class="nt">(input, capture_output, timeout, check, *popenargs, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">492</span> 
+<span class="ne">--&gt; </span><span class="mi">493</span>     <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span><span class="o">*</span><span class="n">popenargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">494</span>         <span class="k">try</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">__init__</span><span class="nt">(self, args, bufsize, executable, stdin, stdout, stderr, preexec_fn, close_fds, shell, cwd, env, universal_newlines, startupinfo, creationflags, restore_signals, start_new_session, pass_fds, encoding, errors, text)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span> 
+<span class="ne">--&gt; </span><span class="mi">858</span>             <span class="bp">self</span><span class="o">.</span><span class="n">_execute_child</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">preexec_fn</span><span class="p">,</span> <span class="n">close_fds</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span>                                 <span class="n">pass_fds</span><span class="p">,</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">_execute_child</span><span class="nt">(self, args, executable, preexec_fn, close_fds, pass_fds, cwd, env, startupinfo, creationflags, shell, p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite, restore_signals, start_new_session)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1705</span>                         <span class="n">err_msg</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno_num</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1706</span>                     <span class="k">raise</span> <span class="n">child_exception_type</span><span class="p">(</span><span class="n">errno_num</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">,</span> <span class="n">err_filename</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1707</span>                 <span class="k">raise</span> <span class="n">child_exception_type</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+
+<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;latex&#39;
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">RuntimeError</span><span class="g g-Whitespace">                              </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="mi">0</span><span class="n">c7487a06fa4</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span> 
+<span class="g g-Whitespace">     </span><span class="mi">26</span> 
+<span class="ne">---&gt; </span><span class="mi">27</span> <span class="n">plot_heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+
+<span class="nn">&lt;ipython-input-3-0c7487a06fa4&gt;</span> in <span class="ni">plot_heatmap</span><span class="nt">(A, ax, title, show_cbar)</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span>     <span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">([</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s1">&#39;black&#39;</span><span class="p">])</span>
+<span class="g g-Whitespace">     </span><span class="mi">13</span>     <span class="k">with</span> <span class="n">sns</span><span class="o">.</span><span class="n">plotting_context</span><span class="p">(</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="ne">---&gt; </span><span class="mi">14</span>         <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span>                          <span class="n">cbar_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">shrink</span><span class="o">=</span><span class="mf">0.7</span><span class="p">),</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span>                          <span class="n">yticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/_decorators.py</span> in <span class="ni">inner_f</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">44</span>             <span class="p">)</span>
+<span class="nn">     45         kwargs.update({k: arg for k, arg</span> in <span class="ni">zip</span><span class="nt">(sig.parameters, args)})</span>
+<span class="ne">---&gt; </span><span class="mi">46</span>         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span>     <span class="k">return</span> <span class="n">inner_f</span>
+<span class="g g-Whitespace">     </span><span class="mi">48</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/matrix.py</span> in <span class="ni">heatmap</span><span class="nt">(data, vmin, vmax, cmap, center, robust, annot, fmt, annot_kws, linewidths, linecolor, cbar, cbar_kws, cbar_ax, square, xticklabels, yticklabels, mask, ax, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">546</span>     <span class="k">if</span> <span class="n">square</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">547</span>         <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">548</span>     <span class="n">plotter</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar_ax</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">549</span>     <span class="k">return</span> <span class="n">ax</span>
+<span class="g g-Whitespace">    </span><span class="mi">550</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/seaborn/matrix.py</span> in <span class="ni">plot</span><span class="nt">(self, ax, cax, kws)</span>
+<span class="g g-Whitespace">    </span><span class="mi">330</span>         <span class="c1"># Possibly rotate them if they overlap</span>
+<span class="g g-Whitespace">    </span><span class="mi">331</span>         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="s2">&quot;get_renderer&quot;</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">332</span>             <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">get_renderer</span><span class="p">())</span>
+<span class="g g-Whitespace">    </span><span class="mi">333</span>         <span class="k">if</span> <span class="n">axis_ticklabels_overlap</span><span class="p">(</span><span class="n">xtl</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">334</span>             <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">xtl</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> 
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/figure.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1861</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1862</span>             <span class="bp">self</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1863</span>             <span class="n">mimage</span><span class="o">.</span><span class="n">_draw_list_compositing_images</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1864</span>                 <span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">artists</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppressComposite</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1865</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/image.py</span> in <span class="ni">_draw_list_compositing_images</span><span class="nt">(renderer, parent, artists, suppress_composite)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="k">if</span> <span class="n">not_composite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_images</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">artists</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>             <span class="n">a</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="c1"># Composite any adjacent images together</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> 
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/cbook/deprecation.py</span> in <span class="ni">wrapper</span><span class="nt">(*inner_args, **inner_kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">409</span>                          <span class="k">else</span> <span class="n">deprecation_addendum</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">410</span>                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">411</span>         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">inner_args</span><span class="p">,</span> <span class="o">**</span><span class="n">inner_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">412</span> 
+<span class="g g-Whitespace">    </span><span class="mi">413</span>     <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axes/_base.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer, inframe)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2746</span>             <span class="n">renderer</span><span class="o">.</span><span class="n">stop_rasterizing</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">2747</span> 
+<span class="ne">-&gt; </span><span class="mi">2748</span>         <span class="n">mimage</span><span class="o">.</span><span class="n">_draw_list_compositing_images</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">artists</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2749</span> 
+<span class="g g-Whitespace">   </span><span class="mi">2750</span>         <span class="n">renderer</span><span class="o">.</span><span class="n">close_group</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/image.py</span> in <span class="ni">_draw_list_compositing_images</span><span class="nt">(renderer, parent, artists, suppress_composite)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="k">if</span> <span class="n">not_composite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_images</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">artists</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>             <span class="n">a</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="c1"># Composite any adjacent images together</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> 
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1163</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1164</span>         <span class="n">ticks_to_draw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_ticks</span><span class="p">()</span>
+<span class="ne">-&gt; </span><span class="mi">1165</span>         <span class="n">ticklabelBoxes</span><span class="p">,</span> <span class="n">ticklabelBoxes2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tick_bboxes</span><span class="p">(</span><span class="n">ticks_to_draw</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1166</span>                                                                 <span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1167</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py</span> in <span class="ni">_get_tick_bboxes</span><span class="nt">(self, ticks, renderer)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1091</span>         <span class="k">return</span> <span class="p">([</span><span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1092</span>                  <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ticks</span> <span class="k">if</span> <span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_visible</span><span class="p">()],</span>
+<span class="ne">-&gt; </span><span class="mi">1093</span>                 <span class="p">[</span><span class="n">tick</span><span class="o">.</span><span class="n">label2</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="nn">   1094                  for tick</span> in <span class="ni">ticks if tick.label2.get_visible</span><span class="nt">()])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1095</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1091</span>         <span class="k">return</span> <span class="p">([</span><span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1092</span>                  <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ticks</span> <span class="k">if</span> <span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_visible</span><span class="p">()],</span>
+<span class="ne">-&gt; </span><span class="mi">1093</span>                 <span class="p">[</span><span class="n">tick</span><span class="o">.</span><span class="n">label2</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="nn">   1094                  for tick</span> in <span class="ni">ticks if tick.label2.get_visible</span><span class="nt">()])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1095</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/text.py</span> in <span class="ni">get_window_extent</span><span class="nt">(self, renderer, dpi)</span>
+<span class="g g-Whitespace">    </span><span class="mi">898</span> 
+<span class="g g-Whitespace">    </span><span class="mi">899</span>         <span class="k">with</span> <span class="n">cbook</span><span class="o">.</span><span class="n">_setattr_cm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">900</span>             <span class="n">bbox</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">descent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">901</span>             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unitless_position</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">902</span>             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transform</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/text.py</span> in <span class="ni">_get_layout</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">    </span><span class="mi">283</span> 
+<span class="g g-Whitespace">    </span><span class="mi">284</span>         <span class="c1"># Full vertical extent of font, including ascenders and descenders:</span>
+<span class="ne">--&gt; </span><span class="mi">285</span>         <span class="n">_</span><span class="p">,</span> <span class="n">lp_h</span><span class="p">,</span> <span class="n">lp_d</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">get_text_width_height_descent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">286</span>             <span class="s2">&quot;lp&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fontproperties</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">287</span>             <span class="n">ismath</span><span class="o">=</span><span class="s2">&quot;TeX&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_usetex</span><span class="p">()</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/backends/backend_agg.py</span> in <span class="ni">get_text_width_height_descent</span><span class="nt">(self, s, prop, ismath)</span>
+<span class="g g-Whitespace">    </span><span class="mi">225</span>             <span class="n">texmanager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_texmanager</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">226</span>             <span class="n">fontsize</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">get_size_in_points</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">227</span>             <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">texmanager</span><span class="o">.</span><span class="n">get_text_width_height_descent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">228</span>                 <span class="n">s</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">229</span>             <span class="k">return</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">d</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">get_text_width_height_descent</span><span class="nt">(self, tex, fontsize, renderer)</span>
+<span class="g g-Whitespace">    </span><span class="mi">421</span>         <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">422</span>             <span class="c1"># use dviread.</span>
+<span class="ne">--&gt; </span><span class="mi">423</span>             <span class="n">dvifile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dvi</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">424</span>             <span class="k">with</span> <span class="n">dviread</span><span class="o">.</span><span class="n">Dvi</span><span class="p">(</span><span class="n">dvifile</span><span class="p">,</span> <span class="mi">72</span> <span class="o">*</span> <span class="n">dpi_fraction</span><span class="p">)</span> <span class="k">as</span> <span class="n">dvi</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">425</span>                 <span class="n">page</span><span class="p">,</span> <span class="o">=</span> <span class="n">dvi</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">make_dvi</span><span class="nt">(self, tex, fontsize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">307</span>             <span class="n">texfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_tex</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">308</span>             <span class="k">with</span> <span class="n">cbook</span><span class="o">.</span><span class="n">_lock_path</span><span class="p">(</span><span class="n">texfile</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">309</span>                 <span class="bp">self</span><span class="o">.</span><span class="n">_run_checked_subprocess</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">310</span>                     <span class="p">[</span><span class="s2">&quot;latex&quot;</span><span class="p">,</span> <span class="s2">&quot;-interaction=nonstopmode&quot;</span><span class="p">,</span> <span class="s2">&quot;--halt-on-error&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">311</span>                      <span class="n">texfile</span><span class="p">],</span> <span class="n">tex</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">_run_checked_subprocess</span><span class="nt">(self, command, tex)</span>
+<span class="g g-Whitespace">    </span><span class="mi">277</span>                                              <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">278</span>         <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">279</span>             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span>                 <span class="s1">&#39;Failed to process string with tex because </span><span class="si">{}</span><span class="s1"> could not be &#39;</span>
+<span class="g g-Whitespace">    </span><span class="mi">281</span>                 <span class="s1">&#39;found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">command</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+<span class="ne">RuntimeError</span>: Failed to process string with tex because latex could not be found
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">_run_checked_subprocess</span><span class="nt">(self, command, tex)</span>
+<span class="g g-Whitespace">    </span><span class="mi">274</span>         <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">275</span>             <span class="n">report</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">command</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">276</span>                                              <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">texcache</span><span class="p">,</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">check_output</span><span class="nt">(timeout, *popenargs, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">414</span> 
+<span class="ne">--&gt; </span><span class="mi">415</span>     <span class="k">return</span> <span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">popenargs</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">416</span>                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">stdout</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">run</span><span class="nt">(input, capture_output, timeout, check, *popenargs, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">492</span> 
+<span class="ne">--&gt; </span><span class="mi">493</span>     <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span><span class="o">*</span><span class="n">popenargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">494</span>         <span class="k">try</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">__init__</span><span class="nt">(self, args, bufsize, executable, stdin, stdout, stderr, preexec_fn, close_fds, shell, cwd, env, universal_newlines, startupinfo, creationflags, restore_signals, start_new_session, pass_fds, encoding, errors, text)</span>
+<span class="g g-Whitespace">    </span><span class="mi">857</span> 
+<span class="ne">--&gt; </span><span class="mi">858</span>             <span class="bp">self</span><span class="o">.</span><span class="n">_execute_child</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">preexec_fn</span><span class="p">,</span> <span class="n">close_fds</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">859</span>                                 <span class="n">pass_fds</span><span class="p">,</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/subprocess.py</span> in <span class="ni">_execute_child</span><span class="nt">(self, args, executable, preexec_fn, close_fds, pass_fds, cwd, env, startupinfo, creationflags, shell, p2cread, p2cwrite, c2pread, c2pwrite, errread, errwrite, restore_signals, start_new_session)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1705</span>                         <span class="n">err_msg</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno_num</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1706</span>                     <span class="k">raise</span> <span class="n">child_exception_type</span><span class="p">(</span><span class="n">errno_num</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">,</span> <span class="n">err_filename</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1707</span>                 <span class="k">raise</span> <span class="n">child_exception_type</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+
+<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;latex&#39;
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">RuntimeError</span><span class="g g-Whitespace">                              </span>Traceback (most recent call last)
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/IPython/core/formatters.py</span> in <span class="ni">__call__</span><span class="nt">(self, obj)</span>
+<span class="g g-Whitespace">    </span><span class="mi">339</span>                 <span class="k">pass</span>
+<span class="g g-Whitespace">    </span><span class="mi">340</span>             <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">341</span>                 <span class="k">return</span> <span class="n">printer</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">342</span>             <span class="c1"># Finally look for special method names</span>
+<span class="g g-Whitespace">    </span><span class="mi">343</span>             <span class="n">method</span> <span class="o">=</span> <span class="n">get_real_method</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_method</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/IPython/core/pylabtools.py</span> in <span class="ni">&lt;lambda&gt;</span><span class="nt">(fig)</span>
+<span class="g g-Whitespace">    </span><span class="mi">246</span> 
+<span class="g g-Whitespace">    </span><span class="mi">247</span>     <span class="k">if</span> <span class="s1">&#39;png&#39;</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">248</span>         <span class="n">png_formatter</span><span class="o">.</span><span class="n">for_type</span><span class="p">(</span><span class="n">Figure</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">fig</span><span class="p">:</span> <span class="n">print_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">249</span>     <span class="k">if</span> <span class="s1">&#39;retina&#39;</span> <span class="ow">in</span> <span class="n">formats</span> <span class="ow">or</span> <span class="s1">&#39;png2x&#39;</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">250</span>         <span class="n">png_formatter</span><span class="o">.</span><span class="n">for_type</span><span class="p">(</span><span class="n">Figure</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">fig</span><span class="p">:</span> <span class="n">retina_figure</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/IPython/core/pylabtools.py</span> in <span class="ni">print_figure</span><span class="nt">(fig, fmt, bbox_inches, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>         <span class="n">FigureCanvasBase</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span> 
+<span class="ne">--&gt; </span><span class="mi">132</span>     <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">print_figure</span><span class="p">(</span><span class="n">bytes_io</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">bytes_io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>     <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;svg&#39;</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/backend_bases.py</span> in <span class="ni">print_figure</span><span class="nt">(self, filename, dpi, facecolor, edgecolor, orientation, format, bbox_inches, pad_inches, bbox_extra_artists, backend, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2191</span>                            <span class="k">else</span> <span class="n">suppress</span><span class="p">())</span>
+<span class="g g-Whitespace">   </span><span class="mi">2192</span>                     <span class="k">with</span> <span class="n">ctx</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">2193</span>                         <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2194</span> 
+<span class="g g-Whitespace">   </span><span class="mi">2195</span>                     <span class="n">bbox_inches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">get_tightbbox</span><span class="p">(</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> 
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/figure.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1861</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1862</span>             <span class="bp">self</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1863</span>             <span class="n">mimage</span><span class="o">.</span><span class="n">_draw_list_compositing_images</span><span class="p">(</span>
+<span class="g g-Whitespace">   </span><span class="mi">1864</span>                 <span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">artists</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppressComposite</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1865</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/image.py</span> in <span class="ni">_draw_list_compositing_images</span><span class="nt">(renderer, parent, artists, suppress_composite)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="k">if</span> <span class="n">not_composite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_images</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">artists</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>             <span class="n">a</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="c1"># Composite any adjacent images together</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> 
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/cbook/deprecation.py</span> in <span class="ni">wrapper</span><span class="nt">(*inner_args, **inner_kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">409</span>                          <span class="k">else</span> <span class="n">deprecation_addendum</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">410</span>                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">411</span>         <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">inner_args</span><span class="p">,</span> <span class="o">**</span><span class="n">inner_kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">412</span> 
+<span class="g g-Whitespace">    </span><span class="mi">413</span>     <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axes/_base.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer, inframe)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2746</span>             <span class="n">renderer</span><span class="o">.</span><span class="n">stop_rasterizing</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">2747</span> 
+<span class="ne">-&gt; </span><span class="mi">2748</span>         <span class="n">mimage</span><span class="o">.</span><span class="n">_draw_list_compositing_images</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">artists</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2749</span> 
+<span class="g g-Whitespace">   </span><span class="mi">2750</span>         <span class="n">renderer</span><span class="o">.</span><span class="n">close_group</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/image.py</span> in <span class="ni">_draw_list_compositing_images</span><span class="nt">(renderer, parent, artists, suppress_composite)</span>
+<span class="g g-Whitespace">    </span><span class="mi">130</span>     <span class="k">if</span> <span class="n">not_composite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_images</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">131</span>         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">artists</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">132</span>             <span class="n">a</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">133</span>     <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">134</span>         <span class="c1"># Composite any adjacent images together</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/artist.py</span> in <span class="ni">draw_wrapper</span><span class="nt">(artist, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>                 <span class="n">renderer</span><span class="o">.</span><span class="n">start_filter</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> 
+<span class="ne">---&gt; </span><span class="mi">41</span>             <span class="k">return</span> <span class="n">draw</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>         <span class="k">finally</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>             <span class="k">if</span> <span class="n">artist</span><span class="o">.</span><span class="n">get_agg_filter</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py</span> in <span class="ni">draw</span><span class="nt">(self, renderer, *args, **kwargs)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1163</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1164</span>         <span class="n">ticks_to_draw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_ticks</span><span class="p">()</span>
+<span class="ne">-&gt; </span><span class="mi">1165</span>         <span class="n">ticklabelBoxes</span><span class="p">,</span> <span class="n">ticklabelBoxes2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tick_bboxes</span><span class="p">(</span><span class="n">ticks_to_draw</span><span class="p">,</span>
+<span class="g g-Whitespace">   </span><span class="mi">1166</span>                                                                 <span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1167</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py</span> in <span class="ni">_get_tick_bboxes</span><span class="nt">(self, ticks, renderer)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1091</span>         <span class="k">return</span> <span class="p">([</span><span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1092</span>                  <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ticks</span> <span class="k">if</span> <span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_visible</span><span class="p">()],</span>
+<span class="ne">-&gt; </span><span class="mi">1093</span>                 <span class="p">[</span><span class="n">tick</span><span class="o">.</span><span class="n">label2</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="nn">   1094                  for tick</span> in <span class="ni">ticks if tick.label2.get_visible</span><span class="nt">()])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1095</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/axis.py</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1091</span>         <span class="k">return</span> <span class="p">([</span><span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1092</span>                  <span class="k">for</span> <span class="n">tick</span> <span class="ow">in</span> <span class="n">ticks</span> <span class="k">if</span> <span class="n">tick</span><span class="o">.</span><span class="n">label1</span><span class="o">.</span><span class="n">get_visible</span><span class="p">()],</span>
+<span class="ne">-&gt; </span><span class="mi">1093</span>                 <span class="p">[</span><span class="n">tick</span><span class="o">.</span><span class="n">label2</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">(</span><span class="n">renderer</span><span class="p">)</span>
+<span class="nn">   1094                  for tick</span> in <span class="ni">ticks if tick.label2.get_visible</span><span class="nt">()])</span>
+<span class="g g-Whitespace">   </span><span class="mi">1095</span> 
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/text.py</span> in <span class="ni">get_window_extent</span><span class="nt">(self, renderer, dpi)</span>
+<span class="g g-Whitespace">    </span><span class="mi">898</span> 
+<span class="g g-Whitespace">    </span><span class="mi">899</span>         <span class="k">with</span> <span class="n">cbook</span><span class="o">.</span><span class="n">_setattr_cm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">900</span>             <span class="n">bbox</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">descent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">901</span>             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unitless_position</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">902</span>             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_transform</span><span class="p">()</span><span class="o">.</span><span class="n">transform</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/text.py</span> in <span class="ni">_get_layout</span><span class="nt">(self, renderer)</span>
+<span class="g g-Whitespace">    </span><span class="mi">283</span> 
+<span class="g g-Whitespace">    </span><span class="mi">284</span>         <span class="c1"># Full vertical extent of font, including ascenders and descenders:</span>
+<span class="ne">--&gt; </span><span class="mi">285</span>         <span class="n">_</span><span class="p">,</span> <span class="n">lp_h</span><span class="p">,</span> <span class="n">lp_d</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">get_text_width_height_descent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">286</span>             <span class="s2">&quot;lp&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fontproperties</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">287</span>             <span class="n">ismath</span><span class="o">=</span><span class="s2">&quot;TeX&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_usetex</span><span class="p">()</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/backends/backend_agg.py</span> in <span class="ni">get_text_width_height_descent</span><span class="nt">(self, s, prop, ismath)</span>
+<span class="g g-Whitespace">    </span><span class="mi">225</span>             <span class="n">texmanager</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_texmanager</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">226</span>             <span class="n">fontsize</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">get_size_in_points</span><span class="p">()</span>
+<span class="ne">--&gt; </span><span class="mi">227</span>             <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">texmanager</span><span class="o">.</span><span class="n">get_text_width_height_descent</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">228</span>                 <span class="n">s</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">229</span>             <span class="k">return</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">d</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">get_text_width_height_descent</span><span class="nt">(self, tex, fontsize, renderer)</span>
+<span class="g g-Whitespace">    </span><span class="mi">421</span>         <span class="k">else</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">422</span>             <span class="c1"># use dviread.</span>
+<span class="ne">--&gt; </span><span class="mi">423</span>             <span class="n">dvifile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dvi</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">424</span>             <span class="k">with</span> <span class="n">dviread</span><span class="o">.</span><span class="n">Dvi</span><span class="p">(</span><span class="n">dvifile</span><span class="p">,</span> <span class="mi">72</span> <span class="o">*</span> <span class="n">dpi_fraction</span><span class="p">)</span> <span class="k">as</span> <span class="n">dvi</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">425</span>                 <span class="n">page</span><span class="p">,</span> <span class="o">=</span> <span class="n">dvi</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">make_dvi</span><span class="nt">(self, tex, fontsize)</span>
+<span class="g g-Whitespace">    </span><span class="mi">307</span>             <span class="n">texfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_tex</span><span class="p">(</span><span class="n">tex</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">308</span>             <span class="k">with</span> <span class="n">cbook</span><span class="o">.</span><span class="n">_lock_path</span><span class="p">(</span><span class="n">texfile</span><span class="p">):</span>
+<span class="ne">--&gt; </span><span class="mi">309</span>                 <span class="bp">self</span><span class="o">.</span><span class="n">_run_checked_subprocess</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">310</span>                     <span class="p">[</span><span class="s2">&quot;latex&quot;</span><span class="p">,</span> <span class="s2">&quot;-interaction=nonstopmode&quot;</span><span class="p">,</span> <span class="s2">&quot;--halt-on-error&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">311</span>                      <span class="n">texfile</span><span class="p">],</span> <span class="n">tex</span><span class="p">)</span>
+
+<span class="nn">/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/matplotlib/texmanager.py</span> in <span class="ni">_run_checked_subprocess</span><span class="nt">(self, command, tex)</span>
+<span class="g g-Whitespace">    </span><span class="mi">277</span>                                              <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">278</span>         <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">279</span>             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span>                 <span class="s1">&#39;Failed to process string with tex because </span><span class="si">{}</span><span class="s1"> could not be &#39;</span>
+<span class="g g-Whitespace">    </span><span class="mi">281</span>                 <span class="s1">&#39;found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">command</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+<span class="ne">RuntimeError</span>: Failed to process string with tex because latex could not be found
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 720x720 with 2 Axes&gt;
+</pre></div>
 </div>
 </div>
-<p>If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other (though we wouldn’t be able to figure that out from our embedding if we didn’t cheat by knowing in advance which community each node is supposed to belong to). The python code below embeds our latent positions down to two dimensions with a Laplacian Spectral Embedding, and then plots the results, color-coding each node by its true community.</p>
+</div>
+<p>If we wanted to embed this graph using our Laplacian or Adjacency Spectral Embedding methods, we’d find the first and second communities layered on top of each other (though we wouldn’t be able to figure that out from our embedding if we didn’t cheat by knowing in advance which community each node is supposed to belong to). The python code below embeds our latent positions all the way down to two dimensions. Below it, you can see a plot of the latent positions, with each node color-coded by its true community.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
 <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">randomized_svd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
 
-<span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dimension</span><span class="p">):</span>
-    <span class="n">latents</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">randomized_svd</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">dimension</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">latents</span>
-
-<span class="k">def</span> <span class="nf">plot_latents</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
+<span class="n">L_latents</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_latents</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
     <span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">latent_positions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">latent_positions</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">hue</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
@@ -678,33 +1064,26 @@
     
     <span class="k">return</span> <span class="n">plot</span>
 
-<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
-<span class="n">L_latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">L_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed the Laplacian&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_7_0.png" src="../../_images/joint-representation-learning_7_0.png" />
 </div>
-</div>
-<p>We’d like to use extra information to more clearly distinguish between the first and second community. We don’t have this information in our network: it needs to come from somewhere else.</p>
+<p>As you can see, we’d have a tough time clustering this - the first and second community are completely indistinguishable. It would be nice if we could use extra information to more clearly distinguish between them. We don’t have this information in our adjacency matrix: it needs to come from somewhere else.</p>
 </div>
 <div class="section" id="covariates">
 <h2>Covariates<a class="headerlink" href="#covariates" title="Permalink to this headline">¶</a></h2>
-<p>But we’re in luck - we have extra in a set of covariates for each node! These covariates contain the extra information we need that allows us to separate our first and second community. However, with only these extra covariate features, we can no longer distinguish between the last two communities - they contain the same information.</p>
-<p>Below is a visualization of our covariates. Each node is associated with its own group of 30 covariates (thirty being chosen primarily to visualize what’s happening more clearly). We’ll organize this information into a matrix, where the <span class="math notranslate nohighlight">\(i_{th}\)</span> row contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Remember that we have 1500 nodes in our network, so there will be 1500 rows. We’ll draw all the covariates for each node from the same Beta distribution (with values ranging from 0 to 1), but the nodes in the first community will be drawn from a different Beta distribution than the nodes in the last two. As a result, the first community is represented by the lighter-colored rows, and the last two are represented by the darker-colored rows.</p>
-<div class="cell tag_hide-input docutils container">
+<p>But we’re in luck - we have a set of covariates for each node! These covariates contain the extra information we need that allows us to separate our first and second community. However, with only these extra covariate features, we can no longer distinguish between the last two communities - they contain the same information.</p>
+<p>Below is Python code that generates these covariates. Each node is associated with its own group of 30 covariates (thirty being chosen primarily to visualize what’s happening more clearly). We’ll organize this information into a matrix, where the <span class="math notranslate nohighlight">\(i_{th}\)</span> row contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Remember that we have 1500 nodes in our network, so there will be 1500 rows. We’ll draw all the covariates for each node from the same Beta distribution (with values ranging from 0 to 1), but the nodes in the first community will be drawn from a different Beta distribution than the nodes in the last two.</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">bernoulli</span><span class="p">,</span> <span class="n">beta</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">beta</span>
+
+<span class="k">def</span> <span class="nf">make_community</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">beta</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">gen_covariates</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
-    <span class="n">make_community</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">beta</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
     <span class="n">c1</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
     <span class="n">c2</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
     <span class="n">c3</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -715,8 +1094,14 @@
 
 <span class="c1"># Generate a covariate matrix</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">gen_covariates</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
-
-<span class="c1"># Plot and make the axis look nice</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here is a visualization of the covariates we just created. The first community is represented by the lighter-colored rows, and the last two are represented by the darker-colored rows.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot and make the axis look nice</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rocket_r&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Visualization of the covariates&quot;</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> 
@@ -725,34 +1110,40 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_11_0.png" src="../../_images/joint-representation-learning_11_0.png" />
-</div>
 </div>
 <p>We can play almost the same game here as we did with the Laplacian. If we embed the information contained in this matrix of covariates into lower dimensions, we can see the reverse situation as before - the first community is separate, but the last two are overlayed on top of each other.</p>
+<p>Below is Python code that embeds the covariates. We’ll use custom embedding code rather than graspologic’s LSE class, because it isn’t technically right to act as if we’re embedding a Laplacian (even though we’re doing essentially the same thing under the hood). Underneath it is a plot of the resulting embedding.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">randomized_svd</span>
+
+<span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dimension</span><span class="p">):</span>
+    <span class="n">latents</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">randomized_svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">dimension</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">latents</span>
+
+<span class="n">X_latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">XXt</span> <span class="o">=</span> <span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span>
-<span class="n">X_latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">XXt</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">X_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed our covariates&quot;</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">X_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we</span><span class="se">\n</span><span class="s2"> only embed our covariates&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_13_0.png" src="../../_images/joint-representation-learning_13_0.png" />
 </div>
-</div>
-<p>We want full separation between all three communities, so we need some kind of representation of our network that allows us to use both the information in the topology and the information in the covariates. This is where CASE comes in.</p>
+<p>As you can see, we’re in a similar situation as we were in with the adjacency matrix, but with different communities: instead of the first and second communities being indistinguishable, now the second and third are. We’d like to see full separation between all three communities, so we need some kind of representation of our network that allows us to use both the information in the topology and the information in the covariates. This is where CASE comes in.</p>
 </div>
 <div class="section" id="covariate-assisted-spectral-embedding">
 <h2>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h2>
 <p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our network and our covariates into a single model. In the most straightforward version of CASE, we combine the network’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. Here, <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Notice the word “regularized” - This means (from the Laplacian section earlier) that our Laplacian looks like <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, notice from linear algebra that we’re effectively taking the weighted sum - or, in math parlance, the dot product - of each row of <span class="math notranslate nohighlight">\(X\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-e25a527b-29c9-4ab4-8c36-ab0e7bb4df13">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-e25a527b-29c9-4ab4-8c36-ab0e7bb4df13" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, notice from linear algebra that we’re effectively taking the weighted sum - or the dot product - of each row of <span class="math notranslate nohighlight">\(X\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two example vectors with only 0’s and 1’s in them:</p>
+<div class="amsmath math notranslate nohighlight" id="equation-2264c77d-1b5c-4e14-9cac-f09fd3e32740">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-2264c77d-1b5c-4e14-9cac-f09fd3e32740" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -762,65 +1153,35 @@
 1 \\
 \end{bmatrix} = 1\times 0 + 1\times 1 + 1\times 1 = 2
 \end{align}\]</div>
-<p>If there are two overlapping 1’s in the same position of the left vector and the right vector, then there will be an additional 1 added to their weighted sum. So, in the case of the binary <span class="math notranslate nohighlight">\(XX^T\)</span>, when we matrix-multiply a row of <span class="math notranslate nohighlight">\(X\)</span> by a column of <span class="math notranslate nohighlight">\(X^T\)</span>, the resulting value, <span class="math notranslate nohighlight">\((XX^T)_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
+<p>If there are two overlapping 1’s in the same position of the left vector and the right vector, then there will be an additional 1 added to their weighted sum. So, in the case of a binary <span class="math notranslate nohighlight">\(XX^T\)</span>, when we matrix-multiply a row of <span class="math notranslate nohighlight">\(X\)</span> by a column of <span class="math notranslate nohighlight">\(X^T\)</span>, the resulting value, <span class="math notranslate nohighlight">\((XX^T)_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
 </div>
-<p>A particular value in <span class="math notranslate nohighlight">\(XX^\top\)</span>, <span class="math notranslate nohighlight">\((XX^\top)_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. The higher the value, the more the two rows share 1’s in the same column. The result is a matrix that looks fairly similar to our Laplacian!</p>
-<p>The following Python code generates both our SBM and our covariate similarity matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this is because we want the scale for our covariate matrix to be roughly the same as the scale for our adjacency matrix. Later, we’ll use a tuning coefficient to help with this as well.</p>
+<p>A particular value in <span class="math notranslate nohighlight">\(XX^\top\)</span>, <span class="math notranslate nohighlight">\((XX^\top)_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of our covariate matrix. Since each row represents the covariates for a particular node, the higher the value of <span class="math notranslate nohighlight">\((XX^\top)_{i, j}\)</span>, the more similar the covariates of the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> nodes are. The overall result is a matrix that looks fairly similar to our Laplacian!</p>
+<p>The following Python code generates our covariate similarity matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. We’ll also normalize the rows of our covariate matrix to have unit length using scikit-learn - this is because we want the scale for our covariate matrix to be roughly the same as the scale for our adjacency matrix. Later, we’ll weight <span class="math notranslate nohighlight">\(XX^\top\)</span> to help with this as well.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
-<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
 
-<span class="k">def</span> <span class="nf">gen_sbm</span><span class="p">(</span><span class="n">p</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">q</span><span class="o">=.</span><span class="mi">15</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate an adjacency matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">3</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">q</span><span class="p">)</span>
-    <span class="n">B</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">B</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">A</span>
-    
-<span class="k">def</span> <span class="nf">gen_covariates</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
-    <span class="n">make_community</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">beta</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">N</span><span class="o">//</span><span class="mi">3</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
-    <span class="n">c1</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-    <span class="n">c2</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">c3</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="n">covariates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">covariates</span>
-
-<span class="c1"># Generate a covariate matrix</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">gen_covariates</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
 <span class="n">XXt</span> <span class="o">=</span> <span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>You can see what our two matrices look like below. As you can see, each matrix contains information about our communities that the other doesn’t have.</p>
+<p>Below, you can see the Laplacian we generated earlier next to <span class="math notranslate nohighlight">\(XX^\top\)</span>. Remember, each matrix contains information about our communities that the other doesn’t have - and our goal is to combine them in a way that lets us distinguish between all three communities.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">L_ax</span> <span class="o">=</span> <span class="n">plot_heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Regularized Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">XXt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Covariate matrix times </span><span class="se">\n</span><span class="s2">its transpose&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">XXt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($XX^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_21_0.png" src="../../_images/joint-representation-learning_21_0.png" />
 </div>
-</div>
-<p>CASE is simply a weighted sum of these two matrices. The weight (here called <span class="math notranslate nohighlight">\(\alpha\)</span>) is multiplied by <span class="math notranslate nohighlight">\(XX^\top\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding.</p>
+<p>The way we’ll combine the two matrices will simply be a weighted sum of these two matrices - this is what CASE is doing under the hood. The weight (here called <span class="math notranslate nohighlight">\(\alpha\)</span>) is multiplied by <span class="math notranslate nohighlight">\(XX^\top\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding.</p>
 <div class="math notranslate nohighlight">
 \[
-L + aXX^\top
+L + \alpha XX^\top
 \]</div>
 <div class="section" id="exploring-possible-weights">
 <h3>Exploring Possible Weights<a class="headerlink" href="#exploring-possible-weights" title="Permalink to this headline">¶</a></h3>
@@ -834,11 +1195,8 @@ L + aXX^\top
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_25_0.png" src="../../_images/joint-representation-learning_25_0.png" />
 </div>
-</div>
-<p>What do different potential weights look like? Let’s do a comparison. Below you can see 9 possible weights on <span class="math notranslate nohighlight">\(XX^\top\)</span>, ranging between <span class="math notranslate nohighlight">\(10^{-5}\)</span> and 100.</p>
+<p>What do different potential weights look like? Let’s do a comparison. Below you can see the embeddings for 9 possible weights on <span class="math notranslate nohighlight">\(XX^\top\)</span>, ranging between <span class="math notranslate nohighlight">\(10^{-5}\)</span> and 100.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
@@ -852,11 +1210,8 @@ L + aXX^\top
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_27_0.png" src="../../_images/joint-representation-learning_27_0.png" />
 </div>
-</div>
-<p>It looks like we’d probably want a weight somewhere between 0.01 and 0.5  - then, we’ll have three communities which are fairly distinct from each other, implying that we’re pulling good information from both our network’s topology and its covariates. We could just pick our weight manually, but it would be nice to have some kind of algorithm or equation which lets us pick a reasonable value automatically.</p>
+<p>It looks like we’d probably want a weight somewhere between 0.01 and 0.5  - then, we’ll have three communities which are fairly distinct from each other, implying that we’re pulling good information from both our network’s topology and its covariates. We could just pick our weight manually, but it would be nice to have some kind of algorithm or equation which lets us pick a reasonable weight automatically.</p>
 </div>
 <div class="section" id="finding-a-reasonable-weight-automatically">
 <h3>Finding a Reasonable Weight Automatically<a class="headerlink" href="#finding-a-reasonable-weight-automatically" title="Permalink to this headline">¶</a></h3>
@@ -868,21 +1223,31 @@ L + aXX^\top
 \[
 weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 \]</div>
-<p>Let’s check what happens when we combine our Laplacian and covariates matrix using the weight described in the equation above. Our embedding works the same as it does in Laplacian Spectral Embedding: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. Remember, we’ll be embedding <span class="math notranslate nohighlight">\(L + \alpha XX^\top\)</span>. We’ll embed all the way down to two dimensions, just to make visualization simpler. As you can see, the combined matrix has good separation between all three communities.</p>
-<div class="cell tag_hide-input docutils container">
+<p>Let’s check what happens when we combine our Laplacian and covariates matrix using the weight described in the equation above. Our embedding works the same as it does in Laplacian Spectral Embedding: we decompose our combined matrix using Singular Value Decomposition, truncating the columns, and then we visualize the rows of the result. Remember, we’ll be embedding <span class="math notranslate nohighlight">\(L + \alpha XX^\top\)</span>, where <span class="math notranslate nohighlight">\(\alpha\)</span> is our weight. We’ll embed all the way down to two dimensions, just to make visualization simpler.</p>
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">eigsh</span>
+
+<span class="c1"># Find the biggest eigenvalues in both of our matrices</span>
 <span class="n">leading_eigval_L</span><span class="p">,</span> <span class="o">=</span> <span class="n">eigsh</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">return_eigenvectors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">leading_eigval_XXt</span><span class="p">,</span> <span class="o">=</span> <span class="n">eigsh</span><span class="p">(</span><span class="n">XXt</span><span class="p">,</span> <span class="n">return_eigenvectors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
+<span class="c1"># Per our equation above, we get the weight using</span>
+<span class="c1"># the ratio of the two biggest eigenvalues.</span>
 <span class="n">weight</span> <span class="o">=</span> <span class="n">leading_eigval_L</span> <span class="o">/</span> <span class="n">leading_eigval_XXt</span>
 
+<span class="c1"># Do our weighted sum, then embed</span>
 <span class="n">L_</span> <span class="o">=</span> <span class="n">L</span> <span class="o">+</span> <span class="n">weight</span><span class="o">*</span><span class="n">XXt</span>
-<span class="n">latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">latents_</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Our Combined Laplacian and </span><span class="se">\n</span><span class="s2">covariates matrix with a weight of </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_</span><span class="p">,</span> 
              <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Embedding of the combined matrix&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 
@@ -890,11 +1255,8 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_32_0.png" src="../../_images/joint-representation-learning_32_0.png" />
 </div>
-</div>
-<p>Success! Just to see how big the difference is, below we can see (from left to right) a comparison of our network’s latent position when we only use its topological information, when we only use the information contained in its covariates, and finally our embedding using the weight we found.</p>
+<p>Success! We’ve managed to achieve separation between all three communities. Below we can see (from left to right) a comparison of our network’s latent position when we only use its topological information, when we only use the information contained in its covariates, and finally our embedding using the weight we found.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
@@ -912,21 +1274,6 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">5</span><span class="n">d6ab5827772</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we only use our covariates&quot;</span><span class="p">,</span> 
-<span class="g g-Whitespace">      </span><span class="mi">9</span>              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-<span class="ne">---&gt; </span><span class="mi">10</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions when we combine</span><span class="se">\n</span><span class="s2"> our network and its covariates&quot;</span><span class="p">,</span> 
-<span class="g g-Whitespace">     </span><span class="mi">11</span>              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> 
-
-<span class="ne">NameError</span>: name &#39;latents_&#39; is not defined
-</pre></div>
-</div>
-<img alt="../../_images/joint-representation-learning_34_1.png" src="../../_images/joint-representation-learning_34_1.png" />
 </div>
 </div>
 </div>
