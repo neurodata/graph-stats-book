@@ -598,11 +598,22 @@
 <p>Consider a social network. A common question that we might have is how, exactly, we could describe the network in the simplest way possible. For instance, if we know nothing about the people, or how they might be connected in the social network, we might want to just say that a pair of people have a probability of being friends. On the other hand, if we know people within the social network are groups of students from different schools, we might want to say that people from the same school have a higher probability of being friends than people from different schools. The way we characterize the network in one of these (or other) ways is called the choice of the single-network model.</p>
 <div class="section" id="erdos-renyi-er">
 <h2>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
-<p>The simplest random network model is the Erdös Rényi (ER) model<sup>1</sup>. Consider the social network example explained above. The simplest possible thing to do with our network would be to assume that a given pair of people within our network have the same chance of being friends as any other selected pair of people. The Erdös Rényi model formalizes this relatively simple model with a single parameter:</p>
-<ol class="simple">
-<li><p><span class="math notranslate nohighlight">\(p\)</span>: an edge existence probability parameter governing how edges are connected.</p></li>
-</ol>
-<p>In an Erdös Rényi network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Further, no other properties of the network (including which vertices an edge is incident, other edges within the network, or any other factors) influence whether a pair of vertices are connected. Statistically, we write that for each edge <span class="math notranslate nohighlight">\(A_{ij}\)</span>, that <span class="math notranslate nohighlight">\(A_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span> distribution. The word “independent” means that edges in the network occurring or not occurring do not affect one another. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If <span class="math notranslate nohighlight">\(\pmb A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\pmb A \sim ER_n(p)\)</span>.</p>
+<p>The simplest random network model is called the Erdös Rényi (ER) model<sup>1</sup>. Consider the social network example explained above. The simplest possible thing to do with our network would be to assume that a given pair of people within our network have the same chance of being friends as any other pair of people we select. The Erdös Rényi model formalizes this relatively simple model with a single parameter:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Intuition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(p\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p>Probability that an edge exists between a pair of vertices</p></td>
+</tr>
+</tbody>
+</table>
+<p>In an Erdös Rényi network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Statistically, we say that for each edge <span class="math notranslate nohighlight">\(A_{ij}\)</span>, that <span class="math notranslate nohighlight">\(A_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span> distribution. The word “independent” means that edges in the network occurring or not occurring do not affect one another. For instance, this means that if we knew a student named Michael was friends with Jack, and Michael was also friends with Josh, that we do not learn any information about whether Jack is friends with Josh. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If Michael and Jack are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, then Jack and Josh are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, too. If <span class="math notranslate nohighlight">\(\pmb A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\pmb A \sim ER_n(p)\)</span>.</p>
 <p>In practice, the ER model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the ER model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know what the degree distribution of an ER network should look like. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from a network which is ER. For instance, if we see a half of the nodes have a very high degree, and the rest of the nodes with a much lower degree, we can reasonably conclude the network might be more complex than can be described by the ER model. If this is the case, we might look for other, more complex, models that could describe our network.</p>
 <div class="admonition-working-out-the-expected-degree-in-an-erd-ouml-s-r-eacute-nyi-network admonition">
 <p class="admonition-title">Working Out the Expected Degree in an Erdös-Rényi Network</p>
@@ -613,14 +624,14 @@
     \mathbb E\left[deg(v_i)\right] &amp;= \mathbb E\left[\sum_{j = 1}^n A_{ij}\right] \\
     &amp;= \sum_{j = 1}^n \mathbb E[A_{ij}]
 \end{align*}\]</div>
-<p>We use the <em>linearity of expectation</em> in the line above, which means that the expectation of a sum with a finite number of terms being summed over (<span class="math notranslate nohighlight">\(n\)</span>, in this case) is the sum of the expectations. Finally, by definition, all of the edges <span class="math notranslate nohighlight">\(A_{ij}\)</span> have the same distribution: <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span>. The expected value of a random quantity which takes a Bernoulli distribution is just the probability <span class="math notranslate nohighlight">\(p\)</span>! Therefore:</p>
+<p>We use the <em>linearity of expectation</em> in the line above, which means that the expectation of a sum with a finite number of terms being summed over (<span class="math notranslate nohighlight">\(n\)</span>, in this case) is the sum of the expectations. Finally, by definition, all of the edges <span class="math notranslate nohighlight">\(A_{ij}\)</span> have the same distribution: <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span>. The expected value of a random quantity which takes a Bernoulli distribution is just the probability <span class="math notranslate nohighlight">\(p\)</span>! This means every term <span class="math notranslate nohighlight">\(\mathbb E[A_{ij}] = p\)</span>. Therefore:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     \mathbb E\left[deg(v_i)\right] &amp;= \sum_{j = 1}^n p = n\cdot p
 \end{align*}\]</div>
 <p>Since all of the <span class="math notranslate nohighlight">\(n\)</span> terms being summed have the same expected value. This holds for <em>every</em> node <span class="math notranslate nohighlight">\(v_i\)</span>, which means that the expected degree of all nodes is an undirected ER network is the same.</p>
 </div>
-<p>The ER model is also useful for the development of new computational techniques to use on random networks. This is because even if the “best” model for a network is something much more complex, we can still calculate an edge probability <span class="math notranslate nohighlight">\(p\)</span> for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. Examining how the algorithm operates on ER networks with different values of <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(p\)</span> might be helpful. This is an especially common approach when people deal with networks that are said to be <em>sparse</em>, or where <span class="math notranslate nohighlight">\(p\)</span> is very small (and consequently, there aren’t many edges).</p>
+<p>The ER model is also useful for the development of new computational techniques to use on random networks. This is because even if the “best” model for a network is something much more complex, we can still calculate an edge probability <span class="math notranslate nohighlight">\(p\)</span> for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. Examining how the algorithm operates on ER networks with different values of <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(p\)</span> might be helpful. This is an especially common approach when people deal with networks that are said to be <em>sparse</em>. A <strong>sparse network</strong> is a network in which the number of edges is much less than the total possible number of edges. This contrasts with a <strong>dense network</strong>, which is a network in which the number of edges is close to the maximum number of possible edges. In the case of an <span class="math notranslate nohighlight">\(ER_{n}(p)\)</span> network, the network is sparse when <span class="math notranslate nohighlight">\(p\)</span> is small (closer to <span class="math notranslate nohighlight">\(0\)</span>), and dense when <span class="math notranslate nohighlight">\(p\)</span> is large (closer to <span class="math notranslate nohighlight">\(1\)</span>).</p>
 <p>In the next code block, we look to sample a single ER network with <span class="math notranslate nohighlight">\(50\)</span> nodes and an edge probability <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(0.3\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -634,51 +645,25 @@
 <span class="n">As</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">ps</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># and plot it</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(50, 0.3) Simulation&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$ER_</span><span class="si">{50}</span><span class="s2">(0.3)$ Simulation&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;ER(50, 0.3) Simulation&#39;}&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$ER_{50}(0.3)$ Simulation&#39;}&gt;
 </pre></div>
 </div>
 <img alt="../../_images/single-network-models_2_1.png" src="../../_images/single-network-models_2_1.png" />
 </div>
 </div>
 <p>Above, we visualize the network using a heatmap. The dark red squares indicate that an edge exists between a pair of vertices, and white squares indicate that an edge does not exist between a pair of vertices.</p>
-<p>If we already have a network, we might want to assume that the network is an ER network, and investigate the edge probability parameter. Next, we use graspologic to estimate the edge probability:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">EREstimator</span>
+<!-- If we already have a network, we might want to assume that the network is an ER network, and investigate the edge probability parameter. Next, we use graspologic to estimate the edge probability: --><!-- from graspologic.models import EREstimator
 
-<span class="c1"># instantiate an ER Estimator which is directed with loops</span>
-<span class="n">er</span> <span class="o">=</span> <span class="n">EREstimator</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># fit an ER model to As</span>
-<span class="n">er</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">As</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ER </span><span class="se">\&quot;</span><span class="s2">p</span><span class="se">\&quot;</span><span class="s2"> parameter: </span><span class="si">{</span><span class="n">er</span><span class="o">.</span><span class="n">p_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ER &quot;p&quot; parameter: 0.288
-</pre></div>
-</div>
-</div>
-</div>
-<p>As we can see, the edge probability parameter in a directed network with loops is just the average fraction of times <span class="math notranslate nohighlight">\(\pmb A\)</span> has a value of <span class="math notranslate nohighlight">\(1\)</span>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average edge weight: </span><span class="si">{</span><span class="n">As</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Average edge weight: 0.288
-</pre></div>
-</div>
-</div>
-</div>
-<p>Note that the <span class="math notranslate nohighlight">\(p\)</span> parameter will be computed differently depending on whether the network is assumed to be directed or undirected, and loopy or hollow. Be careful to specify the appropriate model for the network you have.</p>
+# instantiate an ER Estimator which is directed with loops
+er = EREstimator(directed=True, loops=True)
+# fit an ER model to As
+er.fit(As)
+print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probability parameter in a directed network with loops is just the average fraction of times $\pmb A$ has a value of $1$: --><!-- print(f"Average edge weight: {As.mean()}") --><!-- Note that the $p$ parameter will be computed differently depending on whether the network is assumed to be directed or undirected, and loopy or hollow. Be careful to specify the appropriate subset of models for the network you have. -->
 <p>Next, let’s see what happens when we use a higher edge probability, like <span class="math notranslate nohighlight">\(p=0.7\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -688,15 +673,15 @@
 <span class="n">Al</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pl</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># and plot it</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Al</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(50, 0.7) Simulation&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Al</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$ER_</span><span class="si">{50}</span><span class="s2">(0.7)$ Simulation&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;ER(50, 0.7) Simulation&#39;}&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$ER_{50}(0.7)$ Simulation&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/single-network-models_8_1.png" src="../../_images/single-network-models_8_1.png" />
+<img alt="../../_images/single-network-models_10_1.png" src="../../_images/single-network-models_10_1.png" />
 </div>
 </div>
 <p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
@@ -704,13 +689,27 @@
 <div class="section" id="stochastic-block-model-sbm">
 <h2>Stochastic Block Model (SBM)<a class="headerlink" href="#stochastic-block-model-sbm" title="Permalink to this headline">¶</a></h2>
 <p>Consider the social network above. Using the ER model described above, we can only model the connections between a pair of people with a <em>fixed probability</em> that is the same for all pairs of students within the network. What would happen if we had additional information about students in our network that might influence the probability that they were friends? Consider, for instance, that we know which school each student attends. It seems fairly logical that if two students go to the same school, in general, they will probably have a higher probability of being friends than if they went to different schools. Unfortunately, using the ER model, there is nothing more complex we can do to reflect this fact. This is where the Stochastic Block Model, or SBM, comes into play. The Stochastic Block Model generalizes the ER model, and has the following two parameters:</p>
-<ol class="simple">
-<li><p><span class="math notranslate nohighlight">\(\vec \tau\)</span>: the node community assignment vector for each of the nodes in the network, and</p></li>
-<li><p><span class="math notranslate nohighlight">\(\pmb B\)</span>: the symmetric block matrix for each pair of communities.</p></li>
-</ol>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Intuition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\vec\tau\)</span></p></td>
+<td><p>{1,…,K}<span class="math notranslate nohighlight">\(^n\)</span></p></td>
+<td><p>The community assignment vector for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes to one of <span class="math notranslate nohighlight">\(K\)</span> communities</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\pmb B\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{K \times K}\)</span></p></td>
+<td><p>The symmetric block matrix, which assigns edge probabilities for pairs of communities</p></td>
+</tr>
+</tbody>
+</table>
 <p>With the SBM, we suppose that each node can be assigned to a group of nodes, called a <strong>community</strong>. Instead of describing all pairs of nodes by a fixed probability like with the ER model, in the SBM, we instead describe properties that hold for edges between <em>pairs of communities</em>. We write that <span class="math notranslate nohighlight">\(\vec \tau \in \{1, ..., K\}^n\)</span>, which means that <span class="math notranslate nohighlight">\(\vec \tau\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-dimensional vector which takes one of <span class="math notranslate nohighlight">\(K\)</span> possible values. In our social network example, for instance, this vector would reflect the fact that each of the <span class="math notranslate nohighlight">\(n\)</span> students in our network could be attendees at one of <span class="math notranslate nohighlight">\(K\)</span> possible schools. For a single node <span class="math notranslate nohighlight">\(i\)</span> that is in community <span class="math notranslate nohighlight">\(\ell\)</span>, where <span class="math notranslate nohighlight">\(\ell \in \{1, ..., K\}\)</span>, we write that <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span>.</p>
 <p>Next, let’s discuss the matrix <span class="math notranslate nohighlight">\(\pmb B\)</span>, which is known as the <strong>block matrix</strong> of the SBM. We write down that <span class="math notranslate nohighlight">\(\pmb B \in [0, 1]^{K \times K}\)</span>, which means that the block matrix is a matrix with <span class="math notranslate nohighlight">\(K\)</span> rows and <span class="math notranslate nohighlight">\(K\)</span> columns. If we have a pair of nodes and know which of the <span class="math notranslate nohighlight">\(K\)</span> communities each node is from, the block matrix tells us the probability that those two nodes are connected. This matrix <span class="math notranslate nohighlight">\(\pmb B\)</span> is also symmetric, which means that if <span class="math notranslate nohighlight">\(b_{k, \ell} = p\)</span> where <span class="math notranslate nohighlight">\(p\)</span> is a probability, that <span class="math notranslate nohighlight">\(b_{\ell, k} = p\)</span>, too.</p>
-<p>Finally, let’s think about how to write down the generative model for the SBM. Remember that <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(\pmb B\)</span> are parameters, which means that when we fit a SBM, we know these ahead of time. Intuitionally what we want to reflect is, if we know that node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(\ell\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((\ell, k)\)</span> entry of the block matrix is the probability that <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. Formally, we write this statement down by saying that <span class="math notranslate nohighlight">\(A_{ij}\)</span> conditioned on <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bernoulli(b_{\ell, k})\)</span> distribution. Like the ER model, the edges are still independent, which means that edges occuring or not occuring do not have an impact on one another. Unlike above, we can no longer say that the <span class="math notranslate nohighlight">\(A_{ij}\)</span>s are identically distributed, since the probability <span class="math notranslate nohighlight">\(b_{\ell, k}\)</span> depends on the communities that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are assigned to. This means that if we were to look at a different pair of nodes, the probability that the two nodes are connected could be different, and therefore they would not share the same distribution.</p>
+<p>Finally, let’s think about how to write down the generative model for the SBM. Remember that <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(\pmb B\)</span> are parameters, which means that when we fit a SBM, we know these ahead of time. Intuitionally what we want to reflect is, if we know that node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(\ell\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((\ell, k)\)</span> entry of the block matrix is the probability that <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. We write this statement down by saying that <span class="math notranslate nohighlight">\(A_{ij}\)</span> conditioned on <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bernoulli(b_{\ell, k})\)</span> distribution. Like the ER model, the edges are still independent, which means that edges occuring or not occuring do not have an impact on one another. Unlike above, we can no longer say that the <span class="math notranslate nohighlight">\(A_{ij}\)</span>s are identically distributed, since the probability <span class="math notranslate nohighlight">\(b_{\ell, k}\)</span> depends on the communities that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are assigned to. This means that if we were to look at a different pair of nodes, the probability that the two nodes are connected could be different, and therefore they might not share the same distribution.</p>
 <p>We just covered a lot of intuition that will be critical for understanding many of the later models, so let’s work through an example. Let’s assume that we have <span class="math notranslate nohighlight">\(300\)</span> students, and we know that each student goes to <span class="math notranslate nohighlight">\(1\)</span> of <span class="math notranslate nohighlight">\(2\)</span> possible schools. We don’t really care too much about the ordering of the students for now, so let’s just assume that the students are organized such that the first <span class="math notranslate nohighlight">\(150\)</span> students all go to school <span class="math notranslate nohighlight">\(1\)</span>, and the second <span class="math notranslate nohighlight">\(150\)</span> students all go to school <span class="math notranslate nohighlight">\(2\)</span>. Let’s assume that the students from school <span class="math notranslate nohighlight">\(1\)</span> are a little bit more closely knit than the students from school <span class="math notranslate nohighlight">\(2\)</span>, so we’ll say that the probability of two students who both go to school <span class="math notranslate nohighlight">\(1\)</span> being connected is <span class="math notranslate nohighlight">\(0.5\)</span>, and the probability of two students who both go to school <span class="math notranslate nohighlight">\(2\)</span> being friends is <span class="math notranslate nohighlight">\(0.3\)</span>. Finally, let’s assume that if one student goes to school <span class="math notranslate nohighlight">\(1\)</span> and the other student goes to school <span class="math notranslate nohighlight">\(2\)</span>, that the probability that they are friends is <span class="math notranslate nohighlight">\(0.2\)</span>.</p>
 <div class="admonition-thought-exercise admonition">
 <p class="admonition-title">Thought Exercise</p>
@@ -743,7 +742,8 @@
 
 <span class="n">n</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># number of students</span>
 
-<span class="c1"># tau is a column vector of 50 1s followed by 50 2s</span>
+<span class="c1"># tau is a column vector of 150 1s followed by 50 2s</span>
+<span class="c1"># this vector gives the school each of the 300 students are from</span>
 <span class="n">tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
 
 <span class="n">plot_tau</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Tau, Node Assignment Vector&quot;</span><span class="p">,</span>
@@ -752,17 +752,19 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_11_0.png" src="../../_images/single-network-models_11_0.png" />
+<img alt="../../_images/single-network-models_13_0.png" src="../../_images/single-network-models_13_0.png" />
 </div>
 </div>
 <p>So as we can see, the first <span class="math notranslate nohighlight">\(50\)</span> students are from school <span class="math notranslate nohighlight">\(1\)</span>, and the second <span class="math notranslate nohighlight">\(50\)</span> students are from school <span class="math notranslate nohighlight">\(2\)</span>. Next, let’s look at the block matrix <span class="math notranslate nohighlight">\(\pmb B\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># 2 communities in total</span>
+<span class="c1"># construct the block matrix B as described above</span>
 <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">K</span><span class="p">,</span> <span class="n">K</span><span class="p">))</span>
 <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>
 <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">2</span>
 <span class="n">B</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">3</span>
+
 <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Block Matrix&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;School&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;School&quot;</span><span class="p">)</span>
@@ -775,7 +777,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_13_0.png" src="../../_images/single-network-models_13_0.png" />
+<img alt="../../_images/single-network-models_15_0.png" src="../../_images/single-network-models_15_0.png" />
 </div>
 </div>
 <p>As we can see, the matrix <span class="math notranslate nohighlight">\(\pmb B\)</span> is a symmetric block matrix. Finally, let’s sample a single network from the SBM with parameters <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(\pmb B\)</span>:</p>
@@ -785,6 +787,7 @@
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">adjplot</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
+<span class="c1"># sample a graph from SBM_{300}(tau, B)</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">)</span>
 <span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;School&quot;</span><span class="p">:</span> <span class="n">tau</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)}</span>
@@ -795,12 +798,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_15_0.png" src="../../_images/single-network-models_15_0.png" />
+<img alt="../../_images/single-network-models_17_0.png" src="../../_images/single-network-models_17_0.png" />
 </div>
 </div>
-<p>The above network shows students, ordered by the school they are in (school 1 and school 2, respectively). As we can see in the above network, people from school <span class="math notranslate nohighlight">\(1\)</span> are more connected than people from school <span class="math notranslate nohighlight">\(2\)</span>, which we can see from the fact that there are more connections between people from school <span class="math notranslate nohighlight">\(1\)</span> than from school <span class="math notranslate nohighlight">\(2\)</span>. Also, the connections between people from different schools appear to be a bit more sparse. The above heatmap can be described as <strong>modular</strong>: it has clearly delineated communities, which are the obvious “squares” in the above heatmap.</p>
+<p>The above network shows students, ordered by the school they are in (school 1 and school 2, respectively). As we can see in the above network, people from school <span class="math notranslate nohighlight">\(1\)</span> are more connected than people from school <span class="math notranslate nohighlight">\(2\)</span>.  We notice this from the fact that there are more connections between people from school <span class="math notranslate nohighlight">\(1\)</span> than from school <span class="math notranslate nohighlight">\(2\)</span>. Also, the connections between people from different schools appear to be a bit <em>more sparse</em> (fewer edges) than connections betwen schools. The above heatmap can be described as <strong>modular</strong>: it has clearly delineated communities, which are the vertices that comprise the obvious “squares” in the above adjacency matrix.</p>
 <p>Something easy to mistake about the SBM is that the SBM will <em>not always</em> have the obvious modular structure defined above when we look at a heatmap. Rather, this modular structure is <em>only</em> made obvious because the students are ordered according to the school in which they are in. What do you think will happen if we look at the students in a random order? Do you think it will be obvious that the network will have a modular structure?</p>
-<p>The answer is: <em>No!</em> Let’s see what happens when we use an item, called a <em>permutation</em> of the nodes, to reorder the nodes from the network in a random order:</p>
+<p>The answer is: <em>No!</em> Let’s see what happens when we use an reordering, called a <em>permutation</em> of the nodes, to reorder the nodes from the network into a random order:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -814,19 +817,16 @@
 
 <span class="c1"># same adjacency matrix (up to reorder of the vertices)</span>
 
-<span class="n">ax</span><span class="o">=</span><span class="n">adjplot</span><span class="p">(</span><span class="n">A</span><span class="p">[[</span><span class="n">vtx_perm</span><span class="p">]]</span> <span class="p">[:,</span><span class="n">vtx_perm</span><span class="p">],</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;School&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">=</span><span class="n">adjplot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">vtx_perm</span><span class="p">])]</span> <span class="p">[:,</span><span class="n">vtx_perm</span><span class="p">],</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;School&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-8-be0831a05e70&gt;:12: FutureWarning: Using a non-tuple sequence for multidimensional indexing is deprecated; use `arr[tuple(seq)]` instead of `arr[seq]`. In the future this will be interpreted as an array index, `arr[np.array(seq)]`, which will result either in an error or a different result.
-  ax=adjplot(A[[vtx_perm]] [:,vtx_perm], meta=meta, color=&quot;School&quot;, palette=&quot;Blues&quot;)
-</pre></div>
-</div>
-<img alt="../../_images/single-network-models_17_1.png" src="../../_images/single-network-models_17_1.png" />
+<img alt="../../_images/single-network-models_19_0.png" src="../../_images/single-network-models_19_0.png" />
 </div>
 </div>
-<p>Notice that now, the students are <em>not</em> organized according to school. We can see this by looking at the school assignment vector, shown at the left and top, of the network. In this sense, it becomes quite difficult in practice to determine whether community structure exists simply by looking at a network, unless you are looking at a network in which the nodes are already arranged in an order which respects the community structure. To estimate community structure, we will later look at a number of approaches, including spectral embeddings.</p>
+<p>Notice that now, the students are <em>not</em> organized according to school. We can see this by looking at the school assignment vector, shown at the left and top, of the network. In this sense, it becomes quite difficult in practice to determine whether community structure exists simply by looking at a network, unless you are looking at a network in which the nodes are <em>already arranged</em> in an order which respects the community structure.</p>
+<p>In practice, this means that if you know ahead of time what natural groupings of the nodes might be (such knowing which school each student goes to) by way of your node metadata, you <em>should</em> visualize your data according to that grouping. If you don’t know anything about natural groupings of nodes, however, we are left with the problem of <em>estimating community structure</em>. A later method, called the <em>spectral embedding</em>, will be paired with clustering techniques to allow us to estimate vertex assignment vectors.</p>
 </div>
 <div class="section" id="random-dot-product-graph-rdpg">
 <h2>Random Dot Product Graph (RDPG)<a class="headerlink" href="#random-dot-product-graph-rdpg" title="Permalink to this headline">¶</a></h2>
