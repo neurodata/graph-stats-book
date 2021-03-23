@@ -17,22 +17,31 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import graspologic
+from scipy.stats import beta
 
-casc = graspologic.embed.CovariateAssistedEmbedding(embedding_alg="assortative", n_components=2, tuning_runs=10)
-latents = casc.fit_transform(A, covariates=X)
-plot_latents(latents, title="Embedding our model using graspologic", labels=labels);
+def make_community(a, b, n=500):
+    return beta.rvs(a, b, size=(n, 30))
+
+def gen_covariates():
+    c1 = make_community(2, 5)
+    c2 = make_community(2, 2)
+    c3 = make_community(2, 2)
+
+    covariates = np.vstack((c1, c2, c3))
+    return covariates
+    
+
+# Generate a covariate matrix
+X = gen_covariates(N=N)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mTypeError[0m                                 Traceback (most recent call last)
-[0;32m<ipython-input-17-87e477c82097>[0m in [0;36m<module>[0;34m[0m
-[1;32m      1[0m [0;32mimport[0m [0mgraspologic[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      2[0m [0;34m[0m[0m
-[0;32m----> 3[0;31m [0mcasc[0m [0;34m=[0m [0mgraspologic[0m[0;34m.[0m[0membed[0m[0;34m.[0m[0mCovariateAssistedEmbedding[0m[0;34m([0m[0membedding_alg[0m[0;34m=[0m[0;34m"assortative"[0m[0;34m,[0m [0mn_components[0m[0;34m=[0m[0;36m2[0m[0;34m,[0m [0mtuning_runs[0m[0;34m=[0m[0;36m10[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      4[0m [0mlatents[0m [0;34m=[0m [0mcasc[0m[0;34m.[0m[0mfit_transform[0m[0;34m([0m[0mA[0m[0;34m,[0m [0mcovariates[0m[0;34m=[0m[0mX[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      5[0m [0mplot_latents[0m[0;34m([0m[0mlatents[0m[0;34m,[0m [0mtitle[0m[0;34m=[0m[0;34m"Embedding our model using graspologic"[0m[0;34m,[0m [0mlabels[0m[0;34m=[0m[0mlabels[0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
-
-[0;31mTypeError[0m: __init__() got an unexpected keyword argument 'tuning_runs'
-TypeError: __init__() got an unexpected keyword argument 'tuning_runs'
+[0;32m<ipython-input-6-b850ad04fa34>[0m in [0;36m<module>[0;34m[0m
+[1;32m     14[0m [0;34m[0m[0m
+[1;32m     15[0m [0;31m# Generate a covariate matrix[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 16[0;31m [0mX[0m [0;34m=[0m [0mgen_covariates[0m[0;34m([0m[0mN[0m[0;34m=[0m[0mN[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;31mTypeError[0m: gen_covariates() got an unexpected keyword argument 'N'
+TypeError: gen_covariates() got an unexpected keyword argument 'N'
 
