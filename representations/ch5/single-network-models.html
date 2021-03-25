@@ -595,7 +595,19 @@
                 
   <div class="section" id="single-network-models">
 <h1>Single-Network Models<a class="headerlink" href="#single-network-models" title="Permalink to this headline">¶</a></h1>
-<p>Consider a social network. A common question that we might have is how, exactly, we could describe the network in the simplest way possible. For instance, if we know nothing about the people, or how they might be connected in the social network, we might want to just say that a pair of people have a probability of being friends. On the other hand, if we know people within the social network are groups of students from different schools, we might want to say that people from the same school have a higher probability of being friends than people from different schools. The way we characterize the network in one of these (or other) ways is called the choice of the single-network model.</p>
+<p>To understand single network models, it is crucial to understand the concept of the distribution of a network topology. The distribution of the network topology is <span class="math notranslate nohighlight">\(P\)</span>, and we write that <span class="math notranslate nohighlight">\(\pmb A \sim P\)</span>. The single network model specifies the space <span class="math notranslate nohighlight">\((\mathcal A, \mathcal P)\)</span>, where <span class="math notranslate nohighlight">\(\mathcal A\)</span> is the set of possible networks that can be realized, and <span class="math notranslate nohighlight">\(\mathcal P\)</span> is the set of probability distributions on <span class="math notranslate nohighlight">\(S\)</span>. For a given network with <span class="math notranslate nohighlight">\(n\)</span> nodes, note that <span class="math notranslate nohighlight">\(S\)</span> is an extremely big set. In fact, the number of possible networks that can be realized is <span class="math notranslate nohighlight">\(|\mathcal A| = 2^{n^2}\)</span>. We can see this by noting that for each edge, there are two possible values that can be realized: the edge exists, or the edge does not exist. As a network has <span class="math notranslate nohighlight">\(n^2\)</span> possible edges, this means that we have:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    |\mathcal A| &amp;= \prod_{i =1}^n\prod_{j =1}^n2 \\
+    &amp;= \prod_{i =1}^n 2^n \\
+    &amp;= 2^{n \times n} = 2^{n^2}
+\end{align*}\]</div>
+<p>When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(10\)</span>, note that <span class="math notranslate nohighlight">\(|\mathcal A| = 2^{100}\)</span>, which is more than <span class="math notranslate nohighlight">\(10^{30}\)</span> possible networks that can be realized!</p>
+<p>The set of probability distributions on <span class="math notranslate nohighlight">\(\mathcal A\)</span>, <span class="math notranslate nohighlight">\(\mathcal P\)</span>, is the set <span class="math notranslate nohighlight">\(\mathcal P = \{P_\theta : \pmb \theta \in \pmb \Theta\}\)</span>. Each distribution <span class="math notranslate nohighlight">\(P_\theta\)</span> assigns a probability to <em>every</em> network in <span class="math notranslate nohighlight">\(\mathcal A\)</span>. Written another way, <span class="math notranslate nohighlight">\(\mathcal P_\theta : \mathcal A \rightarrow [0, 1]\)</span>. The most naive model would be to simply describe <span class="math notranslate nohighlight">\(\mathcal P\)</span> categorically; that is, the parameter set <span class="math notranslate nohighlight">\(\pmb \Theta\)</span> can describe each individual network that is poossible. Stated another way, we could describe the set <span class="math notranslate nohighlight">\(\mathcal P = \{P_A : A \in \mathcal A\}\)</span>. Using this model, note that if <span class="math notranslate nohighlight">\(A^* = A\)</span>, that <span class="math notranslate nohighlight">\(P_A(A^*) = 1\)</span>, and for aany <span class="math notranslate nohighlight">\(A^c \neq A\)</span>, that <span class="math notranslate nohighlight">\(P_A(A^c) = 0\)</span>. To specify a particular distribution <span class="math notranslate nohighlight">\(P_A \in \mathcal P\)</span> requires <span class="math notranslate nohighlight">\(|\mathcal A| = 2^{n^2}\)</span> parameters. The limitation of such a model is two fold:</p>
+<ol class="simple">
+<li><p>We cannot store a model with <span class="math notranslate nohighlight">\(2^{n^2}\)</span> parameters for any reasonably sized <span class="math notranslate nohighlight">\(n\)</span>. When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(10\)</span>, we would require <span class="math notranslate nohighlight">\(2^{100}\)</span> bits to store this model, which is more than <span class="math notranslate nohighlight">\(10^{13}\)</span> Petabytes.</p></li>
+<li><p>We could never hope to estimate the parameters for a model with <span class="math notranslate nohighlight">\(2^{n^2}\)</span> parameters from a single network.</p></li>
+</ol>
 <div class="section" id="erdos-renyi-er">
 <h2>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
 <p>The simplest random network model is called the Erdös Rényi (ER) model<sup>1</sup>. Consider the social network example explained above. The simplest possible thing to do with our network would be to assume that a given pair of people within our network have the same chance of being friends as any other pair of people we select. The Erdös Rényi model formalizes this relatively simple model with a single parameter:</p>
@@ -603,7 +615,7 @@
 <thead>
 <tr class="row-odd"><th class="head"><p>Parameter</p></th>
 <th class="head"><p>Space</p></th>
-<th class="head"><p>Intuition</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -613,12 +625,24 @@
 </tr>
 </tbody>
 </table>
-<p>In an Erdös Rényi network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Statistically, we say that for each edge <span class="math notranslate nohighlight">\(A_{ij}\)</span>, that <span class="math notranslate nohighlight">\(A_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span> distribution. The word “independent” means that edges in the network occurring or not occurring do not affect one another. For instance, this means that if we knew a student named Michael was friends with Jack, and Michael was also friends with Josh, that we do not learn any information about whether Jack is friends with Josh. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If Michael and Jack are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, then Jack and Josh are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, too. If <span class="math notranslate nohighlight">\(\pmb A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\pmb A \sim ER_n(p)\)</span>.</p>
-<p>In practice, the ER model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the ER model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know what the degree distribution of an ER network should look like. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from a network which is ER. For instance, if we see a half of the nodes have a very high degree, and the rest of the nodes with a much lower degree, we can reasonably conclude the network might be more complex than can be described by the ER model. If this is the case, we might look for other, more complex, models that could describe our network.</p>
+<p>In an Erdös Rényi network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span>, that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bernoulli(p)\)</span> distribution. The word “independent” means that edges in the network occurring or not occurring do not affect one another. For instance, this means that if we knew a student named Alice was friends with Bob, and Alice was also friends with Hakim, that we do not learn any information about whether Bob is friends with Hakim. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If Michael and Jack are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, then Jack and Josh are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, too. If <span class="math notranslate nohighlight">\(\pmb A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\pmb A \sim ER_n(p)\)</span>.</p>
+<p>What is the likelihood for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\pmb A\)</span> which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span>? Note that the likelihood can be written down as follows:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal L(A; p) &amp;\propto \mathbb P(\pmb A = A; p) \\
+    &amp;= \prod_{i = 1}^n \prod_{j = 1}^n \mathbb P(\mathbf{a}_{ij} = a_{ij}; p)
+\end{align*}\]</div>
+<p>The above step follows by using the fact that the entries of <span class="math notranslate nohighlight">\(\pmb A\)</span> are independent, which means that the probability of the random network <span class="math notranslate nohighlight">\(\pmb A\)</span> taking the value <span class="math notranslate nohighlight">\(A\)</span> is the product of the probabilities of the individual random adjacencies <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> taking the values <span class="math notranslate nohighlight">\(a_{ij}\)</span>. Next, we recall that by assumption of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model, that <span class="math notranslate nohighlight">\(\pmb a_{ij} \sim Bern(p)\)</span> for all <span class="math notranslate nohighlight">\(\pmb a_{ij}\)</span>, by the identical distribution assumption. Therefore, for each <span class="math notranslate nohighlight">\(\mathbb P(a_{ij}; p)\)</span>, it is the case that <span class="math notranslate nohighlight">\(\mathbb P(\mathbf{a_{ij}} = a_{ij}; p) = p^{a_{ij}}(1 - p)^{1 - a_{ij}}\)</span>, which is the probability mass function for a Bernoulli-distributed random variable. Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal L(A; p) &amp;\propto \prod_{i = 1}^n \prod_{j = 1}^n p^{a_{ij}}(1 - p)^{1 - a_{ij}} \\
+    &amp;= p^{\sum_{i,j} a_{ij}} \cdot (1 - p)^{n - \sum_{i,j}a_{ij}}
+\end{align*}\]</div>
+<p>In practice, the ER model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the ER model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know what the degree distribution of an ER network should look like. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from a network which is ER. For instance, if we see a half of the nodes have a very high degree, and the rest of the nodes with a much lower degree, we can reasonably conclude the network might be more complex than can be described by the ER model. If this is the case, we might look for other, more complex, models that could describe our network. In some of the exercises at the end of this section, we will explore how to formalize these relationships.</p>
 <div class="admonition-working-out-the-expected-degree-in-an-erd-ouml-s-r-eacute-nyi-network admonition">
 <p class="admonition-title">Working Out the Expected Degree in an Erdös-Rényi Network</p>
-<p>Suppose that <span class="math notranslate nohighlight">\((\mathcal V, \mathcal E)\)</span> is the topology of an undirected network with loops and adjacency matrix <span class="math notranslate nohighlight">\(\pmb A\)</span>. The network has <span class="math notranslate nohighlight">\(n\)</span> nodes <span class="math notranslate nohighlight">\(\mathcal V = (v_i)_{i = 1}^n\)</span>. Recall that the in an undirected, loopy network, node degree is <span class="math notranslate nohighlight">\(deg(v_i) = \sum_{j = 1}^n A_{ij}\)</span>. What is the expected degree of a given node <span class="math notranslate nohighlight">\(v_i\)</span> if <span class="math notranslate nohighlight">\(\mathcal G\)</span> were ER with probability parameter <span class="math notranslate nohighlight">\(p\)</span>?</p>
-<p>To describe this, we will compute the expectated value of the degree <span class="math notranslate nohighlight">\(deg(v_i)\)</span>:</p>
+<p>Suppose that <span class="math notranslate nohighlight">\(A\)</span> is a simple network. The network has <span class="math notranslate nohighlight">\(n\)</span> nodes <span class="math notranslate nohighlight">\(\mathcal V = (v_i)_{i = 1}^n\)</span>. Recall that the in a simple network, the node degree is <span class="math notranslate nohighlight">\(deg(v_i) = \sum_{j = 1}^n A_{ij}\)</span>. What is the expected degree of a given node <span class="math notranslate nohighlight">\(v_i\)</span> if <span class="math notranslate nohighlight">\(A\)</span> were <span class="math notranslate nohighlight">\(ER_n(p)\)</span>?</p>
+<p>To describe this, we will compute the expectated value of the degree <span class="math notranslate nohighlight">\(deg(v_i)\)</span>, written <span class="math notranslate nohighlight">\(\mathbb E\left[deg(v_i)\right]\)</span>. Let’s see what happens:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     \mathbb E\left[deg(v_i)\right] &amp;= \mathbb E\left[\sum_{j = 1}^n A_{ij}\right] \\
@@ -631,14 +655,14 @@
 \end{align*}\]</div>
 <p>Since all of the <span class="math notranslate nohighlight">\(n\)</span> terms being summed have the same expected value. This holds for <em>every</em> node <span class="math notranslate nohighlight">\(v_i\)</span>, which means that the expected degree of all nodes is an undirected ER network is the same.</p>
 </div>
-<p>The ER model is also useful for the development of new computational techniques to use on random networks. This is because even if the “best” model for a network is something much more complex, we can still calculate an edge probability <span class="math notranslate nohighlight">\(p\)</span> for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. Examining how the algorithm operates on ER networks with different values of <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(p\)</span> might be helpful. This is an especially common approach when people deal with networks that are said to be <em>sparse</em>. A <strong>sparse network</strong> is a network in which the number of edges is much less than the total possible number of edges. This contrasts with a <strong>dense network</strong>, which is a network in which the number of edges is close to the maximum number of possible edges. In the case of an <span class="math notranslate nohighlight">\(ER_{n}(p)\)</span> network, the network is sparse when <span class="math notranslate nohighlight">\(p\)</span> is small (closer to <span class="math notranslate nohighlight">\(0\)</span>), and dense when <span class="math notranslate nohighlight">\(p\)</span> is large (closer to <span class="math notranslate nohighlight">\(1\)</span>).</p>
+<!-- The ER model is also useful for the development of new computational techniques to use on random networks. This is because even if the "best" model for a network is something much more complex, we can still calculate an edge probability $p$ for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. Examining how the algorithm operates on ER networks with different values of $n$ and $p$ might be helpful. This is an especially common approach when people deal with networks that are said to be *sparse*. A **sparse network** is a network in which the number of edges is much less than the total possible number of edges. This contrasts with a **dense network**, which is a network in which the number of edges is close to the maximum number of possible edges. In the case of an $ER_{n}(p)$ network, the network is sparse when $p$ is small (closer to $0$), and dense when $p$ is large (closer to $1$). -->
 <p>In the next code block, we look to sample a single ER network with <span class="math notranslate nohighlight">\(50\)</span> nodes and an edge probability <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(0.3\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
 <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
 
-<span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># network with 50 vertices</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># network with 50 nodes</span>
 <span class="n">ps</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of an edge existing is .3</span>
 
 <span class="c1"># sample a single adj. mtx from ER(50, .3)</span>
@@ -657,13 +681,6 @@
 </div>
 </div>
 <p>Above, we visualize the network using a heatmap. The dark red squares indicate that an edge exists between a pair of vertices, and white squares indicate that an edge does not exist between a pair of vertices.</p>
-<!-- If we already have a network, we might want to assume that the network is an ER network, and investigate the edge probability parameter. Next, we use graspologic to estimate the edge probability: --><!-- from graspologic.models import EREstimator
-
-# instantiate an ER Estimator which is directed with loops
-er = EREstimator(directed=True, loops=True)
-# fit an ER model to As
-er.fit(As)
-print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probability parameter in a directed network with loops is just the average fraction of times $\pmb A$ has a value of $1$: --><!-- print(f"Average edge weight: {As.mean()}") --><!-- Note that the $p$ parameter will be computed differently depending on whether the network is assumed to be directed or undirected, and loopy or hollow. Be careful to specify the appropriate subset of models for the network you have. -->
 <p>Next, let’s see what happens when we use a higher edge probability, like <span class="math notranslate nohighlight">\(p=0.7\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -681,7 +698,7 @@ print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probabilit
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$ER_{50}(0.7)$ Simulation&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/single-network-models_10_1.png" src="../../_images/single-network-models_10_1.png" />
+<img alt="../../_images/single-network-models_5_1.png" src="../../_images/single-network-models_5_1.png" />
 </div>
 </div>
 <p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
@@ -693,7 +710,7 @@ print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probabilit
 <thead>
 <tr class="row-odd"><th class="head"><p>Parameter</p></th>
 <th class="head"><p>Space</p></th>
-<th class="head"><p>Intuition</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
@@ -752,7 +769,7 @@ print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probabilit
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_13_0.png" src="../../_images/single-network-models_13_0.png" />
+<img alt="../../_images/single-network-models_8_0.png" src="../../_images/single-network-models_8_0.png" />
 </div>
 </div>
 <p>So as we can see, the first <span class="math notranslate nohighlight">\(50\)</span> students are from school <span class="math notranslate nohighlight">\(1\)</span>, and the second <span class="math notranslate nohighlight">\(50\)</span> students are from school <span class="math notranslate nohighlight">\(2\)</span>. Next, let’s look at the block matrix <span class="math notranslate nohighlight">\(\pmb B\)</span>:</p>
@@ -777,7 +794,7 @@ print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probabilit
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_15_0.png" src="../../_images/single-network-models_15_0.png" />
+<img alt="../../_images/single-network-models_10_0.png" src="../../_images/single-network-models_10_0.png" />
 </div>
 </div>
 <p>As we can see, the matrix <span class="math notranslate nohighlight">\(\pmb B\)</span> is a symmetric block matrix. Finally, let’s sample a single network from the SBM with parameters <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(\pmb B\)</span>:</p>
@@ -798,7 +815,7 @@ print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probabilit
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_17_0.png" src="../../_images/single-network-models_17_0.png" />
+<img alt="../../_images/single-network-models_12_0.png" src="../../_images/single-network-models_12_0.png" />
 </div>
 </div>
 <p>The above network shows students, ordered by the school they are in (school 1 and school 2, respectively). As we can see in the above network, people from school <span class="math notranslate nohighlight">\(1\)</span> are more connected than people from school <span class="math notranslate nohighlight">\(2\)</span>.  We notice this from the fact that there are more connections between people from school <span class="math notranslate nohighlight">\(1\)</span> than from school <span class="math notranslate nohighlight">\(2\)</span>. Also, the connections between people from different schools appear to be a bit <em>more sparse</em> (fewer edges) than connections betwen schools. The above heatmap can be described as <strong>modular</strong>: it has clearly delineated communities, which are the vertices that comprise the obvious “squares” in the above adjacency matrix.</p>
@@ -822,7 +839,7 @@ print(f"ER \"p\" parameter: {er.p_}") --><!-- As we can see, the edge probabilit
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_19_0.png" src="../../_images/single-network-models_19_0.png" />
+<img alt="../../_images/single-network-models_14_0.png" src="../../_images/single-network-models_14_0.png" />
 </div>
 </div>
 <p>Notice that now, the students are <em>not</em> organized according to school. We can see this by looking at the school assignment vector, shown at the left and top, of the network. In this sense, it becomes quite difficult in practice to determine whether community structure exists simply by looking at a network, unless you are looking at a network in which the nodes are <em>already arranged</em> in an order which respects the community structure.</p>
