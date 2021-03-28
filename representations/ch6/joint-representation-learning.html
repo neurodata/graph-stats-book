@@ -562,8 +562,8 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#variations-on-case">
-   Variations on CASE
+  <a class="reference internal nav-link" href="#non-assortative-case">
+   Non-Assortative Case
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -772,12 +772,12 @@
 </div>
 <div class="section" id="covariate-assisted-spectral-embedding">
 <h2>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">¶</a></h2>
-<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE <span id="id1">[<span>cascpaper</span>]</span>, is a simple way of combining our network and our covariates into a single model. In the most straightforward version of CASE, we combine the network’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. Here, <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Notice the word “regularized” - This means (from the Laplacian section earlier) that our Laplacian looks like <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span>.</p>
+<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining our network and our covariates into a single model. In the most straightforward version of CASE, we combine the network’s regularized Laplacian matrix <span class="math notranslate nohighlight">\(L\)</span> and a function of our covariate matrix <span class="math notranslate nohighlight">\(XX^\top\)</span>. Here, <span class="math notranslate nohighlight">\(X\)</span> is just our covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Notice the word “regularized” - This means (from the Laplacian section earlier) that our Laplacian looks like <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(X\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(XX^T\)</span>, notice from linear algebra that we’re effectively taking the weighted sum - or the dot product - of each row of <span class="math notranslate nohighlight">\(X\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-a0afc180-9685-42a0-8b9f-d841b77f8b0d">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-a0afc180-9685-42a0-8b9f-d841b77f8b0d" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-39ede770-d1ef-4352-85c4-d25213d2c72d">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-39ede770-d1ef-4352-85c4-d25213d2c72d" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -888,11 +888,7 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matlotlib.gridspec</span> <span class="kn">import</span> <span class="n">GridSpec</span>
-
-<span class="c1"># generate grid spec</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">))</span>
-<span class="c1"># fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Our Combined Laplacian and </span><span class="se">\n</span><span class="s2">covariates matrix with a weight of </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_</span><span class="p">,</span> 
              <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Embedding of the combined matrix&quot;</span><span class="p">,</span> 
@@ -903,18 +899,7 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
-<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">15</span><span class="o">-</span><span class="mi">9</span><span class="n">a54e7bb97d1</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">matlotlib.gridspec</span> <span class="kn">import</span> <span class="n">GridSpec</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> 
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># generate grid spec</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">))</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="c1"># fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))</span>
-
-<span class="ne">ModuleNotFoundError</span>: No module named &#39;matlotlib&#39;
-</pre></div>
-</div>
+<img alt="../../_images/joint-representation-learning_40_0.png" src="../../_images/joint-representation-learning_40_0.png" />
 </div>
 </div>
 <p>Success! We’ve managed to achieve separation between all three communities. Below we can see (from left to right) a comparison of our network’s latent position when we only use its topological information, when we only use the information contained in its covariates, and finally our embedding using the weight we found.</p>
@@ -942,17 +927,13 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (XX^\top)}
 </div>
 </div>
 </div>
-<div class="section" id="variations-on-case">
-<h2>Variations on CASE<a class="headerlink" href="#variations-on-case" title="Permalink to this headline">¶</a></h2>
-<p>We don’t always want to embed <span class="math notranslate nohighlight">\(L + \alpha XX^\top\)</span>. Using the regularized Laplacian by itself, for instance, isn’t always best. Here are some situations where we might consider using a different equation to combine the topological and the covariate information in our network.</p>
-<p><em>non-assortative</em><br />
-If your graph is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square our Laplacian. This gets rid of a lot of annoying negative eigenvalues, and we end up embedding <span class="math notranslate nohighlight">\(LL + aXX^\top\)</span>.</p>
-<p><em>big graphs</em><br />
-In large graphs, we’d like to perform as few operations on our two matrices as possible prior to embedding (since any computation we do on huge matrices is pretty expensive and can take awhile). Here, we can use a variant on classical correlation analysis<sup>4</sup> and simply embed <span class="math notranslate nohighlight">\(LX\)</span>.</p>
+<div class="section" id="non-assortative-case">
+<h2>Non-Assortative Case<a class="headerlink" href="#non-assortative-case" title="Permalink to this headline">¶</a></h2>
+<p>We don’t always want to embed <span class="math notranslate nohighlight">\(L + \alpha XX^\top\)</span>. Using the regularized Laplacian by itself, for instance, isn’t always best. If your network is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square our Laplacian. This is because the adjacency matrices of non-assortative networks have a lot of negative eigenvalues; squaring the Laplacian gets rid of a lot of annoying negative eigenvalues, and we end up with a better embedding. In the non-assortative case, we end up embedding <span class="math notranslate nohighlight">\(LL + aXX^\top\)</span>.</p>
 </div>
 <div class="section" id="using-graspologic">
 <h2>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h2>
-<p>Graspologic’s CovariateAssistedSpectralEmbedding class implements CASE directly. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aXX^T\)</span> down to two dimensions, and then plots the latent positions to show the clustering. You can also try the above variations on CASE with the <code class="docutils literal notranslate"><span class="pre">embedding_alg</span></code> parameter.</p>
+<p>Graspologic’s CovariateAssistedSpectralEmbedding class implements CASE directly. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aXX^T\)</span> down to two dimensions, and then plots the latent positions to show the clustering. The <code class="docutils literal notranslate"><span class="pre">embedding_alg</span></code> parameter controls the assortative vs. non-assortative case.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graspologic</span>
