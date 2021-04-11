@@ -504,11 +504,43 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/representations/ch6/multigraph-representation-learning.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiple-adjacency-spectral-embedding">
+   Multiple Adjacency Spectral Embedding
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
         </div>
     </div>
 </div>
@@ -519,6 +551,82 @@
                 
   <div class="section" id="multigraph-representation-learning">
 <h1><span class="section-number">3.5. </span>Multigraph Representation Learning<a class="headerlink" href="#multigraph-representation-learning" title="Permalink to this headline">¶</a></h1>
+<p>There are</p>
+<div class="section" id="multiple-adjacency-spectral-embedding">
+<h2>Multiple Adjacency Spectral Embedding<a class="headerlink" href="#multiple-adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h2>
+<p>Multiple Adjacency Spectral Embedding (MASE) is an extension of Adjacency Spectral Embedding (see ASE tutorial) for an arbitrary number of graphs. Once graphs are embedded, the low-dimensional Euclidean representation can be used to visualize the latent positions of vertices, perform inference, etc.</p>
+<p>The general idea of MASE is to take a bunch of graphs, embed them with Adjacency Spectral Embedding, and then combine those embeddings into a single matrix and re-embed the combined matrix.</p>
+<p><strong>figure explaining the above</strong></p>
+<p>We sample two 2-block SBMs (undirected, no self-loops) with 50 vertices, each block containing 25 vertices (𝑛=[25,25]), and with the following block connectivity matrices:</p>
+<p>𝐵1=[0.30.10.10.7], 𝐵2=[0.30.10.10.3]</p>
+<p>The only difference between the two is the within-block probability for the second block. We sample 𝐺1∼SBM(𝑛,𝐵1) and 𝐺2∼SBM(𝑛,𝐵2).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">]</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.015</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">]])</span>
+<span class="n">graphs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="n">g</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">heatmap</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">graphs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">graphs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">pairplot</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">bc509362d19d</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">latents</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">graphs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;pairplot&#39; is not defined
+</pre></div>
+</div>
+<img alt="../../_images/multigraph-representation-learning_8_1.png" src="../../_images/multigraph-representation-learning_8_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+
+<span class="n">mase</span> <span class="o">=</span> <span class="n">MASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">mase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
+<span class="n">pairplot</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.PairGrid at 0x15f614340&gt;
+</pre></div>
+</div>
+<img alt="../../_images/multigraph-representation-learning_9_1.png" src="../../_images/multigraph-representation-learning_9_1.png" />
+</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
