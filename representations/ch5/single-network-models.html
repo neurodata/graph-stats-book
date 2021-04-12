@@ -255,6 +255,16 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="#erdos-renyi-er">
+     Erdös-Rényi (ER)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="#stochastic-block-model-sbm">
+     Stochastic Block Model (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="#references">
      References
     </a>
@@ -544,30 +554,61 @@
      Foundation
     </a>
    </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#erdos-renyi-er">
+   Erdös-Rényi (ER)
+  </a>
+  <ul class="nav section-nav flex-column">
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#erdos-renyi-er">
-     Erdös-Rényi (ER)
+    <a class="reference internal nav-link" href="#likelihood">
+     Likelihood
     </a>
    </li>
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#stochastic-block-model-sbm">
-     Stochastic Block Model (SBM)
+    <a class="reference internal nav-link" href="#practical-utility">
+     Practical Utility
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#code-examples">
+     Code Examples
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#stochastic-block-model-sbm">
+   Stochastic Block Model (SBM)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
+     A Priori Stochastic Block Model
     </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#a-posteriori-stochastic-block-model">
-       A Posteriori Stochastic Block Model
-      </a>
-     </li>
-     <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
-       A Priori Stochastic Block Model
+      <a class="reference internal nav-link" href="#id1">
+       Likelihood
       </a>
      </li>
     </ul>
    </li>
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#code-examples">
+    <a class="reference internal nav-link" href="#a-posteriori-stochastic-block-model">
+     A Posteriori Stochastic Block Model
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id2">
+       Likelihood
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
      Code Examples
     </a>
    </li>
@@ -708,9 +749,17 @@
 <li><p>With a single network observed (or really, any number of networks we could collect in the real world) we would never be able to estimate <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span> parameters.</p></li>
 </ol>
 <p>So, what are some more reasonable descriptions of <span class="math notranslate nohighlight">\(\mathcal P\)</span>? We explore some choices below.</p>
+<p>In all of the below models, we will explore the concept of the <strong>likelihood equivalence class</strong>, or an <em>equivalence class</em>, for short. The likelihood <span class="math notranslate nohighlight">\(\mathcal L\)</span> is a function which in general, describes how effective a particular observation can be described by a random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> with parameters <span class="math notranslate nohighlight">\(\theta\)</span>, written <span class="math notranslate nohighlight">\(\mathbf A \sim F(\theta)\)</span>. Formally, the likelihood is the function where <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) \propto \mathbb P_\theta(A)\)</span>; that is, the likelihood is proportional to the probability of observing the realization <span class="math notranslate nohighlight">\(A\)</span> if the underlying random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> has parameters <span class="math notranslate nohighlight">\(\theta\)</span>. The reason we write <span class="math notranslate nohighlight">\(\propto\)</span> instead of <span class="math notranslate nohighlight">\(=\)</span> is that, in the case of probability distributions, it is often rather tedious to take care of all constants when simplifying expressions, and these constants can detract from much of the intuition of what is going on. If we instead focus on the likelihood, we only need to worry about the parts of the probability statement that deal directly with the parameters <span class="math notranslate nohighlight">\(\theta\)</span> and the realization itself <span class="math notranslate nohighlight">\(A\)</span>. Why does this matter when it comes to equivalence classes? An equivalence class is a partition of the sample space <span class="math notranslate nohighlight">\(E \subseteq \mathcal A_n\)</span>, which has the following properties. Holding the parameters <span class="math notranslate nohighlight">\(\theta\)</span> fixed:</p>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> are members of the same equivalence class <span class="math notranslate nohighlight">\(E\)</span> (written <span class="math notranslate nohighlight">\(A, A' \in E\)</span>), then <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) = \mathcal L_\theta(A')\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A''\)</span> are members of different equivalence classes; that is, <span class="math notranslate nohighlight">\(A \in E\)</span> and <span class="math notranslate nohighlight">\(A'' \in E'\)</span> where <span class="math notranslate nohighlight">\(E, E'\)</span> are equivalence classes, then <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) \neq \mathcal L_\theta(A'')\)</span>.</p></li>
+<li><p>Using points 1. and 2., we can establish that if <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(E'\)</span> are two different equivalence classes, then <span class="math notranslate nohighlight">\(E \cap E' = \varnothing\)</span>.</p></li>
+</ol>
+<p>We will see more below about how the equivalence classes come into play with network models, and in a later section, we will see their relevance to the estimation of the parameters <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
+</div>
 </div>
 <div class="section" id="erdos-renyi-er">
-<h2>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
+<h1>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h1>
 <p>The simplest random network model is called the Erdös Rényi (ER) model<sup>1</sup>. Consider the social network example explained above. The simplest possible thing to do with our network would be to assume that a given pair of people within our network have the same chance of being friends as any other pair of people we select. The Erdös Rényi model formalizes this relatively simple model with a single parameter:</p>
 <table class="colwidths-auto table">
 <thead>
@@ -727,6 +776,8 @@
 </tbody>
 </table>
 <p>In an Erdös Rényi network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span>, that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bern(p)\)</span> distribution, whenever <span class="math notranslate nohighlight">\(j &gt; i\)</span>. The word “independent” means that edges in the network occurring or not occurring do not affect one another. For instance, this means that if we knew a student named Alice was friends with Bob, and Alice was also friends with Chadwick, that we do not learn any information about whether Bob is friends with Chadwick. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If Alice and Bob are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, then Alice/Bob and Chadwick are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, too. When <span class="math notranslate nohighlight">\(i &gt; j\)</span>, we allow <span class="math notranslate nohighlight">\(\mathbf a_{ij} = \mathbf a_{ji}\)</span>. This means that the connections <em>across the diagonal</em> of the adjacency matrix are all equal, which means that we have built-in the property of undirectedness into our networks. Further, we let <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>, which means that all self-loops are always unconnected. This means that all the networks are hollow. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim ER_n(p)\)</span>.</p>
+<div class="section" id="likelihood">
+<h2>Likelihood<a class="headerlink" href="#likelihood" title="Permalink to this headline">¶</a></h2>
 <p>What is the likelihood for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span>? Remember that the likelihood is proportional to the probability of observing a particular realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> given the parameters <span class="math notranslate nohighlight">\(\theta\)</span>. With <span class="math notranslate nohighlight">\(\theta = p\)</span> (that is, an ER-random network has only a single parameter, the probability <span class="math notranslate nohighlight">\(p\)</span>) we get:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -744,18 +795,17 @@
 \[\begin{align*}
     \mathcal L_\theta(A) &amp;\propto \prod_{j &gt; i} p^{a_{ij}}(1 - p)^{1 - a_{ij}} \\
     &amp;= p^{\sum_{j &gt; i} a_{ij}} \cdot (1 - p)^{\binom{n}{2} - \sum_{j &gt; i}a_{ij}} \\
-    &amp;= p^{|\mathcal E|} \cdot (1 - p)^{\binom{n}{2} - |\mathcal E|}
+    &amp;= p^{m(A)} \cdot (1 - p)^{\binom{n}{2} - m(A)}
 \end{align*}\]</div>
-<p>This means that the likelihood <span class="math notranslate nohighlight">\(\mathcal L_\theta(A)\)</span> is a function <em>only</em> of the number of edges <span class="math notranslate nohighlight">\(|\mathcal E|\)</span> in the network represented by adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>. There is a big implication here: we can define <strong>equivalence classes</strong> of the sample space <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> in terms of their likelihood. Let <span class="math notranslate nohighlight">\(|\mathcal E(A)| = \sum_{j &gt; i} a_{ij}\)</span> denote the number of edges in adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>. The equivalence class on the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks are the sets:</p>
+<p>This means that the likelihood <span class="math notranslate nohighlight">\(\mathcal L_\theta(A)\)</span> is a function <em>only</em> of the number of edges <span class="math notranslate nohighlight">\(m(A) = \sum_{j &gt; i}a_{ij}\)</span> in the network represented by adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>. The equivalence class on the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks are the sets:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    E_{i}(p) &amp;= \left\{A \in \mathcal A_n : |\mathcal E(A)| = i\right\}
+    E_{i} &amp;= \left\{A \in \mathcal A_n : m(A) = i\right\}
 \end{align*}\]</div>
-<p>where <span class="math notranslate nohighlight">\(i\)</span> index from <span class="math notranslate nohighlight">\(0\)</span> (the minimum number of edges possible) all the way up to <span class="math notranslate nohighlight">\(n^2\)</span> (the maximum number of edges possible). To drive this intuition home a little bit more, what we mean here is that for any <span class="math notranslate nohighlight">\(A \in E_i\)</span> and any other <span class="math notranslate nohighlight">\(A'\)</span> also <span class="math notranslate nohighlight">\(\in E_i\)</span> (that is, both <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> have the same number of edges, <span class="math notranslate nohighlight">\(i\)</span>), that <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) = \mathcal L_\theta(A')\)</span> for any choice <span class="math notranslate nohighlight">\(p \in [0,1]\)</span>. No matter the ER-random network (regardless of the choice of <span class="math notranslate nohighlight">\(p\)</span>) both <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> will be equally likely because they have the same number of edges. Further, they <em>will</em> be more or less likely depending on the choice of <span class="math notranslate nohighlight">\(p\)</span> to networks which are in <em>other</em> equivalence classes. We can summarize these statements as follows. For any choice <span class="math notranslate nohighlight">\(p \in [0, 1]\)</span>:</p>
-<ol class="simple">
-<li><p>For any <span class="math notranslate nohighlight">\(A, A' \in E_i(p)\)</span> (both <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> are in the equivalence class of networks with <span class="math notranslate nohighlight">\(i\)</span> edges), <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) = \mathcal L_\theta(A')\)</span>, and</p></li>
-<li><p>For any <span class="math notranslate nohighlight">\(A \in E_i(p)\)</span> and <span class="math notranslate nohighlight">\(A'' \in E_j(p)\)</span> (that is, <span class="math notranslate nohighlight">\(A\)</span> is in the equivalence class with <span class="math notranslate nohighlight">\(i\)</span> edges but <span class="math notranslate nohighlight">\(A''\)</span> is in the equivalence class with <span class="math notranslate nohighlight">\(j\)</span> edges), if <span class="math notranslate nohighlight">\(i \neq j\)</span>, then <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) \neq \mathcal L_\theta(A'')\)</span>.</p></li>
-</ol>
+<p>where <span class="math notranslate nohighlight">\(i\)</span> index from <span class="math notranslate nohighlight">\(0\)</span> (the minimum number of edges possible) all the way up to <span class="math notranslate nohighlight">\(n^2\)</span> (the maximum number of edges possible). All of the relationships for equivalence classes discussed above apply to the sets <span class="math notranslate nohighlight">\(E_i\)</span>.</p>
+</div>
+<div class="section" id="practical-utility">
+<h2>Practical Utility<a class="headerlink" href="#practical-utility" title="Permalink to this headline">¶</a></h2>
 <p>In practice, the ER model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the ER model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know what the degree distribution of an ER network should look like. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from a network which is ER. For instance, if we see a half of the nodes have a very high degree, and the rest of the nodes with a much lower degree, we can reasonably conclude the network might be more complex than can be described by the ER model. If this is the case, we might look for other, more complex, models that could describe our network. In some of the exercises at the end of this section, we will explore how to formalize these relationships.</p>
 <div class="admonition-working-out-the-expected-degree-in-an-erd-ouml-s-r-eacute-nyi-network admonition">
 <p class="admonition-title">Working Out the Expected Degree in an Erdös-Rényi Network</p>
@@ -774,6 +824,9 @@
 <p>Since all of the <span class="math notranslate nohighlight">\(n\)</span> terms being summed have the same expected value. This holds for <em>every</em> node <span class="math notranslate nohighlight">\(v_i\)</span>, which means that the expected degree of all nodes is an undirected ER network is the same.</p>
 </div>
 <!-- The ER model is also useful for the development of new computational techniques to use on random networks. This is because even if the "best" model for a network is something much more complex, we can still calculate an edge probability $p$ for the network without needing any information but the adjacency matrix. Consider, for instance, a case where we design a new algorithm for a social network, and we want to know how much more RAM we might need as the social network grows. We might want to investigate how the algorithm scales to networks with different numbers of people and different connection probabilities that might be realistic as our social network expands in popularity. Examining how the algorithm operates on ER networks with different values of $n$ and $p$ might be helpful. This is an especially common approach when people deal with networks that are said to be *sparse*. A **sparse network** is a network in which the number of edges is much less than the total possible number of edges. This contrasts with a **dense network**, which is a network in which the number of edges is close to the maximum number of possible edges. In the case of an $ER_{n}(p)$ network, the network is sparse when $p$ is small (closer to $0$), and dense when $p$ is large (closer to $1$). -->
+</div>
+<div class="section" id="code-examples">
+<h2>Code Examples<a class="headerlink" href="#code-examples" title="Permalink to this headline">¶</a></h2>
 <p>In the next code block, we look to sample a single ER network with <span class="math notranslate nohighlight">\(50\)</span> nodes and an edge probability <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(0.3\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -821,75 +874,14 @@
 </div>
 <p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
 </div>
+</div>
 <div class="section" id="stochastic-block-model-sbm">
-<h2>Stochastic Block Model (SBM)<a class="headerlink" href="#stochastic-block-model-sbm" title="Permalink to this headline">¶</a></h2>
+<h1>Stochastic Block Model (SBM)<a class="headerlink" href="#stochastic-block-model-sbm" title="Permalink to this headline">¶</a></h1>
 <p>Consider the social network above. Using the ER model described above, we can only model the connections between a pair of people with a <em>fixed probability</em> that is the same for all pairs of students within the network. What would happen if we had additional information about students in our network that might influence the probability that they were friends? Consider that we know students attend one of several schools in our network. It seems fairly logical that if two students go to the same school, in general, they will probably have a higher probability of being friends than if they went to different schools. Unfortunately, using the ER model, there is nothing more complex we can do to reflect this fact. This is where the Stochastic Block Model, or SBM, comes into play.</p>
 <p>The SBM captures this idea through the use of a vertex-assignment vector, which assigns each of the <span class="math notranslate nohighlight">\(n\)</span> vertices in the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities. A <strong>community</strong> is a group of nodes within the network. In our example case, the communities would represent the schools that students are able to attend in our network. There are two flavors of SBMs: one in which the vertex-assignment vector is treated as <em>unknown</em> and one in which the vertex-assignment vector is treated as *known (it is a <em>vertex attribute</em> for the network). Across both SBM flavors, instead of describing all pairs of nodes by a fixed probability like with the ER model, in the SBM, we instead describe properties that hold for edges between <em>pairs of communities</em>.</p>
-<div class="section" id="a-posteriori-stochastic-block-model">
-<h3>A Posteriori Stochastic Block Model<a class="headerlink" href="#a-posteriori-stochastic-block-model" title="Permalink to this headline">¶</a></h3>
-<p>In the <em>a posteriori</em> Stochastic Block Model (SBM), we consider that vertex assignment to one of <span class="math notranslate nohighlight">\(K\)</span> communities is a random proocess. This model has the following parameters:</p>
-<table class="colwidths-auto table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Parameter</p></th>
-<th class="head"><p>Space</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\vec \pi\)</span></p></td>
-<td><p>the <span class="math notranslate nohighlight">\(K-1\)</span> probability simplex</p></td>
-<td><p>The probability of a vertex being assigned to community <span class="math notranslate nohighlight">\(K\)</span></p></td>
-</tr>
-<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
-<td><p>[0,1]<span class="math notranslate nohighlight">\(^{K \times K}\)</span></p></td>
-<td><p>The block matrix, which assigns edge probabilities for pairs of communities</p></td>
-</tr>
-</tbody>
-</table>
-<p>In the <em>a posteriori</em> SBM, the vertex-assignment vector is treated as a vector-valued random variable, which is denoted by <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>. In this case, <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> takes values in the space <span class="math notranslate nohighlight">\(\{1,...,K\}^n\)</span>. This means that for a given realization of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, denoted by <span class="math notranslate nohighlight">\(\vec \tau\)</span>, that for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network, we obtain an integer value between <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(K\)</span> indicating which community a node is from. Statistically, we write that the vertex assignment for node <span class="math notranslate nohighlight">\(i\)</span>, denoted by <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span>, is sampled independently and identically from <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>. Stated another way, the vector <span class="math notranslate nohighlight">\(\vec\pi\)</span> indicates the probability <span class="math notranslate nohighlight">\(\pi_k\)</span> of assignment to each community <span class="math notranslate nohighlight">\(k\)</span> in the network.</p>
-<p>Next, let’s discuss the matrix <span class="math notranslate nohighlight">\(B\)</span>, which is known as the <strong>block matrix</strong> of the SBM. We write down that <span class="math notranslate nohighlight">\(B \in [0, 1]^{K \times K}\)</span>, which means that the block matrix is a matrix with <span class="math notranslate nohighlight">\(K\)</span> rows and <span class="math notranslate nohighlight">\(K\)</span> columns. If we have a pair of nodes and know which of the <span class="math notranslate nohighlight">\(K\)</span> communities each node is from, the block matrix tells us the probability that those two nodes are connected. If our networks are simple, the matrix <span class="math notranslate nohighlight">\(B\)</span> is also symmetric, which means that if <span class="math notranslate nohighlight">\(b_{k, \ell} = p\)</span> where <span class="math notranslate nohighlight">\(p\)</span> is a probability, that <span class="math notranslate nohighlight">\(b_{\ell, k} = p\)</span>, too. The requirement of <span class="math notranslate nohighlight">\(B\)</span> to be symmetric exists <em>only</em> if we are dealing with simple networks, since they are undirected; if we relax the requirement of undirectedness (and allow directed networks) <span class="math notranslate nohighlight">\(B\)</span> no longer need be symmetric.</p>
-<p>Finally, let’s think about how to write down the generative model in the <em>a posteriori</em> SBM. We showed above the model for the random vertex-assignment variable, <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, above. The model for edges of the <em>a posteriori</em> SBM is, in fact, conditional on the assignments obtained through this procedure. We write down that, conditioned on <span class="math notranslate nohighlight">\(\pmb \tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\pmb \tau_j = k\)</span>, that if <span class="math notranslate nohighlight">\(j &gt; i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(b_{\ell,k})\)</span> distribution. What this reflects is the idea that, if node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(\ell\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((\ell,k)\)</span> entry of the block matrix <span class="math notranslate nohighlight">\(B\)</span> indicates the probability that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. Like the ER model, the edges are still independent, which means that edges occuring or not occuring do not have an impact on one another. Unlike above, we can no longer say that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>s are identically distributed, since the probability <span class="math notranslate nohighlight">\(b_{\ell, k}\)</span> depends on the communities that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are assigned to. This means that if we were to look at a different pair of nodes, the probability that the two nodes are connected could be different, and therefore they might not share the same distribution. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an <em>a priori</em> SBM network with parameters <span class="math notranslate nohighlight">\(\vec \pi\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_n(\vec \pi, B)\)</span>.</p>
-<p>What does the likelihood for the <em>a posteriori</em> SBM look like? In this case, <span class="math notranslate nohighlight">\(\theta = (\vec \pi, B)\)</span> are the parameters for the model, so the likelihood for a realization <span class="math notranslate nohighlight">\(A\)</span> of <span class="math notranslate nohighlight">\(\mathbf A\)</span> is:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\mathcal L_\theta(A) &amp;\propto \mathbb P_\theta(\mathbf A = A)
-\end{align*}\]</div>
-<p>Next, we use the fact that the probability that <span class="math notranslate nohighlight">\(\mathbf A = A\)</span> is, in fact, the <em>marginalization</em> (over realizations of <span class="math notranslate nohighlight">\(\pmb \tau\)</span>) of the joint <span class="math notranslate nohighlight">\((\mathbf A, \pmb \tau)\)</span>. In the line after that, we use Bayes’ Theorem to separate the joint probability into a conditional probability and a marginal probability:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-557ce758-3c91-45e4-9e68-2c0e6dfb96d2">
-<span class="eqno">(2.1)<a class="headerlink" href="#equation-557ce758-3c91-45e4-9e68-2c0e6dfb96d2" title="Permalink to this equation">¶</a></span>\[\begin{align}
-    &amp;= \int_\tau \mathbb P_\theta(\mathbf A = A, \pmb \tau = \tau)\textrm{d}\tau \nonumber\\
-    &amp;= \int_\tau \mathbb P_\theta(\mathbf A = A \big | \pmb \tau = \tau)\mathbb P_\theta(\pmb \tau = \tau)\textrm{d}\tau
-    \label{eqn:apost_sbm_eq1}
-\end{align}\]</div>
-<p>Let’s think about each of these probabilities separately. Remember that for <span class="math notranslate nohighlight">\(\pmb \tau\)</span>, that each entry <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span> is sampled <em>independently and identically</em> from <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>.The probability mass for a <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>-valued random variable is <span class="math notranslate nohighlight">\(\mathbb P(\pmb \tau_i = \tau_i; \vec \pi) = \pi_{\tau_i}\)</span>. Finally, note that if we are taking the products of <span class="math notranslate nohighlight">\(n\)</span> <span class="math notranslate nohighlight">\(\pi_{\tau_i}\)</span> terms, that many of these values will end up being the same. Consider, for instance, if the vector <span class="math notranslate nohighlight">\(\tau = [1,2,1,2,1]\)</span>. We end up with three terms of <span class="math notranslate nohighlight">\(\pi_1\)</span>, and two terms of <span class="math notranslate nohighlight">\(\pi_2\)</span>, and it does not matter which order we multiply them in. Rather, all we need to keep track of are the counts of each <span class="math notranslate nohighlight">\(\pi\)</span>. term. Written another way, we can use the indicator that <span class="math notranslate nohighlight">\(\tau_i = k\)</span>, given by <span class="math notranslate nohighlight">\(\mathbb 1_{\tau_i = k}\)</span>, and a running counter over all of the community probability assignments <span class="math notranslate nohighlight">\(\pi_k\)</span> to make this expression a little more sensible. We will use the symbol <span class="math notranslate nohighlight">\(n_k = \sum_{i = 1}^n \mathbb 1_{\tau_i = k}\)</span> to denote this value:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\mathbb P_\theta(\pmb \tau = \tau) &amp;= \prod_{i = 1}^n \mathbb P_\theta(\pmb \tau_i = \tau_i)\;\;\;\;\textrm{Independence Assumption} \\
-&amp;= \prod_{i = 1}^n \pi_{\tau_i} \;\;\;\;\textrm{p.m.f. of a Categorical R.V.}\\
-&amp;= \prod_{k = 1}^K \pi_{k}^{n_k}
-\end{align*}\]</div>
-<p>Next, let’s think about the conditional probability term, <span class="math notranslate nohighlight">\(\mathbb P_\theta(\mathbf A = A \big | \pmb \tau = \tau)\)</span>. Remember that the entries are all independent conditional on <span class="math notranslate nohighlight">\(\pmb \tau\)</span> taking the value <span class="math notranslate nohighlight">\(\tau\)</span>. This means that we can separate the probability of the entire <span class="math notranslate nohighlight">\(\mathbf A = A\)</span> into the product of the probabilities edge-wise. Further, remember that conditional on <span class="math notranslate nohighlight">\(\pmb \tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\pmb \tau_j = k\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is <span class="math notranslate nohighlight">\(Bern(b_{\ell,k})\)</span>. The distribution of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> does <em>not</em> depend on any of the other entries of <span class="math notranslate nohighlight">\(\pmb \tau\)</span>. Remembering that the probability mass function of a Bernoulli R.V. is given by <span class="math notranslate nohighlight">\(\mathbb P(\mathbf a_{ij}=a_{ij}; p) = p^{a_{ij}}(1 - p)^{a_{ij}}\)</span>, this gives:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\mathbb P_\theta(\mathbf A = A \big | \pmb \tau = \tau) &amp;= \prod_{j &gt; i}\mathbb P_\theta(\mathbf a_{ij} = a_{ij} \big | \pmb \tau = \tau)\;\;\;\;\textrm{Independence Assumption} \\
-&amp;= \prod_{j &gt; i}\mathbb P_\theta(\mathbf a_{ij} = a_{ij} \big | \pmb \tau_i = \ell, \pmb \tau_j = k) \;\;\;\;\textrm{$\mathbf a_{ij}$ depends only on $\tau_i$ and $\tau_j$}\\
-&amp;= \prod_{j &gt; i} b_{\ell k}^{a_{ij}} (1 - b_{\ell k})^{1 - a_{ij}}
-\end{align*}\]</div>
-<p>Again, we can simplify this expression a bit. Recall the indicator function above. Let <span class="math notranslate nohighlight">\(|\mathcal E_{\ell k}| = \sum_{j &gt; i}\mathbb 1_{\tau_i = \ell}\mathbb 1_{\tau_j=k}a_{ij}\)</span>, and let <span class="math notranslate nohighlight">\(n_{\ell k}= \sum_{j&gt;i}\mathbb 1_{\tau_i = \ell}\mathbb 1_{\tau_j = k}\)</span>. Note that <span class="math notranslate nohighlight">\(\mathcal E_{\ell k}\)</span> is the number of edges between nodes in community <span class="math notranslate nohighlight">\(\ell\)</span> and community <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\(n_{\ell k}\)</span> is the number of <em>possible</em> edges between nodes in community <span class="math notranslate nohighlight">\(\ell\)</span> and community <span class="math notranslate nohighlight">\(k\)</span>. This expression can be simplified to:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\mathbb P_\theta(\mathbf A = A \big | \pmb \tau = \tau) &amp;= \prod_{\ell,k} b_{\ell k}^{|\mathcal E_{\ell k}|}(1 - b_{\ell k})^{n_{\ell k} - |\mathcal E_{\ell k}|}
-\end{align*}\]</div>
-<p>Combining these into the integrand from Equation (\ref{eqn:apost_sbm_eq1}) gives:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\mathcal L_\theta(A) &amp;\propto \int_\tau \mathbb P_\theta(\mathbf A = A \big | \pmb \tau = \tau) \mathbb P_\theta(\pmb \tau = \tau)\textrm{d}\tau \\
-&amp;= \int_\tau \prod_{k = 1}^K \pi_k^{n_k}\cdot \prod_{\ell,k} b_{\ell k}^{|\mathcal E_{\ell k}|}(1 - b_{\ell k})^{n_{\ell k} - |\mathcal E_{\ell k}|}\textrm{d}\tau
-\end{align*}\]</div>
-<!-- TODO: return to add equivalence classes --></div>
 <div class="section" id="a-priori-stochastic-block-model">
-<h3>A Priori Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h3>
-<p>The <em>a priori</em> SBM is very similar to the <em>a posteriori</em> SBM, with the caveat that whereas in the <em>a posteriori</em> SBM we only knew the probabilities of assignment <span class="math notranslate nohighlight">\(\vec \pi\)</span>, here we know the vertex assignments <span class="math notranslate nohighlight">\(\vec \tau\)</span> <em>a priori</em>. The <em>a priori</em> SBM and has the following two parameters:</p>
+<h2>A Priori Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<p>The <em>a priori</em> SBM is an SBM in which we know <em>a priori</em> (that is, ahead of time) which vertices are in which vertex communities. Here, we will use the variable <span class="math notranslate nohighlight">\(K\)</span> to denote the maximum number of communities that vertices could be assigned to. The ordering of the communities does not matter; the community we call <span class="math notranslate nohighlight">\(1\)</span> versus <span class="math notranslate nohighlight">\(2\)</span> versus <span class="math notranslate nohighlight">\(K\)</span> is largely a symbolic distinction (the only thing that matters is that they are <em>different</em>). The <em>a priori</em> SBM and has the following two parameters:</p>
 <table class="colwidths-auto table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Parameter</p></th>
@@ -909,29 +901,93 @@
 </tbody>
 </table>
 <p>We write that <span class="math notranslate nohighlight">\(\vec \tau \in \{1, ..., K\}^n\)</span>, which means that <span class="math notranslate nohighlight">\(\vec \tau\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-dimensional vector which takes one of <span class="math notranslate nohighlight">\(K\)</span> possible values. In our social network example, for instance, this vector would reflect the fact that each of the <span class="math notranslate nohighlight">\(n\)</span> students in our network could be attendees at one of <span class="math notranslate nohighlight">\(K\)</span> possible schools. For a single node <span class="math notranslate nohighlight">\(i\)</span> that is in community <span class="math notranslate nohighlight">\(\ell\)</span>, where <span class="math notranslate nohighlight">\(\ell \in \{1, ..., K\}\)</span>, we write that <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span>.</p>
-<p>The matrix <span class="math notranslate nohighlight">\(B\)</span> behaves exactly the same as it did with the <em>a posteriori</em> SBM. Finally, let’s think about how to write down the generative model for the <em>a priori</em> SBM. Remember that <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(\pmb B\)</span> are parameters, which means that when we fit a SBM, we know these ahead of time. Intuitionally what we want to reflect is, if we know that node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(\ell\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((\ell, k)\)</span> entry of the block matrix is the probability that <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. We write this statement down by saying that for <span class="math notranslate nohighlight">\(j &gt; i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> conditioned on <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(b_{\ell, k})\)</span> distribution.  If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> SBM network with parameters <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_n(\vec \tau, B)\)</span>.</p>
-<p>What does the likelihood for the <em>a priori</em> SBM look like? Fortunately, since <span class="math notranslate nohighlight">\(\vec \tau\)</span> is a <em>parameter</em> of the <em>a priori</em> SBM, the likelihood is a bit simpler than for the <em>a posteriori</em> SBM. This is because the <em>a posteriori</em> SBM requires a marginalization over potential realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, whereas the <em>a priori</em> SBM does not. The likelihood is as follows, omitting detailed explanations of steps that are described above:</p>
+<p>Next, let’s discuss the matrix <span class="math notranslate nohighlight">\(B\)</span>, which is known as the <strong>block matrix</strong> of the SBM. We write down that <span class="math notranslate nohighlight">\(B \in [0, 1]^{K \times K}\)</span>, which means that the block matrix is a matrix with <span class="math notranslate nohighlight">\(K\)</span> rows and <span class="math notranslate nohighlight">\(K\)</span> columns. If we have a pair of nodes and know which of the <span class="math notranslate nohighlight">\(K\)</span> communities each node is from, the block matrix tells us the probability that those two nodes are connected. If our networks are simple, the matrix <span class="math notranslate nohighlight">\(B\)</span> is also symmetric, which means that if <span class="math notranslate nohighlight">\(b_{k, \ell} = p\)</span> where <span class="math notranslate nohighlight">\(p\)</span> is a probability, that <span class="math notranslate nohighlight">\(b_{\ell, k} = p\)</span>, too. The requirement of <span class="math notranslate nohighlight">\(B\)</span> to be symmetric exists <em>only</em> if we are dealing with simple networks, since they are undirected; if we relax the requirement of undirectedness (and allow directed networks) <span class="math notranslate nohighlight">\(B\)</span> no longer need be symmetric.</p>
+<p>Finally, let’s think about how to write down the generative model for the <em>a priori</em> SBM. Remember that <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(\pmb B\)</span> are parameters, which means that when we fit a SBM, we know these ahead of time. Intuitionally what we want to reflect is, if we know that node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(\ell\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((\ell, k)\)</span> entry of the block matrix is the probability that <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. We write this statement down by saying that for <span class="math notranslate nohighlight">\(j &gt; i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> conditioned on <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(b_{\ell, k})\)</span> distribution.  If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> SBM network with parameters <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_n(\vec \tau, B)\)</span>.</p>
+<div class="section" id="id1">
+<h3>Likelihood<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>What does the likelihood for the <em>a priori</em> SBM look like? Fortunately, since <span class="math notranslate nohighlight">\(\vec \tau\)</span> is a <em>parameter</em> of the <em>a priori</em> SBM, the likelihood is a bit simpler than for the <em>a posteriori</em> SBM. This is because the <em>a posteriori</em> SBM requires a marginalization over potential realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, whereas the <em>a priori</em> SBM does not. First, remember that the edges are independent. This means that the probability that <span class="math notranslate nohighlight">\(\mathbf A = A\)</span> can be split into the product of the probabilities that each entry <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a_{ij}\)</span>. Next, remember that, given <span class="math notranslate nohighlight">\(\mathbf B\)</span> and <span class="math notranslate nohighlight">\(\vec \tau\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> takes the distribution <span class="math notranslate nohighlight">\(Bern(b_{\ell k})\)</span>, where <span class="math notranslate nohighlight">\(\tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span>. Remember that the probability mass function of a Bernoulli R.V. is given by <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x = x; p) = p^x (1 - p)^{1 - x}\)</span>. Putting these steps together gives us that:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
 \mathcal L_\theta(A) &amp;\propto \mathbb P_{\theta}(\mathbf A = A) \\
 &amp;= \prod_{j &gt; i} \mathbb P_\theta(\mathbf a_{ij} = a_{ij})\;\;\;\;\textrm{Independence Assumption} \\
 &amp;= \prod_{j &gt; i} b_{\ell k}^{a_{ij}}(1 - b_{\ell k})^{1 - a_{ij}}\;\;\;\;\textrm{p.m.f. of Bernoulli distribution} \\
-&amp;= \prod_{k, \ell}b_{\ell k}^{|\mathcal E_{\ell k}|}(1 - b_{\ell k})^{n_{\ell k} - |\mathcal E_{\ell k}|}
+&amp;= \prod_{k, \ell}b_{\ell k}^{m_{\ell k}(A)}(1 - b_{\ell k})^{n_{\ell k} - m_{\ell k}(A)}
 \end{align*}\]</div>
-<p>Like the ER model, there are again equivalence classes of the sample space <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> in terms of their likelihood. Let <span class="math notranslate nohighlight">\(|\mathcal E_{\ell k}(A)|\)</span> denote the number of edges in the <span class="math notranslate nohighlight">\((\ell, k)\)</span> block of adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>. For a two-community setting, with <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span> given, the equivalence classes are the sets:</p>
+<p>Where <span class="math notranslate nohighlight">\(n_{\ell k}\)</span> denotes the total number of edges possible between vertices assigned to community <span class="math notranslate nohighlight">\(\ell\)</span> and vertices assigned to community <span class="math notranslate nohighlight">\(k\)</span>. That is, <span class="math notranslate nohighlight">\(n_{\ell k} = \sum_{j &gt; i} \mathbb 1_{\tau_i = \ell}\mathbb 1_{\tau_j = k}\)</span>. Further, we will use <span class="math notranslate nohighlight">\(m_{\ell k}(A)\)</span> to denote the total number of edges observed in <span class="math notranslate nohighlight">\(A\)</span>. That is, <span class="math notranslate nohighlight">\(m_{\ell k} = \sum_{j &gt; i}\mathbb 1_{\tau_i = l}\mathbb 1_{\tau_j = k}a_{ij}\)</span>.</p>
+<p>Like the ER model, there are again equivalence classes of the sample space <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> in terms of their likelihood. For a two-community setting, with <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span> given, the equivalence classes are the sets:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    E_{a,b,c}(\vec \tau, B) &amp;= \left\{A \in \mathcal A_n : \mathcal E_{11}(A) = a, \mathcal E_{21}=\mathcal E_{12}(A) = b, \mathcal E_{22}(A) = c\right\}
+    E_{a,b,c}(\vec \tau, B) &amp;= \left\{A \in \mathcal A_n : m_{11}(A) = a, \mathcal E_{21}=m_{12}(A) = b, m_{22}(A) = c\right\}
 \end{align*}\]</div>
-<p>The number of equivalence classes possible scales with the number of communities, and the manner in which vertices are assigned to communities (particularly, the number of nodes in each community). As before, we have the following. For any <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span>:</p>
-<ol class="simple">
-<li><p>If <span class="math notranslate nohighlight">\(A, A' \in E_{a,b,c}(\vec \tau, B)\)</span> (that is, <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> are in the same equivalence class), <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) = \mathcal L_\theta(A')\)</span>, and</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(A \in E_{a, b, c}(\vec \tau, B)\)</span> but <span class="math notranslate nohighlight">\(A' \in E_{a', b', c'}(\vec \tau, B)\)</span> where either <span class="math notranslate nohighlight">\(a \neq a', b \neq b'\)</span>, or <span class="math notranslate nohighlight">\(c \neq c'\)</span>, then <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) \neq \mathcal L_\theta(A')\)</span>.</p></li>
-</ol>
+<p>The number of equivalence classes possible scales with the number of communities, and the manner in which vertices are assigned to communities (particularly, the number of nodes in each community).</p>
 </div>
 </div>
-<div class="section" id="code-examples">
-<h2>Code Examples<a class="headerlink" href="#code-examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="a-posteriori-stochastic-block-model">
+<h2>A Posteriori Stochastic Block Model<a class="headerlink" href="#a-posteriori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<p>In the <em>a posteriori</em> Stochastic Block Model (SBM), we consider that vertex assignment to one of <span class="math notranslate nohighlight">\(K\)</span> communities is a random process. This model has the following parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\vec \pi\)</span></p></td>
+<td><p>the <span class="math notranslate nohighlight">\(K-1\)</span> probability simplex</p></td>
+<td><p>The probability of a vertex being assigned to community <span class="math notranslate nohighlight">\(K\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{K \times K}\)</span></p></td>
+<td><p>The block matrix, which assigns edge probabilities for pairs of communities</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <em>a posteriori</em> SBM is a bit more complicated than the <em>a priori</em> SBM. We will think about the <em>a posteriori</em> SBM as a variation of the <em>a priori</em> SBM, where instead of the vertex-assignment vector being treated as a fixed parameter, we will treat it as a vector-valued random variable. This vector-valued random variable, denoted by <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, is a <em>latent variable</em>, which means that in our real data, we don’t actually get to see realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> itself. In this case, <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> takes values in the space <span class="math notranslate nohighlight">\(\{1,...,K\}^n\)</span>. This means that for a given realization of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, denoted by <span class="math notranslate nohighlight">\(\vec \tau\)</span>, that for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network, we obtain an integer value between <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(K\)</span> indicating which community a node is from. Statistically, we write that the vertex assignment for node <span class="math notranslate nohighlight">\(i\)</span>, denoted by <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span>, is sampled independently and identically from <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>. Stated another way, the vector <span class="math notranslate nohighlight">\(\vec\pi\)</span> indicates the probability <span class="math notranslate nohighlight">\(\pi_k\)</span> of assignment to each community <span class="math notranslate nohighlight">\(k\)</span> in the network.</p>
+<p>The matrix <span class="math notranslate nohighlight">\(B\)</span> behaves exactly the same as it did with the <em>a posteriori</em> SBM. Finally, let’s think about how to write down the generative model in the <em>a posteriori</em> SBM. We showed above the model for the random vertex-assignment variable, <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, above. The model for edges of the <em>a posteriori</em> SBM is, in fact, conditional on the assignments obtained through this procedure. We write down that, conditioned on <span class="math notranslate nohighlight">\(\pmb \tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\pmb \tau_j = k\)</span>, that if <span class="math notranslate nohighlight">\(j &gt; i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(b_{\ell,k})\)</span> distribution. What this reflects is the idea that, if node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(\ell\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((\ell,k)\)</span> entry of the block matrix <span class="math notranslate nohighlight">\(B\)</span> indicates the probability that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. Like the ER model, the edges are still independent, which means that edges occuring or not occuring do not have an impact on one another. Unlike above, we can no longer say that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>s are identically distributed, since the probability <span class="math notranslate nohighlight">\(b_{\ell, k}\)</span> depends on the communities that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are assigned to. This means that if we were to look at a different pair of nodes, the probability that the two nodes are connected could be different, and therefore they might not share the same distribution. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an <em>a posteriori</em> SBM network with parameters <span class="math notranslate nohighlight">\(\vec \pi\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_n(\vec \pi, B)\)</span>.</p>
+<div class="section" id="id2">
+<h3>Likelihood<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>What does the likelihood for the <em>a posteriori</em> SBM look like? In this case, <span class="math notranslate nohighlight">\(\theta = (\vec \pi, B)\)</span> are the parameters for the model, so the likelihood for a realization <span class="math notranslate nohighlight">\(A\)</span> of <span class="math notranslate nohighlight">\(\mathbf A\)</span> is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathcal L_\theta(A) &amp;\propto \mathbb P_\theta(\mathbf A = A)
+\end{align*}\]</div>
+<p>Next, we use the fact that the probability that <span class="math notranslate nohighlight">\(\mathbf A = A\)</span> is, in fact, the <em>marginalization</em> (over realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>) of the joint <span class="math notranslate nohighlight">\((\mathbf A, \vec{\pmb \tau})\)</span>. In this case, we will let <span class="math notranslate nohighlight">\(\mathcal T = \{1,...,K\}^n\)</span> be the space of all possible realizations that <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> could take. In the line after that, we use Bayes’ Theorem to separate the joint probability into a conditional probability and a marginal probability:</p>
+<div class="amsmath math notranslate nohighlight" id="equation-9055281e-3476-4d9a-a3f1-4d817b93008f">
+<span class="eqno">(2.1)<a class="headerlink" href="#equation-9055281e-3476-4d9a-a3f1-4d817b93008f" title="Permalink to this equation">¶</a></span>\[\begin{align}
+    &amp;= \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A, \vec{\pmb \tau} = \vec \tau) \\
+    &amp;= \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau)\mathbb P_\theta(\vec{\pmb \tau} = \vec \tau)
+\end{align}\]</div>
+<p>Let’s think about each of these probabilities separately. Remember that for <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, that each entry <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span> is sampled <em>independently and identically</em> from <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>.The probability mass for a <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>-valued random variable is <span class="math notranslate nohighlight">\(\mathbb P(\pmb \tau_i = \tau_i; \vec \pi) = \pi_{\tau_i}\)</span>. Finally, note that if we are taking the products of <span class="math notranslate nohighlight">\(n\)</span> <span class="math notranslate nohighlight">\(\pi_{\tau_i}\)</span> terms, that many of these values will end up being the same. Consider, for instance, if the vector <span class="math notranslate nohighlight">\(\tau = [1,2,1,2,1]\)</span>. We end up with three terms of <span class="math notranslate nohighlight">\(\pi_1\)</span>, and two terms of <span class="math notranslate nohighlight">\(\pi_2\)</span>, and it does not matter which order we multiply them in. Rather, all we need to keep track of are the counts of each <span class="math notranslate nohighlight">\(\pi\)</span>. term. Written another way, we can use the indicator that <span class="math notranslate nohighlight">\(\tau_i = k\)</span>, given by <span class="math notranslate nohighlight">\(\mathbb 1_{\tau_i = k}\)</span>, and a running counter over all of the community probability assignments <span class="math notranslate nohighlight">\(\pi_k\)</span> to make this expression a little more sensible. We will use the symbol <span class="math notranslate nohighlight">\(n_k = \sum_{i = 1}^n \mathbb 1_{\tau_i = k}\)</span> to denote this value:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(\vec{\pmb \tau} = \vec \tau) &amp;= \prod_{i = 1}^n \mathbb P_\theta(\pmb \tau_i = \tau_i)\;\;\;\;\textrm{Independence Assumption} \\
+&amp;= \prod_{i = 1}^n \pi_{\tau_i} \;\;\;\;\textrm{p.m.f. of a Categorical R.V.}\\
+&amp;= \prod_{k = 1}^K \pi_{k}^{n_k}\;\;\;\;\textrm{Reorganizing what we are taking products of}
+\end{align*}\]</div>
+<p>Next, let’s think about the conditional probability term, <span class="math notranslate nohighlight">\(\mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau)\)</span>. Remember that the entries are all independent conditional on <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> taking the value <span class="math notranslate nohighlight">\(\vec\tau\)</span>. Just like with the <em>a priori</em> SBM, we can use the independence assumption to write this probability as the product of the entry-wise probabilities. Further, remember that conditional on <span class="math notranslate nohighlight">\(\pmb \tau_i = \ell\)</span> and <span class="math notranslate nohighlight">\(\pmb \tau_j = k\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is <span class="math notranslate nohighlight">\(Bern(b_{\ell,k})\)</span>. The distribution of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> does <em>not</em> depend on any of the other entries of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>. Finally, remembering the p.m.f. of a Bernoulli R.V. gives:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau) &amp;= \prod_{j &gt; i}\mathbb P_\theta(\mathbf a_{ij} = a_{ij} \big | \vec{\pmb \tau} = \vec \tau)\;\;\;\;\textrm{Independence Assumption} \\
+&amp;= \prod_{j &gt; i}\mathbb P_\theta(\mathbf a_{ij} = a_{ij} \big | \pmb \tau_i = \ell, \pmb \tau_j = k) \;\;\;\;\textrm{$\mathbf a_{ij}$ depends only on $\tau_i$ and $\tau_j$}\\
+&amp;= \prod_{j &gt; i} b_{\ell k}^{a_{ij}} (1 - b_{\ell k})^{1 - a_{ij}}
+\end{align*}\]</div>
+<p>Again, we can simplify this expression a bit. Recall the indicator function above. Let <span class="math notranslate nohighlight">\(m_{\ell k}(A0\)</span> and <span class="math notranslate nohighlight">\(n_{\ell k}\)</span> be defined as above, with the same interpretations. This expression can be simplified to:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau) &amp;= \prod_{\ell,k} b_{\ell k}^{m_{\ell k}(A)}(1 - b_{\ell k})^{n_{\ell k} - m_{\ell k}(A)}
+\end{align*}\]</div>
+<p>Combining these into the integrand gives:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathcal L_\theta(A) &amp;\propto \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau) \mathbb P_\theta(\vec{\pmb \tau} = \vec \tau) \\
+&amp;= \sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \pi_k^{n_k}\cdot \prod_{\ell,k} b_{\ell k}^{m_{\ell k}(A)}(1 - b_{\ell k})^{n_{\ell k} - m_{\ell k}(A)}
+\end{align*}\]</div>
+<p>Evaluating this sum explicitly proves to be relatively tedious and is a bit outside of the scope of this book, so we will omit it here.</p>
+<!-- TODO: return to add equivalence classes --></div>
+</div>
+<div class="section" id="id3">
+<h2>Code Examples<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>We just covered a lot of intuition that will be critical for understanding many of the later models, so let’s work through an example. Let’s assume that we have <span class="math notranslate nohighlight">\(300\)</span> students, and we know that each student goes to <span class="math notranslate nohighlight">\(1\)</span> of <span class="math notranslate nohighlight">\(2\)</span> possible schools. We will begin by thinking about the <em>a priori</em> SBM, since it’s a little more straightforward to generate samples. We don’t really care too much about the ordering of the students for now, so let’s just assume that the students are organized such that the first <span class="math notranslate nohighlight">\(150\)</span> students all go to school <span class="math notranslate nohighlight">\(1\)</span>, and the second <span class="math notranslate nohighlight">\(150\)</span> students all go to school <span class="math notranslate nohighlight">\(2\)</span>. Let’s assume that the students from school <span class="math notranslate nohighlight">\(1\)</span> are a little bit more closely knit than the students from school <span class="math notranslate nohighlight">\(2\)</span>, so we’ll say that the probability of two students who both go to school <span class="math notranslate nohighlight">\(1\)</span> being connected is <span class="math notranslate nohighlight">\(0.5\)</span>, and the probability of two students who both go to school <span class="math notranslate nohighlight">\(2\)</span> being friends is <span class="math notranslate nohighlight">\(0.3\)</span>. Finally, let’s assume that if one student goes to school <span class="math notranslate nohighlight">\(1\)</span> and the other student goes to school <span class="math notranslate nohighlight">\(2\)</span>, that the probability that they are friends is <span class="math notranslate nohighlight">\(0.2\)</span>.</p>
 <div class="admonition-thought-exercise admonition">
 <p class="admonition-title">Thought Exercise</p>
@@ -1052,6 +1108,7 @@
 </div>
 <div class="section" id="random-dot-product-graph-rdpg">
 <h2>Random Dot Product Graph (RDPG)<a class="headerlink" href="#random-dot-product-graph-rdpg" title="Permalink to this headline">¶</a></h2>
+<p>Like the <em>a posteriori</em> SBM, we will use the Random Dot Product Graph (RDPG) to describe</p>
 </div>
 <div class="section" id="generalized-random-dot-product-graph-grdpg">
 <h2>Generalized Random Dot Product Graph (GRDPG)<a class="headerlink" href="#generalized-random-dot-product-graph-grdpg" title="Permalink to this headline">¶</a></h2>
