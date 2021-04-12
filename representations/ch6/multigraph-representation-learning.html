@@ -556,6 +556,11 @@
    </li>
   </ul>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-graspologic">
+   Using Graspologic
+  </a>
+ </li>
 </ul>
 
         </nav>
@@ -575,10 +580,24 @@
 <p>In this section, we’ll explore the strengths and weaknesses of different types of multigraph representation learning. Multiple Adjacency Spectral Embedding (MASE) is a technique which embeds a bunch of networks separately (with normal Adjacency Spectral Embedding), and then re-embeds all the separate results into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
 <div class="section" id="multiple-adjacency-spectral-embedding">
 <h2>Multiple Adjacency Spectral Embedding<a class="headerlink" href="#multiple-adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h2>
+<p>The first algorithm we’ll explore is called MASE, and is probably the easiest to understand if you know how Adjacency Spectral Embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node. The location of each point relative to other points uses the information from all of the networks. MASE is based on the common subspace independent-edge (COSIE) model from the multi-network models section of chapter 5, so we’re operating under the assumption that there <em>is</em> some low-dimensional space common to all of our networks that we can embed into in the first place.</p>
+<p>The figure below shows how MASE works under the hood. First, we embed the adjacency matrices of a bunch of networks separately. Then, we take all of those embeddings, concatenate them into a single matrix, and embed the entire concatenated matrix.</p>
+<div class="figure align-default" id="mase-fig">
+<a class="reference internal image-reference" href="../../_images/mase1.jpeg"><img alt="../../_images/mase1.jpeg" src="../../_images/mase1.jpeg" style="height: 400px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.1 </span><span class="caption-text">The MASE algorithm</span><a class="headerlink" href="#mase-fig" title="Permalink to this image">¶</a></p>
+</div>
 <div class="section" id="a-collection-of-networks">
 <h3>A Collection of Networks<a class="headerlink" href="#a-collection-of-networks" title="Permalink to this headline">¶</a></h3>
 <p>Suppose we have a set of networks generated from Stochastic Block Models with two communities in each network. The networks have aligned nodes – meaning that the <span class="math notranslate nohighlight">\(i_{th}\)</span> row of all of their adjacency matrices represent the same nodes. The nodes also all belong to the same communities. However, edge probabilities might change depending on the network - in the first network, you might have nodes in the same community having a high chance of connecting to each other, whereas in the second network, nodes are much more likely to be connected to other nodes in different communities. Your goal is to find a common space in which to represent all of these networks, that captures the common community structure in all of these.</p>
 <p>Below is Python code which generates four networks with Stochastic Block Models. The labels are the same across the networks (which means that nodes have a consistent community no matter which network you’re looking at), but the block probability matrices are quite different.</p>
+<div class="cell tag_hide-cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -627,10 +646,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_7_0.png" src="../../_images/multigraph-representation-learning_7_0.png" />
+<img alt="../../_images/multigraph-representation-learning_9_0.png" src="../../_images/multigraph-representation-learning_9_0.png" />
 </div>
 </div>
-<p>First, we’re going to embed each network separately. Doing this lets us</p>
+<p>Now, we want to embed each of the four networks separately. Doing this lets us see what the individual embeddings of the networks each look like. We’ll also need these embeddings to unify the networks all into a single space.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -665,27 +684,49 @@
     
     <span class="k">return</span> <span class="n">plot</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">):</span>
     <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Embeddings of our four networks&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Embeddings of our four networks&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+
+<span class="c1"># TODO: add legend</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_10_0.png" src="../../_images/multigraph-representation-learning_10_0.png" />
+<img alt="../../_images/multigraph-representation-learning_12_0.png" src="../../_images/multigraph-representation-learning_12_0.png" />
 </div>
 </div>
-<p>Multiple Adjacency Spectral Embedding (MASE) is an extension of Adjacency Spectral Embedding (see ASE tutorial) for an arbitrary number of graphs. Once graphs are embedded, the low-dimensional Euclidean representation can be used to visualize the latent positions of vertices, perform inference, etc.</p>
-<p>The general idea of MASE is to take a bunch of graphs, embed them with Adjacency Spectral Embedding, and then combine those embeddings into a single matrix and re-embed the combined matrix.</p>
-<div class="figure align-default" id="mase-fig">
-<a class="reference internal image-reference" href="../../_images/mase1.jpeg"><img alt="../../_images/mase1.jpeg" src="../../_images/mase1.jpeg" style="height: 400px;" /></a>
-<p class="caption"><span class="caption-number">Fig. 3.1 </span><span class="caption-text">The MASE algorithm</span><a class="headerlink" href="#mase-fig" title="Permalink to this image">¶</a></p>
+<p>Now, we want to take these individual embeddings, concatenate them into a single matrix, and then embed the result.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
+
+<span class="n">concatenated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
+<span class="n">joint_embedding</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">selectSVD</span><span class="p">(</span><span class="n">concatenated</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
 </div>
-<p>We sample two 2-block SBMs (undirected, no self-loops) with 50 vertices, each block containing 25 vertices (𝑛=[25,25]), and with the following block connectivity matrices:</p>
-<p>𝐵1=[0.30.10.10.7], 𝐵2=[0.30.10.10.3]</p>
-<p>The only difference between the two is the within-block probability for the second block. We sample 𝐺1∼SBM(𝑛,𝐵1) and 𝐺2∼SBM(𝑛,𝐵2).</p>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">joint_embedding</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Joint embedding of our four networks&quot;</span><span class="p">,</span>
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Joint embedding of our four networks&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/multigraph-representation-learning_15_1.png" src="../../_images/multigraph-representation-learning_15_1.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="using-graspologic">
+<h2>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -701,8 +742,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;MASE embedding&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_15_1.png" src="../../_images/multigraph-representation-learning_15_1.png" />
-</div>
+<img alt="../../_images/multigraph-representation-learning_17_1.png" src="../../_images/multigraph-representation-learning_17_1.png" />
 </div>
 </div>
 </div>
