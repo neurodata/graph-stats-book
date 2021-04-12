@@ -17,21 +17,38 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graspologic.plot import gridplot, heatmap
+from graspologic.plot import binary_heatmap
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
-heatmap(graphs[0])
-ase = ASE(n_components=2)
-latents = ase.fit_transform(graphs[0])
-pairplot(latents, labels=labels)
+
+fig, axs = plt.subplots(2, 2, figsize=(5,5))
+for ax, graph in zip(axs.flat, [A1, A2, A3, A4]):
+    hmap = binary_heatmap(graph, ax=ax, cbar=False)
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+    hmap.vlines(n, 0, n*2, colors="black", lw=.9, linestyle="dashed", alpha=.8)
+    hmap.hlines(n, 0, n*2, colors="black", lw=.9, linestyle="dashed", alpha=.8)
+    
+plt.suptitle("Four different networks", fontsize=18)
+fig.subplots_adjust(hspace=.05, wspace=.05)
+
+cmap = ListedColormap(["white", "black"])
+cbar_ax = fig.add_axes([.95, 0.13, 0.07, 0.75])
+cbar = fig.colorbar(hmap.imshow(A1, cmap=cmap), cax=cbar_ax)
+cbar.set_ticks([0.25, 0.75])
+cbar.set_ticklabels(["No Edge", "Edge"])
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m<ipython-input-2-bc509362d19d>[0m in [0;36m<module>[0;34m[0m
-[1;32m      4[0m [0mase[0m [0;34m=[0m [0mASE[0m[0;34m([0m[0mn_components[0m[0;34m=[0m[0;36m2[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      5[0m [0mlatents[0m [0;34m=[0m [0mase[0m[0;34m.[0m[0mfit_transform[0m[0;34m([0m[0mgraphs[0m[0;34m[[0m[0;36m0[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0;32m----> 6[0;31m [0mpairplot[0m[0;34m([0m[0mlatents[0m[0;34m,[0m [0mlabels[0m[0;34m=[0m[0mlabels[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m
-[0;31mNameError[0m: name 'pairplot' is not defined
-NameError: name 'pairplot' is not defined
+[0;31mImportError[0m                               Traceback (most recent call last)
+[0;32m<ipython-input-2-c6eb9ad31271>[0m in [0;36m<module>[0;34m[0m
+[0;32m----> 1[0;31m [0;32mfrom[0m [0mgraspologic[0m[0;34m.[0m[0mplot[0m [0;32mimport[0m [0mbinary_heatmap[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      2[0m [0;32mimport[0m [0mmatplotlib[0m[0;34m.[0m[0mpyplot[0m [0;32mas[0m [0mplt[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0;32mfrom[0m [0mmatplotlib[0m[0;34m.[0m[0mcolors[0m [0;32mimport[0m [0mListedColormap[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m [0;34m[0m[0m
+[1;32m      5[0m [0;34m[0m[0m
+
+[0;31mImportError[0m: cannot import name 'binary_heatmap' from 'graspologic.plot' (/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/graspologic/plot/__init__.py)
+ImportError: cannot import name 'binary_heatmap' from 'graspologic.plot' (/opt/hostedtoolcache/Python/3.8.8/x64/lib/python3.8/site-packages/graspologic/plot/__init__.py)
 
