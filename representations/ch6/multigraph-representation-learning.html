@@ -576,44 +576,22 @@
   <div class="section" id="multigraph-representation-learning">
 <h1><span class="section-number">3.5. </span>Multigraph Representation Learning<a class="headerlink" href="#multigraph-representation-learning" title="Permalink to this headline">¶</a></h1>
 <p>Say you’re a brain researcher, and you have a bunch of scans of people’s brains - some are scans of normal people, and some are scans of people with Abnormal Disease. You have an algorithm that lets you create networks from these brains, so you turn all your brain scans into networks. You want to know if the scans from the abnormal group are more similar to each other than to the scans from normal people. What do you do? It seems like your abnormal networks should look different than normal networks, but how can you actually test this? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but which might look quite different?</p>
-<p>Well, one thing that you could do is embed your networks and then try to learn from the embeddings. Say you have nine networks of normal brains, and nine networks of abnormal brains.</p>
+<p>Well, one thing that you could do is embed your networks and then try to learn from the embeddings. This would serve the dual purpose of having less stuff to deal with, as well as having some way to directly compare embeddings. Say you have nine networks of normal brains, and nine networks of abnormal brains.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate networks from an SBM, given some parameters</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+
+<span class="c1"># Generate networks from an SBM, given some parameters</span>
 <span class="k">def</span> <span class="nf">make_network</span><span class="p">(</span><span class="o">*</span><span class="n">probs</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p4</span> <span class="o">=</span> <span class="n">probs</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">],</span> <span class="p">[</span><span class="n">p3</span><span class="p">,</span> <span class="n">p4</span><span class="p">]])</span>
     <span class="k">return</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">P</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="n">return_labels</span><span class="p">)</span>
 
 <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="o">.</span><span class="mi">12</span><span class="p">,</span> <span class="o">.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">03</span>
-<span class="n">normals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
-<span class="n">abnormal</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mi">1</span><span class="n">f372be96e2b</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> 
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="o">.</span><span class="mi">12</span><span class="p">,</span> <span class="o">.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">03</span>
-<span class="ne">----&gt; </span><span class="mi">8</span> <span class="n">normals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">abnormal</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
-
-<span class="nn">&lt;ipython-input-1-1f372be96e2b&gt;</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> 
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="o">.</span><span class="mi">12</span><span class="p">,</span> <span class="o">.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">03</span>
-<span class="ne">----&gt; </span><span class="mi">8</span> <span class="n">normals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">abnormal</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
-
-<span class="nn">&lt;ipython-input-1-1f372be96e2b&gt;</span> in <span class="ni">make_network</span><span class="nt">(n, return_labels, *probs)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="k">def</span> <span class="nf">make_network</span><span class="p">(</span><span class="o">*</span><span class="n">probs</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p4</span> <span class="o">=</span> <span class="n">probs</span>
-<span class="ne">----&gt; </span><span class="mi">4</span>     <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">],</span> <span class="p">[</span><span class="n">p3</span><span class="p">,</span> <span class="n">p4</span><span class="p">]])</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="k">return</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">P</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="n">return_labels</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> 
-
-<span class="ne">NameError</span>: name &#39;np&#39; is not defined
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">normals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
+<span class="n">abnormals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
 </pre></div>
 </div>
 </div>
@@ -623,6 +601,8 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">ImageGrid</span>
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">binary_heatmap</span><span class="p">,</span> <span class="n">adjplot</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
 
@@ -631,7 +611,7 @@
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">axi</span><span class="p">,</span> <span class="n">axj</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">grid1</span><span class="p">,</span> <span class="n">grid2</span><span class="p">)):</span>
     <span class="n">hmn</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">normals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axi</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">hma</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">abnormal</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axj</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">hma</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">abnormals</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axj</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="p">[</span><span class="n">hmn</span><span class="p">,</span> <span class="n">hma</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">spine</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>    
@@ -649,6 +629,7 @@
 <img alt="../../_images/multigraph-representation-learning_3_0.png" src="../../_images/multigraph-representation-learning_3_0.png" />
 </div>
 </div>
+<p>The most obvious way to embed these networks is by averaging them, and then embedding the result of that averaging. It turns out that this is actually not only the right thing to do, but the optimal thing to do if your networks are all drawn from the same distribution. In our case, averaging only the normal networks together, and averaging only the abnormal networks together, will produce two embeddings that are as good as possible.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -656,14 +637,12 @@
 <span class="c1"># Compute the average adjacency matrix for </span>
 <span class="c1"># normal brains and alzheimer&#39;s brains</span>
 <span class="n">normal_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">normals</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">alzheimer_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alzheimers</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">total_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">normals</span> <span class="o">+</span> <span class="n">alzheimers</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">abnormal_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">abnormals</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Embed both matrices</span>
 <span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">latents_normal</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">normal_mean</span><span class="p">)</span>
 <span class="n">latents_abnormal</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">abnormal_mean</span><span class="p">)</span>
-<span class="n">latents_everything</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">total_mean</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -688,28 +667,48 @@
     <span class="k">return</span> <span class="n">plot</span>
 
 <span class="c1"># plot</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_normal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the normal graphs&quot;</span><span class="p">,</span> 
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_normal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the </span><span class="se">\n</span><span class="s2">normal graphs&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_alzheimer</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the alzheimer&#39;s graphs&quot;</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_abnormal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the </span><span class="se">\n</span><span class="s2">alzheimer&#39;s graphs&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_everything</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average everything&quot;</span><span class="p">,</span> 
-             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Embedding when we average everything&#39;}&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&quot;Embedding when we average the \nalzheimer&#39;s graphs&quot;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_5_1.png" src="../../_images/multigraph-representation-learning_5_1.png" />
+<img alt="../../_images/multigraph-representation-learning_6_1.png" src="../../_images/multigraph-representation-learning_6_1.png" />
 </div>
 </div>
-<p>could embed all of these networks separately with Adjacency Spectral Embedding or Laplacian Spectral Embedding, and presumably you’d learn something about their community structure that way.  This would serve the dual purpose of having less stuff to deal with, as well as having some way to directly compare embeddings which live in the same space. Figuring out the best way to represent groups of networks is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
+<p>Both of these embeddings look great. But what if we wanted to embed <em>all</em> of the networks into the same space? Let’s try it. We can take all of the networks, both normal and abnormal ones, and then average them together. This results in a single embedding.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">normals</span> <span class="o">+</span> <span class="n">abnormals</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">latents_everything</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">total_mean</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_everything</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average everything together&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multigraph-representation-learning_9_0.png" src="../../_images/multigraph-representation-learning_9_0.png" />
+</div>
+</div>
+<p>Bummer. What we’ve just discovered is that, even though it’s a great idea to simply average a bunch of networks if they were drawn from the same distribution, there are some situations in which averaging your networks simply results in meaningless noise. This is a case of averaging networks which are “heterogeneous”. This means that not only are your networks slightly different, but they’re <em>expected</em> to be different: they come from different distributions. So if you sampled a lot of networks, like we just did, then averaging them would produce poor results.</p>
+<p>We’d like to find a way to compare these heterogeneous networks directly, and to embed them all into the same space. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
 <p>In this section, we’ll explore the strengths and weaknesses of different types of multigraph representation learning. Multiple Adjacency Spectral Embedding (MASE) is a technique which embeds a bunch of networks separately (with normal Adjacency Spectral Embedding), and then re-embeds all the separate results into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
 <div class="section" id="multiple-adjacency-spectral-embedding">
 <h2>Multiple Adjacency Spectral Embedding<a class="headerlink" href="#multiple-adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h2>
-<p>The first algorithm we’ll explore is called MASE, and is probably the easiest to understand if you know how Adjacency Spectral Embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node. The location of each point relative to other points uses the information from all of the networks. MASE is based on the common subspace independent-edge (COSIE) model from the multi-network models section of chapter 5, so we’re operating under the assumption that there <em>is</em> some low-dimensional space common to all of our networks that we can embed into in the first place.</p>
+<p>The first algorithm we’ll explore is called MASE, and is probably the easiest to understand if you know how Adjacency Spectral Embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node - but, unlike simply averaging, your networks don’t necessarily have to be drawn from the same distribution. MASE is based on the common subspace independent-edge (COSIE) model from the multi-network models section of chapter 5, so we’re operating under the assumption that there <em>is</em> some low-dimensional space common to all of our networks that we can embed into in the first place.</p>
 <p>The figure below shows how MASE works under the hood. First, we embed the adjacency matrices of a bunch of networks separately. Then, we take all of those embeddings, concatenate them into a single matrix, and embed the entire concatenated matrix.</p>
 <div class="figure align-default" id="mase-fig">
 <a class="reference internal image-reference" href="../../_images/mase1.jpeg"><img alt="../../_images/mase1.jpeg" src="../../_images/mase1.jpeg" style="height: 400px;" /></a>
@@ -742,6 +741,20 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">8</span><span class="o">-</span><span class="mi">0</span><span class="n">ba99826d15e</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="o">.</span><span class="mi">12</span><span class="p">,</span> <span class="o">.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">03</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">A1</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">make_sbm</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> 
+<span class="g g-Whitespace">      </span><span class="mi">7</span>                       <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">A2</span> <span class="o">=</span> <span class="n">make_sbm</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;make_sbm&#39; is not defined
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -770,7 +783,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_14_0.png" src="../../_images/multigraph-representation-learning_14_0.png" />
+<img alt="../../_images/multigraph-representation-learning_18_0.png" src="../../_images/multigraph-representation-learning_18_0.png" />
 </div>
 </div>
 <p>Now, we want to embed each of the four networks separately. Doing this lets us see what the individual embeddings of the networks each look like. We’ll also need these embeddings to unify the networks all into a single space.</p>
@@ -801,7 +814,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_17_0.png" src="../../_images/multigraph-representation-learning_17_0.png" />
+<img alt="../../_images/multigraph-representation-learning_21_0.png" src="../../_images/multigraph-representation-learning_21_0.png" />
 </div>
 </div>
 <p>Now, we want to take these individual embeddings, concatenate them into a single matrix, and then embed the result.</p>
@@ -826,7 +839,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Joint embedding of our four networks&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_20_1.png" src="../../_images/multigraph-representation-learning_20_1.png" />
+<img alt="../../_images/multigraph-representation-learning_24_1.png" src="../../_images/multigraph-representation-learning_24_1.png" />
 </div>
 </div>
 </div>
@@ -848,7 +861,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;MASE embedding&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_22_1.png" src="../../_images/multigraph-representation-learning_22_1.png" />
+<img alt="../../_images/multigraph-representation-learning_26_1.png" src="../../_images/multigraph-representation-learning_26_1.png" />
 </div>
 </div>
 </div>

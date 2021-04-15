@@ -17,38 +17,27 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-# Generate networks from an SBM, given some parameters
-def make_network(*probs, n=100, return_labels=False):
-    p1, p2, p3, p4 = probs
-    P = np.array([[p1, p2], [p3, p4]])
-    return sbm([n, n], P, return_labels=return_labels)
+import numpy as np
+from graspologic.simulations import sbm
 
+n = 100
 p1, p2, p3 = .12, .06, .03
-normals = [make_network(p1, p3, p3, p1) for i in range(9)]
-abnormal = [make_network(p3, p1, p1, p3) for i in range(9)]
+A1, labels = make_sbm(p1, p3, p3, p1, 
+                      return_labels=True)
+A2 = make_sbm(p1, p3, p3, p2)
+A3 = make_sbm(p3, p2, p2, p3)
+A4 = make_sbm(p1, p3, p3, p3)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m<ipython-input-1-1f372be96e2b>[0m in [0;36m<module>[0;34m[0m
-[1;32m      6[0m [0;34m[0m[0m
-[1;32m      7[0m [0mp1[0m[0;34m,[0m [0mp2[0m[0;34m,[0m [0mp3[0m [0;34m=[0m [0;36m.12[0m[0;34m,[0m [0;36m.06[0m[0;34m,[0m [0;36m.03[0m[0;34m[0m[0;34m[0m[0m
-[0;32m----> 8[0;31m [0mnormals[0m [0;34m=[0m [0;34m[[0m[0mmake_network[0m[0;34m([0m[0mp1[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp1[0m[0;34m)[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0;36m9[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      9[0m [0mabnormal[0m [0;34m=[0m [0;34m[[0m[0mmake_network[0m[0;34m([0m[0mp3[0m[0;34m,[0m [0mp1[0m[0;34m,[0m [0mp1[0m[0;34m,[0m [0mp3[0m[0;34m)[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0;36m9[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[0;32m<ipython-input-8-0ba99826d15e>[0m in [0;36m<module>[0;34m[0m
+[1;32m      4[0m [0mn[0m [0;34m=[0m [0;36m100[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      5[0m [0mp1[0m[0;34m,[0m [0mp2[0m[0;34m,[0m [0mp3[0m [0;34m=[0m [0;36m.12[0m[0;34m,[0m [0;36m.06[0m[0;34m,[0m [0;36m.03[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 6[0;31m A1, labels = make_sbm(p1, p3, p3, p1, 
+[0m[1;32m      7[0m                       return_labels=True)
+[1;32m      8[0m [0mA2[0m [0;34m=[0m [0mmake_sbm[0m[0;34m([0m[0mp1[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp2[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
 
-[0;32m<ipython-input-1-1f372be96e2b>[0m in [0;36m<listcomp>[0;34m(.0)[0m
-[1;32m      6[0m [0;34m[0m[0m
-[1;32m      7[0m [0mp1[0m[0;34m,[0m [0mp2[0m[0;34m,[0m [0mp3[0m [0;34m=[0m [0;36m.12[0m[0;34m,[0m [0;36m.06[0m[0;34m,[0m [0;36m.03[0m[0;34m[0m[0;34m[0m[0m
-[0;32m----> 8[0;31m [0mnormals[0m [0;34m=[0m [0;34m[[0m[0mmake_network[0m[0;34m([0m[0mp1[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp1[0m[0;34m)[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0;36m9[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      9[0m [0mabnormal[0m [0;34m=[0m [0;34m[[0m[0mmake_network[0m[0;34m([0m[0mp3[0m[0;34m,[0m [0mp1[0m[0;34m,[0m [0mp1[0m[0;34m,[0m [0mp3[0m[0;34m)[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0;36m9[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
-
-[0;32m<ipython-input-1-1f372be96e2b>[0m in [0;36mmake_network[0;34m(n, return_labels, *probs)[0m
-[1;32m      2[0m [0;32mdef[0m [0mmake_network[0m[0;34m([0m[0;34m*[0m[0mprobs[0m[0;34m,[0m [0mn[0m[0;34m=[0m[0;36m100[0m[0;34m,[0m [0mreturn_labels[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      3[0m     [0mp1[0m[0;34m,[0m [0mp2[0m[0;34m,[0m [0mp3[0m[0;34m,[0m [0mp4[0m [0;34m=[0m [0mprobs[0m[0;34m[0m[0;34m[0m[0m
-[0;32m----> 4[0;31m     [0mP[0m [0;34m=[0m [0mnp[0m[0;34m.[0m[0marray[0m[0;34m([0m[0;34m[[0m[0;34m[[0m[0mp1[0m[0;34m,[0m [0mp2[0m[0;34m][0m[0;34m,[0m [0;34m[[0m[0mp3[0m[0;34m,[0m [0mp4[0m[0;34m][0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      5[0m     [0;32mreturn[0m [0msbm[0m[0;34m([0m[0;34m[[0m[0mn[0m[0;34m,[0m [0mn[0m[0;34m][0m[0;34m,[0m [0mP[0m[0;34m,[0m [0mreturn_labels[0m[0;34m=[0m[0mreturn_labels[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      6[0m [0;34m[0m[0m
-
-[0;31mNameError[0m: name 'np' is not defined
-NameError: name 'np' is not defined
+[0;31mNameError[0m: name 'make_sbm' is not defined
+NameError: name 'make_sbm' is not defined
 
