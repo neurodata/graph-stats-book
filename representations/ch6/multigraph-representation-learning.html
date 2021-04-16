@@ -550,6 +550,11 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#what-s-going-on-under-the-hood">
+     What’s Going On Under The Hood
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#a-collection-of-networks">
      A Collection of Networks
     </a>
@@ -575,8 +580,8 @@
                 
   <div class="section" id="multigraph-representation-learning">
 <h1><span class="section-number">3.5. </span>Multigraph Representation Learning<a class="headerlink" href="#multigraph-representation-learning" title="Permalink to this headline">¶</a></h1>
-<p>Say you’re a brain researcher, and you have a bunch of scans of people’s brains - some are scans of normal people, and some are scans of people with Abnormal Disease. You have an algorithm that lets you create networks from these brains, so you turn all your brain scans into networks. You want to know if the scans from the abnormal group are more similar to each other than to the scans from normal people. What do you do? It seems like your abnormal networks should look different than normal networks, but how can you actually test this? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but which might look quite different?</p>
-<p>Well, one thing that you could do is embed your networks and then try to learn from the embeddings. This would serve the dual purpose of having less stuff to deal with, as well as having some way to directly compare embeddings. Say you have nine networks of normal brains, and nine networks of abnormal brains.</p>
+<p>Say you’re a brain researcher, and you have a bunch of scans of people’s brains - some are scans of normal people, and some are scans of people with Abnormal Disease. You have an algorithm that lets you create networks from these brains, so you turn all your brain scans into networks. You want to know if the scans from the abnormal group are more similar to each other than to the scans from normal people. What do you do? It seems like your abnormal networks should look different than normal networks, but how can you actually see if they do? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but which might come from quite different distributions?</p>
+<p>Well, if your goal is to find differences between the normal and abnormal networks, you could try embedding your networks and then seeing those embeddings look like. This would serve the dual purpose of having less stuff to deal with and having some way to directly compare your networks in the same space. For example, say you have nine networks of normal brains and nine networks of abnormal brains.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -590,6 +595,7 @@
 
 <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="o">.</span><span class="mi">12</span><span class="p">,</span> <span class="o">.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">03</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
 <span class="n">normals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
 <span class="n">abnormals</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_network</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)]</span>
 </pre></div>
@@ -629,7 +635,8 @@
 <img alt="../../_images/multigraph-representation-learning_3_0.png" src="../../_images/multigraph-representation-learning_3_0.png" />
 </div>
 </div>
-<p>The most obvious way to embed these networks is by averaging them, and then embedding the result of that averaging. It turns out that this is actually not only the right thing to do, but the optimal thing to do if your networks are all drawn from the same distribution. In our case, averaging only the normal networks together, and averaging only the abnormal networks together, will produce two embeddings that are as good as possible.</p>
+<p>Remember, our goal is to see if the normal brains differ from the abnormal brains. From the heatmaps, it looks like both the normal and abnormal brains each have two communities. The normal brains have stronger connections within these communities, whereas the abnormal brains have stronger connections between the communities. We’d like to embed the brains into some lower-dimensional space to see if we can see this more clearly, and then we’ll see whether we can find some clustering in that space. Try to think about how you might find a lower-dimensional embedding where the location of each node’s latent positions uses information from all of the networks.</p>
+<p>The first thing you might come up with is to average your networks together, and then embed the result of that averaging. It turns out that this is actually the right thing to do in the special case where every network you average is drawn from the same distribution. In our case, averaging only the normal networks together, and averaging only the abnormal networks together, will produce two separate embeddings with nicely clustered nodes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -647,7 +654,7 @@
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
@@ -667,34 +674,32 @@
     <span class="k">return</span> <span class="n">plot</span>
 
 <span class="c1"># plot</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_normal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the </span><span class="se">\n</span><span class="s2">normal graphs&quot;</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_normal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the </span><span class="se">\n</span><span class="s2">normal networks&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_abnormal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the </span><span class="se">\n</span><span class="s2">alzheimer&#39;s graphs&quot;</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_abnormal</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average the </span><span class="se">\n</span><span class="s2">alzheimer&#39;s networks&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="mf">1.15</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;x-large&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="p">,</span>
+           <span class="n">title_fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&quot;Embedding when we average the \nalzheimer&#39;s graphs&quot;}&gt;
-</pre></div>
-</div>
-<img alt="../../_images/multigraph-representation-learning_6_1.png" src="../../_images/multigraph-representation-learning_6_1.png" />
+<img alt="../../_images/multigraph-representation-learning_6_0.png" src="../../_images/multigraph-representation-learning_6_0.png" />
 </div>
 </div>
-<p>Both of these embeddings look great. But what if we wanted to embed <em>all</em> of the networks into the same space? Let’s try it. We can take all of the networks, both normal and abnormal ones, and then average them together. This results in a single embedding.</p>
+<p>Both of these embeddings have clear clustering: there are clearly two groups of nodes in both the normal and the alzheimer’s graphs. But what if we wanted to embed <em>all</em> of the networks into the same space, both the alzheimer’s and normal networks, so that there’s only one plot? Let’s try it. We’ll take all of the networks, both normal and abnormal ones, and then average them together, and then do an Adjacency Spectral Embedding. This will result in a single plot, with each point representing a single node. Do you think we’ll still find this nice community separation?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">normals</span> <span class="o">+</span> <span class="n">abnormals</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">latents_everything</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">total_mean</span><span class="p">)</span>
+<span class="n">all_latents</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">total_mean</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_everything</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average everything together&quot;</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">all_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we average everything together&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -703,16 +708,43 @@
 <img alt="../../_images/multigraph-representation-learning_9_0.png" src="../../_images/multigraph-representation-learning_9_0.png" />
 </div>
 </div>
-<p>Bummer. What we’ve just discovered is that, even though it’s a great idea to simply average a bunch of networks if they were drawn from the same distribution, there are some situations in which averaging your networks simply results in meaningless noise. This is a case of averaging networks which are “heterogeneous”. This means that not only are your networks slightly different, but they’re <em>expected</em> to be different: they come from different distributions. So if you sampled a lot of networks, like we just did, then averaging them would produce poor results.</p>
-<p>We’d like to find a way to compare these heterogeneous networks directly, and to embed them all into the same space. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
+<p>Nope, bummer. Our community separation is gone. As far as anybody can tell, our latent positions have just become meaningless noise.</p>
+<p>What we’ve discovered is that, even though it’s a great idea to simply average a bunch of networks if they were drawn from the same distribution, it’s a horrible idea to average your networks if they might come from different distributions. This is a case of averaging networks which are “heterogeneous”: Not only are your networks slightly different, but they’re <em>expected</em> to be different because they’re distributed differently. Sampling a lot of heterogenous networks and then averaging them, as you can see above, can result in losing the community signal you might have had.</p>
+<p>We’d like to find a way to compare these heterogeneous networks directly, so that we can embed all of our networks into the same space and still keep that community structure. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
+<p>&lt;fig 1 from carey’s paper goes here&gt;</p>
 <p>In this section, we’ll explore the strengths and weaknesses of different types of multigraph representation learning. Multiple Adjacency Spectral Embedding (MASE) is a technique which embeds a bunch of networks separately (with normal Adjacency Spectral Embedding), and then re-embeds all the separate results into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
 <div class="section" id="multiple-adjacency-spectral-embedding">
 <h2>Multiple Adjacency Spectral Embedding<a class="headerlink" href="#multiple-adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h2>
-<p>The first algorithm we’ll explore is called MASE, and is probably the easiest to understand if you know how Adjacency Spectral Embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node - but, unlike simply averaging, your networks don’t necessarily have to be drawn from the same distribution. MASE is based on the common subspace independent-edge (COSIE) model from the multi-network models section of chapter 5, so we’re operating under the assumption that there <em>is</em> some low-dimensional space common to all of our networks that we can embed into in the first place.</p>
-<p>The figure below shows how MASE works under the hood. First, we embed the adjacency matrices of a bunch of networks separately. Then, we take all of those embeddings, concatenate them into a single matrix, and embed the entire concatenated matrix.</p>
+<p>The first algorithm we’ll explore is called MASE, and is probably the easiest to understand if you know how Adjacency Spectral Embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node - but, unlike simply averaging, MASE lets you use networks which aren’t necessarily drawn from the same distribution. MASE is based on the common subspace independent-edge (COSIE) model from the multi-network models section of chapter 5, so we’re operating under the assumption that there <em>is</em> some low-dimensional space common to all of our networks that we can embed into in the first place.</p>
+<p>Let’s try MASE on our group of normal and abnormal brains – then, we’ll dive deeper into what’s going on under the hood.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
+
+<span class="n">mase</span> <span class="o">=</span> <span class="n">MASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents_mase</span> <span class="o">=</span> <span class="n">mase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">normals</span> <span class="o">+</span> <span class="n">abnormals</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_mase</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding when we use MASE on everything together&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multigraph-representation-learning_16_0.png" src="../../_images/multigraph-representation-learning_16_0.png" />
+</div>
+</div>
+<p>Unlike simply averaging all of our networks together, MASE manages to keep the community structure that we found when we averaged the normal and abnormal networks separately.</p>
+<div class="section" id="what-s-going-on-under-the-hood">
+<h3>What’s Going On Under The Hood<a class="headerlink" href="#what-s-going-on-under-the-hood" title="Permalink to this headline">¶</a></h3>
+<p>The figure below shows how MASE works. First, we embed the adjacency matrices of a bunch of networks separately, using our standard Adjacency Spectral Embedding algorithm. Then, we take all of those embeddings, concatenate them into a single matrix, and embed the entire concatenated matrix.</p>
 <div class="figure align-default" id="mase-fig">
 <a class="reference internal image-reference" href="../../_images/mase1.jpeg"><img alt="../../_images/mase1.jpeg" src="../../_images/mase1.jpeg" style="height: 400px;" /></a>
 <p class="caption"><span class="caption-number">Fig. 3.1 </span><span class="caption-text">The MASE algorithm</span><a class="headerlink" href="#mase-fig" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="a-collection-of-networks">
 <h3>A Collection of Networks<a class="headerlink" href="#a-collection-of-networks" title="Permalink to this headline">¶</a></h3>
@@ -769,7 +801,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_18_0.png" src="../../_images/multigraph-representation-learning_18_0.png" />
+<img alt="../../_images/multigraph-representation-learning_25_0.png" src="../../_images/multigraph-representation-learning_25_0.png" />
 </div>
 </div>
 <p>Now, we want to embed each of the four networks separately. Doing this lets us see what the individual embeddings of the networks each look like. We’ll also need these embeddings to unify the networks all into a single space.</p>
@@ -800,7 +832,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_21_0.png" src="../../_images/multigraph-representation-learning_21_0.png" />
+<img alt="../../_images/multigraph-representation-learning_28_0.png" src="../../_images/multigraph-representation-learning_28_0.png" />
 </div>
 </div>
 <p>Now, we want to take these individual embeddings, concatenate them into a single matrix, and then embed the result.</p>
@@ -825,7 +857,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Joint embedding of our four networks&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_24_1.png" src="../../_images/multigraph-representation-learning_24_1.png" />
+<img alt="../../_images/multigraph-representation-learning_31_1.png" src="../../_images/multigraph-representation-learning_31_1.png" />
 </div>
 </div>
 </div>
@@ -847,7 +879,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;MASE embedding&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_26_1.png" src="../../_images/multigraph-representation-learning_26_1.png" />
+<img alt="../../_images/multigraph-representation-learning_33_1.png" src="../../_images/multigraph-representation-learning_33_1.png" />
 </div>
 </div>
 </div>
