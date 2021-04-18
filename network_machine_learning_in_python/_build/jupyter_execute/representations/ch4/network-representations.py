@@ -1,1 +1,1 @@
-# Network Representations
+# Representations of Networks

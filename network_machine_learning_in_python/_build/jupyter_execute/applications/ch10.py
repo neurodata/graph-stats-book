@@ -1,1 +1,0 @@
-# Algorithms for more than 2 graphs

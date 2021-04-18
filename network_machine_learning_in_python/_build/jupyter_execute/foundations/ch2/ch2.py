@@ -6,8 +6,9 @@
 :titlesonly:
 
 
+big-picture
 get-the-data
-discover-and-visualize
+../../foundationsn/ch2/discover-and-visualize
 prepare-the-data
 transformation-techniques
 select-and-train
