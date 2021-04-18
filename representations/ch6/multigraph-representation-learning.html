@@ -575,17 +575,29 @@
     <a class="reference internal nav-link" href="#what-s-going-on-under-the-hood">
      What’s Going On Under The Hood
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#a-collection-of-networks">
+       A Collection of Networks
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#embedding">
+       Embedding
+      </a>
+     </li>
+    </ul>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#a-collection-of-networks">
-     A Collection of Networks
+    <a class="reference internal nav-link" href="#using-graspologic">
+     Using Graspologic
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-graspologic">
-   Using Graspologic
+  <a class="reference internal nav-link" href="#omnibus-embedding">
+   Omnibus Embedding
   </a>
  </li>
 </ul>
@@ -604,6 +616,14 @@
 <h1><span class="section-number">3.5. </span>Multigraph Representation Learning<a class="headerlink" href="#multigraph-representation-learning" title="Permalink to this headline">¶</a></h1>
 <p>Say you’re a brain researcher, and you have a bunch of scans of people’s brains - some are scans of normal people, and some are scans of people with Abnormal Disease. You have an algorithm that lets you create networks from these brains, so you turn all your brain scans into networks. You want to know if these two different types of networks share a common community structure. It seems like you should be able to find communities in both networks – they’re both brain networks, after all – but what do you do? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but which might come from quite different distributions?</p>
 <p>Well, if your goal is to find the shared community structure between the normal and abnormal networks, you could try embedding your networks and then seeing those embeddings look like. This would serve the dual purpose of having less stuff to deal with and having some way to directly compare your networks in the same space. For example, say you have nine networks of normal brains and nine networks of abnormal brains.</p>
+<div class="cell tag_hide-cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -634,8 +654,6 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">ImageGrid</span>
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">binary_heatmap</span><span class="p">,</span> <span class="n">adjplot</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
 
@@ -659,7 +677,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_4_0.png" src="../../_images/multigraph-representation-learning_4_0.png" />
+<img alt="../../_images/multigraph-representation-learning_5_0.png" src="../../_images/multigraph-representation-learning_5_0.png" />
 </div>
 </div>
 <p>Remember, our goal is to find the community structure in these brains. We’d like to embed our brain networks into some lower-dimensional space to see if we can see this more clearly. Then, we’ll see whether we can find some clustering in that space. Try to think about how you might find a lower-dimensional embedding where the location of each node’s latent positions uses information from all of the networks.</p>
@@ -711,7 +729,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_8_0.png" src="../../_images/multigraph-representation-learning_8_0.png" />
+<img alt="../../_images/multigraph-representation-learning_9_0.png" src="../../_images/multigraph-representation-learning_9_0.png" />
 </div>
 </div>
 <p>Both of these embeddings have clear clustering: there are two communities of nodes in both the normal and the abnormal graphs. We can recover the labels for these communities fairly easily using our pick of unsupervised clustering algorithm. Because we know that the latent positions in an Adjacency Spectral Embedding are normally distributed, we know that the above embeddings are distributed according to a Gaussian Mixture. “Gaussian” just means “normal”, and a gaussian mixture model just means that we have groups of normally distributed data clusters. As a result, it makes sense to cluster these data using scikit-learn’s GaussianMixture implementation.</p>
@@ -745,7 +763,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_12_0.png" src="../../_images/multigraph-representation-learning_12_0.png" />
+<img alt="../../_images/multigraph-representation-learning_13_0.png" src="../../_images/multigraph-representation-learning_13_0.png" />
 </div>
 </div>
 <p>But what if we wanted to embed <em>all</em> of the networks into the same space, both the alzheimer’s and normal networks, so that there’s only one plot? Let’s try it. We’ll take all of the networks, both normal and abnormal ones, and then average them together, and then do an Adjacency Spectral Embedding. This will result in a single plot, with each point representing a single node. Do you think we’ll still find this nice community separation?</p>
@@ -764,7 +782,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_15_0.png" src="../../_images/multigraph-representation-learning_15_0.png" />
+<img alt="../../_images/multigraph-representation-learning_16_0.png" src="../../_images/multigraph-representation-learning_16_0.png" />
 </div>
 </div>
 <p>Nope, bummer. Our community separation is gone. As far as anybody can tell, our latent positions have just become meaningless noise, so we can’t cluster and find communities like we did before.</p>
@@ -775,7 +793,7 @@
 <p>There are at least three possible approaches to multigraph representation learning with respect to classification: Classifier Ensemble, Network Combination, and Embedding Product. Each of these eventually results in a trained classifier which tells us which nodes belong to which communities.</p>
 <div class="section" id="classifier-ensemble">
 <h3>Classifier Ensemble<a class="headerlink" href="#classifier-ensemble" title="Permalink to this headline">¶</a></h3>
-<p>In a Classifier Ensemble, you start with a set of networks, then you train a classifier for each network. Now, you have a set of classifiers, each one corresponding to one of the networks. You combine these all into a single classifier, and use this to classify all of the networks.</p>
+<p>In a Classifier Ensemble, you start with a set of networks, then you train a classifier for each network. You then have a set of classifiers, each one corresponding to one of the networks. You combine these all into a single classifier, and use this to classify all of the networks.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -826,19 +844,16 @@
 <span class="n">latents</span> <span class="o">=</span> <span class="n">MASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">normals</span><span class="o">+</span><span class="n">abnormals</span><span class="p">)</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="n">GMM</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.2</span><span class="p">,</span> <span class="o">-.</span><span class="mi">02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">55</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> 
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification </span><span class="se">\n</span><span class="s2">(with combined classifier)&quot;</span><span class="p">,</span> 
              <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
 <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Classifier Ensemble&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Classifier Ensemble&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(1.5, 1.1, &#39;Classifier Ensemble&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/multigraph-representation-learning_21_1.png" src="../../_images/multigraph-representation-learning_21_1.png" />
+<img alt="../../_images/multigraph-representation-learning_22_0.png" src="../../_images/multigraph-representation-learning_22_0.png" />
 </div>
 </div>
 </div>
@@ -895,15 +910,12 @@
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_omni</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">mase_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> 
              <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels_normal</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Network Combination&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Network Combination&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(2, 1.1, &#39;Network Combination&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/multigraph-representation-learning_24_1.png" src="../../_images/multigraph-representation-learning_24_1.png" />
+<img alt="../../_images/multigraph-representation-learning_25_0.png" src="../../_images/multigraph-representation-learning_25_0.png" />
 </div>
 </div>
 </div>
@@ -962,15 +974,12 @@
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_mase</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">mase_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels_normal</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Embedding Product&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Embedding Product&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(1.4, 0.7, &#39;Embedding Product&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/multigraph-representation-learning_27_1.png" src="../../_images/multigraph-representation-learning_27_1.png" />
+<img alt="../../_images/multigraph-representation-learning_28_0.png" src="../../_images/multigraph-representation-learning_28_0.png" />
 </div>
 </div>
 <p>For the rest of this section, we’ll explore the strengths and weaknesses of different particular algorithms that use these approaches. Multiple Adjacency Spectral Embedding (MASE) is an Embedding Product technique which embeds a bunch of networks separately (with normal Adjacency Spectral Embedding), and then re-embeds all the separate latent positions into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
@@ -979,7 +988,7 @@
 <div class="section" id="multiple-adjacency-spectral-embedding">
 <h2>Multiple Adjacency Spectral Embedding<a class="headerlink" href="#multiple-adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h2>
 <p>The first algorithm we’ll explore is called MASE, and is probably the easiest to understand if you know how Adjacency Spectral Embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node - but, unlike simply averaging, MASE lets you use networks which aren’t necessarily drawn from the same distribution. MASE is based on the common subspace independent-edge (COSIE) model from the multi-network models section of chapter 5, so we’re operating under the assumption that there <em>is</em> some low-dimensional space common to all of our networks that we can embed into in the first place.</p>
-<p>Let’s try MASE on our group of normal and abnormal brains – then, we’ll dive deeper into what’s going on under the hood.</p>
+<p>Let’s go back to our group of normal and abnormal brains and try using MASE to embed them rather than averaging. Then, we’ll dive deeper into what’s going on under the hood. First, we’ll instantiate a MASE classifier and embed down to two dimensions. Then we’ll create a combined list of the normal and abnormal brains, and use MASE to find the latent positions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -998,10 +1007,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_32_0.png" src="../../_images/multigraph-representation-learning_32_0.png" />
+<img alt="../../_images/multigraph-representation-learning_33_0.png" src="../../_images/multigraph-representation-learning_33_0.png" />
 </div>
 </div>
-<p>Unlike simply averaging all of our networks together, MASE manages to keep the community structure that we found when we averaged the normal and abnormal networks separately.</p>
+<p>Unlike simply averaging all of our networks together, MASE manages to keep the community structure that we found when we averaged the normal and abnormal networks separately. Let’s see what’s under the hood.</p>
 <div class="section" id="what-s-going-on-under-the-hood">
 <h3>What’s Going On Under The Hood<a class="headerlink" href="#what-s-going-on-under-the-hood" title="Permalink to this headline">¶</a></h3>
 <p>The figure below shows how MASE works. First, we embed the adjacency matrices of a bunch of networks separately, using our standard Adjacency Spectral Embedding algorithm. Then, we take all of those embeddings, concatenate them into a single matrix, and embed the entire concatenated matrix.</p>
@@ -1009,19 +1018,10 @@
 <a class="reference internal image-reference" href="../../_images/mase1.jpeg"><img alt="../../_images/mase1.jpeg" src="../../_images/mase1.jpeg" style="height: 400px;" /></a>
 <p class="caption"><span class="caption-number">Fig. 3.1 </span><span class="caption-text">The MASE algorithm</span><a class="headerlink" href="#mase-fig" title="Permalink to this image">¶</a></p>
 </div>
-</div>
 <div class="section" id="a-collection-of-networks">
-<h3>A Collection of Networks<a class="headerlink" href="#a-collection-of-networks" title="Permalink to this headline">¶</a></h3>
-<p>Suppose we have a set of networks generated from Stochastic Block Models with two communities in each network. The networks have aligned nodes – meaning that the <span class="math notranslate nohighlight">\(i_{th}\)</span> row of all of their adjacency matrices represent the same nodes. The nodes also all belong to the same communities. However, edge probabilities might change depending on the network - in the first network, you might have nodes in the same community having a high chance of connecting to each other, whereas in the second network, nodes are much more likely to be connected to other nodes in different communities. Your goal is to find a common space in which to represent all of these networks, that captures the common community structure in all of these.</p>
+<h4>A Collection of Networks<a class="headerlink" href="#a-collection-of-networks" title="Permalink to this headline">¶</a></h4>
+<p>Suppose we have a set of networks generated from Stochastic Block Models with two communities in each network. The networks have aligned nodes – meaning that the <span class="math notranslate nohighlight">\(i_{th}\)</span> row of all of their adjacency matrices represent the same nodes. The nodes also all belong to the same communities. However, edge probabilities might change depending on the network. In the first network, you might have nodes in the same community having a high chance of connecting to each other, whereas in the second network, nodes are much more likely to be connected to other nodes in different communities. You want to end up with a classification that distinctly groups the nodes into their respective communities, using the information from all of the networks. Because MASE takes the Embedding Product approach, we start by embedding each network separately with an Adjacency Spectral Embedding.</p>
 <p>Below is Python code which generates four networks with Stochastic Block Models. The labels are the same across the networks (which means that nodes have a consistent community no matter which network you’re looking at), but the block probability matrices are quite different.</p>
-<div class="cell tag_hide-cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1068,7 +1068,10 @@
 <img alt="../../_images/multigraph-representation-learning_41_0.png" src="../../_images/multigraph-representation-learning_41_0.png" />
 </div>
 </div>
-<p>Now, we want to embed each of the four networks separately. Doing this lets us see what the individual embeddings of the networks each look like. We’ll also need these embeddings to unify the networks all into a single space.</p>
+</div>
+<div class="section" id="embedding">
+<h4>Embedding<a class="headerlink" href="#embedding" title="Permalink to this headline">¶</a></h4>
+<p>Now, we’ll embed each of the four networks separately using Adjacency Spectral Embedding. We’ll need these embeddings to unify the networks all into a single space.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -1096,7 +1099,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_44_0.png" src="../../_images/multigraph-representation-learning_44_0.png" />
+<img alt="../../_images/multigraph-representation-learning_45_0.png" src="../../_images/multigraph-representation-learning_45_0.png" />
 </div>
 </div>
 <p>Now, we want to take these individual embeddings, concatenate them into a single matrix, and then embed the result.</p>
@@ -1121,13 +1124,13 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Joint embedding of our four networks&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_47_1.png" src="../../_images/multigraph-representation-learning_47_1.png" />
+<img alt="../../_images/multigraph-representation-learning_48_1.png" src="../../_images/multigraph-representation-learning_48_1.png" />
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="using-graspologic">
-<h2>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h2>
+<h3>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -1143,9 +1146,13 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;MASE embedding&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_49_1.png" src="../../_images/multigraph-representation-learning_49_1.png" />
+<img alt="../../_images/multigraph-representation-learning_50_1.png" src="../../_images/multigraph-representation-learning_50_1.png" />
 </div>
 </div>
+</div>
+</div>
+<div class="section" id="omnibus-embedding">
+<h2>Omnibus Embedding<a class="headerlink" href="#omnibus-embedding" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
