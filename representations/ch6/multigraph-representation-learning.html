@@ -609,6 +609,11 @@
     </ul>
    </li>
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-mathematics-of-mase">
+     *The Mathematics of MASE
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#using-graspologic">
      Using Graspologic
     </a>
@@ -1149,6 +1154,98 @@
 </div>
 </div>
 </div>
+<div class="section" id="the-mathematics-of-mase">
+<h3>*The Mathematics of MASE<a class="headerlink" href="#the-mathematics-of-mase" title="Permalink to this headline">¶</a></h3>
+<p>With MASE, each network has a corresponding score matrix. Just like the set of joint latent positions describes how the networks are similar, the score matrices describe how each network is different.</p>
+<p>Suppose we have a set of networks with adjacency matrices <span class="math notranslate nohighlight">\(A^{(1)}, ..., A^{(m)}\)</span>, with each network being unweighted. Suppose our joint latent positions are called <span class="math notranslate nohighlight">\(V\)</span>. Then each adjacency matrix, <span class="math notranslate nohighlight">\(A^{(i)}\)</span>, can be decomposed into <span class="math notranslate nohighlight">\(VR^{(i)} V^\top\)</span>, where <span class="math notranslate nohighlight">\(R^{(i)}\)</span> is the score matrix corresponding to the <span class="math notranslate nohighlight">\(i_{th}\)</span> network:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A^{(i)} = VR^{(i)} V^\top
+\end{align*}\]</div>
+<p>Any particular score matrix, <span class="math notranslate nohighlight">\(R^{(i)}\)</span>, is square and <span class="math notranslate nohighlight">\(d \times d\)</span>. The dimension, <span class="math notranslate nohighlight">\(d\)</span>, corresponds to the number of embedding dimensions – so if we wanted to embed down to two dimensions, each <span class="math notranslate nohighlight">\(R^{(i)}\)</span> would be a <span class="math notranslate nohighlight">\(2 \times 2\)</span> matrix.</p>
+<p>Now, here’s the interesting part: how do we find our score matrices? Well, there’s a theorem in linear algebra about matrices which are <em>orthogonal</em>, meaning that they’re all perpendicular to each other. This theorem says that the inverse of an orthogonal matrix is its transpose. So, for an orthogonal matrix <span class="math notranslate nohighlight">\(O\)</span>,</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    O^\top = O^{-1}
+\end{align*}\]</div>
+<p>Interestingly, the column-vectors of our joint embedding matrix (let’s call it <span class="math notranslate nohighlight">\(V\)</span>) are all orthogonal. Since definitionally, what it means for two vectors to be orthogonal is that they have a dot product of 0, we can check this below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">V</span> <span class="o">=</span> <span class="n">joint_embedding</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Take the dot product of the columns of our joint latent position matrix</span>
+<span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">V</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">V</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-0.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>What this all means is that the inverse of our joint embedding matrix <span class="math notranslate nohighlight">\(V\)</span> is its transpose. You can see below that <span class="math notranslate nohighlight">\(V^\top V\)</span> is just the identity matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="nd">@V</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1., -0.],
+       [-0.,  1.]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>and so, finally, we can use the above two facts to find a score matrix. We just take matrix inverses, and then use the fact that the matrices we’re inverting are orthogonal to turn them into transposes.</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A^{(i)} &amp;= VR^{(i)} V^\top \\
+    V^{-1} A^{(i)} (V^\top)^{-1} &amp;= R^{(i)} \\
+    V^\top A^{(i)} V &amp;= R^{(i)} 
+\end{align*}\]</div>
+<p>Below, we turn our list of networks into a 3-D numpy array, and then do the above multiplication to get a new 3D numpy array of scores matrices. Because we embedded into two dimensions, each score matrix is <span class="math notranslate nohighlight">\(2 \times 2\)</span>, and the four score matrices are “slices” along the 0th axis of the numpy array.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">networks_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">networks_array</span> <span class="o">@</span> <span class="n">V</span>
+<span class="n">scores</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(4, 2, 2)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, let’s recreate the first network using only its score matrix and the joint latent positions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A_0</span> <span class="o">=</span> <span class="n">V</span> <span class="o">@</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below to the left, you can see the heatmap for the first network’s score matrix. Next to it, you can see the recreation of the first network. Remember that we only used the score matrix to recreate it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">binary_heatmap</span><span class="p">(</span><span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The original adjacency matrix </span><span class="se">\n</span><span class="s2">for the first network&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Score matrix for the first network&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_0</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The first network, recreated&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multigraph-representation-learning_59_0.png" src="../../_images/multigraph-representation-learning_59_0.png" />
+</div>
+</div>
+</div>
 <div class="section" id="using-graspologic">
 <h3>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
@@ -1166,7 +1263,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;MASE embedding&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_50_1.png" src="../../_images/multigraph-representation-learning_50_1.png" />
+<img alt="../../_images/multigraph-representation-learning_61_1.png" src="../../_images/multigraph-representation-learning_61_1.png" />
 </div>
 </div>
 </div>
