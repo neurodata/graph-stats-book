@@ -1,0 +1,124 @@
+# Preface
+
+## Network Machine Learning and You
+
+#### TODO
+
+
+
+In 2006, Geoffrey Hinton et al. published a paper1 showing how to train a deep neural
+network capable of recognizing handwritten digits with state-of-the-art precision
+(>98%). They branded this technique “Deep Learning.” Training a deep neural net
+was widely considered impossible at the time, and most researchers had abandoned
+the idea since the 1990s. This paper revived the interest of the scientific community
+and before long many new papers demonstrated that Deep Learning was not only
+possible, but capable of mind-blowing achievements that no other Machine Learning
+(ML) technique could hope to match (with the help of tremendous computing power
+and great amounts of data). This enthusiasm soon extended to many other areas of
+Machine Learning.
+
+Fast-forward 10 years and Machine Learning has conquered the industry: it is now at
+the heart of much of the magic in today’s high-tech products, ranking your web
+search results, powering your smartphone’s speech recognition, recommending videos,
+and beating the world champion at the game of Go. Before you know it, it will be
+driving your car.
+
+## Network Machine Learning in Your Projects
+
+So naturally you are excited about Network Machine Learning and you would love to join the
+party!  
+
+Perhaps you're a researcher and you want to expose shadowy financial networks and corporate fraud? Or Show how sattellites can spot Martian volcanoes? Improve mammograms for cancer researchers, or model communities of neurons in the brain?
+
+Or maybe you're a data scientist and your company has tons of data (user logs, financial data, production data, machine sensor data, hotline stats, HR reports, etc.), and more than likely you could
+view the data as a network and unearth some hidden gems of knowledge if you just knew where to look? for example:  
+
+- Explore purchasing networks and isolate the most active customers  
+- Explore patterns of collaboration in your company's network of employees
+- Detect which transactions are likely to be fraudulent  
+- Isolate groups in your company which are overperforming or underperforming
+- And more  
+
+Whatever the reason, you have decided to learn about networks and implement their analysis in your projects. Great idea!
+
+## Objective and Approach
+
+This book assumes you know next to nothing about how networks can be viewed as a statistical object. Its goal is to give you the concepts, the intuitions, and the tools you need to actually implement programs capable of learning from network data.
+
+The book is intended to give you the best introduction you can possibly get to learn about how networks can be used to explore data. You might be a graduate student, doing research on biochemical networks or trade networks in ancient Mesopotamia. Or you might be a professional interested in an introduction to the field of network data science, because you think it might be useful for your company. Whoever you are, we think you'll find a lot of things that are useful and interesting in this book!
+
+We'll cover the fundamentals of network data science, focusing on developing intuition on networks as statistical objects, doing so while paired with relevant Python tutorials. By the end of this book, you will be able to utilize efficient and easy to use tools available for performing analyses on networks. You will also have a whole new range of statistical techniques in your toolbox, such as representations, models, and algorithms for networks.
+
+We'll spend this book learning about network algorithms by showing how they're implemented in production-ready Python frameworks:
+- Numpy and Scipy are used for scientific programming. They give you access to array objects, which are the main way we'll represent networks.
+- Scikit-Learn is very easy to use, yet it implements many Machine Learning algorithms efficiently, so it makes for a great entry point to learn Machine Learning.
+- Graspologic is an open-source Python package developed by Microsoft and Johns Hopkins University which gives you utilities and algorithms for doing statistical analyses on network-valued data.
+
+The book favors a hands-on approach, growing an intuitive understanding of
+networks through concrete working examples and a bit of theory.
+While you can read this book without picking up your laptop, we highly recommend
+you experiment with the code examples available online as Jupyter notebooks at http://docs.neurodata.io/graph-stats-book/intro.html.
+
+## Prerequisites
+
+We assume you have a basic knowledge of mathematics. If you care about what's under the hood you should also have a reasonable understanding of college-level math, such as calculus, linear algebra, probability, and statistics. 
+
+You should also probably have some background in programming - we'll mainly be using Python to build and explore our networks. If you don't have too much of a Python or math background, don't worry - we'll link some resources to give you a head start.
+
+If you've never used Jupyter, don't worry about it. It is a great tool to have in your toolbox and it's easy to learn. We'll also link some resources for you if you are not familiar with Python's scientific libraries, like numpy, scipy, and scikit-learn.
+
+## Roadmap
+
+This book is organized into three parts. 
+
+Part I, Foundations, gives you a brief overview of the kinds of things you'll be doing in this book, and shows you how to solve a network data science problem from start to finish. It covers the following topics:
+- What a network is and where you can find networks in the wild
+- All the reasons why you should care about studying networks
+- Examples of ways you could apply network data science to your own projects
+- An overview of the types of problems Network Machine Learning is good at dealing with
+- The main challenges you'd encounter if you explored Network Learning more deeply
+- Exploring a real network data science dataset, to get a broad understanding of what you might be able to learn.
+
+Part II, Representations, is all about how we can represent networks statistically, and what we can do with those representations. It covers the following topics:
+- Ways you can represent individual networks
+- Ways you can represent groups of networks
+- The various useful properties different types of networks have
+- Types of network representation models and why they're useful
+- How to represent networks as lower-dimensional embeddings
+- Types of learning you can do on representations of multiple networks
+- Types of learning when you have extra information about your networks
+
+Part III, Applications, is about using the representations you learned about in the previous part to learn about your networks. It covers the following topics:
+- Figuring out if communities in your networks are different from each other
+- Selecting the right model to represent your data
+- Finding nodes in your networks that are interesting
+- Finding edges in your networks that are interesting
+- Finding communities in your networks that are interesting
+- Finding nodes or edges which are anomalies in a particular network
+- Detecting networks which are anomalies when you have a group of networks
+- What to do when you have new data after you've already trained a network model
+- How hypothesis testing works on networks
+- Pairing nodes that represent the same thing between two networks
+
+## Conventions Used In This Book
+
+## Using Code Examples
+
+## About the Authors
+
+**Dr. Joshua Vogelstein** is an Assistant Professor in the Department of Biomedical Engineering at Johns Hopkins University, with joint appointments in Applied Mathematics and Statistics, Computer Science, Electrical and Computer Engineering, Neuroscience, and Biostatistics. His research focuses on the statistics of networks in brain science (connectomes). His lab and collaborators have developed the leading computational algorithms and libraries to perform statistical analysis on networks.
+
+**Alex Loftus** is a master’s student at Johns Hopkins University in the Department of Biomedical Engineering, with an undergraduate degree in neuroscience. He has worked on implementing network spectral embedding and clustering algorithms in Python, and helped develop an MRI pipeline to produce brain networks from diffusion MRI data.
+
+**Eric Bridgeford** is a PhD student in the Department of Biostatistics at Johns Hopkins University. Eric’s background includes Computer Science and Biomedical Engineering, and he is an avid contributor of packages to CRAN and PyPi for nonparametric hypothesis testing. Eric studies general approaches for statistical inference in network data, with applications to problems with network estimation in MRI connectomics data, including replicability and batch effects.
+
+**Dr. Carey E. Priebe** is Professor of Applied Mathematics and Statistics, and a founding member of the Center for Imaging Science (CIS) and the Mathematical Institute for Data Science (MINDS) at Johns Hopkins University. He is a leading researcher in theoretical, methodological, and applied statistics / data science; much of his recent work focuses on spectral network analysis and subsequent statistical inference. Professor Priebe is Senior Member of the IEEE, Elected Member of the International Statistical Institute, Fellow of the Institute of Mathematical Statistics, and Fellow of the American Statistical Association.
+
+**Chris White** is Managing Director, Microsoft Research Special Projects. He leads mission-oriented research and software development teams focusing on high risk problems. Prior to joining Microsoft, he was a Fellow at Harvard for network statistics and machine learning. Chris’s work has been featured in media outlets including Popular Science, CBS’s 60 Minutes, CNN, the Wall Street Journal, Rolling Stone Magazine, TEDx, and Google’s Solve for X. Chris was profiled in a cover feature for the Sept/Oct 2016 issue of Popular Science.
+
+**Weiwei Yang** is a Principal Development Manager at Microsoft Research. Her interests are in resource efficient alt-SGD ML methods inspired by biological learning. The applied research group she leads aims to democratize AI by addressing issues of sustainability, robustness, scalability, and efficiency in ML. Her group has applied ML to address social issues such as countering human trafficking and to energy grid stabilizations.
+
+
+## Acknowledgements
+
+First of all, big thanks to everybody who has been reading the book as we write and giving feedback. So far, this list includes Ross Lawrence, Geoff Loftus, Alex McCoy, and Peter Brown.
