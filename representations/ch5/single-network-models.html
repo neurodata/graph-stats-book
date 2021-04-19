@@ -656,50 +656,52 @@
     <a class="reference internal nav-link" href="#random-dot-product-graph-rdpg">
      Random Dot Product Graph (RDPG)
     </a>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#a-priori-random-dot-product-graph">
-     <em>
-      A Priori
-     </em>
-     Random Dot Product Graph
-    </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#id4">
-       Code Examples
+      <a class="reference internal nav-link" href="#a-priori-rdpg">
+       <em>
+        A Priori
+       </em>
+       RDPG
       </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h4 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#id4">
+         Code Examples
+        </a>
+       </li>
+      </ul>
      </li>
      <li class="toc-h3 nav-item toc-entry">
       <a class="reference internal nav-link" href="#id5">
        *Likelihood
       </a>
      </li>
-    </ul>
-   </li>
-   <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#a-posteriori-rdpg">
-     <em>
-      A Posteriori
-     </em>
-     RDPG
-    </a>
-    <ul class="nav section-nav flex-column">
      <li class="toc-h3 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#id6">
-       *Likelihood
+      <a class="reference internal nav-link" href="#a-posteriori-rdpg">
+       <em>
+        A Posteriori
+       </em>
+       RDPG
       </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h4 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#id6">
+         *Likelihood
+        </a>
+       </li>
+      </ul>
      </li>
     </ul>
    </li>
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#degree-corrected-models">
-     Degree-Corrected Models
+    <a class="reference internal nav-link" href="#inhomogeneous-erdos-reny-ier">
+     Inhomogeneous Erdös-Rény (IER)
     </a>
    </li>
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#inhomogeneous-erdos-renyi-ier">
-     Inhomogeneous Erdos-Renyi (IER)
+    <a class="reference internal nav-link" href="#degree-corrected-stochastic-block-moodel-dcsbm">
+     Degree-Corrected Stochastic Block Moodel (DCSBM)
     </a>
    </li>
   </ul>
@@ -876,7 +878,7 @@
 <li><p>As we explained previously, when <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(15\)</span>, we would need over <span class="math notranslate nohighlight">\(10^{30}\)</span> bits of storage just to define <span class="math notranslate nohighlight">\(\theta\)</span>. This amounts to more than <span class="math notranslate nohighlight">\(10^{8}\)</span> zetabytes, which exceeds the storage capacity of <em>the entire world</em>.</p></li>
 <li><p>With a single network observed (or really, any number of networks we could collect in the real world) we would never be able to estimate <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span> parameters for any reasonably non-trivial number of nodes <span class="math notranslate nohighlight">\(n\)</span>. For the case of one observed network <span class="math notranslate nohighlight">\(A\)</span>, an estimate of <span class="math notranslate nohighlight">\(\theta\)</span> (referred to as <span class="math notranslate nohighlight">\(\hat\theta\)</span>) would simply be for <span class="math notranslate nohighlight">\(\hat\theta\)</span> to have a <span class="math notranslate nohighlight">\(1\)</span> in the entry corresponding to our observed network, and a <span class="math notranslate nohighlight">\(0\)</span> everywhere else. Inferentially, this would imply that the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which governs realizations <span class="math notranslate nohighlight">\(A\)</span> is deterministic, even if this is not the case. Even if we collected potentially <em>many</em> observed networks, we would still (with very high probability) just get <span class="math notranslate nohighlight">\(\hat \theta\)</span> as a series of point masses on the observed networks we see, and <span class="math notranslate nohighlight">\(0\)</span>s everywhere else. This would mean our parameter estimates <span class="math notranslate nohighlight">\(\hat\theta\)</span> would not generalize to new observations at <em>all</em>.</p></li>
 </ol>
-<p>So, what are some more reasonable descriptions of <span class="math notranslate nohighlight">\(\mathcal P\)</span>? We explore some choices below.</p>
+<p>So, what are some more reasonable descriptions of <span class="math notranslate nohighlight">\(\mathcal P\)</span>? We explore some choices below. Particularly, we will be most interested in the <em>independent-edge</em> networks. These are the families of networks in which the generative procedure which governs the random networks assume that the edges of the network are generated <em>independently</em>. <strong>Statistical Independence</strong> is a property which greatly simplifies many of the modelling assumptions which are crucial for proper estimation and rigorous statistical inference, which we will learn more about in the later chapters.</p>
 <div class="section" id="equivalence-classes">
 <h3>*Equivalence Classes<a class="headerlink" href="#equivalence-classes" title="Permalink to this headline">¶</a></h3>
 <p>In all of the below models, we will explore the concept of the <strong>likelihood equivalence class</strong>, or an <em>equivalence class</em>, for short. The likelihood <span class="math notranslate nohighlight">\(\mathcal L\)</span> is a function which in general, describes how effective a particular observation can be described by a random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> with parameters <span class="math notranslate nohighlight">\(\theta\)</span>, written <span class="math notranslate nohighlight">\(\mathbf A \sim F(\theta)\)</span>. Formally, the likelihood is the function where <span class="math notranslate nohighlight">\(\mathcal L_\theta(A) \propto \mathbb P_\theta(A)\)</span>; that is, the likelihood is proportional to the probability of observing the realization <span class="math notranslate nohighlight">\(A\)</span> if the underlying random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> has parameters <span class="math notranslate nohighlight">\(\theta\)</span>.  Why does this matter when it comes to equivalence classes? An equivalence class is a subset of the sample space <span class="math notranslate nohighlight">\(E \subseteq \mathcal A_n\)</span>, which has the following properties. Holding the parameters <span class="math notranslate nohighlight">\(\theta\)</span> fixed:</p>
@@ -1243,8 +1245,8 @@
 \mathcal L_\theta(A) &amp;\propto \mathbb P_\theta(\mathbf A = A)
 \end{align*}\]</div>
 <p>Next, we use the fact that the probability that <span class="math notranslate nohighlight">\(\mathbf A = A\)</span> is, in fact, the <em>marginalization</em> (over realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>) of the joint <span class="math notranslate nohighlight">\((\mathbf A, \vec{\pmb \tau})\)</span>. In this case, we will let <span class="math notranslate nohighlight">\(\mathcal T = \{1,...,K\}^n\)</span> be the space of all possible realizations that <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> could take. In the line after that, we use Bayes’ Theorem to separate the joint probability into a conditional probability and a marginal probability:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-0d0803f7-b7ec-44d1-90e0-6ead9b123504">
-<span class="eqno">(2.1)<a class="headerlink" href="#equation-0d0803f7-b7ec-44d1-90e0-6ead9b123504" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-3997d775-efa7-4cb7-81d5-d8ead7860451">
+<span class="eqno">(2.1)<a class="headerlink" href="#equation-3997d775-efa7-4cb7-81d5-d8ead7860451" title="Permalink to this equation">¶</a></span>\[\begin{align}
     &amp;= \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A, \vec{\pmb \tau} = \vec \tau) \\
     &amp;= \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau)\mathbb P_\theta(\vec{\pmb \tau} = \vec \tau)
 \end{align}\]</div>
@@ -1353,9 +1355,8 @@
 <p>As we can see, <span class="math notranslate nohighlight">\(P\)</span> captures a similar modular structure to the actual adjacency matrix corresponding to the SBM network. Also, <span class="math notranslate nohighlight">\(P\)</span> captures the probability of connections between each pair of students. Indeed, it is the case that <span class="math notranslate nohighlight">\(P\)</span> contains the information of both <span class="math notranslate nohighlight">\(\vec\tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. This means that we can write down a generative model by specifying <em>only</em> <span class="math notranslate nohighlight">\(P\)</span>, and we no longer need to specify <span class="math notranslate nohighlight">\(\vec\tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span> at all. To write down the generative model in this way, we say that for all <span class="math notranslate nohighlight">\(j &gt; i\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij} \sim Bern(p_{ij})\)</span> independently, where <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span>, and <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>.</p>
 <p>What is so special about this formulation of the SBM problem? As it turns out, for a <em>symmetric</em> probability matrix <span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(P\)</span> can be decomposed using a matrix <span class="math notranslate nohighlight">\(X\)</span>, where <span class="math notranslate nohighlight">\(P = X X^\top\)</span>. We will call a single row of <span class="math notranslate nohighlight">\(X\)</span> the vector <span class="math notranslate nohighlight">\(\vec x_i\)</span>. Remember, using this expression, each entry <span class="math notranslate nohighlight">\(p_{ij}\)</span> is the product <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span>, for all <span class="math notranslate nohighlight">\(i, j\)</span>. Like <span class="math notranslate nohighlight">\(P\)</span>, <span class="math notranslate nohighlight">\(X\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows, each of which corresponds to a single node in our network. However, the special property of <span class="math notranslate nohighlight">\(X\)</span> is that it doesn’t <em>necessarily</em> have <span class="math notranslate nohighlight">\(n\)</span> columns: rather, <span class="math notranslate nohighlight">\(X\)</span> often will have many fewer columns than rows. For instance, with <span class="math notranslate nohighlight">\(P\)</span> defined as above, there in fact exists an <span class="math notranslate nohighlight">\(X\)</span> with just <span class="math notranslate nohighlight">\(2\)</span> columns that can be used to describe <span class="math notranslate nohighlight">\(P\)</span>. This matrix <span class="math notranslate nohighlight">\(X\)</span> will be called the <em>latent position matrix</em>, and each row <span class="math notranslate nohighlight">\(\vec x_i\)</span> will be called the <em>latent position of a node</em>. Like previously, there are two types of RDPGs: one in which <span class="math notranslate nohighlight">\(X\)</span> is treated as <em>known</em>, and another in which <span class="math notranslate nohighlight">\(X\)</span> is treated as <em>unknown</em>.</p>
 <p>Now, your next thought might be that this requires a <em>lot</em> more space to represent an SBM network, and you’d be right: <span class="math notranslate nohighlight">\(\vec \tau\)</span> has <span class="math notranslate nohighlight">\(n\)</span> entries, and <span class="math notranslate nohighlight">\(B\)</span> has <span class="math notranslate nohighlight">\(K \times K\)</span> entries, where <span class="math notranslate nohighlight">\(K\)</span> is typically much smaller than <span class="math notranslate nohighlight">\(n\)</span>. On the other hand, in this formulation, <span class="math notranslate nohighlight">\(P\)</span> has <span class="math notranslate nohighlight">\(\binom{n}{2}\)</span> entries, which is much bigger than <span class="math notranslate nohighlight">\(n + K \times K\)</span> (since <span class="math notranslate nohighlight">\(K\)</span> is usually much smaller than <span class="math notranslate nohighlight">\(n\)</span>). The advantage is that under this formulation, <span class="math notranslate nohighlight">\(P\)</span> doesn’t need to have this rigorous modular structure characteristic of SBM networks, and can look a <em>lot</em> more interesting. As we will see in later chapters, this network representation will prove extremely flexible for allowing us to capture networks that are fairly complex. Further, we can also perform analysis on the matrix <span class="math notranslate nohighlight">\(X\)</span> itself, which will prove very useful for estimation of SBMs.</p>
-</div>
-<div class="section" id="a-priori-random-dot-product-graph">
-<h2><em>A Priori</em> Random Dot Product Graph<a class="headerlink" href="#a-priori-random-dot-product-graph" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="a-priori-rdpg">
+<h3><em>A Priori</em> RDPG<a class="headerlink" href="#a-priori-rdpg" title="Permalink to this headline">¶</a></h3>
 <p>The <em>a priori</em> Random Dot Product Graph is an RDPG in which we know <em>a priori</em> the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. The <em>a priori</em> RDPG has the following parameter:</p>
 <table class="colwidths-auto table">
 <thead>
@@ -1383,7 +1384,7 @@
 <p>Noting that <span class="math notranslate nohighlight">\(X\)</span> has <span class="math notranslate nohighlight">\(d\)</span> columns, this implies that <span class="math notranslate nohighlight">\(\vec x_i \in  \mathbb R^d\)</span>, or that each node’s latent position is a real-valued <span class="math notranslate nohighlight">\(d\)</span>-dimensional vector.</p>
 <p>What is the generative model for the <em>a priori</em> RDPG? As we discussed above, given <span class="math notranslate nohighlight">\(X\)</span>, for all <span class="math notranslate nohighlight">\(j &gt; i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij} \sim Bern(\vec x_i^\top \vec x_j)\)</span> independently. If <span class="math notranslate nohighlight">\(i &lt; j\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span> (<em>symmetry</em>), and <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span> (<em>hollow</em>). If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> RDPG with parameter <span class="math notranslate nohighlight">\(X\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim RDPG_n(X)\)</span>.</p>
 <div class="section" id="id4">
-<h3>Code Examples<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h4>Code Examples<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
 <p>We will let <span class="math notranslate nohighlight">\(X\)</span> be a little more complex than in our preceding example. Our <span class="math notranslate nohighlight">\(X\)</span> will produce a <span class="math notranslate nohighlight">\(P\)</span> that still <em>somewhat</em> has a modular structure, but not quite as much as before. Let’s assume, for instance, that we have <span class="math notranslate nohighlight">\(300\)</span> people who live along a very long road that is <span class="math notranslate nohighlight">\(100\)</span> miles long, and each person is <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span> of a mile apart. The nodes of our network represent the people who live along our assumed street. If two people are closer to one another, it might make sense to think that they have a higher probability of being friends. If two people are neighbors, we think that they will have a very high probability of being connected (almost <span class="math notranslate nohighlight">\(1\)</span>) and when people are very far apart, we think that they will have a very low probability of being connected (almost <span class="math notranslate nohighlight">\(0\)</span>). What could we use for <span class="math notranslate nohighlight">\(X\)</span>?</p>
 <p>One possible approach would be to let each <span class="math notranslate nohighlight">\(\vec x_i\)</span> be defined as follows:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -1492,20 +1493,20 @@ p_{100,200} &amp;= \vec x_{100}^\top x_{200} = \frac{2}{3} \cdot \frac 1 3 + \fr
 </div>
 </div>
 </div>
+</div>
 <div class="section" id="id5">
 <h3>*Likelihood<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p>Given <span class="math notranslate nohighlight">\(X\)</span>, the likelihood for an RDPG is relatively straightforward. The independence assumption vastly simplifies our resulting expression. We will also use many of the results we’ve identified above, such as the p.m.f. of a Bernoulli random variable:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathcal L_\theta(A) &amp;\propto \mathbb P(A) \\
+    \mathcal L_\theta(A) &amp;\propto \mathbb P_\theta(A) \\
     &amp;= \prod_{j &gt; i}\mathbb P(\mathbf a_{ij} = a_{ij}),\;\;\;\; \textrm{Independence Assumption} \\
     &amp;= \prod_{j &gt; i}(\vec x_i^\top \vec x_j)^{a_{ij}}(1 - \vec x_i^\top \vec x_j)^{1 - a_{ij}},\;\;\;\; a_{ij} \sim Bern(\vec x_i^\top \vec x_j)
 \end{align*}\]</div>
 <p>Unfortunately, the likelihood equivalence classes are a bit harder to understand intuitionally here compared to the ER and SBM examples so we won’t write them down here, but they still exist!</p>
 </div>
-</div>
 <div class="section" id="a-posteriori-rdpg">
-<h2><em>A Posteriori</em> RDPG<a class="headerlink" href="#a-posteriori-rdpg" title="Permalink to this headline">¶</a></h2>
+<h3><em>A Posteriori</em> RDPG<a class="headerlink" href="#a-posteriori-rdpg" title="Permalink to this headline">¶</a></h3>
 <p>The <em>a posteriori</em> RDPG is to the <em>a priori</em> RDPG what the <em>a posteriori</em> SBM was to the <em>a priori</em> SBM. Formally, we instead suppose that we do <em>not</em> know the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, but instead know how we can characterize the individual latent position vectors. We have the following parameter:</p>
 <table class="colwidths-auto table">
 <thead>
@@ -1524,7 +1525,7 @@ p_{100,200} &amp;= \vec x_{100}^\top x_{200} = \frac{2}{3} \cdot \frac 1 3 + \fr
 <p>The parameter <span class="math notranslate nohighlight">\(F\)</span> is what is known as an <strong>inner-product distribution</strong>. In the simplest case, we will assume that <span class="math notranslate nohighlight">\(F\)</span> is a distribution on a subset of the possible real vectors that have <span class="math notranslate nohighlight">\(d\)</span>-dimensions with an important caveat: for any two vectors within this subset, their inner product <em>must</em> be a probability. We will refer to the subset of the possible real vectors as <span class="math notranslate nohighlight">\(\mathcal X_d\)</span>, which is a subset of <span class="math notranslate nohighlight">\(\mathbb R^d\)</span>. This means that for any <span class="math notranslate nohighlight">\(\vec x_i, \vec x_j\)</span> that are in <span class="math notranslate nohighlight">\(\mathcal X_d\)</span>, it is always the case that <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span> is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. This is essential because like previously, we will describe the distribution of each edge in the adjacency matrix using <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span>. Next, we will treat the latent position matrix as a matrix-valued random variable which is <em>latent</em> (remember, <em>latent</em> means that we don’t get to see it in our real data). Like before, we will call <span class="math notranslate nohighlight">\(\vec{\mathbf x}_i\)</span> the random latent position vectors for the nodes of our network. In this case, each <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i\)</span> is sampled independently and identically from the inner-product distribution <span class="math notranslate nohighlight">\(F\)</span> described above. The latent-position matrix is the matrix-valued random variable <span class="math notranslate nohighlight">\(\mathbf X\)</span> whose entries are the latent vectors <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i\)</span>, for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes.</p>
 <p>The model for edges of the <em>a posteriori</em> RDPG can be described by conditioning n this unobserved latent-position matrix. We write down that, conditioned on <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i = \vec x\)</span> and <span class="math notranslate nohighlight">\(\vec {\mathbf x}_j = \vec y\)</span>, that if <span class="math notranslate nohighlight">\(j &gt; i\)</span>, then <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(\vec x^\top \vec y)\)</span> distribution. As before, if <span class="math notranslate nohighlight">\(i &lt; j\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span> (<em>symmetry</em>), and <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span> (<em>hollow</em>). If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an <em>a posteriori</em> RDPG with parameter <span class="math notranslate nohighlight">\(F\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim RDPG_n(F)\)</span>.</p>
 <div class="section" id="id6">
-<h3>*Likelihood<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<h4>*Likelihood<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <p>The likelihood for the <em>a posteriori</em> RDPG is fairly complicated. This is because, like the <em>a posteriori</em> SBM, we do not actually get to see the latent position matrix <span class="math notranslate nohighlight">\(\mathbf X\)</span>, so we need to use <em>marginalization</em> to obtain an expression for the likelihood. Here, we are concerned with realizations of <span class="math notranslate nohighlight">\(\mathbf X\)</span>. Remember that <span class="math notranslate nohighlight">\(\mathbf X\)</span> is just a matrix whose rows are <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i\)</span>, each of which individually have have the distribution <span class="math notranslate nohighlight">\(F\)</span>; e.g., <span class="math notranslate nohighlight">\(\vec{\mathbf x}_i \sim F\)</span>. For simplicity, we will assume that <span class="math notranslate nohighlight">\(F\)</span> is a disrete distribution on <span class="math notranslate nohighlight">\(\mathcal X_d\)</span>. This makes the logic of what is going on below much simpler since the notation gets less complicated, but does not detract from the generalizability of the result (the only difference is that sums would be replaced by multivariate integrals, and probability mass functions replaced by probability density functions).</p>
 <p>We will let <span class="math notranslate nohighlight">\(p\)</span> denote the probability mass function (p.m.f.) of this discrete distribution function <span class="math notranslate nohighlight">\(F\)</span>. The strategy will be to use the independence assumption, followed by marginalization over the relevant rows of <span class="math notranslate nohighlight">\(\mathbf X\)</span>:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -1574,11 +1575,29 @@ p_{100,200} &amp;= \vec x_{100}^\top x_{200} = \frac{2}{3} \cdot \frac 1 3 + \fr
 \end{align*}\]</div>
 </div>
 </div>
-<div class="section" id="degree-corrected-models">
-<h2>Degree-Corrected Models<a class="headerlink" href="#degree-corrected-models" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="inhomogeneous-erdos-renyi-ier">
-<h2>Inhomogeneous Erdos-Renyi (IER)<a class="headerlink" href="#inhomogeneous-erdos-renyi-ier" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="inhomogeneous-erdos-reny-ier">
+<h2>Inhomogeneous Erdös-Rény (IER)<a class="headerlink" href="#inhomogeneous-erdos-reny-ier" title="Permalink to this headline">¶</a></h2>
+<p>In the preceding models, we typically made assumptions about how we could characterize the edge-existence probabilities using fewer than <span class="math notranslate nohighlight">\(\binom n 2\)</span> unique probabilities (one for each edge). The reason for this is that in general, <span class="math notranslate nohighlight">\(n\)</span> is usually relatively large, so attempting to actually learn <span class="math notranslate nohighlight">\(\binom n 2\)</span> unique probabilities is not, in general, going to be very feasible (it is <em>never</em> feasible when we have a single network, since a single network only has <span class="math notranslate nohighlight">\(\binom n 2\)</span> unique observed values). Further, it is relatively difficult to ask questions for which assuming edges share <em>nothing</em> in common (even if they don’t share the same probabilities, there may be properties underlying the probabilities, such as the <em>latent positions</em> that we saw above with the RDPG, that we might still want to characterize) is actually favorable.</p>
+<p>Nonetheless, the most general model for an independent-edge random network is known as the Inhomogeneous Erdös-Rényi (IER) Random Network. An IER Random Network is characterized by the following parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(P\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{n \times n}\)</span></p></td>
+<td><p>The edge probability matrix.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The probability matrix <span class="math notranslate nohighlight">\(P\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, where each entry <span class="math notranslate nohighlight">\(p_{ij}\)</span> is a probability (a value between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>). Further, if we restrict ourselves to the case of simple networks like we have done so far, <span class="math notranslate nohighlight">\(P\)</span> will also be symmetric (<span class="math notranslate nohighlight">\(p_{ij} = p_{ji}\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>). The generative model is similar to the preceding models we have seen: given the <span class="math notranslate nohighlight">\((i, j)\)</span> entry of <span class="math notranslate nohighlight">\(P\)</span>, denoted <span class="math notranslate nohighlight">\(p_{ij}\)</span>, the edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> are independent <span class="math notranslate nohighlight">\(Bern(p_{ij})\)</span>. It is worth noting that <em>all</em> of the preceding models we have discussed so far are special cases of the IER model. This means that, for instance, if we were to consider only the probability matrices where all of the entries are the same, we could represent the ER models. Similarly, if we were to only to consider the probability matrices <span class="math notranslate nohighlight">\(P\)</span> where <span class="math notranslate nohighlight">\(P = XX^\top\)</span>, we could represent any RDPG.</p>
+</div>
+<div class="section" id="degree-corrected-stochastic-block-moodel-dcsbm">
+<h2>Degree-Corrected Stochastic Block Moodel (DCSBM)<a class="headerlink" href="#degree-corrected-stochastic-block-moodel-dcsbm" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 <div class="section" id="references">
