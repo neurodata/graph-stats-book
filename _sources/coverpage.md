@@ -1,4 +1,4 @@
-# Network Machine Learning in Python
+# Hands-on Network Machine Learning with Scikit-Learn and Graspologic
 
 ```{figure} Images/umap_pedigo_small.jpg
 ---
