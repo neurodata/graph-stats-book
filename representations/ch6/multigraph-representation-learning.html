@@ -734,8 +734,7 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">ImageGrid</span>
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">binary_heatmap</span><span class="p">,</span> <span class="n">adjplot</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;savefig.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
 
 <span class="k">def</span> <span class="nf">small_binary_heatmap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -913,8 +912,53 @@
 <img alt="../../_images/multigraph-representation-learning_26_0.png" src="../../_images/multigraph-representation-learning_26_0.png" />
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.axes_size</span> <span class="kn">import</span> <span class="n">Fraction</span><span class="p">,</span> <span class="n">AxesX</span><span class="p">,</span> <span class="n">AxesY</span>
+
+<span class="k">def</span> <span class="nf">binary_heatmap</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">],</span> <span class="n">colorbar_ticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;No Edge&quot;</span><span class="p">,</span> <span class="s2">&quot;Edge&quot;</span><span class="p">],</span> <span class="n">outline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Colors must be length 2&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;center&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Center is not allowed for binary heatmaps.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;cmap&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;cmap is not allowed in a binary heatmap. To change colors, use the `colors` parameter.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">colorbar_ticklabels</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">colorbar_ticklabels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;colorbar_ticklabels must be list-like and length 2.&quot;</span><span class="p">)</span>
+
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">colorbar</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">colorbar</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;cbar&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cbar</span><span class="p">:</span>
+        <span class="n">colorbar</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">])</span>
+        <span class="n">colorbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="n">colorbar_ticklabels</span><span class="p">)</span>
+        <span class="n">colorbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_frame_on</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outline</span><span class="p">:</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">plot</span>
+
+<span class="n">binary_heatmap</span><span class="p">(</span><span class="n">averaged</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Averaged Brain Network&quot;</span><span class="p">,</span> <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multigraph-representation-learning_27_0.png" src="../../_images/multigraph-representation-learning_27_0.png" />
+</div>
+</div>
 <p>By averaging, we’ve lost all of the community structure used to exist. That’s why our big averaged embedding failed.</p>
-<p>What we’ve discovered is that, even though it’s a great idea to simply average  all of your networks together if they were drawn from the same distribution, it’s often a horrible idea to average all of your networks if they might come from different distributions. This is a case of averaging networks which are “heterogeneous”: Not only are your networks slightly different, but they’re <em>expected</em> to be different because, again, they’re drawn from different distributions. Sampling a lot of heterogenous networks and then averaging them, as you can see from our exploration above, can result in losing the community signal you might have had.</p>
+<p>We’ve just discovered that even though it’s a great idea to simply average all of your networks together if they were drawn from the same distribution, it’s often a horrible idea to average all of your networks if they might come from different distributions. This is a case of averaging networks which are “heterogeneous”: Not only are your networks slightly different, but they’re <em>expected</em> to be different because, again, they’re drawn from different distributions. Sampling a lot of heterogenous networks and then averaging them, as you can see from our exploration above, can result in losing the community signal you might have had.</p>
 <p>We’d like to find a way to compare these heterogeneous networks directly, so that we can embed all of our networks into the same space and still keep that nice community structure. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
 </div>
 </div>
@@ -993,10 +1037,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1800x1200 with 0 Axes&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_32_1.png" src="../../_images/multigraph-representation-learning_32_1.png" />
+<img alt="../../_images/multigraph-representation-learning_33_1.png" src="../../_images/multigraph-representation-learning_33_1.png" />
 </div>
 </div>
 </div>
@@ -1063,7 +1107,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_36_0.png" src="../../_images/multigraph-representation-learning_36_0.png" />
+<img alt="../../_images/multigraph-representation-learning_37_0.png" src="../../_images/multigraph-representation-learning_37_0.png" />
 </div>
 </div>
 <p>For the rest of this section, we’ll explore the strengths and weaknesses of different particular algorithms that use these approaches. Multiple Adjacency Spectral Embedding (MASE) is a technique which combines embeddings by concatennating and re-embedding the separate latent positions into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
@@ -1091,7 +1135,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_41_0.png" src="../../_images/multigraph-representation-learning_41_0.png" />
+<img alt="../../_images/multigraph-representation-learning_42_0.png" src="../../_images/multigraph-representation-learning_42_0.png" />
 </div>
 </div>
 <p>Unlike the disastrous results from simply averaging all of our networks together, MASE manages to keep the community structure that we found when we averaged our networks separately. Let’s see what’s under the hood.</p>
@@ -1149,7 +1193,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_49_0.png" src="../../_images/multigraph-representation-learning_49_0.png" />
+<img alt="../../_images/multigraph-representation-learning_50_0.png" src="../../_images/multigraph-representation-learning_50_0.png" />
 </div>
 </div>
 </div>
@@ -1183,7 +1227,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_53_0.png" src="../../_images/multigraph-representation-learning_53_0.png" />
+<img alt="../../_images/multigraph-representation-learning_54_0.png" src="../../_images/multigraph-representation-learning_54_0.png" />
 </div>
 </div>
 <p>Now, we want to take these individual embeddings, concatenate them into a single matrix, and then embed the result.</p>
@@ -1207,7 +1251,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_56_0.png" src="../../_images/multigraph-representation-learning_56_0.png" />
+<img alt="../../_images/multigraph-representation-learning_57_0.png" src="../../_images/multigraph-representation-learning_57_0.png" />
 </div>
 </div>
 </div>
@@ -1227,7 +1271,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_59_0.png" src="../../_images/multigraph-representation-learning_59_0.png" />
+<img alt="../../_images/multigraph-representation-learning_60_0.png" src="../../_images/multigraph-representation-learning_60_0.png" />
 </div>
 </div>
 </div>
@@ -1316,8 +1360,8 @@
 </div>
 </div>
 <p>Below and to the left, you can see the original adjacency matrix for the first matrix. In the center, you can see the heatmap for the first network’s score matrix. Next to it, you can see the recreation of the first network. Remember that we only used the score matrix to recreate it. The first network has a block probability matrix of</p>
-<div class="amsmath math notranslate nohighlight" id="equation-794d988a-c901-4ab9-b075-ea37d0ecea73">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-794d988a-c901-4ab9-b075-ea37d0ecea73" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-984720c3-d5e8-46eb-b7ae-942b097c077d">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-984720c3-d5e8-46eb-b7ae-942b097c077d" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 .12 &amp; .03 \\
 .03 &amp; .06 \\
@@ -1337,7 +1381,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_72_0.png" src="../../_images/multigraph-representation-learning_72_0.png" />
+<img alt="../../_images/multigraph-representation-learning_73_0.png" src="../../_images/multigraph-representation-learning_73_0.png" />
 </div>
 </div>
 </div>
