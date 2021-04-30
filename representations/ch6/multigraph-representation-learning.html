@@ -605,6 +605,13 @@
     <a class="reference internal nav-link" href="#grouping-the-networks-together">
      Grouping The Networks Together
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#why-did-our-embedding-fail">
+       Why Did Our Embedding Fail?
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
@@ -619,8 +626,8 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#combining-the-classifiers">
-     Combining the classifiers
+    <a class="reference internal nav-link" href="#omni-one">
+     Omni one
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
@@ -684,8 +691,8 @@
 <h1><span class="section-number">3.5. </span>Multigraph Representation Learning<a class="headerlink" href="#multigraph-representation-learning" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="aliens-and-humans">
 <h2>Aliens and Humans<a class="headerlink" href="#aliens-and-humans" title="Permalink to this headline">¶</a></h2>
-<p>Say you’re a brain researcher, and you have a bunch of scans of brains - some are scans of normal people, and some are scans of aliens. You have some code that estimates networks from your scans, so you turn all your scans into networks. The nodes represent the brain regions which are common to both humans and aliens (isn’t evolution amazing?), and the edges represent communication between these brain regions. You want to know if the human and alien networks share a common community structure. It seems like you should be able to find communities common to both races – they’re both brain networks, after all – but what do you do? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but whose edges might come from totally different distributions?</p>
-<p>Well, if your goal is to find the shared community structure between the human and alien networks, you could try embedding your networks and then seeing what those embeddings look like. This would serve the dual purpose of having less stuff to deal with and having some way to directly compare your networks in the same space. For example, say you have nine alien networks and nine human networks. Since alien brain networks aren’t currently very accessible, we’ll just simulate our human and alien networks with Stochastic Block Models. We’ll say that the communities we’re trying to find are the two hemispheres of the brain. We’ll design the human brains to have strong connections within hemispheres, and we’ll design the alien brains to have strong connections between hemispheres.</p>
+<p>Say you’re a brain researcher, and you have a bunch of scans of brains - some are scans of normal people, and some are scans of aliens. You have some code that estimates networks from your scans, so you turn all your scans into networks. The nodes represent the brain regions which are common to both humans and aliens (isn’t evolution amazing?), and the edges represent communication between these brain regions. You want to know if the human and alien networks share a common grouping of regions (your research topic is titled, “Do Alien Brains Have The Same Hemispheres That We Do?”). What do you do? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but whose edges might come from totally different distributions?</p>
+<p>Well, if your goal is to find the shared grouping of regions between the human and alien networks, you could try embedding your networks and then seeing what those embeddings look like. This would serve the dual purpose of having less stuff to deal with and having some way to directly compare all of your networks in the same space. For example, say you have nine alien networks and nine human networks. Since alien brain networks aren’t currently very accessible, we’ll just simulate our human and alien networks with Stochastic Block Models. The communities that we’re trying to group all of the brain regions into are the two hemispheres of the brain. We’ll design the human brains to have strong connections within hemispheres, and we’ll design the alien brains to have strong connections between hemispheres – but the same regions still correspond to the same hemispheres.</p>
 <p>we’ll use a relatively small number of nodes and fairly small block probabilities. You can see the specific parameters in the code below.</p>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
@@ -727,6 +734,16 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">ImageGrid</span>
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">binary_heatmap</span><span class="p">,</span> <span class="n">adjplot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;savefig.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+
+<span class="k">def</span> <span class="nf">small_binary_heatmap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">spine</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
 
@@ -734,13 +751,8 @@
 <span class="n">grid2</span> <span class="o">=</span> <span class="n">ImageGrid</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="mi">122</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">axes_pad</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">share_all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">axi</span><span class="p">,</span> <span class="n">axj</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">grid1</span><span class="p">,</span> <span class="n">grid2</span><span class="p">)):</span>
-    <span class="n">hmn</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">humans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axi</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">hma</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">aliens</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axj</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="p">[</span><span class="n">hmn</span><span class="p">,</span> <span class="n">hma</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">spine</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>    
-        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">hmn</span> <span class="o">=</span> <span class="n">small_binary_heatmap</span><span class="p">(</span><span class="n">humans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axi</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">hma</span> <span class="o">=</span> <span class="n">small_binary_heatmap</span><span class="p">(</span><span class="n">aliens</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axj</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">grid1</span><span class="o">.</span><span class="n">axes_all</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Human Brain Networks&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
 <span class="n">grid2</span><span class="o">.</span><span class="n">axes_all</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Alien Brain Networks&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
@@ -756,7 +768,7 @@
 <div class="section" id="grouping-the-networks-separately">
 <h3>Grouping the Networks Separately<a class="headerlink" href="#grouping-the-networks-separately" title="Permalink to this headline">¶</a></h3>
 <p>Remember, our goal is to find community structure common to both humans and aliens, and in our case that community structure is the brain hemispheres. We’re going to try to to embed our brain networks into some lower-dimensional space - that way, we can use standard clustering methods from machine learning to figure out which regions are grouped. Try to think about how you might find a lower-dimensional embedding where the location of each node’s latent positions uses information from all of the networks.</p>
-<p>The first idea you might come up with is to average your networks together, and then embed the result of that averaging with Spectral Embedding. It turns out that this is actually the right thing to do in the very special case where the edges of all the networks you have come from the same distribution. In our case, averaging only the human networks together, and averaging only the alien networks together, will produce two separate embeddings with nicely clustered nodes.</p>
+<p>The first idea you might come up with is to average your networks together, and then embed the result of that averaging with Spectral Embedding. It turns out that this is actually the right idea in the very special case where the edges of all the networks you have come from the same distribution. In our case, averaging only the human networks together, and averaging only the alien networks together, will produce two separate embeddings with nicely clustered nodes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -865,8 +877,46 @@
 </div>
 </div>
 <p>Nope, bummer. Our community separation into discrete hemispheres is gone - the human networks and the alien networks cancelled each other out. As far as anybody can tell, our latent positions have just become meaningless noise, so we can’t cluster and find communities like we did before.</p>
-<p>What we’ve discovered is that, even though it’s a great idea to simply average a bunch of networks if they were drawn from the same distribution, it’s often a horrible idea to average your networks if they might come from different distributions. This is a case of averaging networks which are “heterogeneous”: Not only are your networks slightly different, but they’re <em>expected</em> to be different because they’re drawn from different distributions. Sampling a lot of heterogenous networks and then averaging them, as you can see above, can result in losing the community signal you might have had.</p>
-<p>We’d like to find a way to compare these heterogeneous networks directly, so that we can embed all of our networks into the same space and still keep that community structure. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
+<div class="section" id="why-did-our-embedding-fail">
+<h4>Why Did Our Embedding Fail?<a class="headerlink" href="#why-did-our-embedding-fail" title="Permalink to this headline">¶</a></h4>
+<p>Why did this happen? Well, let’s go back and compare one human brain network with one alien brain network.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">hmn</span> <span class="o">=</span> <span class="n">small_binary_heatmap</span><span class="p">(</span><span class="n">humans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;One Human Brain Network&quot;</span><span class="p">)</span>
+<span class="n">hma</span> <span class="o">=</span> <span class="n">small_binary_heatmap</span><span class="p">(</span><span class="n">aliens</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;One Alien Brain Network&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multigraph-representation-learning_23_0.png" src="../../_images/multigraph-representation-learning_23_0.png" />
+</div>
+</div>
+<p>The human network has more edges in the upper-left and lower-left quadrants of the heatmap. This implies that two regions in the same hemisphere are more likely to be connected for humans than two regions in opposite hemispheres.</p>
+<p>The alien network tells a different story. For aliens, two regions in opposite hemispheres are more likely to be connected than two regions in the same hemisphere.</p>
+<p>But what happens when you average these two adjacency matrices together?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">combined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">humans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">aliens</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">averaged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">small_binary_heatmap</span><span class="p">(</span><span class="n">averaged</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Averaged Brain Network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multigraph-representation-learning_26_0.png" src="../../_images/multigraph-representation-learning_26_0.png" />
+</div>
+</div>
+<p>By averaging, we’ve lost all of the community structure used to exist. That’s why our big averaged embedding failed.</p>
+<p>What we’ve discovered is that, even though it’s a great idea to simply average  all of your networks together if they were drawn from the same distribution, it’s often a horrible idea to average all of your networks if they might come from different distributions. This is a case of averaging networks which are “heterogeneous”: Not only are your networks slightly different, but they’re <em>expected</em> to be different because, again, they’re drawn from different distributions. Sampling a lot of heterogenous networks and then averaging them, as you can see from our exploration above, can result in losing the community signal you might have had.</p>
+<p>We’d like to find a way to compare these heterogeneous networks directly, so that we can embed all of our networks into the same space and still keep that nice community structure. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multigraph representation learning (here, “graph” just means “network”).</p>
+</div>
 </div>
 </div>
 <div class="section" id="different-types-of-multigraph-representation-learning">
@@ -874,7 +924,7 @@
 <p>Let’s take a moment to explore some of the possible general approaches we could take in multigraph representation learning. At some point we need to combine the many individual representations of our networks into one, and there are at least three possible places where we could do this: combining the networks, combining the classifiers, and combining the embeddings. Each of these eventually results in a latent position representation for our networks. You can do whatever you want with these latent position representations; in our case, we’ll illustrate that we can use them to classify our nodes.</p>
 <div class="section" id="combining-the-networks">
 <h3>Combining the networks<a class="headerlink" href="#combining-the-networks" title="Permalink to this headline">¶</a></h3>
-<p>With this approach, you’ll start with a set of networks, and then you’ll combine them all into a single network prior to do anything else. You can then embed and classify this network directly. What we did before, averaging the human and alien networks, was an example of combining our networks – we just averaged all of our adjacency matrices, and then we embedded the result. Another technique that we’ll learn about soon, Omnibus Embedding, is a more complex network combination algorithm.</p>
+<p>With this approach, you’ll start with a set of networks, and then you’ll combine them all into a single network prior to doing anything else. You can then embed and classify this network directly. What we did before, averaging the human and alien networks, was an example of combining our networks – we just averaged all of our adjacency matrices, and then we embedded the result. Another technique that we’ll learn about soon, Omnibus Embedding, is a more complex network combination algorithm.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -943,78 +993,15 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1800x1200 with 0 Axes&gt;
 </pre></div>
 </div>
-<img alt="../../_images/multigraph-representation-learning_25_1.png" src="../../_images/multigraph-representation-learning_25_1.png" />
+<img alt="../../_images/multigraph-representation-learning_32_1.png" src="../../_images/multigraph-representation-learning_32_1.png" />
 </div>
 </div>
 </div>
-<div class="section" id="combining-the-classifiers">
-<h3>Combining the classifiers<a class="headerlink" href="#combining-the-classifiers" title="Permalink to this headline">¶</a></h3>
-<p>you can also start with a set of networks, and then train a classifier for each network. This classifier could be anything: maybe you train a separate Gaussian Mixture Model, or a k-means clustering model. You then have a set of classifiers, each one corresponding to one of the networks. You then figure out some reasonable way to combine these all into a single classifier. You use this single classifier to group your nodes.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
-<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
-<span class="kn">from</span> <span class="nn">graspologic.embed.omni</span> <span class="kn">import</span> <span class="n">_get_omni_matrix</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<span class="c1"># add stack of heatmaps</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="o">.</span><span class="mi">02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">-.</span><span class="mi">02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span> 
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">humans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjacency Matrices&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-    <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">)</span>
-
-
-<span class="c1"># add arrow</span>
-<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
-
-<span class="c1"># add stack of heatmaps</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
-    <span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="p">[</span><span class="o">.</span><span class="mi">02</span><span class="o">*</span><span class="n">i</span> <span class="o">+</span> <span class="mf">1.15</span><span class="p">,</span> <span class="o">-.</span><span class="mi">02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">.</span><span class="mi">55</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">]</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">])</span> 
-    <span class="n">right</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="n">width</span>
-    <span class="n">top</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">+</span> <span class="n">height</span>
-    <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;Classifiers&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> 
-        <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">26</span><span class="p">})</span>
-
-<span class="c1"># add second arrow</span>
-<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.85</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
-
-<span class="c1"># classify</span>
-<span class="n">latents</span> <span class="o">=</span> <span class="n">MASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">humans</span><span class="o">+</span><span class="n">aliens</span><span class="p">)</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="n">GMM</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.2</span><span class="p">,</span> <span class="o">-.</span><span class="mi">02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">55</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification </span><span class="se">\n</span><span class="s2">(with combined classifier)&quot;</span><span class="p">,</span> 
-             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Combining the classifiers&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_28_0.png" src="../../_images/multigraph-representation-learning_28_0.png" />
-</div>
-</div>
+<div class="section" id="omni-one">
+<h3>Omni one<a class="headerlink" href="#omni-one" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="combining-the-embeddings">
 <h3>Combining the embeddings<a class="headerlink" href="#combining-the-embeddings" title="Permalink to this headline">¶</a></h3>
@@ -1076,10 +1063,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_31_0.png" src="../../_images/multigraph-representation-learning_31_0.png" />
+<img alt="../../_images/multigraph-representation-learning_36_0.png" src="../../_images/multigraph-representation-learning_36_0.png" />
 </div>
 </div>
-<p>For the rest of this section, we’ll explore the strengths and weaknesses of different particular algorithms that use these approaches. Multiple Adjacency Spectral Embedding (MASE) is a technique combines embeddings by concatennating and re-embedding the separate latent positions into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
+<p>For the rest of this section, we’ll explore the strengths and weaknesses of different particular algorithms that use these approaches. Multiple Adjacency Spectral Embedding (MASE) is a technique which combines embeddings by concatennating and re-embedding the separate latent positions into a single space. MASE is nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and for them to belong to the same communities. Omnibus embedding combines the adjacency matrix of all of the matrices into a single super-matrix, and then embeds that super-matrix.</p>
 </div>
 </div>
 <div class="section" id="multiple-adjacency-spectral-embedding">
@@ -1104,7 +1091,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_36_0.png" src="../../_images/multigraph-representation-learning_36_0.png" />
+<img alt="../../_images/multigraph-representation-learning_41_0.png" src="../../_images/multigraph-representation-learning_41_0.png" />
 </div>
 </div>
 <p>Unlike the disastrous results from simply averaging all of our networks together, MASE manages to keep the community structure that we found when we averaged our networks separately. Let’s see what’s under the hood.</p>
@@ -1162,7 +1149,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_44_0.png" src="../../_images/multigraph-representation-learning_44_0.png" />
+<img alt="../../_images/multigraph-representation-learning_49_0.png" src="../../_images/multigraph-representation-learning_49_0.png" />
 </div>
 </div>
 </div>
@@ -1196,7 +1183,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_48_0.png" src="../../_images/multigraph-representation-learning_48_0.png" />
+<img alt="../../_images/multigraph-representation-learning_53_0.png" src="../../_images/multigraph-representation-learning_53_0.png" />
 </div>
 </div>
 <p>Now, we want to take these individual embeddings, concatenate them into a single matrix, and then embed the result.</p>
@@ -1220,7 +1207,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_51_0.png" src="../../_images/multigraph-representation-learning_51_0.png" />
+<img alt="../../_images/multigraph-representation-learning_56_0.png" src="../../_images/multigraph-representation-learning_56_0.png" />
 </div>
 </div>
 </div>
@@ -1240,12 +1227,13 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_54_0.png" src="../../_images/multigraph-representation-learning_54_0.png" />
+<img alt="../../_images/multigraph-representation-learning_59_0.png" src="../../_images/multigraph-representation-learning_59_0.png" />
 </div>
 </div>
 </div>
 <div class="section" id="the-mathematics-of-mase">
 <h3>*The Mathematics of MASE<a class="headerlink" href="#the-mathematics-of-mase" title="Permalink to this headline">¶</a></h3>
+<p><em>section on how to get V</em></p>
 <p>With MASE, each network has a corresponding score matrix. Just like the set of joint latent positions describes how the networks are similar, the score matrices describe how each network is different.</p>
 <p>Suppose we have a set of networks with adjacency matrices <span class="math notranslate nohighlight">\(A^{(1)}, ..., A^{(m)}\)</span>, with each network being unweighted. Suppose our joint latent positions are called <span class="math notranslate nohighlight">\(V\)</span>. Then each adjacency matrix, <span class="math notranslate nohighlight">\(A^{(i)}\)</span>, can be decomposed into <span class="math notranslate nohighlight">\(VR^{(i)} V^\top\)</span>, where <span class="math notranslate nohighlight">\(R^{(i)}\)</span> is the score matrix corresponding to the <span class="math notranslate nohighlight">\(i_{th}\)</span> network:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -1269,7 +1257,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-0.0
 </pre></div>
 </div>
 </div>
@@ -1282,8 +1270,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1., 0.],
-       [0., 1.]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1., -0.],
+       [-0.,  1.]])
 </pre></div>
 </div>
 </div>
@@ -1328,8 +1316,8 @@
 </div>
 </div>
 <p>Below and to the left, you can see the original adjacency matrix for the first matrix. In the center, you can see the heatmap for the first network’s score matrix. Next to it, you can see the recreation of the first network. Remember that we only used the score matrix to recreate it. The first network has a block probability matrix of</p>
-<div class="amsmath math notranslate nohighlight" id="equation-7f724868-2b43-428d-9115-a7fd9099c741">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-7f724868-2b43-428d-9115-a7fd9099c741" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-794d988a-c901-4ab9-b075-ea37d0ecea73">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-794d988a-c901-4ab9-b075-ea37d0ecea73" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 .12 &amp; .03 \\
 .03 &amp; .06 \\
@@ -1349,7 +1337,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_66_0.png" src="../../_images/multigraph-representation-learning_66_0.png" />
+<img alt="../../_images/multigraph-representation-learning_72_0.png" src="../../_images/multigraph-representation-learning_72_0.png" />
 </div>
 </div>
 </div>
