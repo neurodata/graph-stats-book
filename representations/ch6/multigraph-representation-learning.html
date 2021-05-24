@@ -626,13 +626,13 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#combining-the-networks">
-     Combining the networks
+    <a class="reference internal nav-link" href="#combining-the-networks-together">
+     Combining the Networks Together
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#omni-one">
-     Omni one
+    <a class="reference internal nav-link" href="#combining-the-networks-separately">
+     Combining The Networks Separately
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
@@ -1031,11 +1031,9 @@
 </div>
 <div class="section" id="different-types-of-multiple-network-representation-learning">
 <h2>Different Types of Multiple-Network Representation Learning<a class="headerlink" href="#different-types-of-multiple-network-representation-learning" title="Permalink to this headline">¶</a></h2>
-<p>TODO: add omni</p>
-<p>Let’s take a moment to explore some of the possible general approaches we could take in multiple-network representation learning. At some point we need to combine the many individual representations of our networks into one, and there are at least three possible places where we could do this: combining the networks, <strong>omni one</strong>, and combining the embeddings. Each of these eventually results in a latent position representation for our networks. It’s important to note that in all of these approaches, we’re simply learning representations for our groups of networks. You can do whatever you want with these representations; in our case, we’ll illustrate that we can use them to classify our nodes.</p>
-<div class="section" id="combining-the-networks">
-<h3>Combining the networks<a class="headerlink" href="#combining-the-networks" title="Permalink to this headline">¶</a></h3>
-<p>TODO: add more info</p>
+<p>Let’s take a moment to explore some of the possible general approaches we could take in multiple-network representation learning. At some point we need to combine the many individual representations of our networks into one, and there are at least three possible places where we could do this: combining the networks together, combining the networks separately, and combining the embeddings. Each of these eventually results in a latent position representation for our networks. It’s important to note that in all of these approaches, we’re simply learning representations for our groups of networks. You can do whatever you want with these representations; in our case, we’ll illustrate that we can use them to classify our nodes.</p>
+<div class="section" id="combining-the-networks-together">
+<h3>Combining the Networks Together<a class="headerlink" href="#combining-the-networks-together" title="Permalink to this headline">¶</a></h3>
 <p>With this approach, you’ll start with a set of networks, and then you’ll combine them all into a single network prior to doing anything else. You can then embed and classify this network directly. What we did before, averaging the human and alien networks, was an example of combining our networks – we just averaged all of our adjacency matrices, and then we embedded the result.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1044,7 +1042,7 @@
 <span class="kn">from</span> <span class="nn">graspologic.embed.omni</span> <span class="kn">import</span> <span class="n">_get_omni_matrix</span>
 <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">();</span>
 
 <span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1065,6 +1063,81 @@
     <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
 
+
+<span class="c1"># add arrow</span>
+<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
+
+<span class="c1"># add joint matrix</span>
+<span class="n">omni_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">human_mean_network</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">a_hm</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">omni_ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">a_hm</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Joint Matrix&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">a_hm</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">spine</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    
+<span class="c1"># add second arrow</span>
+<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.75</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
+
+<span class="c1"># add averaged embedding</span>
+<span class="n">omni_embed_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">human_latents</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">omni_embed_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Joint Embedding&quot;</span><span class="p">,</span> 
+             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">omni_embed_ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># add third arrow</span>
+<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.7</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
+
+<span class="c1"># classify</span>
+<span class="n">mase_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">3.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">human_latents</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">mase_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> 
+             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span> <span class="n">labels</span><span class="o">=</span><span class="n">human_labels</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+
+<span class="c1"># plt.suptitle(&quot;Combining the Networks&quot;, x=2, y=1.1, fontsize=26);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
+</pre></div>
+</div>
+<img alt="../../_images/multigraph-representation-learning_34_1.png" src="../../_images/multigraph-representation-learning_34_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="combining-the-networks-separately">
+<h3>Combining The Networks Separately<a class="headerlink" href="#combining-the-networks-separately" title="Permalink to this headline">¶</a></h3>
+<p>The above approach is nice for collapsing our information into a single embedding – with each point in our final embedding representing a single node of our network. However, there are situations in which we might want to keep our embeddings separate, but make sure that they’re in the same latent space – meaning, the embeddings aren’t rotations of each other. That way, we can directly compare the embeddings of our separate embeddings.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed.omni</span> <span class="kn">import</span> <span class="n">_get_omni_matrix</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">();</span>
+
+<span class="c1"># add stack of heatmaps</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span> 
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">humans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjacency Matrices&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
 
 <span class="c1"># add arrow</span>
 <span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
@@ -1085,111 +1158,19 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
 
 <span class="c1"># add omni embedding</span>
-<span class="n">latents_omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">humans</span><span class="o">+</span><span class="n">aliens</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">omni_embed_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_omni</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">omni_embed_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Joint Embedding&quot;</span><span class="p">,</span> 
-             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">omni_embed_ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># add third arrow</span>
-<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.7</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
-
-<span class="c1"># classify</span>
-<span class="n">labels_normal</span> <span class="o">=</span> <span class="n">GMM</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">human_latents</span><span class="p">)</span>
-<span class="n">mase_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">3.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_omni</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">mase_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> 
-             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span> <span class="n">labels</span><span class="o">=</span><span class="n">human_labels</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Averaging the Networks&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
-</pre></div>
-</div>
-<img alt="../../_images/multigraph-representation-learning_36_1.png" src="../../_images/multigraph-representation-learning_36_1.png" />
-</div>
-</div>
-</div>
-<div class="section" id="omni-one">
-<h3>Omni one<a class="headerlink" href="#omni-one" title="Permalink to this headline">¶</a></h3>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
-<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
-<span class="kn">from</span> <span class="nn">graspologic.embed.omni</span> <span class="kn">import</span> <span class="n">_get_omni_matrix</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">();</span>
-
-<span class="c1"># add stack of heatmaps</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span> 
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">humans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">latents_omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">humans</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">aliens</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">embedding</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">latents_omni</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.1</span><span class="o">+</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjacency Matrices&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Separate Combination&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">embedding</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> 
+                       <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
     <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
-
-
-<span class="c1"># add arrow</span>
-<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
-
-<span class="c1"># add joint matrix</span>
-<span class="n">omni_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">_get_omni_matrix</span><span class="p">(</span><span class="n">humans</span><span class="o">+</span><span class="n">aliens</span><span class="p">)</span>
-<span class="n">a_hm</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">omni_ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">a_hm</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Joint Matrix&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">spine</span> <span class="ow">in</span> <span class="n">a_hm</span><span class="o">.</span><span class="n">spines</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-    <span class="n">spine</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    
-<span class="c1"># add second arrow</span>
-<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.75</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
-
-<span class="c1"># add omni embedding</span>
-<span class="n">latents_omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">humans</span><span class="o">+</span><span class="n">aliens</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">omni_embed_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_omni</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">omni_embed_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Joint Embedding&quot;</span><span class="p">,</span> 
-             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">omni_embed_ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># add third arrow</span>
-<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.7</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
-<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
-
-<span class="c1"># classify</span>
-<span class="n">labels_normal</span> <span class="o">=</span> <span class="n">GMM</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">human_latents</span><span class="p">)</span>
-<span class="n">mase_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">3.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mf">.55</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_omni</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">mase_ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Classification&quot;</span><span class="p">,</span> 
-             <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span> <span class="n">labels</span><span class="o">=</span><span class="n">human_labels</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Combining the Networks&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 432x288 with 0 Axes&gt;
-</pre></div>
-</div>
-<img alt="../../_images/multigraph-representation-learning_38_1.png" src="../../_images/multigraph-representation-learning_38_1.png" />
+<img alt="../../_images/multigraph-representation-learning_37_0.png" src="../../_images/multigraph-representation-learning_37_0.png" />
 </div>
 </div>
 </div>
@@ -1253,7 +1234,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_41_0.png" src="../../_images/multigraph-representation-learning_41_0.png" />
+<img alt="../../_images/multigraph-representation-learning_40_0.png" src="../../_images/multigraph-representation-learning_40_0.png" />
 </div>
 </div>
 <p>For the rest of this section, we’ll explore the strengths and weaknesses of different particular techniques which use these approaches. The first we’ll look at is combines the embeddings, like above. It’s called Multiple Adjacency Spectral Embedding, or MASE for short.</p>
@@ -1284,7 +1265,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_46_0.png" src="../../_images/multigraph-representation-learning_46_0.png" />
+<img alt="../../_images/multigraph-representation-learning_45_0.png" src="../../_images/multigraph-representation-learning_45_0.png" />
 </div>
 </div>
 <p>Unlike the disastrous results from simply averaging all of our networks together, MASE manages to keep the community structure that we found when we averaged our networks separately. Let’s see what’s under the hood.</p>
@@ -1338,7 +1319,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_54_0.png" src="../../_images/multigraph-representation-learning_54_0.png" />
+<img alt="../../_images/multigraph-representation-learning_53_0.png" src="../../_images/multigraph-representation-learning_53_0.png" />
 </div>
 </div>
 </div>
@@ -1380,7 +1361,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_58_0.png" src="../../_images/multigraph-representation-learning_58_0.png" />
+<img alt="../../_images/multigraph-representation-learning_57_0.png" src="../../_images/multigraph-representation-learning_57_0.png" />
 </div>
 </div>
 <p>It’s important to keep in mind that these embeddings don’t live in the same <em>latent space</em>. What this means is that averaging these networks together would result in essentially meaningless noise. This is because of the rotational invariance of latent positions: you can only recover the latent positions of any network up to a rotation.</p>
@@ -1414,7 +1395,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_62_0.png" src="../../_images/multigraph-representation-learning_62_0.png" />
+<img alt="../../_images/multigraph-representation-learning_61_0.png" src="../../_images/multigraph-representation-learning_61_0.png" />
 </div>
 </div>
 <p>Because the rows of these matrices are all aligned - meaning, row 0 corresponds to node 0 for all four matrices - we can actually think of each node as having (in this case) eight latent position dimensions: two for each of our four networks. Eight is a somewhat arbitrary number here: each network contributes two dimensions simply because we originally chose to embed all of our networks down to two dimensions with ASE, and the number of networks is of course even more arbitrary. You’ll usually have more than four.</p>
@@ -1438,7 +1419,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_65_0.png" src="../../_images/multigraph-representation-learning_65_0.png" />
+<img alt="../../_images/multigraph-representation-learning_64_0.png" src="../../_images/multigraph-representation-learning_64_0.png" />
 </div>
 </div>
 </div>
@@ -1487,7 +1468,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_69_0.png" src="../../_images/multigraph-representation-learning_69_0.png" />
+<img alt="../../_images/multigraph-representation-learning_68_0.png" src="../../_images/multigraph-representation-learning_68_0.png" />
 </div>
 </div>
 <p>Looks like this idea worked well - Our nodes are clearly grouped into two distinct communities, and all of our networks were drawn from the same distribution! To reiterate, what we did was:</p>
@@ -1519,7 +1500,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_74_0.png" src="../../_images/multigraph-representation-learning_74_0.png" />
+<img alt="../../_images/multigraph-representation-learning_73_0.png" src="../../_images/multigraph-representation-learning_73_0.png" />
 </div>
 </div>
 </div>
@@ -1553,7 +1534,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-0.0
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
 </pre></div>
 </div>
 </div>
@@ -1603,8 +1584,8 @@
 </div>
 </div>
 <p>Below and to the left, you can see the original adjacency matrix for the first matrix. In the center, you can see the heatmap for the first network’s score matrix. Next to it, you can see the recreation of the first network. Remember that we only used the score matrix to recreate it. The first network has a block probability matrix of</p>
-<div class="amsmath math notranslate nohighlight" id="equation-158c5a33-e4ef-4c64-a420-16563bbaf94f">
-<span class="eqno">(3.1)<a class="headerlink" href="#equation-158c5a33-e4ef-4c64-a420-16563bbaf94f" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-faffd483-025c-444d-a813-735cf9b8a1af">
+<span class="eqno">(3.1)<a class="headerlink" href="#equation-faffd483-025c-444d-a813-735cf9b8a1af" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 .12 &amp; .03 \\
 .03 &amp; .06 \\
@@ -1625,15 +1606,19 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_87_0.png" src="../../_images/multigraph-representation-learning_87_0.png" />
+<img alt="../../_images/multigraph-representation-learning_86_0.png" src="../../_images/multigraph-representation-learning_86_0.png" />
 </div>
 </div>
-<p>So we’ve learned that MASE is useful when you want a joint embedding that combines all of your networks together, and when you want to estimate edge probabilities for one of your networks. What if we wanted to keep our separate embeddings, but put them all in the same space? That’s what the Omnibus Embedding gives you, and what we’ll explore now.</p>
+<p>So we’ve learned that MASE is useful when you want a joint embedding that combines all of your networks together, and when you want to estimate edge probabilities for one of your networks. What if we wanted to keep our separate embeddings, but put them all in the same space? That’s what the Omnibus Embedding gives, and what we’ll explore now.</p>
 </div>
 </div>
 </div>
 <div class="section" id="omnibus-embedding">
 <h2>Omnibus Embedding<a class="headerlink" href="#omnibus-embedding" title="Permalink to this headline">¶</a></h2>
+<p>The Omnibus Embedding combines networks separately to put them all into the same latent space. What this means is that the embeddings for each network after the omnibus embedding are <em>directly comparable</em>: none of the embeddings are rotations of each other, and distances between nodes across embeddings actually means something. You can use the omnibus embedding to answer a variety of questions about the interacting properties of a collection of networks. For example, you could figure out which nodes or subgraphs are responsible for similarities or differences across your networks, or you could determine whether subcommunities in your networks are statistically similar or different. You could try to figure out which underlying parameters of your network are the same, and which are different.</p>
+<p>In the next section, we’ll explore how the Omnibus Embedding works. Sections in future chapters will explore some the things you can do with your separate embeddings to learn about your networks.</p>
+<p><em>talk about asymptotic normality of latent positions</em></p>
+<p><em>talk about manova</em></p>
 <div class="section" id="omni-on-our-human-and-alien-networks">
 <h3>OMNI on our human and alien networks<a class="headerlink" href="#omni-on-our-human-and-alien-networks" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
@@ -1654,7 +1639,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_93_0.png" src="../../_images/multigraph-representation-learning_93_0.png" />
+<img alt="../../_images/multigraph-representation-learning_95_0.png" src="../../_images/multigraph-representation-learning_95_0.png" />
 </div>
 </div>
 </div>
@@ -1701,12 +1686,21 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_97_0.png" src="../../_images/multigraph-representation-learning_97_0.png" />
+<img alt="../../_images/multigraph-representation-learning_99_0.png" src="../../_images/multigraph-representation-learning_99_0.png" />
 </div>
 </div>
 </div>
 <div class="section" id="how-does-omni-work">
 <h3>How Does OMNI work?<a class="headerlink" href="#how-does-omni-work" title="Permalink to this headline">¶</a></h3>
+<p>Say we only have two networks. Let’s name their adjacency matrices <span class="math notranslate nohighlight">\(A^{(1)}\)</span> and <span class="math notranslate nohighlight">\(A^{(2)}\)</span>. Then, the omnibus embedding looks like this:</p>
+<div class="amsmath math notranslate nohighlight" id="equation-893a0ed3-6c16-40b0-8e09-2ed018681a30">
+<span class="eqno">(3.2)<a class="headerlink" href="#equation-893a0ed3-6c16-40b0-8e09-2ed018681a30" title="Permalink to this equation">¶</a></span>\[\begin{align}
+\begin{bmatrix}
+A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
+\frac{A^{(2)} + A^{(1)}}{2} &amp; A^{(2)} \\
+\end{bmatrix}
+\end{align}\]</div>
+<p>In general, when we have <span class="math notranslate nohighlight">\(m\)</span> networks, the <span class="math notranslate nohighlight">\(i_{th}\)</span> diagonal entry is <span class="math notranslate nohighlight">\(A^{(i)}\)</span> and the <span class="math notranslate nohighlight">\((i, j)_{th}\)</span> entry is <span class="math notranslate nohighlight">\(\frac{A^{(i)} + A^{(j)}}{2}\)</span>. What this means is that you just stick each of your adjacency matrices on the diagonal of a large matrix, and you fill in the off-diagonals with the averages of each pair of two adjacency matrices.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">=</span> <span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">networks</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1773,7 +1767,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_100_0.png" src="../../_images/multigraph-representation-learning_100_0.png" />
+<img alt="../../_images/multigraph-representation-learning_103_0.png" src="../../_images/multigraph-representation-learning_103_0.png" />
 </div>
 </div>
 <div class="section" id="creating-the-omnibus-matrix-for-all-four-networks">
@@ -1809,7 +1803,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_103_0.png" src="../../_images/multigraph-representation-learning_103_0.png" />
+<img alt="../../_images/multigraph-representation-learning_106_0.png" src="../../_images/multigraph-representation-learning_106_0.png" />
 </div>
 </div>
 </div>
@@ -1883,7 +1877,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_108_0.png" src="../../_images/multigraph-representation-learning_108_0.png" />
+<img alt="../../_images/multigraph-representation-learning_111_0.png" src="../../_images/multigraph-representation-learning_111_0.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -1919,7 +1913,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_110_0.png" src="../../_images/multigraph-representation-learning_110_0.png" />
+<img alt="../../_images/multigraph-representation-learning_113_0.png" src="../../_images/multigraph-representation-learning_113_0.png" />
 </div>
 </div>
 </div>
