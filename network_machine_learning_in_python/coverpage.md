@@ -1,6 +1,6 @@
 # Hands-on Network Machine Learning with Scikit-Learn and Graspologic
 
-```{figure} Images/umap_pedigo_small.jpg
+```{figure} images/umap_pedigo_small.jpg
 ---
 height: 700px
 name: worm-connectome
