@@ -37,3 +37,9 @@ We welcome and recognize all contributions. You can see a list of current contri
 ## Credits
 
 This project is created using the excellent open source [Jupyter Book project](https://jupyterbook.org/) and the [executablebooks/cookiecutter-jupyter-book template](https://github.com/executablebooks/cookiecutter-jupyter-book).
+
+## Color Schemes
+
+- Sequential color scales: low `#fcfbfd`, high `#3f007d`, discrete [RColor Brewer Purples](https://colorbrewer2.org/#type=sequential&scheme=Purples&n=8)
+- Divergent: low `#b2182b` middle `#f7f7f7` high `#2166ac`, discrete [RColor Brewer RdBu](https://colorbrewer2.org/#type=diverging&scheme=RdBu&n=9)
+- Qualitative: [RColorBrewer Paired](https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=12)
