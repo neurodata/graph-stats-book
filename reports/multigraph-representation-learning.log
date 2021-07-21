@@ -18,24 +18,49 @@ Traceback (most recent call last):
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
 import matplotlib.pyplot as plt
-from graspologic.simulations import er_np
-from graphbook_code import binary_heatmap
+import matplotlib as mpl
+from mpl_toolkits.axes_grid1 import ImageGrid
+from graspologic.plot import adjplot, heatmap
+from graphbook_code import binary_heatmap, lined_heatmap, add_legend
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
 %config InlineBackend.figure_format = 'retina'
 
-fig, ax = plt.subplots(figsize=(4,4))
-n = 10
-p = .5
-A = er_np(n, p)
-binary_heatmap(A, ax=ax, yticklabels=5, linewidths=1, linecolor="black", title="A small, simple network");
+fig = plt.figure(figsize=(14,7))
+
+grid1 = ImageGrid(fig, 121, (2, 2), axes_pad=.1, share_all=True)
+grid2 = ImageGrid(fig, 122, (2, 2), axes_pad=.1, share_all=True)
+
+for i, (axi, axj) in enumerate(zip(grid1, grid2)):
+    hmn = lined_heatmap(humans[i], ax=axi, legend=False, outline=True)
+    hma = lined_heatmap(aliens[i], ax=axj, legend=False, outline=True)
+    
+
+grid1.axes_all[0].set_title("Human Brain Networks", fontsize=24, y=1.05, loc="left")
+grid2.axes_all[0].set_title("Alien Brain Networks", fontsize=24, y=1.05, loc="left")
+
+add_legend(grid2.axes_all[2])
+
+plt.tight_layout(w_pad=3)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mUnboundLocalError[0m                         Traceback (most recent call last)
-[0;32m/tmp/ipykernel_1672/1463537543.py[0m in [0;36m<module>[0;34m[0m
-[1;32m      8[0m [0mp[0m [0;34m=[0m [0;36m.5[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      9[0m [0mA[0m [0;34m=[0m [0mer_np[0m[0;34m([0m[0mn[0m[0;34m,[0m [0mp[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0;32m---> 10[0;31m [0mbinary_heatmap[0m[0;34m([0m[0mA[0m[0;34m,[0m [0max[0m[0;34m=[0m[0max[0m[0;34m,[0m [0myticklabels[0m[0;34m=[0m[0;36m5[0m[0;34m,[0m [0mlinewidths[0m[0;34m=[0m[0;36m1[0m[0;34m,[0m [0mlinecolor[0m[0;34m=[0m[0;34m"black"[0m[0;34m,[0m [0mtitle[0m[0;34m=[0m[0;34m"A small, simple network"[0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
-[0m
+[0;32m/tmp/ipykernel_1736/3062180740.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     15[0m [0;34m[0m[0m
+[1;32m     16[0m [0;32mfor[0m [0mi[0m[0;34m,[0m [0;34m([0m[0maxi[0m[0;34m,[0m [0maxj[0m[0;34m)[0m [0;32min[0m [0menumerate[0m[0;34m([0m[0mzip[0m[0;34m([0m[0mgrid1[0m[0;34m,[0m [0mgrid2[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 17[0;31m     [0mhmn[0m [0;34m=[0m [0mlined_heatmap[0m[0;34m([0m[0mhumans[0m[0;34m[[0m[0mi[0m[0;34m][0m[0;34m,[0m [0max[0m[0;34m=[0m[0maxi[0m[0;34m,[0m [0mlegend[0m[0;34m=[0m[0;32mFalse[0m[0;34m,[0m [0moutline[0m[0;34m=[0m[0;32mTrue[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     18[0m     [0mhma[0m [0;34m=[0m [0mlined_heatmap[0m[0;34m([0m[0maliens[0m[0;34m[[0m[0mi[0m[0;34m][0m[0;34m,[0m [0max[0m[0;34m=[0m[0maxj[0m[0;34m,[0m [0mlegend[0m[0;34m=[0m[0;32mFalse[0m[0;34m,[0m [0moutline[0m[0;34m=[0m[0;32mTrue[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     19[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/graphbook_code/plotting.py[0m in [0;36mlined_heatmap[0;34m(data, binary, lines_every_n, alpha, *args, **kwargs)[0m
+[1;32m     87[0m [0;32mdef[0m [0mlined_heatmap[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0mbinary[0m[0;34m=[0m[0;32mTrue[0m[0;34m,[0m [0mlines_every_n[0m[0;34m=[0m[0;32mNone[0m[0;34m,[0m [0malpha[0m[0;34m=[0m[0;36m0.8[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     88[0m     [0;32mif[0m [0mbinary[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 89[0;31m         [0max[0m [0;34m=[0m [0mbinary_heatmap[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     90[0m     [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     91[0m         [0max[0m [0;34m=[0m [0mheatmap[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
 [0;32m/opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/graphbook_code/plotting.py[0m in [0;36mbinary_heatmap[0;34m(X, colors, legend_labels, outline, legend, **kwargs)[0m
 [1;32m    148[0m     [0mkwargs[0m[0;34m[[0m[0;34m"cbar"[0m[0;34m][0m [0;34m=[0m [0;32mFalse[0m[0;34m[0m[0;34m[0m[0m
 [1;32m    149[0m     [0mcmap[0m [0;34m=[0m [0mmpl[0m[0;34m.[0m[0mcolors[0m[0;34m.[0m[0mListedColormap[0m[0;34m([0m[0mcolors[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
