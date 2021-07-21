@@ -42,7 +42,7 @@ This project is created using the excellent open source [Jupyter Book project](h
 
 - Sequential color scales: low `#fcfbfd`, high `#3f007d`, discrete [RColor Brewer Purples](https://colorbrewer2.org/#type=sequential&scheme=Purples&n=8)
 - Divergent: low `#b2182b` middle `#f7f7f7` high `#2166ac`, discrete [RColor Brewer RdBu](https://colorbrewer2.org/#type=diverging&scheme=RdBu&n=9)
-- Qualitative: [RColorBrewer Paired](https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=12)
+- Qualitative: [Matplotlib Tab10](https://matplotlib.org/stable/_images/sphx_glr_colormaps_006.png)
 
 ## Code
 Functions specific to this book - e.g., plotting functions we use regularly - has been stored in the subpackage below.
