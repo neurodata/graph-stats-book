@@ -641,15 +641,15 @@
 </ol>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}) \\
-    &amp;= \prod_{i, j} \mathbb P(\mathbf a_{ij} = a_{ij})
+    \mathbb P_\theta(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}) \\
+    &amp;= \prod_{i, j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij})
 \end{align*}\]</div>
 <p>In the special case where our networks are simple (undirected and loopless), this simplifies to:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(\mathbf A = A) &amp;= \prod_{i &lt; j} \mathbb P(\mathbf a_{ij} = a_{ij})
+    \mathbb P_\theta(\mathbf A = A) &amp;= \prod_{i &lt; j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij})
 \end{align*}\]</div>
-<p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>.  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops.</p>
+<p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>, and we only need to worry about one of the edges (we chose the edges in the upper right triangle of the adjacency matrix arbitrarily).  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops, so we don’t need to worry about the case where <span class="math notranslate nohighlight">\(i = j\)</span> either.</p>
 <div class="section" id="the-coin-flip-example">
 <h2><span class="section-number">6.2.1. </span>The Coin Flip Example<a class="headerlink" href="#the-coin-flip-example" title="Permalink to this headline">¶</a></h2>
 <p>Let’s think about what exactly this means using an example that you are likely familiar with. I have a single coin, and I want to know the probability of the outcome of a roll of that coin being a heads. For sake of argument, we will call this coin <em>fair</em>, which means that the true probability it lands on heads (or tails) is <span class="math notranslate nohighlight">\(0.5\)</span>. In this case, I would call the outcome of the <span class="math notranslate nohighlight">\(i^{th}\)</span> coin flip the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>, and it can produce realizations which take one of two possible values: a heads (an outcome of a <span class="math notranslate nohighlight">\(1\)</span>) or a tails (an outcome of a <span class="math notranslate nohighlight">\(0\)</span>). We will say that we see <span class="math notranslate nohighlight">\(10\)</span> total coin flips. We will number these realizations as <span class="math notranslate nohighlight">\(x_i\)</span>, where <span class="math notranslate nohighlight">\(i\)</span> goes from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10\)</span>. To recap, the boldfaced <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> denotes the random variable, and the unbolded <span class="math notranslate nohighlight">\(x_i\)</span> denotes the realization which we actually see. Our question of interest is: how do we estimate the probability of the coin landing on a heads, if we don’t know anything about the true probability value <span class="math notranslate nohighlight">\(p\)</span>, other than the outcomes of the coin flips we got to observe?</p>
@@ -658,24 +658,66 @@
 <p>For any one coin flip, the probability of observing the outcome <span class="math notranslate nohighlight">\(i\)</span> is, by definition of the Bernoulli distribution:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}
+    \mathbb P_\theta(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}
 \end{align*}\]</div>
+<p>Note that we use the notation <span class="math notranslate nohighlight">\(\mathbb P_\theta\)</span> to indicate that the probability is a function of the parameter set <span class="math notranslate nohighlight">\(\theta\)</span> for the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>. Here, since the only parameter for each <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a probability <span class="math notranslate nohighlight">\(p\)</span>, then <span class="math notranslate nohighlight">\(\theta = p\)</span>.</p>
 <p>If we saw <span class="math notranslate nohighlight">\(n\)</span> total outcomes, the probability is, using the definition of mutual independence:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}\mathbb P(\mathbf x_i = x_i) \\
+    \mathbb P_\theta(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}\mathbb P(\mathbf x_i = x_i) \\
     &amp;= \prod_{i = 1}^n p^{x_i}(1 - p)^{1 - x_i} \\
     &amp;= p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}
 \end{align*}\]</div>
 <p>What if we saw <span class="math notranslate nohighlight">\(10\)</span> coin flips, and <span class="math notranslate nohighlight">\(6\)</span> were heads? Can we take a “guess” at what <span class="math notranslate nohighlight">\(p\)</span> might be? Intuitively your first reaction might be to say a good guess of <span class="math notranslate nohighlight">\(p\)</span>, which we will abbreviate <span class="math notranslate nohighlight">\(\hat p\)</span>, would be <span class="math notranslate nohighlight">\(0.6\)</span>, which is <span class="math notranslate nohighlight">\(6\)</span> heads of <span class="math notranslate nohighlight">\(10\)</span> outcomes. In many ways, this intuitive guess is spot on. However, in network machine learning, we like to be really specific about why, exactly, this guess makes sense.</p>
-<p>Looking at the above equation, one thing we can do is use the technique of <strong>maximum likelihood estimation</strong>. We call the function <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)\)</span> the <em>likelihood</em> of our sequence, for a given value of <span class="math notranslate nohighlight">\(p\)</span>. Note that we have added the term “<span class="math notranslate nohighlight">\(; p\)</span>” to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we <em>really</em> want to do is find the value that <span class="math notranslate nohighlight">\(p\)</span> could take, which <em>maximizes</em> the likelihood.</p>
+<p>Looking at the above equation, one thing we can do is use the technique of <strong>maximum likelihood estimation</strong>. We call the function <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)\)</span> the <em>likelihood</em> of our sequence, for a given value of <span class="math notranslate nohighlight">\(p\)</span>. Note that we have added the term “<span class="math notranslate nohighlight">\(; p\)</span>” to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we <em>really</em> want to do is find the value that <span class="math notranslate nohighlight">\(p\)</span> could take, which <em>maximizes</em> the likelihood. Let’s see what the likelihood function looks like as a function of different values of <span class="math notranslate nohighlight">\(p\)</span>:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">.02</span><span class="p">,</span> <span class="mf">.98</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">49</span><span class="p">)</span>
+<span class="n">nflips</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">nheads</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">likelihood</span> <span class="o">=</span> <span class="n">p</span><span class="o">**</span><span class="p">(</span><span class="n">nheads</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">nflips</span> <span class="o">-</span> <span class="n">nheads</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">likelihood</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Bernoulli probability parameter, p&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Likelihood, $P_{</span><span class="se">\\</span><span class="s2">theta}(x_1, ..., x_</span><span class="si">{10}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_2_0.png" src="../../_images/estimating-parameters_2_0.png" />
+</div>
+</div>
+<p>As we can see, it turns out that our intuitive answer, that <span class="math notranslate nohighlight">\(p=0.6\)</span>, is in fact the Maximum Likelihood Estimate for the Bernoulli probability parameter <span class="math notranslate nohighlight">\(p\)</span>. Now how do we go about showing this rigorously?</p>
 <p>An easier problem, we often will find, is to instead maximize the <em>log likelihood</em> rather than the likelihood itself. This is because the log function is <em>monotone</em>, which means that if <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span>, then <span class="math notranslate nohighlight">\(\log\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span> as well for some choices <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span>. Without going too down in the weeds, the idea is that the <span class="math notranslate nohighlight">\(\log\)</span> function does not change any critical points of the likelihood. The log likelihood of the above expression is:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
 \log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \log \left[p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}\right] \\
 &amp;= \sum_{i = 1}^n x_i \log(p) + \left(n - \sum_{i = 1}^n x_i\right)\log(1 - p)
 \end{align*}\]</div>
-<p>To do this, we will use some basic calculus. Remembering from calculus <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, to find a maximal point of the likelihood function with respect to some variable <span class="math notranslate nohighlight">\(p\)</span>, our process looks like this:</p>
+<p>And visually, the log-likelihood now looks instead like this:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loglikelihood</span> <span class="o">=</span> <span class="n">nheads</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">nflips</span> <span class="o">-</span> <span class="n">nheads</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">loglikelihood</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Bernoulli probability parameter, p&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Log Likelihood, $</span><span class="se">\\</span><span class="s2">log P_{</span><span class="se">\\</span><span class="s2">theta}(x_1, ..., x_</span><span class="si">{10}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_5_0.png" src="../../_images/estimating-parameters_5_0.png" />
+</div>
+</div>
+<p>Although we can see that the two plots look <em>almost</em> nothing alike, the key is the word <em>almost</em> here. Notice that the absolute maximum is, in fact, the same regardless of whether we use the likelihood or the log-likelihood. Further, notice that at the maximum, the slope of the tangent line is <span class="math notranslate nohighlight">\(0\)</span>. You may recall from calculus that this is how we typically go about finding a critical point of a function. Now, let’s get make our argument a little more technical. Remembering from calculus <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, to find a maximal point of the log-likelihood function with respect to some variable <span class="math notranslate nohighlight">\(p\)</span>, our process looks like this:</p>
 <ol class="simple">
 <li><p>Take the derivative of the log-likelihood with respect to <span class="math notranslate nohighlight">\(p\)</span>,</p></li>
 <li><p>Set it equal to <span class="math notranslate nohighlight">\(0\)</span> and solve for the critical point <span class="math notranslate nohighlight">\(p^*\)</span>,</p></li>
@@ -816,7 +858,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_7_0.png" src="../../_images/estimating-parameters_7_0.png" />
+<img alt="../../_images/estimating-parameters_12_0.png" src="../../_images/estimating-parameters_12_0.png" />
 </div>
 </div>
 <p>Now what happens when we take the SVD of <span class="math notranslate nohighlight">\(A\)</span>? We will first show that the singular vectors <span class="math notranslate nohighlight">\(U\)</span> and the singular values of <span class="math notranslate nohighlight">\(\Sigma\)</span> when appropriately arranged do, in fact, comprise <span class="math notranslate nohighlight">\(A\)</span>:</p>
@@ -846,7 +888,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$U$&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/estimating-parameters_11_1.png" src="../../_images/estimating-parameters_11_1.png" />
+<img alt="../../_images/estimating-parameters_16_1.png" src="../../_images/estimating-parameters_16_1.png" />
 </div>
 </div>
 <p>In this book, we do not need to know how to solve for, nor prove the existence of, the SVD. We will take these two facts for granted. Discussing the below, we will delve briefly into the concept of <strong>matrix rank</strong>, which we will define now.</p>
@@ -879,7 +921,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$\\sigma_1 u_1 u_1^T$&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/estimating-parameters_14_1.png" src="../../_images/estimating-parameters_14_1.png" />
+<img alt="../../_images/estimating-parameters_19_1.png" src="../../_images/estimating-parameters_19_1.png" />
 </div>
 </div>
 <ol class="simple">
@@ -902,7 +944,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$A_2$&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/estimating-parameters_17_1.png" src="../../_images/estimating-parameters_17_1.png" />
+<img alt="../../_images/estimating-parameters_22_1.png" src="../../_images/estimating-parameters_22_1.png" />
 </div>
 </div>
 <p>Well, it’s not exact, but it looks pretty close, considering we only used <span class="math notranslate nohighlight">\(2\)</span> <span class="math notranslate nohighlight">\(n\)</span>-dimensional vectors instead of a full <span class="math notranslate nohighlight">\(n \times n\)</span> matrix! Visually, it looks like we’ve done an extremely good job of capturing the modular structure that <span class="math notranslate nohighlight">\(A\)</span> had, and in fact, it actually looks <em>more</em> obvious than with <span class="math notranslate nohighlight">\(A\)</span> itself. This property, and the reason why two  vectors captured two communities, will be key to the concept of the spectral embedding, which we will learn about in the next section.</p>
@@ -918,7 +960,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$A_{10}$&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/estimating-parameters_19_1.png" src="../../_images/estimating-parameters_19_1.png" />
+<img alt="../../_images/estimating-parameters_24_1.png" src="../../_images/estimating-parameters_24_1.png" />
 </div>
 </div>
 <p>Which looks very close to the plot of the adjacency matrix of <span class="math notranslate nohighlight">\(A\)</span> that we saw previously.</p>
