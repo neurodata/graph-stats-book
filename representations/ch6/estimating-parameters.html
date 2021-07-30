@@ -50,6 +50,8 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="6.3. Random-Walk and Diffusion-based Methods" href="random-walk-diffusion-methods.html" />
@@ -567,11 +569,55 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/representations/ch6/estimating-parameters.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#erdos-renyi-er">
+   6.2.1. Erdös-Rényi (ER)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
+   6.2.2.
+   <em>
+    a priori
+   </em>
+   Stochastic Block Model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#singular-value-decomposition">
+   6.2.3. Singular Value Decomposition*
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -582,6 +628,298 @@
                 
   <div class="section" id="estimating-parameters-in-network-models">
 <h1><span class="section-number">6.2. </span>Estimating Parameters in Network Models<a class="headerlink" href="#estimating-parameters-in-network-models" title="Permalink to this headline">¶</a></h1>
+<p>Throughout Chapter 5, we spent a lot of attention developing intuition for many of the network models that are essential to understanding random networks. Recall that the notation that we use for a random network (more specifically, a network-valued random variable), <span class="math notranslate nohighlight">\(\mathbf A\)</span>, does <em>not</em> refer to any network we could ever hope to see (or as we introduced in the previous chapter, <em>realize</em>) in the real world. This issue is extremely important in network machine learning, so we will try to drive it home one more time: no matter how much data we collected (unless we could get infinite data, which we <em>can’t</em>), we can never hope to understand the true distribution of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. As network scientists, this leaves us with a bit of a problem: what, then, can we do to make useful claims about <span class="math notranslate nohighlight">\(\mathbf A\)</span>, if we can’t actually see <span class="math notranslate nohighlight">\(\mathbf A\)</span> nor its distribution?</p>
+<p>This is where statistics, particularly, <strong>estimation</strong>, comes into play. At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using <em>only</em> the data we are given: finitely many (in network statistics, often just <em>one</em>) samples which we assume are <em>realizations</em> of the random variable we want to learn about. The properties of the random variable that we seek to learn about are called <strong>estimands</strong>, and  In the case of our network models, in particular, we will attempt to obtain reasonable estimates of the parameters (our <em>estimands</em>) associated with random networks.</p>
+<p>Several key assumptions will be heavily used throughout the course of this chapter, which were developed in Chapter 5. In particular, the most common two properties we will leverage are:</p>
+<ol class="simple">
+<li><p>Independence of edges: when working with independent-edge random network models, we will assume that edges in our random network are <em>independent</em>. This means that the probability of observing a particular realization of a random network is, in fact, the product of the probabilities of observing each edge in the random network. Notationally, what this means is that if <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network with <span class="math notranslate nohighlight">\(n\)</span> nodes and edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, and <span class="math notranslate nohighlight">\(A\)</span> is a realization of that random network with edges <span class="math notranslate nohighlight">\(a_{ij}\)</span>, then:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}) \\
+    &amp;= \prod_{i, j} \mathbb P(\mathbf a_{ij} = a_{ij})
+\end{align*}\]</div>
+<p>In the special case where our networks are simple (undirected and loopless), this simplifies to:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P(\mathbf A = A) &amp;= \prod_{i &lt; j} \mathbb P(\mathbf a_{ij} = a_{ij})
+\end{align*}\]</div>
+<p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>.  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops.</p>
+<div class="highlight-[admonition} notranslate"><div class="highlight"><pre><span></span>
+Let&#39;s think about what exactly this means using an example that you are likely familiar with. I have a single coin, and I want to know the probability of the outcome of a roll of that coin being a heads. For sake of argument, we will call this coin *fair*, which means that the true probability it lands on heads (or tails) is $0.5$. In this case, I would call the outcome of the $i^{th}$ coin flip the random variable $\mathbf x_i$, and it can produce realizations which take one of two possible values: a heads (an outcome of a $1$) or a tails (an outcome of a $0$). We will say that we see $10$ total coin flips. We will number these realizations as $x_i$, where $i$ goes from $1$ to $10$. To recap, the boldfaced $\mathbf x_i$ denotes the random variable, and the unbolded $x_i$ denotes the realization which we actually see. Our question of interest is: how do we estimate the probability of the coin landing on a heads, if we don&#39;t know anything about the true probability value $p$, other than the outcomes of the coin flips we got to observe?
+
+Here, since $\mathbf x_i$ takes the value $1$ or $0$ each with probability $0.5$, we would say that $\mathbf x_i$ is a $Bernoulli(0.5)$ random variable. This means that the random variable $\mathbf x$ has the Bernoulli distribution, and the probability of a heads, $p$, is $0.5$. All $10$ of our $\mathbf x_i$ are called *identically distributed*, since they all have the same $Bernoulli(0.5)$ distribution.
+
+We will also assume that the outcomes of the coin flips are mutually independent, which is explained in the terminology section.
+
+For any one coin flip, the probability of observing the outcome $i$ is, by definition of the Bernoulli distribution:
+\begin{align*}
+    \mathbb P(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}
+\end{align*}
+If we saw $n$ total outcomes, the probability is, using the definition of mutual independence:
+\begin{align*}
+    \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}\mathbb P(\mathbf x_i = x_i) \\
+    &amp;= \prod_{i = 1}^n p^{x_i}(1 - p)^{1 - x_i} \\
+    &amp;= p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}
+\end{align*}
+What if we saw $10$ coin flips, and $6$ were heads? Can we take a &quot;guess&quot; at what $p$ might be? Intuitively your first reaction might be to say a good guess of $p$, which we will abbreviate $\hat p$, would be $0.6$, which is $6$ heads of $10$ outcomes. In many ways, this intuitive guess is spot on. However, in network machine learning, we like to be really specific about why, exactly, this guess makes sense. 
+
+Looking at the above equation, one thing we can do is use the technique of **maximum likelihood estimation**. We call the function $\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)$ the *likelihood* of our sequence, for a given value of $p$. Note that we have added the term &quot;$; p$&quot; to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we *really* want to do is find the value that $p$ could take, which *maximizes* the likelihood. 
+
+An easier problem, we often will find, is to instead maximize the *log likelihood* rather than the likelihood itself. This is because the log function is *monotone*, which means that if $\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)$, then $\log\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)$ as well for some choices $p_1$ and $p_2$. Without going too down in the weeds, the idea is that the $\log$ function does not change any critical points of the likelihood. The log likelihood of the above expression is:
+\begin{align*}
+\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \log \left[p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}\right] \\
+&amp;= \sum_{i = 1}^n x_i \log(p) + \left(n - \sum_{i = 1}^n x_i\right)\log(1 - p)
+\end{align*}
+
+To do this, we will use some basic calculus. Remembering from calculus $1$ and $2$, to find a maximal point of the likelihood function with respect to some variable $p$, our process looks like this:
+1. Take the derivative of the log-likelihood with respect to $p$,
+2. Set it equal to $0$ and solve for the critical point $p^*$,
+3. Verify that the critical point $p^*$ is indeed an estimate of a maximum, $\hat p$. 
+
+Proceeding using the result we derived above, and using the fact that $\frac{d}{du} \log(u) = \frac{1}{u}$ and that $\frac{d}{du} \log(1 - u) = -\frac{1}{1 - u}$:
+\begin{align*}
+\frac{d}{d p}\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \frac{\sum_{i = 1}^n x_i}{p} - \frac{n - \sum_{i = 1}^n x_i}{1 - p} = 0 \\
+\Rightarrow \frac{\sum_{i = 1}^n x_i}{p} &amp;= \frac{n - \sum_{i = 1}^n x_i}{1 - p} \\
+\Rightarrow (1 - p)\sum_{i = 1}^n x_i &amp;= p\left(n - \sum_{i = 1}^n x_i\right) \\
+\sum_{i = 1}^n x_i - p\sum_{i = 1}^n x_i &amp;= pn - p\sum_{i = 1}^n x_i \\
+\Rightarrow p^* &amp;= \frac{1}{n}\sum_{i = 1}^n x_i
+\end{align*}
+We use the notation $p^*$ here to denote that $p^*$ is a critical point of the function.
+
+Finally, we must check that this is an estimate of a maximum, which we can do by taking the second derivative and checking that the second derivative is negative. We will omit this since it&#39;s a bit intricate and tangential from our argument, but if you work it through, you will find that the second derivative is indeed negative at $p^*$. This means that $p^*$ is indeed an estimate of a maximum, which we would denote by $\hat p$.
+
+Finally, using this result, we find that with $6$ heads in $10$ outcomes, we would obtain an estimate:
+\begin{align*}
+    \hat p &amp;= \frac{6}{10} = 0.6
+\end{align*}
+which exactly aligns with our intuition.
+</pre></div>
+</div>
+<p>So, why do we need estimation tools, if in our example, our intuition gave us the answer a whole lot faster? Unfortunately, the particular scenario we described was one of the <em>simplest possible examples</em> in which a parameter requires estimation. As the scenario grows more complicated, and <em>especially</em> when we extend to network-valued data, figuring out good ways to estimate parameters is extremely difficult. For this reason, we will describe some tools which are very relevant to network machine learning to learn about network parameters.</p>
+<p>We will review estimation techniques for several of the approaches we discussed in Chapter 5, for Single Network Models.</p>
+<div class="section" id="erdos-renyi-er">
+<h2><span class="section-number">6.2.1. </span>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
+<p>Recall that the Erdös-Rényi (ER) network has a single parameter: the probability of each edge existing, which we termed <span class="math notranslate nohighlight">\(p\)</span>. Due to the simplicity of a random network which is ER, fortunately we can resort to the Maximum Likelihood technique we delved into in the coin example above, and it turns out we obtain a very similar result with some caveats. In Chapter 5, we explored the derivation for the probability of observing a realization <span class="math notranslate nohighlight">\(A\)</span> of a given random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER, which is equivalent to the likelihood of <span class="math notranslate nohighlight">\(A\)</span>. Recall this was:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(m = \sum_{i &lt; j} a_{ij}\)</span> is the total number of edges in the observed network <span class="math notranslate nohighlight">\(A\)</span>. Our approach here parallels directly the approach for the coin; we begin by taking the log of the probability:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \log \mathbb P_\theta(A) &amp;= \log \left[p^{m} \cdot (1 - p)^{\binom{n}{2} - m}\right] \\
+    &amp;= m \log p + \left(\binom n 2 - m\right)\log (1 - p)
+\end{align*}\]</div>
+<p>Next, we take the derivative with respect to <span class="math notranslate nohighlight">\(p\)</span>, set equal to <span class="math notranslate nohighlight">\(0\)</span>, and we end up with:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{d}{d p}\log \mathbb P_\theta(A) &amp;= \frac{m}{p} - \frac{\binom n 2 - m}{1 - p} = 0 \\
+\Rightarrow p^* &amp;= \frac{m}{\binom n 2}
+\end{align*}\]</div>
+<p>We omitted several detailed steps due to the fact that we show the rigorous derivation above. Checking the second derivative, which we omit since it is rather mathematically tedious, we see that the second derivative at <span class="math notranslate nohighlight">\(p^*\)</span> is negative, so we indeed have found an estimate of the maximum, and will be denoted by <span class="math notranslate nohighlight">\(\hat p\)</span>. This gives that the Maximum Likelihood Estimate (or, the MLE, for short) of the probability <span class="math notranslate nohighlight">\(p\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat p &amp;= \frac{m}{\binom n 2}
+\end{align*}\]</div>
+</div>
+<div class="section" id="a-priori-stochastic-block-model">
+<h2><span class="section-number">6.2.2. </span><em>a priori</em> Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<p>The <em>a priori</em> Stochastic Block Model also has a single paramter: the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, whose entries <span class="math notranslate nohighlight">\(b_{kk'}\)</span> denote the probabilities of edges existing or not existing between pairs of communities in the Stochastic Block Model. When we derived the probability for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which could be characterized using the <em>a priori</em> Stochasic Block Model, we obtained that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \prod_{k, k' \in [K]}b_{k'k}^{m_{k'k}} \cdot (1 - b_{k'k})^{n_{k'k - m_{k'k}}}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}\)</span> was the number of possible edges between nodes in community <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>, and <span class="math notranslate nohighlight">\(m_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}a_{ij}\)</span> was the number of edges in the realization <span class="math notranslate nohighlight">\(A\)</span> between nodes within communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>.</p>
+<p>Noting that the log of the product is the sum of the logs, or that <span class="math notranslate nohighlight">\(\log \prod_i x_i = \sum_i \log x_i\)</span>, the log of the probability is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \log \mathbb P_\theta(A) &amp;= \sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})
+\end{align*}\]</div>
+<p>We notice a side-note that we mentioned briefly in the network models section: in a lot of ways, the probability (and consequently, the log probability) of a random network which is an <em>a priori</em> SBM behaves very similarly to that of a random network which is ER, with the caveat that the probability term <span class="math notranslate nohighlight">\(p\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(\binom n 2\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m\)</span> have been replaced with the probability term <span class="math notranslate nohighlight">\(b_{k'k}\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(n_{k'k}\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m_{k'k}\)</span> which <em>apply only to that particular pair of communities</em>. In this sense, the <em>a priori</em> SBM is kind of like a collection of communities of ER networks. Pretty neat right? Well, it doesn’t stop there. When we take the partial derivative of <span class="math notranslate nohighlight">\(\log \mathbb P_\theta(A)\)</span> with respect to any of the probability terms <span class="math notranslate nohighlight">\(b_{l'l}\)</span>, we see an even more direct consequence of this observation:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= \frac{\partial}{\partial b_{l'l}}\sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}) \\
+    &amp;= \sum_{k, k' \in [K]} \frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right]
+\end{align*}\]</div>
+<p>Now what? Notice that any of the summands in which <span class="math notranslate nohighlight">\(k \neq l\)</span> and <span class="math notranslate nohighlight">\(k' \neq l'\)</span>, the partial derivative with respect to <span class="math notranslate nohighlight">\(b_{l'l}\)</span> is in fact exactly <span class="math notranslate nohighlight">\(0\)</span>! Why is this? Well, let’s consider a <span class="math notranslate nohighlight">\(k\)</span> which is different from <span class="math notranslate nohighlight">\(l\)</span>, and a <span class="math notranslate nohighlight">\(k'\)</span> which is different from <span class="math notranslate nohighlight">\(l'\)</span>. Notice that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right] = 0
+\end{align*}\]</div>
+<p>which simply follows since the quantity to the right of the partial derivative is not a funcion of <span class="math notranslate nohighlight">\(b_{l'l}\)</span> at all! Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= 0 + \frac{\partial}{\partial b_{l'l}}\left[m_{l'l}\log b_{l'l} + \left(n_{l'l} - m_{l'l}\right)\log(1 - b_{l'l})\right] \\
+    &amp;= \frac{m_{l'l}}{b_{l'l}} - \frac{n_{l'l} - m_{l'l}}{1 - b_{l'l}} = 0 \\
+\Rightarrow b_{l'l}^* &amp;= \frac{m_{l'l}}{n_{l'l}}
+\end{align*}\]</div>
+<p>Like above, we omit the second derivative test, and conclude that the MLE of the block matrix <span class="math notranslate nohighlight">\(B\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is <em>a priori</em> SBM is the matrix <span class="math notranslate nohighlight">\(\hat B\)</span> with entries:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat b_{l'l} &amp;= \frac{m_{l'l}}{n_{l'l}}
+\end{align*}\]</div>
+</div>
+<div class="section" id="singular-value-decomposition">
+<h2><span class="section-number">6.2.3. </span>Singular Value Decomposition*<a class="headerlink" href="#singular-value-decomposition" title="Permalink to this headline">¶</a></h2>
+<p>In the succedding sections, we will begin to explore a set of techniques, known as <em>matrix decomposition</em>s, in which a matrix is broken into progressive sets of submatrices. In our case, the matrix will be the adjacency matrix corresponding to a realized network (or networks), and our goal will be to identify submatrices which when analyzed allow us to perform inference about the realized network.</p>
+<p>The key to the successive sections is a concept known as the <strong>singular value decomposition</strong>, or SVD. Note that for these and successive sections, we will present a simplified, and non-rigorous, review of the SVD and many results that are important for developing intuition around this decomposition. This description of the SVD has been modified to fit our purposes: particularly, the description we provide applies only to square matrices (such as the adjacency matrix of a network), and many of the properties we will cover will only apply to symmetric matrices (such as an adjacency matrix for a network which is undirected). For more details, or for explicit proofs, we would recommend a Linear Algebra textbook [Trefethan, LADR].</p>
+<p><strong>Singular Value Decomposition</strong> (SVD) of a square, symmetric matrix: Suppose that <span class="math notranslate nohighlight">\(A\)</span> is a matrix which is square, has <span class="math notranslate nohighlight">\(n\)</span> rows and columns, and  is symmetric (that is, <span class="math notranslate nohighlight">\(A \in \mathbb R^{n \times n}\)</span>, and for any <span class="math notranslate nohighlight">\(i, j \in [n]\)</span>, <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>). Then there exists a matrix <span class="math notranslate nohighlight">\(U\)</span> which is square and orthogonal (that is, <span class="math notranslate nohighlight">\(U \in \mathbb R^{n \times n}\)</span> aand <span class="math notranslate nohighlight">\(UU^T = U^T U = I\)</span>) and a matrix <span class="math notranslate nohighlight">\(\Sigma\)</span> which is square, diagonal, and whose entries are non-negative, decreasing, and real-valued (that is, <span class="math notranslate nohighlight">\(\Sigma \in \mathbb R^{n \times n}\)</span>, <span class="math notranslate nohighlight">\(\sigma_{ij} = 0\)</span> for any <span class="math notranslate nohighlight">\(i \neq j\)</span>, and <span class="math notranslate nohighlight">\(\sigma_{1} \geq \sigma_2 \geq ... \geq \sigma_n \geq 0\)</span> for all <span class="math notranslate nohighlight">\(i \in [n]\)</span>), where:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A &amp;= U \Sigma U^T
+\end{align*}\]</div>
+<p>The factorization of <span class="math notranslate nohighlight">\(A\)</span> into the product of the matrices <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma\)</span>, aand <span class="math notranslate nohighlight">\(U^T\)</span> is known as a <strong>singular value decomposition</strong> of <span class="math notranslate nohighlight">\(A\)</span>. Further, the diagonal entries of <span class="math notranslate nohighlight">\(\Sigma\)</span>, <span class="math notranslate nohighlight">\(\sigma_{ii}\)</span>, are known as the <strong>singular values</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>. Finally, the columns of the matrix <span class="math notranslate nohighlight">\(U\)</span>, each of which is an <span class="math notranslate nohighlight">\(n\)</span>-dimensional unit vector <span class="math notranslate nohighlight">\(u_i\)</span>, are known as the <strong>singular vectors</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>. Symbolically, this looks something like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A &amp;= \begin{bmatrix}
+    \uparrow &amp; \uparrow &amp;  &amp; \uparrow \\
+    u_1 &amp; \vec u_2 &amp; ... &amp; \vec u_n \\
+    \downarrow &amp; \downarrow &amp;  &amp; \downarrow
+    \end{bmatrix}\begin{bmatrix}
+    \sigma_1 &amp; &amp;  &amp; \\
+    &amp; \sigma_2 &amp;  &amp; \\
+    &amp; &amp; \ddots &amp; \\
+    &amp; &amp; &amp; \sigma_n
+    \end{bmatrix}\begin{bmatrix}
+    \leftarrow &amp; \vec u_1^T &amp; \rightarrow \\
+    \leftarrow &amp; \vec u_2^T &amp; \rightarrow \\
+    &amp; \vdots &amp; \\
+    \leftarrow &amp; \vec u_n^T &amp; \rightarrow \\
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>Let’s illustrate the SVD using an example. We will sample a <span class="math notranslate nohighlight">\(50 \times 50\)</span> realization of an adjacency matrix from a random network which is an <em>a priori</em> SBM, with <span class="math notranslate nohighlight">\(2\)</span> communities. The first 25 nodes will be in the first coommunity, and the second 25 nodes will be in the second community. The within-community probabilities will both be <span class="math notranslate nohighlight">\(0.8\)</span>, and the between-community probabilities will be <span class="math notranslate nohighlight">\(0.1\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">graspologic</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">draw_multiplot</span><span class="p">,</span> <span class="n">draw_layout_plot</span>
+
+<span class="c1"># block matrix</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+<span class="c1"># community assignment vector</span>
+<span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span> <span class="o">=</span> <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;2&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_7_0.png" src="../../_images/estimating-parameters_7_0.png" />
+</div>
+</div>
+<p>Now what happens when we take the SVD of <span class="math notranslate nohighlight">\(A\)</span>? We will first show that the singular vectors <span class="math notranslate nohighlight">\(U\)</span> and the singular values of <span class="math notranslate nohighlight">\(\Sigma\)</span> when appropriately arranged do, in fact, comprise <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svd</span>
+
+<span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Ut</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; A = USU^T: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">Ut</span><span class="p">))))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> A = USU^T:  True
+</pre></div>
+</div>
+</div>
+</div>
+<p>What does <span class="math notranslate nohighlight">\(U\)</span> look like?</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$U$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$U$&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/estimating-parameters_11_1.png" src="../../_images/estimating-parameters_11_1.png" />
+</div>
+</div>
+<p>In this book, we do not need to know how to solve for, nor prove the existence of, the SVD. We will take these two facts for granted. Discussing the below, we will delve briefly into the concept of <strong>matrix rank</strong>, which we will define now.</p>
+<p><strong>Matrix Rank</strong>: The rank of a matrix <span class="math notranslate nohighlight">\(A\)</span>, defined <span class="math notranslate nohighlight">\(rank(A)\)</span>, is the number of linearly independent rows and columns of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>What does this mean? At a very high level, we can think of the matrix rank as telling us just how “simple” the matrix <span class="math notranslate nohighlight">\(A\)</span> is. A matrix which is rank <span class="math notranslate nohighlight">\(1\)</span> is very simple, in that all of its rows or columns can be expressed as a weighted sum of just a single vector. On the other hand, a matrix which has “full rank”, or a rank of <span class="math notranslate nohighlight">\(n\)</span>, is a bit more complex, in that no row nor column can be expressed as a sum of other rows nor columns.</p>
+<p>The next two results are critical to our understanding of the geometry of what is going on in the SVD:</p>
+<ol class="simple">
+<li><p>The matrix <span class="math notranslate nohighlight">\(A\)</span> can be expressed as the sum of the rank <span class="math notranslate nohighlight">\(1\)</span> matrices <span class="math notranslate nohighlight">\(\sigma_i \vec u_i \vec u_i^T\)</span>; that is:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A &amp;= \sum_{i = 1}^n \sigma_i u_i u_i^T
+\end{align*}\]</div>
+<p>What does this result say? This result expresses that the matrix <span class="math notranslate nohighlight">\(A\)</span> can be fully expressed as the sum of a bunch of rank-1 matrices <span class="math notranslate nohighlight">\(u_i u_i^T\)</span>, which are weighted by the corresponding singular value <span class="math notranslate nohighlight">\(\sigma_i\)</span>. Each matrix product is <span class="math notranslate nohighlight">\(n \times n\)</span> because <span class="math notranslate nohighlight">\(u_i \in \mathbb R^{n \times 1}\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-dimensional row-vector and <span class="math notranslate nohighlight">\(\vec u_i^T \in \mathbb R^{1 \times n}\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-dimensional column-vector. Symbolically, this looks like:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A &amp;= \sigma_1 \begin{bmatrix}\uparrow \\ \vec u_1 \\ \downarrow\end{bmatrix}\begin{bmatrix}\leftarrow &amp; \vec u_1^T &amp; \rightarrow \end{bmatrix} + 
+    \sigma_2 \begin{bmatrix}\uparrow \\ \vec u_2 \\ \downarrow\end{bmatrix}\begin{bmatrix}\leftarrow &amp; \vec u_2^T &amp; \rightarrow \end{bmatrix} + 
+    ... + 
+    \sigma_n \begin{bmatrix}\uparrow \\ \vec u_n \\ \downarrow\end{bmatrix}\begin{bmatrix}\leftarrow &amp; \vec u_n^T &amp; \rightarrow \end{bmatrix}
+\end{align*}\]</div>
+<p>Let’s take a look at what <span class="math notranslate nohighlight">\(\sigma_1 \vec u_1 \vec u_1^T\)</span> looks like next:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">U</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">Ut</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\sigma_1 u_1 u_1^T$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$\\sigma_1 u_1 u_1^T$&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/estimating-parameters_14_1.png" src="../../_images/estimating-parameters_14_1.png" />
+</div>
+</div>
+<ol class="simple">
+<li><p>Let <span class="math notranslate nohighlight">\(A_k = \sum_{i = 1}^k \sigma_i u_i u_i^T\)</span>, where <span class="math notranslate nohighlight">\(k \leq n\)</span>. Then:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    ||A - A_k||_F &amp;= \min_{\text{all rank $k$ square matrices }A' \in \mathbb R^{n \times n}} ||A - A'||_F
+\end{align*}\]</div>
+<p>This result will be the most important thing we need to undersand about the SVD itself. In particular, what this result says is that if we were to look at the sum of <span class="math notranslate nohighlight">\(A\)</span> expressed above, and <em>only</em> look at the sum of the first <span class="math notranslate nohighlight">\(k\)</span> of those terms, that rank <span class="math notranslate nohighlight">\(k\)</span> matrix <span class="math notranslate nohighlight">\(A_k\)</span> is the most similar rank <span class="math notranslate nohighlight">\(k\)</span> matrix to <span class="math notranslate nohighlight">\(A\)</span>, according to the Frobenius norm.</p>
+<p>What happens when we choose <span class="math notranslate nohighlight">\(k = 1\)</span>? Well, we get the result above! Now that doesn’t look too much like <span class="math notranslate nohighlight">\(A\)</span>. But what if we chose a few more vectors, like <span class="math notranslate nohighlight">\(k=2\)</span>?</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span><span class="o">=</span><span class="mi">2</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">]),</span> <span class="n">Ut</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">,</span> <span class="p">:])),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$A_2$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$A_2$&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/estimating-parameters_17_1.png" src="../../_images/estimating-parameters_17_1.png" />
+</div>
+</div>
+<p>Well, it’s not exact, but it looks pretty close, considering we only used <span class="math notranslate nohighlight">\(2\)</span> <span class="math notranslate nohighlight">\(n\)</span>-dimensional vectors instead of a full <span class="math notranslate nohighlight">\(n \times n\)</span> matrix! Visually, it looks like we’ve done an extremely good job of capturing the modular structure that <span class="math notranslate nohighlight">\(A\)</span> had, and in fact, it actually looks <em>more</em> obvious than with <span class="math notranslate nohighlight">\(A\)</span> itself. This property, and the reason why two  vectors captured two communities, will be key to the concept of the spectral embedding, which we will learn about in the next section.</p>
+<p>How about with <span class="math notranslate nohighlight">\(k=10\)</span>?</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">]),</span> <span class="n">Ut</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">,</span> <span class="p">:])),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$A_</span><span class="si">{10}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$A_{10}$&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/estimating-parameters_19_1.png" src="../../_images/estimating-parameters_19_1.png" />
+</div>
+</div>
+<p>Which looks very close to the plot of the adjacency matrix of <span class="math notranslate nohighlight">\(A\)</span> that we saw previously.</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
