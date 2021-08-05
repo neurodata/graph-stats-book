@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6.2. Estimating Parameters in Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>6.3. Estimating Parameters in Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -54,8 +54,8 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.3. Random-Walk and Diffusion-based Methods" href="random-walk-diffusion-methods.html" />
-    <link rel="prev" title="6.1. Why embed networks?" href="why-embed-networks.html" />
+    <link rel="next" title="6.4. Random-Walk and Diffusion-based Methods" href="random-walk-diffusion-methods.html" />
+    <link rel="prev" title="6.2. Spectral Embedding Methods" href="spectral-embedding.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -322,29 +322,34 @@
      6.1. Why embed networks?
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="spectral-embedding.html">
+     6.2. Spectral Embedding Methods
+    </a>
+   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     6.2. Estimating Parameters in Network Models
+     6.3. Estimating Parameters in Network Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="random-walk-diffusion-methods.html">
-     6.3. Random-Walk and Diffusion-based Methods
+     6.4. Random-Walk and Diffusion-based Methods
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="graph-neural-networks.html">
-     6.4. Graph Neural Networks
+     6.5. Graph Neural Networks
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="multigraph-representation-learning.html">
-     6.5. Multiple-Network Representation Learning
+     6.6. Multiple-Network Representation Learning
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="joint-representation-learning.html">
-     6.6. Joint Representation Learning
+     6.7. Joint Representation Learning
     </a>
    </li>
   </ul>
@@ -598,17 +603,17 @@
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-coin-flip-example">
-   6.2.1. The Coin Flip Example
+   6.3.1. The Coin Flip Example
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#erdos-renyi-er">
-   6.2.2. Erdös-Rényi (ER)
+   6.3.2. Erdös-Rényi (ER)
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
-   6.2.3.
+   6.3.3.
    <em>
     a priori
    </em>
@@ -617,7 +622,7 @@
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#singular-value-decomposition">
-   6.2.4. Singular Value Decomposition*
+   6.3.4. Singular Value Decomposition*
   </a>
  </li>
 </ul>
@@ -632,7 +637,7 @@
               <div>
                 
   <div class="section" id="estimating-parameters-in-network-models">
-<h1><span class="section-number">6.2. </span>Estimating Parameters in Network Models<a class="headerlink" href="#estimating-parameters-in-network-models" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">6.3. </span>Estimating Parameters in Network Models<a class="headerlink" href="#estimating-parameters-in-network-models" title="Permalink to this headline">¶</a></h1>
 <p>Throughout Chapter 5, we spent a lot of attention developing intuition for many of the network models that are essential to understanding random networks. Recall that the notation that we use for a random network (more specifically, a network-valued random variable), <span class="math notranslate nohighlight">\(\mathbf A\)</span>, does <em>not</em> refer to any network we could ever hope to see (or as we introduced in the previous chapter, <em>realize</em>) in the real world. This issue is extremely important in network machine learning, so we will try to drive it home one more time: no matter how much data we collected (unless we could get infinite data, which we <em>can’t</em>), we can never hope to understand the true distribution of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. As network scientists, this leaves us with a bit of a problem: what, then, can we do to make useful claims about <span class="math notranslate nohighlight">\(\mathbf A\)</span>, if we can’t actually see <span class="math notranslate nohighlight">\(\mathbf A\)</span> nor its distribution?</p>
 <p>This is where statistics, particularly, <strong>estimation</strong>, comes into play. At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using <em>only</em> the data we are given: finitely many (in network statistics, often just <em>one</em>) samples which we assume are <em>realizations</em> of the random variable we want to learn about. The properties of the random variable that we seek to learn about are called <strong>estimands</strong>, and  In the case of our network models, in particular, we will attempt to obtain reasonable estimates of the parameters (our <em>estimands</em>) associated with random networks.</p>
 <p>Several key assumptions will be heavily used throughout the course of this chapter, which were developed in Chapter 5. In particular, the most common two properties we will leverage are:</p>
@@ -651,7 +656,7 @@
 \end{align*}\]</div>
 <p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>, and we only need to worry about one of the edges (we chose the edges in the upper right triangle of the adjacency matrix arbitrarily).  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops, so we don’t need to worry about the case where <span class="math notranslate nohighlight">\(i = j\)</span> either.</p>
 <div class="section" id="the-coin-flip-example">
-<h2><span class="section-number">6.2.1. </span>The Coin Flip Example<a class="headerlink" href="#the-coin-flip-example" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.3.1. </span>The Coin Flip Example<a class="headerlink" href="#the-coin-flip-example" title="Permalink to this headline">¶</a></h2>
 <p>Let’s think about what exactly this means using an example that you are likely familiar with. I have a single coin, and I want to know the probability of the outcome of a roll of that coin being a heads. For sake of argument, we will call this coin <em>fair</em>, which means that the true probability it lands on heads (or tails) is <span class="math notranslate nohighlight">\(0.5\)</span>. In this case, I would call the outcome of the <span class="math notranslate nohighlight">\(i^{th}\)</span> coin flip the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>, and it can produce realizations which take one of two possible values: a heads (an outcome of a <span class="math notranslate nohighlight">\(1\)</span>) or a tails (an outcome of a <span class="math notranslate nohighlight">\(0\)</span>). We will say that we see <span class="math notranslate nohighlight">\(10\)</span> total coin flips. We will number these realizations as <span class="math notranslate nohighlight">\(x_i\)</span>, where <span class="math notranslate nohighlight">\(i\)</span> goes from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10\)</span>. To recap, the boldfaced <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> denotes the random variable, and the unbolded <span class="math notranslate nohighlight">\(x_i\)</span> denotes the realization which we actually see. Our question of interest is: how do we estimate the probability of the coin landing on a heads, if we don’t know anything about the true probability value <span class="math notranslate nohighlight">\(p\)</span>, other than the outcomes of the coin flips we got to observe?</p>
 <p>Here, since <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> takes the value <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(0\)</span> each with probability <span class="math notranslate nohighlight">\(0.5\)</span>, we would say that <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> random variable. This means that the random variable <span class="math notranslate nohighlight">\(\mathbf x\)</span> has the Bernoulli distribution, and the probability of a heads, <span class="math notranslate nohighlight">\(p\)</span>, is <span class="math notranslate nohighlight">\(0.5\)</span>. All <span class="math notranslate nohighlight">\(10\)</span> of our <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> are called <em>identically distributed</em>, since they all have the same <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> distribution.</p>
 <p>We will also assume that the outcomes of the coin flips are mutually independent, which is explained in the terminology section.</p>
@@ -744,7 +749,7 @@
 <p>We will review estimation techniques for several of the approaches we discussed in Chapter 5, for Single Network Models.</p>
 </div>
 <div class="section" id="erdos-renyi-er">
-<h2><span class="section-number">6.2.2. </span>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.3.2. </span>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
 <p>Recall that the Erdös-Rényi (ER) network has a single parameter: the probability of each edge existing, which we termed <span class="math notranslate nohighlight">\(p\)</span>. Due to the simplicity of a random network which is ER, fortunately we can resort to the Maximum Likelihood technique we delved into in the coin example above, and it turns out we obtain a very similar result with some caveats. In Chapter 5, we explored the derivation for the probability of observing a realization <span class="math notranslate nohighlight">\(A\)</span> of a given random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER, which is equivalent to the likelihood of <span class="math notranslate nohighlight">\(A\)</span>. Recall this was:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -769,7 +774,7 @@
 \end{align*}\]</div>
 </div>
 <div class="section" id="a-priori-stochastic-block-model">
-<h2><span class="section-number">6.2.3. </span><em>a priori</em> Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.3.3. </span><em>a priori</em> Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
 <p>The <em>a priori</em> Stochastic Block Model also has a single paramter: the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, whose entries <span class="math notranslate nohighlight">\(b_{kk'}\)</span> denote the probabilities of edges existing or not existing between pairs of communities in the Stochastic Block Model. When we derived the probability for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which could be characterized using the <em>a priori</em> Stochasic Block Model, we obtained that:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -806,7 +811,7 @@
 \end{align*}\]</div>
 </div>
 <div class="section" id="singular-value-decomposition">
-<h2><span class="section-number">6.2.4. </span>Singular Value Decomposition*<a class="headerlink" href="#singular-value-decomposition" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.3.4. </span>Singular Value Decomposition*<a class="headerlink" href="#singular-value-decomposition" title="Permalink to this headline">¶</a></h2>
 <p>In the succedding sections, we will begin to explore a set of techniques, known as <em>matrix decomposition</em>s, in which a matrix is broken into progressive sets of submatrices. In our case, the matrix will be the adjacency matrix corresponding to a realized network (or networks), and our goal will be to identify submatrices which when analyzed allow us to perform inference about the realized network.</p>
 <p>The key to the successive sections is a concept known as the <strong>singular value decomposition</strong>, or SVD. Note that for these and successive sections, we will present a simplified, and non-rigorous, review of the SVD and many results that are important for developing intuition around this decomposition. This description of the SVD has been modified to fit our purposes: particularly, the description we provide applies only to square matrices (such as the adjacency matrix of a network), and many of the properties we will cover will only apply to symmetric matrices (such as an adjacency matrix for a network which is undirected). For more details, or for explicit proofs, we would recommend a Linear Algebra textbook [Trefethan, LADR].</p>
 <p><strong>Singular Value Decomposition</strong> (SVD) of a square, symmetric matrix: Suppose that <span class="math notranslate nohighlight">\(A\)</span> is a matrix which is square, has <span class="math notranslate nohighlight">\(n\)</span> rows and columns, and  is symmetric (that is, <span class="math notranslate nohighlight">\(A \in \mathbb R^{n \times n}\)</span>, and for any <span class="math notranslate nohighlight">\(i, j \in [n]\)</span>, <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>). Then there exists a matrix <span class="math notranslate nohighlight">\(U\)</span> which is square and orthogonal (that is, <span class="math notranslate nohighlight">\(U \in \mathbb R^{n \times n}\)</span> aand <span class="math notranslate nohighlight">\(UU^T = U^T U = I\)</span>) and a matrix <span class="math notranslate nohighlight">\(\Sigma\)</span> which is square, diagonal, and whose entries are non-negative, decreasing, and real-valued (that is, <span class="math notranslate nohighlight">\(\Sigma \in \mathbb R^{n \times n}\)</span>, <span class="math notranslate nohighlight">\(\sigma_{ij} = 0\)</span> for any <span class="math notranslate nohighlight">\(i \neq j\)</span>, and <span class="math notranslate nohighlight">\(\sigma_{1} \geq \sigma_2 \geq ... \geq \sigma_n \geq 0\)</span> for all <span class="math notranslate nohighlight">\(i \in [n]\)</span>), where:</p>
@@ -980,8 +985,8 @@
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="why-embed-networks.html" title="previous page"><span class="section-number">6.1. </span>Why embed networks?</a>
-    <a class='right-next' id="next-link" href="random-walk-diffusion-methods.html" title="next page"><span class="section-number">6.3. </span>Random-Walk and Diffusion-based Methods</a>
+    <a class='left-prev' id="prev-link" href="spectral-embedding.html" title="previous page"><span class="section-number">6.2. </span>Spectral Embedding Methods</a>
+    <a class='right-next' id="next-link" href="random-walk-diffusion-methods.html" title="next page"><span class="section-number">6.4. </span>Random-Walk and Diffusion-based Methods</a>
 
         </div>
         
