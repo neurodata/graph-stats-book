@@ -17,18 +17,53 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graphbook_code import draw_multiplot
+from graphbook_code import heatmap
+import seaborn as sns
+from matplotlib.colors import Normalize
+from graphbook_code import GraphColormap
+import matplotlib.cm as cm
 
-draw_multiplot(A, pos=nx.kamada_kawai_layout)
+fig, axs = plt.subplots(1, 5, figsize=(25, 5))
+
+# First axis (Degree)
+heatmap(D, ax=axs[0], cbar=False, title="Degree Matrix $D$")
+
+# Second axis (-)
+axs[1].text(x=.5, y=.5, s="-", fontsize=200, 
+            va='center', ha='center')
+axs[1].get_xaxis().set_visible(False)
+axs[1].get_yaxis().set_visible(False)
+sns.despine(ax=axs[1], left=True, bottom=True)
+
+# Third axis (Adjacency matrix)
+heatmap(A, ax=axs[2], cbar=False, title="Adjacency Matrix $A$")
+
+# Third axis (=)
+axs[3].text(x=.5, y=.5, s="=", fontsize=200,
+            va='center', ha='center')
+axs[3].get_xaxis().set_visible(False)
+axs[3].get_yaxis().set_visible(False)
+sns.despine(ax=axs[3], left=True, bottom=True)
+
+# Fourth axis
+heatmap(L, ax=axs[4], cbar=False, title="Laplacian Matrix $L$")
+
+# Colorbar
+vmin, vmax = np.array(L).min(), np.array(L).max()
+norm = Normalize(vmin=vmin, vmax=vmax)
+im = cm.ScalarMappable(cmap=GraphColormap("sequential").color, norm=norm)
+fig.colorbar(im, ax=axs, shrink=0.8, aspect=10);
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m/tmp/ipykernel_1876/2947105489.py[0m in [0;36m<module>[0;34m[0m
-[1;32m      1[0m [0;32mfrom[0m [0mgraphbook_code[0m [0;32mimport[0m [0mdraw_multiplot[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      2[0m [0;34m[0m[0m
-[0;32m----> 3[0;31m [0mdraw_multiplot[0m[0;34m([0m[0mA[0m[0;34m,[0m [0mpos[0m[0;34m=[0m[0mnx[0m[0;34m.[0m[0mkamada_kawai_layout[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m
-[0;31mNameError[0m: name 'nx' is not defined
-NameError: name 'nx' is not defined
+[0;32m/tmp/ipykernel_2012/2605773330.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      5[0m [0;32mimport[0m [0mmatplotlib[0m[0;34m.[0m[0mcm[0m [0;32mas[0m [0mcm[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      6[0m [0;34m[0m[0m
+[0;32m----> 7[0;31m [0mfig[0m[0;34m,[0m [0maxs[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m5[0m[0;34m,[0m [0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m25[0m[0;34m,[0m [0;36m5[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      8[0m [0;34m[0m[0m
+[1;32m      9[0m [0;31m# First axis (Degree)[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mNameError[0m: name 'plt' is not defined
+NameError: name 'plt' is not defined
 
