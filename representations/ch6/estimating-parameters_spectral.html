@@ -726,9 +726,10 @@
 <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="p">[((</span><span class="n">n</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
-    
+
 <span class="n">P</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Simulated RDPG(X)&quot;</span><span class="p">);</span>
@@ -746,27 +747,30 @@
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">RDPGEstimator</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># number of latent dimensions is 2</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="n">Phat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">p_mat_</span>
+<span class="n">Xhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">latent_</span>
+<span class="n">Phat</span> <span class="o">=</span> <span class="n">Xhat</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Xhat</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">heatmap</span><span class="p">(</span><span class="n">Phat</span><span class="p">,</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat P_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat X_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 <span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$X_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 <span class="n">fig</span><span class="p">;</span>
@@ -789,7 +793,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fit number of latent dimensions: 4
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fit number of latent dimensions: 3
 </pre></div>
 </div>
 </div>
@@ -852,6 +856,7 @@
 <span class="n">B</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
      <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]]</span>
+
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ns</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">B</span><span class="p">)</span>
 
@@ -1014,49 +1019,49 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pi_0hat: 0.32
-pi_1hat: 0.3
-pi_2hat: 0.38
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pi_0hat: 0.28
+pi_1hat: 0.4
+pi_2hat: 0.32
 </pre></div>
 </div>
 </div>
 </div>
-<p>So the predicted community assignment probability vector, <span class="math notranslate nohighlight">\(\hat{\vec\pi}\)</span>, does not exactly match the true community assignment probability vector, <span class="math notranslate nohighlight">\(\vec \pi = \begin{bmatrix}\frac{1}{3} &amp; \frac{1}{3} &amp; \frac{1}{3}\end{bmatrix}\)</span>. To learn about the probability matrix <span class="math notranslate nohighlight">\(P\)</span>, we can now use the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class, with our predicted labels:</p>
+<p>So the predicted community assignment probability vector, <span class="math notranslate nohighlight">\(\hat{\vec\pi}\)</span>, does not exactly match the true community assignment probability vector, <span class="math notranslate nohighlight">\(\vec \pi = \begin{bmatrix}\frac{1}{3} &amp; \frac{1}{3} &amp; \frac{1}{3}\end{bmatrix}\)</span>. To learn about the block matrix <span class="math notranslate nohighlight">\(B\)</span>, we can now use the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class, with our predicted labels:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">SBMEstimator</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">SBMEstimator</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">labels_kmeans_remap</span><span class="p">)</span>
-<span class="n">Phat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">p_mat_</span>
+<span class="n">Bhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">block_p_</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Phat</span><span class="p">,</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Bhat</span><span class="p">,</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat P_</span><span class="si">{SBM}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat B_</span><span class="si">{SBM}</span><span class="s2">$&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-<span class="n">P</span> <span class="o">=</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">)))</span>  <span class="c1"># default entries to 0.2</span>
-<span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">:</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># B11</span>
-<span class="n">P</span><span class="p">[</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]:(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]:(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># B22</span>
-<span class="n">P</span><span class="p">[(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]):(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-  <span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]):(</span><span class="n">counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">counts</span><span class="p">[</span><span class="mi">2</span><span class="p">])]</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># B33</span>
-<span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-<span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_</span><span class="si">{SBM}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{SBM}</span><span class="s2">$&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Bhat</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">)),</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$|\hat B_</span><span class="si">{SBM}</span><span class="s2"> - B_</span><span class="si">{SBM}</span><span class="s2">|$&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 
 <span class="n">fig</span><span class="p">;</span>
 </pre></div>
@@ -1093,6 +1098,7 @@ pi_2hat: 0.38
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># generate a reordering of the n nodes</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
 <span class="n">vtx_perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">A_permuted</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">vtx_perm</span><span class="p">])]</span> <span class="p">[:,</span><span class="n">vtx_perm</span><span class="p">]</span>
@@ -1101,7 +1107,7 @@ pi_2hat: 0.38
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span> <span class="k">as</span> <span class="n">hm_code</span> 
 <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_layout_plot</span> <span class="k">as</span> <span class="n">lp_code</span>
@@ -1167,7 +1173,8 @@ pi_2hat: 0.38
 <p>Next, we visualize the silhouette score as a function of the number of clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span> <span class="k">as</span> <span class="n">df</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span> <span class="k">as</span> <span class="n">df</span>
 
 <span class="n">nclusters</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>  <span class="c1"># graspologic nclusters goes from 2 to max_clusters</span>
 <span class="n">silhouette</span> <span class="o">=</span> <span class="n">km_clust</span><span class="o">.</span><span class="n">silhouette_</span>  <span class="c1"># obtain the respective silhouette scores</span>
@@ -1183,19 +1190,7 @@ pi_2hat: 0.38
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1871</span><span class="o">/</span><span class="mf">1424549696.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> 
-<span class="ne">---&gt; </span><span class="mi">10</span> <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">silhouette_df</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Number of Clusters&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Silhouette Score&quot;</span><span class="p">);</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Silhouette Analysis of KMeans Clusterings&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> <span class="n">fig</span><span class="p">;</span>
-
-<span class="ne">NameError</span>: name &#39;sns&#39; is not defined
-</pre></div>
-</div>
-<img alt="../../_images/estimating-parameters_spectral_46_1.png" src="../../_images/estimating-parameters_spectral_46_1.png" />
+<img alt="../../_images/estimating-parameters_spectral_46_0.png" src="../../_images/estimating-parameters_spectral_46_0.png" />
 </div>
 </div>
 <p>As we can see, Silhouette Analysis has indicated the best number of clusters as <span class="math notranslate nohighlight">\(3\)</span> (which, is indeed, <em>correct</em> since we are performing a simulation where we know the right answer). Next, let’s take a look at the pairs plot for the optimal classifier. We begin by producing the predicted labels for each of our nodes, and remapping to the true community assignment labels, exactly as we did previously for further analysis:</p>
@@ -1203,7 +1198,6 @@ pi_2hat: 0.38
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels_autokmeans</span> <span class="o">=</span> <span class="n">km_clust</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xhat_permuted</span><span class="p">)</span>
 <span class="n">labels_autokmeans</span> <span class="o">=</span> <span class="n">remap_labels</span><span class="p">(</span><span class="n">y_perm</span><span class="p">,</span> <span class="n">labels_autokmeans</span><span class="p">)</span>
-
 
 <span class="n">ari_kmeans</span> <span class="o">=</span> <span class="n">adjusted_rand_score</span><span class="p">(</span><span class="n">labels_autokmeans</span><span class="p">,</span> <span class="n">y_perm</span><span class="p">)</span>
 
@@ -1216,8 +1210,11 @@ pi_2hat: 0.38
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_48_0.png" src="../../_images/estimating-parameters_spectral_48_0.png" />
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">KMeans</span></code> was still able to find relatively stable clusters, which align quite well (ARI of <span class="math notranslate nohighlight">\(0.942\)</span>, which is near <span class="math notranslate nohighlight">\(1\)</span>) with the true labels! Next, we will look at which points <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> tends to get <em>wrong</em> to see if any patterns arise:</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">KMeans</span></code> was still able to find relatively stable clusters, which align quite well (ARI of <span class="math notranslate nohighlight">\(0.855\)</span>, which is not perfect but closer to <span class="math notranslate nohighlight">\(1\)</span> than to <span class="math notranslate nohighlight">\(0\)</span>!) with the true labels! Next, we will look at which points <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> tends to get <em>wrong</em> to see if any patterns arise:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">error</span> <span class="o">=</span> <span class="n">y_perm</span> <span class="o">-</span> <span class="n">labels_autokmeans</span>  <span class="c1"># compute which assigned labels from labels_kmeans_remap differ from the true labels y</span>
@@ -1239,6 +1236,9 @@ pi_2hat: 0.38
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_50_0.png" src="../../_images/estimating-parameters_spectral_50_0.png" />
+</div>
 </div>
 <p>And there do not appear to be any dramatic issues in our clustering which woul suggest systematic errors are present. To infer about <span class="math notranslate nohighlight">\(\vec \pi\)</span> or <span class="math notranslate nohighlight">\(B\)</span>, we would proceed exactly as we did previously, by using these labels with the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class to perform inference:</p>
 <div class="cell docutils container">
@@ -1250,17 +1250,57 @@ pi_2hat: 0.38
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pi_0hat: 0.3
+pi_1hat: 0.37
+pi_2hat: 0.33
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SBMEstimator</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A_permuted</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">labels_autokmeans</span><span class="p">)</span>
-<span class="n">Phat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">p_mat_</span>
+<span class="n">Bhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">block_p_</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We do not plot <span class="math notranslate nohighlight">\(P\)</span> due to the fact that the random shuffling of the node order leaves the plot relatively uninterpretable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Bhat</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat B_</span><span class="si">{SBM}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">),</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{SBM}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Bhat</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">)),</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$|\hat B_</span><span class="si">{SBM}</span><span class="s2"> - B_</span><span class="si">{SBM}</span><span class="s2">|$&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_54_0.png" src="../../_images/estimating-parameters_spectral_54_0.png" />
+</div>
+</div>
+<p>Which appears very close to the true <span class="math notranslate nohighlight">\(B\)</span>.</p>
 <div class="admonition-a-posteriori-stochastic-block-model-recap admonition">
 <p class="admonition-title">a posteriori Stochastic Block Model, Recap</p>
 <p>We just covered many details about how to perform statistical inference with a realization of a random network which we think can be well summarized by a Stochastic Block Model. For this reason, we will review some of the key things that were covered, to better put them in context:</p>
