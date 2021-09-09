@@ -17,32 +17,29 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graspologic.simulations import rdpg
+from pandas import DataFrame as df
 
-n = 60  # the number of nodes in our network
+nclusters = range(2, 11)  # graspologic nclusters goes from 2 to max_clusters
+silhouette = km_clust.silhouette_  # obtain the respective silhouette scores
 
-# design the latent position matrix X according to 
-# the rules we laid out previously
-X = np.zeros((n,2))
-for i in range(0, n):
-    X[i,:] = [((n - i)/n)**2, (i/n)**2]
-    
-P = X @ np.transpose(X)
+silhouette_df = df({"Number of Clusters": nclusters, "Silhouette Score": silhouette})  # place into pandas dataframe
 
-A = rdpg(X)
+fig, ax = plt.subplots(1,1,figsize=(12, 6))
 
-draw_multiplot(A, title="Simulated RDPG(X)");
+sns.lineplot(data=silhouette_df,ax=ax, x="Number of Clusters", y="Silhouette Score");
+ax.set_title("Silhouette Analysis of KMeans Clusterings")
+fig;
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m/tmp/ipykernel_1969/1582132453.py[0m in [0;36m<module>[0;34m[0m
-[1;32m      5[0m [0;31m# design the latent position matrix X according to[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      6[0m [0;31m# the rules we laid out previously[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
-[0;32m----> 7[0;31m [0mX[0m [0;34m=[0m [0mnp[0m[0;34m.[0m[0mzeros[0m[0;34m([0m[0;34m([0m[0mn[0m[0;34m,[0m[0;36m2[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      8[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0;36m0[0m[0;34m,[0m [0mn[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      9[0m     [0mX[0m[0;34m[[0m[0mi[0m[0;34m,[0m[0;34m:[0m[0;34m][0m [0;34m=[0m [0;34m[[0m[0;34m([0m[0;34m([0m[0mn[0m [0;34m-[0m [0mi[0m[0;34m)[0m[0;34m/[0m[0mn[0m[0;34m)[0m[0;34m**[0m[0;36m2[0m[0;34m,[0m [0;34m([0m[0mi[0m[0;34m/[0m[0mn[0m[0;34m)[0m[0;34m**[0m[0;36m2[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[0;32m/tmp/ipykernel_1871/1424549696.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      8[0m [0mfig[0m[0;34m,[0m [0max[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m[0;36m1[0m[0;34m,[0m[0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m12[0m[0;34m,[0m [0;36m6[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      9[0m [0;34m[0m[0m
+[0;32m---> 10[0;31m [0msns[0m[0;34m.[0m[0mlineplot[0m[0;34m([0m[0mdata[0m[0;34m=[0m[0msilhouette_df[0m[0;34m,[0m[0max[0m[0;34m=[0m[0max[0m[0;34m,[0m [0mx[0m[0;34m=[0m[0;34m"Number of Clusters"[0m[0;34m,[0m [0my[0m[0;34m=[0m[0;34m"Silhouette Score"[0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     11[0m [0max[0m[0;34m.[0m[0mset_title[0m[0;34m([0m[0;34m"Silhouette Analysis of KMeans Clusterings"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     12[0m [0mfig[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
 
-[0;31mNameError[0m: name 'np' is not defined
-NameError: name 'np' is not defined
+[0;31mNameError[0m: name 'sns' is not defined
+NameError: name 'sns' is not defined
 
