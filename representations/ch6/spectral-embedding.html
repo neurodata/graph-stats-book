@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
@@ -73,6 +73,10 @@
     
         <div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
       
       <img src="../../_static/logo.png" class="logo" alt="logo">
       
@@ -681,21 +685,31 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-graspologic">
-   6.3.8. Using Graspologic
+  <a class="reference internal nav-link" href="#figuring-out-how-many-dimensions-to-embed-your-network-into">
+   6.3.8. Figuring Out How Many Dimensions To Embed Your Network Into
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-graspologic-to-embed-networks">
+   6.3.9. Using Graspologic to embed networks
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#adjacency-spectral-embedding">
-     6.3.8.1. Adjacency Spectral Embedding
+     6.3.9.1. Adjacency Spectral Embedding
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#laplacian-spectral-embedding">
-     6.3.8.2. Laplacian Spectral Embedding
+     6.3.9.2. Laplacian Spectral Embedding
     </a>
    </li>
   </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-should-you-use-ase-and-when-should-you-use-lse">
+   6.3.10. When should you use ASE and when should you use LSE?
+  </a>
  </li>
 </ul>
 
@@ -1120,7 +1134,7 @@ Take the <span class="math notranslate nohighlight">\(i^{th}\)</span> column of 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2026/4020697758.py:28: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1996/4020697758.py:28: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
 </pre></div>
 </div>
@@ -1478,11 +1492,62 @@ Let’s call our embeddings, the latent position matrix, <span class="math notra
 <p>If you have an <em>estimate</em> for the latent positions, there’s math that shows that you get a pretty good estimate for the block probability matrix as well. In practice, that’s what you’re actually doing: getting an estimate of the latent positions with spectral embedding, then you can use those to do more downstream tasks or get an estimate for the block probability matrix.</p>
 </div>
 </div>
-<div class="section" id="using-graspologic">
-<h2><span class="section-number">6.3.8. </span>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="figuring-out-how-many-dimensions-to-embed-your-network-into">
+<h2><span class="section-number">6.3.8. </span>Figuring Out How Many Dimensions To Embed Your Network Into<a class="headerlink" href="#figuring-out-how-many-dimensions-to-embed-your-network-into" title="Permalink to this headline">¶</a></h2>
+<p>One thing we haven’t addressed is how to figure out how many dimensions to embed down to. We’ve generally been embedding into two dimensions throughout this chapter (mainly because it’s easier to visualize), but you can embed into as many dimensions as you want.</p>
+<p>If you don’t have any prior information about the “true” dimensionality of your latent positions, by default you’d just be stuck guessing. Fortunately, there are some rules-of-thumb to make your guess better, and some methods people have developed to make fairly decent guesses automatically.</p>
+<p>The most common way to pick the number of embedding dimensions is with something called a scree plot. Essentially, the intuition is this: the top singular vectors of an adjacency matrix contain the most useful information about your network, and as the singular vectors have smaller and smaller singular values, they contain less important and so are less important (this is why we’re allowed to cut out the smallest <span class="math notranslate nohighlight">\(n-k\)</span> singular vectors in the spectral embedding algorithm).</p>
+<p>The scree plot just plots the singular values by their indices: the first (biggest) singular value is in the beginning, and the last (smallest) singular value is at the end.</p>
+<p>You can see the scree plot for the Laplacian we made earlier below. We’re only plotting the first ten singular values for demonstration purposes.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from graspologic.plot import screeplot</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Circle</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patheffects</span> <span class="kn">import</span> <span class="n">withStroke</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.anchored_artists</span> <span class="kn">import</span> <span class="n">AnchoredDrawingArea</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svdvals</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># eigval plot</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">svdvals</span><span class="p">(</span><span class="n">L2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">D</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Singular value index&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Singular value&quot;</span><span class="p">)</span>
+
+<span class="c1"># plot circle</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">.15</span><span class="p">,</span> <span class="mf">.15</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="mf">.15</span>
+<span class="n">ada</span> <span class="o">=</span> <span class="n">AnchoredDrawingArea</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower left&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">((</span><span class="mi">105</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span> <span class="mi">20</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.0125</span><span class="p">),</span>
+                <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">withStroke</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">foreground</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)])</span>
+<span class="n">ada</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ada</span><span class="p">)</span>
+
+<span class="c1"># add text</span>
+<span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+    
+<span class="n">text</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">.19</span><span class="p">,</span> <span class="s2">&quot;Elbow&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_62_0.png" src="../../_images/spectral-embedding_62_0.png" />
+</div>
+</div>
+<p>You’ll notice that there’s a marked area called the “elbow”. This is an area where singular values stop changing in magnitude as much when they get smaller: before the elbow, singular values change rapidly, and after the elbow, singular values barely change at all. (It’s called an elbow because the plot kind of looks like an arm, viewed from the side!)</p>
+<p>The location of this elbow gives you a rough indication for how many “true” dimensions your latent positions have. The singular values after the elbow are quite close to each other and have singular vectors which are largely noise, and don’t tell you very much about your data. It looks from the scree plot that we should be embedding down to two dimensions, and that adding more dimensions would probably just mean adding noise to our embedding.</p>
+<p>One drawback to this method is that a lot of the time, the elbow location is pretty subjective - real data will rarely have a nice, pretty elbow like the one you see above. The advantage is that it still generally works pretty well; embedding into a few more dimensions than you need isn’t too bad, since you’ll only have a few noies dimensions and there still may be <em>some</em> signal there.</p>
+<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2006 by Mu Zhu and Ali Ghodsi at the University of Waterloo. We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
+</div>
+<div class="section" id="using-graspologic-to-embed-networks">
+<h2><span class="section-number">6.3.9. </span>Using Graspologic to embed networks<a class="headerlink" href="#using-graspologic-to-embed-networks" title="Permalink to this headline">¶</a></h2>
 <p>It’s pretty straightforward to use graspologic’s API to embed a network. The setup works like an SKlearn class: you instantiate an AdjacencySpectralEmbed class, and then you use it to transform data. You set the number of dimensions to embed to (the number of eigenvector columns to keep!) with <code class="docutils literal notranslate"><span class="pre">n_components</span></code>.</p>
 <div class="section" id="adjacency-spectral-embedding">
-<h3><span class="section-number">6.3.8.1. </span>Adjacency Spectral Embedding<a class="headerlink" href="#adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">6.3.9.1. </span>Adjacency Spectral Embedding<a class="headerlink" href="#adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -1507,12 +1572,12 @@ Let’s call our embeddings, the latent position matrix, <span class="math notra
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/spectral-embedding_64_0.png" src="../../_images/spectral-embedding_64_0.png" />
+<img alt="../../_images/spectral-embedding_68_0.png" src="../../_images/spectral-embedding_68_0.png" />
 </div>
 </div>
 </div>
 <div class="section" id="laplacian-spectral-embedding">
-<h3><span class="section-number">6.3.8.2. </span>Laplacian Spectral Embedding<a class="headerlink" href="#laplacian-spectral-embedding" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">6.3.9.2. </span>Laplacian Spectral Embedding<a class="headerlink" href="#laplacian-spectral-embedding" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
@@ -1532,10 +1597,25 @@ Let’s call our embeddings, the latent position matrix, <span class="math notra
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;left&#39;:&#39;Laplacian Spectral Embedding&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/spectral-embedding_67_1.png" src="../../_images/spectral-embedding_67_1.png" />
+<img alt="../../_images/spectral-embedding_71_1.png" src="../../_images/spectral-embedding_71_1.png" />
 </div>
 </div>
 </div>
+</div>
+<div class="section" id="when-should-you-use-ase-and-when-should-you-use-lse">
+<h2><span class="section-number">6.3.10. </span>When should you use ASE and when should you use LSE?<a class="headerlink" href="#when-should-you-use-ase-and-when-should-you-use-lse" title="Permalink to this headline">¶</a></h2>
+<p>Throughout this article, we’ve primarily used LSE, since Laplacians have some nice properties (such as having singular values being the same as eigenvalues) that make stuff like SVD easier to explain. However, you can embed the same network with either ASE or LSE, and you’ll get two different (but equally true) embeddings.</p>
+<p>Since both embeddings will give you a reasonable clustering, how are they different? When should you use one compared to the other?</p>
+<p>Well, it turns out that LSE and ASE capture different notions of “clustering”. Carey Priebe and collaborators at Johns Hopkins University investigated this recently - in 2018 - and discovered that LSE lets you capture “affinity” structure, whereas ASE lets you capture “core-periphery” structure (their paper is called “On a two-truths phenomenon in spectral graph clustering” - it’s an interesting read for the curious). The difference between the two types of structure is shown in the image below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">figure</span><span class="p">}</span> <span class="o">../../</span><span class="n">Images</span><span class="o">/</span><span class="n">two</span><span class="o">-</span><span class="n">truths</span><span class="o">.</span><span class="n">jpeg</span>
+<span class="n">height</span><span class="p">:</span> <span class="mi">400</span><span class="n">px</span>
+
+<span class="n">name</span><span class="p">:</span> <span class="n">two</span><span class="o">-</span><span class="n">truths</span>
+<span class="n">Affinity</span> <span class="n">vs</span><span class="o">.</span> <span class="n">Core</span><span class="o">-</span><span class="n">periphery</span> <span class="n">Structure</span> 
+</pre></div>
+</div>
+<p>The “affinity” structure - the one that LSE is good at finding - means that you have two groups of nodes which are well-connected within the groups, and aren’t very connected with each other. Think of a friend network in two schools, where people within the same school are much more likely to be friends than people in different schools. This is a type of structure we’ve seen a lot in this book in our Stochastic Block Model examples. If you think the communities in your data look like this, you should apply LSE to your network.</p>
+<p>The name “core-periphery” is a good description for this type of structure (which ASE is good at finding). In this notion of clustering, you have a core group of well-connected nodes surrounded by a bunch of “outlier” nodes which just don’t have too many edges with anything in general. Think of a core of popular, well-liked, and charismatic kids at a high school, with a periphery of loners or people who prefer not to socialize as much.</p>
 </div>
 </div>
 
@@ -1591,7 +1671,7 @@ Let’s call our embeddings, the latent position matrix, <span class="math notra
         
         </div>
     </div>
-    <footer class="footer mt-5 mt-md-0">
+    <footer class="footer">
     <div class="container">
       <p>
         
