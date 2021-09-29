@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
@@ -1420,8 +1420,19 @@
 <p>There’s an obvious solution here: why don’t we just embed <em>again</em>? Nothing stops us from doing a Singular Value Decomposition on a nonsquare matrix, and so we can just create a joint embedding of our combined matrix and go back down to a healthy <span class="math notranslate nohighlight">\(d\)</span> columns.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
-<span class="n">joint_embedding</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">selectSVD</span><span class="p">(</span><span class="n">concatenated</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">select_svd</span>
+<span class="n">joint_embedding</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">select_svd</span><span class="p">(</span><span class="n">concatenated</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2036</span><span class="o">/</span><span class="mf">393147859.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">select_svd</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">joint_embedding</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">select_svd</span><span class="p">(</span><span class="n">concatenated</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="ne">ImportError</span>: cannot import name &#39;select_svd&#39; from &#39;graspologic.embed&#39; (/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/embed/__init__.py)
 </pre></div>
 </div>
 </div>
@@ -1459,9 +1470,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_68_0.png" src="../../_images/multigraph-representation-learning_68_0.png" />
-</div>
 </div>
 <p>Looks like this idea worked well - Our nodes are clearly grouped into two distinct communities, and all of our networks were drawn from the same distribution! To reiterate, what we did was:</p>
 <ol class="simple">
@@ -1490,9 +1498,6 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;MASE embedding&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_73_0.png" src="../../_images/multigraph-representation-learning_73_0.png" />
 </div>
 </div>
 </div>
@@ -1525,22 +1530,11 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-0.0
-</pre></div>
-</div>
-</div>
 </div>
 <p>What this all means is that <span class="math notranslate nohighlight">\(V^\top V\)</span> is just the identity matrix <span class="math notranslate nohighlight">\(I\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="nd">@V</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1., 0.],
-       [0., 1.]])
 </pre></div>
 </div>
 </div>
@@ -1561,11 +1555,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(4, 2, 2)
-</pre></div>
-</div>
-</div>
 </div>
 <p>Now, here’s something interesting: it turns out that we can estimate the edge probability matrix which generated any graph with <span class="math notranslate nohighlight">\( P^{(i)} = V R^{(i)} V^\top\)</span>.</p>
 <div class="cell docutils container">
@@ -1576,8 +1565,8 @@
 </div>
 </div>
 <p>Below and to the left, you can see the original adjacency matrix for the first matrix. In the center, you can see the heatmap for the first network’s score matrix. Next to it, you can see the recreation of the first network. Remember that we only used the score matrix to recreate it. The first network has a block probability matrix of</p>
-<div class="amsmath math notranslate nohighlight" id="equation-8277c389-750f-41e6-a9d2-fd45258de5a4">
-<span class="eqno">(6.1)<a class="headerlink" href="#equation-8277c389-750f-41e6-a9d2-fd45258de5a4" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-188a589e-48ba-4b2b-8e89-4ba30ff50eb1">
+<span class="eqno">(6.1)<a class="headerlink" href="#equation-188a589e-48ba-4b2b-8e89-4ba30ff50eb1" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 .12 &amp; .03 \\
 .03 &amp; .06 \\
@@ -1597,9 +1586,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_86_0.png" src="../../_images/multigraph-representation-learning_86_0.png" />
-</div>
 </div>
 <p>So we’ve learned that MASE is useful when you want a joint embedding that combines all of your networks together, and when you want to estimate edge probabilities for one of your networks. What if we wanted to keep our separate embeddings, but put them all in the same space? That’s what the Omnibus Embedding gives, and what we’ll explore now.</p>
 </div>
@@ -1617,8 +1603,8 @@
 <p>Let’s take a network generated from an RDPG with <span class="math notranslate nohighlight">\(n\)</span> nodes. Each of these <span class="math notranslate nohighlight">\(n\)</span> nodes is associated with a latent position vector, corresponding to that node’s row in the network’s embedding. What it means for a node to have a latent position vector is that the probability for an edge to exist between two nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> is the dot product of their latent position vectors.</p>
 <p>More specifically, if <span class="math notranslate nohighlight">\(\textbf{P}\)</span> is a matrix of edge probabilities, and <span class="math notranslate nohighlight">\(\textbf{X}\)</span> is our latent position matrix, then <span class="math notranslate nohighlight">\(\textbf{P} = \textbf{X} \textbf{X}^\top\)</span>.</p>
 <p>The nonidentifiability problem is as follows: Take any orthogonal matrix (a matrix which only rotates or flips other matrices). Call it <span class="math notranslate nohighlight">\(\textbf{W}\)</span>. By definition, the transpose of any orthogonal matrix is its inverse: <span class="math notranslate nohighlight">\(\textbf{W} \textbf{W}^\top = \textbf{I}\)</span>, where <span class="math notranslate nohighlight">\(\textbf{I}\)</span> is the identity matrix. So,</p>
-<div class="amsmath math notranslate nohighlight" id="equation-f4593f11-3a75-4e94-a6a7-deea91c7fa57">
-<span class="eqno">(6.2)<a class="headerlink" href="#equation-f4593f11-3a75-4e94-a6a7-deea91c7fa57" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-77fbe2b6-6ba8-4ba7-a5f1-05f98184494a">
+<span class="eqno">(6.2)<a class="headerlink" href="#equation-77fbe2b6-6ba8-4ba7-a5f1-05f98184494a" title="Permalink to this equation">¶</a></span>\[\begin{align}
 P &amp;= \textbf{X} \textbf{X}^\top \\
   &amp;= \textbf{X} \textbf{I} \textbf{X}^\top \\
   &amp;= (\textbf{X} \textbf{W}) (\textbf{W}^\top \textbf{X}^\top) \\
@@ -1649,9 +1635,6 @@ P &amp;= \textbf{X} \textbf{X}^\top \\
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_94_0.png" src="../../_images/multigraph-representation-learning_94_0.png" />
 </div>
 </div>
 </div>
@@ -1689,9 +1672,6 @@ P &amp;= \textbf{X} \textbf{X}^\top \\
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_98_0.png" src="../../_images/multigraph-representation-learning_98_0.png" />
-</div>
 </div>
 <p>Unlike when we embedded the four networks separately, the clusters created by the Omnibus Embedding <em>live in the same space</em>: you don’t have to rotate or flip your points to line them up across embeddings. The cluster of blue points is always in the top left, and the cluster of red points is always in the bottom right. This means that we can compare points directly; the relative location of the node in your network corresponding to the red circle, for instance, now means something across the four networks, and we can do stuff like measure the distance of the red circle in network 1 to the red circle in network two to gain information.</p>
 </div>
@@ -1704,8 +1684,8 @@ P &amp;= \textbf{X} \textbf{X}^\top \\
 </ol>
 <p>The omnibus matrix itself just has every original adjacency or laplacian matrix along its diagonal, and the elementwise average of every pair of original matrices on the off-diagonals. This means that the Omnibus Matrix is <em>huge</em>: if you have <span class="math notranslate nohighlight">\(m\)</span> networks, each of which has <span class="math notranslate nohighlight">\(n\)</span> nodes, the Omnibus Matrix will be a <span class="math notranslate nohighlight">\(mn \times mn\)</span> matrix.</p>
 <p>For example, say we only have two networks. Let’s name their adjacency matrices <span class="math notranslate nohighlight">\(A^{(1)}\)</span> and <span class="math notranslate nohighlight">\(A^{(2)}\)</span>. Then, the omnibus embedding looks like this:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-e019aff4-07be-49b6-9e18-4e96b028102e">
-<span class="eqno">(6.3)<a class="headerlink" href="#equation-e019aff4-07be-49b6-9e18-4e96b028102e" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-bca610a3-1b27-4aed-b9a0-e612400bafce">
+<span class="eqno">(6.3)<a class="headerlink" href="#equation-bca610a3-1b27-4aed-b9a0-e612400bafce" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 \frac{A^{(2)} + A^{(1)}}{2} &amp; A^{(2)} \\
@@ -1725,7 +1705,9 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <p>Below you can see the resulting Omnibus Matrix. The first and second networks are shown as heatmaps on the left, and their Omnibus Matrix is shown on the right.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fig, axs = plt.subplots(1, 3, figsize=(15, 5))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">text</span>
+
+<span class="c1"># fig, axs = plt.subplots(1, 3, figsize=(15, 5))</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="n">gs</span> <span class="o">=</span> <span class="n">GridSpec</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="n">ax0</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -1756,16 +1738,6 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
     <span class="n">hm</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">omni</span><span class="p">)</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">omni</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.6</span><span class="p">)</span>
     
 <span class="c1"># text</span>
-<span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,):</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-    <span class="n">left</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.5</span>
-    <span class="n">right</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="n">width</span>
-    <span class="n">top</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">+</span> <span class="n">height</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">),</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="n">bottom</span> <span class="o">+</span> <span class="n">top</span><span class="p">),</span> <span class="n">label</span><span class="p">,</span>
-                <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
-                <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
-                <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">))</span>
-
 <span class="n">text</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$A_1$&quot;</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.75</span><span class="p">)</span>
 <span class="n">text</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$A_2$&quot;</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
 <span class="n">text</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\frac{(A_2 + A_1)}</span><span class="si">{2}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
@@ -1778,9 +1750,6 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_104_0.png" src="../../_images/multigraph-representation-learning_104_0.png" />
 </div>
 </div>
 <div class="section" id="creating-the-omnibus-matrix-for-all-four-networks">
@@ -1815,9 +1784,6 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_107_0.png" src="../../_images/multigraph-representation-learning_107_0.png" />
-</div>
 </div>
 </div>
 <div class="section" id="embedding-the-omnibus-matrix">
@@ -1825,17 +1791,12 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <p>You should understand the next step fairly well by now. We embed the Omnibus Matrix normally, using ASE, as if it were just a normal adjacency matrix. This will create an <span class="math notranslate nohighlight">\(nm \times d\)</span> sized latent position matrix (where, remember, <span class="math notranslate nohighlight">\(n\)</span> is the number of nodes in each network, <span class="math notranslate nohighlight">\(m\)</span> is the number of networks, and <span class="math notranslate nohighlight">\(d\)</span> is the number of embedding dimensions). Here, since each of our four networks has 200 nodes, <span class="math notranslate nohighlight">\(mn\)</span> is 800, and we chose to embed down to two dimensions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">selectSVD</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">select_svd</span>
 
-<span class="n">U</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">selectSVD</span><span class="p">(</span><span class="n">omni</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">select_svd</span><span class="p">(</span><span class="n">omni</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">joint_embedding</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">D</span><span class="p">))</span>
 
 <span class="n">joint_embedding</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(800, 2)
 </pre></div>
 </div>
 </div>
@@ -1852,11 +1813,6 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <span class="n">latent_networks</span> <span class="o">=</span> <span class="n">joint_embedding</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">latent_networks</span><span class="o">.</span><span class="n">shape</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(4, 200, 2)
 </pre></div>
 </div>
 </div>
@@ -1904,14 +1860,8 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_115_1.png" src="../../_images/multigraph-representation-learning_115_1.png" />
-</div>
 </div>
 <div class="figure align-default" id="fig-omnibus" style="width: 300px">
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_115_0.png" src="../../_images/multigraph-representation-learning_115_0.png" />
-</div>
 <p class="caption"><span class="caption-number">Fig. 6.3 </span><span class="caption-text">This is a <strong>caption</strong>, with an embedded <code class="docutils literal notranslate"><span class="pre">{glue:text}</span></code> element: !</span><a class="headerlink" href="#fig-omnibus" title="Permalink to this image">¶</a></p>
 </div>
 <p>And finally, below is the above embeddings, plotted in Euclidean space. Each point is a row of the embedding above, and the dots are colored according to their class label. The big matrix on the left (the joint OMNI embedding) just contains every latent position we have, across all of our networks. This means that, on the lefthand plot, there will be four points for every node (remember that we’re operating under the assumption that we have the same set of nodes across all of our networks).</p>
@@ -1939,9 +1889,6 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <span class="n">fig</span><span class="o">.</span><span class="n">supylabel</span><span class="p">(</span><span class="s2">&quot;Dimension 2&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mf">.01</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_118_0.png" src="../../_images/multigraph-representation-learning_118_0.png" />
 </div>
 </div>
 </div>
@@ -2082,11 +2029,9 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <span class="n">g</span><span class="o">.</span><span class="n">add_legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="n">g</span><span class="o">.</span><span class="n">add_legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Type of Mouse&quot;</span><span class="p">);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s2">&quot;center right&quot;</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_121_0.png" src="../../_images/multigraph-representation-learning_121_0.png" />
 </div>
 </div>
 <p>You can clearly see a difference between the genetically modified mice and the normal mice. The genetically modified mice are off in their own cluster; if you’re familiar with classical statistics, you could do a MANOVA here and find that the genetically modified mice are significantly different from the rest - if we wanted to, we could figure out which mice are genetically modified, even without having that information in advance!</p>

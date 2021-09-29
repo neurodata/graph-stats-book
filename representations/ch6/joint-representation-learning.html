@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/sphinx-book-theme.e2363ea40746bee74734a24ffefccd78.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
@@ -656,10 +656,15 @@
   <a class="reference internal nav-link" href="#using-graspologic">
    6.8.4. Using Graspologic
   </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#omnibus-joint-embedding">
+   6.8.5. Omnibus Joint Embedding
+  </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#references">
-     6.8.4.1. References
+     6.8.5.1. References
     </a>
    </li>
   </ul>
@@ -679,7 +684,7 @@
 <h1><span class="section-number">6.8. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
 <p>In many problems, our network might be more than just the information contained in its adjacency matrix (called its topology, or its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of the network. Because they jointly use both the topology of the network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
-<p>In this section, we’ll explore different ways to learn from our data when we have access to the covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
+<p>In this section, we’ll explore different ways to learn from our data when we have access to the covariates of a network in addition to its topological structure. We’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or its regularized Laplacian, we’ll combine the Laplacian and our covariates into a new matrix and embed that.</p>
 <p>A good way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates and some is in our topology. Using the Stochastic Block Model, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in its covariates. By combining the topology and the covariates, we’ll get a nice embedding that lets us find three distinct community clusters.</p>
 <div class="section" id="stochastic-block-model">
 <h2><span class="section-number">6.8.1. </span>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">¶</a></h2>
@@ -843,8 +848,8 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^T\)</span>, notice we’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-5c418164-626c-4fdd-9f00-3dd6081df62c">
-<span class="eqno">(6.4)<a class="headerlink" href="#equation-5c418164-626c-4fdd-9f00-3dd6081df62c" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-347f541c-15d1-47f6-b8a3-5041a7a9ad18">
+<span class="eqno">(6.4)<a class="headerlink" href="#equation-347f541c-15d1-47f6-b8a3-5041a7a9ad18" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1015,8 +1020,87 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 <img alt="../../_images/joint-representation-learning_45_0.png" src="../../_images/joint-representation-learning_45_0.png" />
 </div>
 </div>
+</div>
+<div class="section" id="omnibus-joint-embedding">
+<h2><span class="section-number">6.8.5. </span>Omnibus Joint Embedding<a class="headerlink" href="#omnibus-joint-embedding" title="Permalink to this headline">¶</a></h2>
+<p>If you’ve read the Multiple-Network Representation Learning section, you’ve seen the Omnibus Embedding (if you haven’t read that section, you should go read it before reading this one!). To recap, the way the omnibus embedding works is:</p>
+<ol class="simple">
+<li><p>Have a bunch of networks</p></li>
+<li><p>Combine the adjacency matrices from all of those networks into a single, huge network</p></li>
+<li><p>Embed that huge network</p></li>
+</ol>
+<p>Remember that the Omnibus Embedding is a way to bring all of your networks into the same space (meaning, you don’t run into any rotational nonidentifiability issues when you embed). Once you embed the Omnibus Matrix, it’ll produce a huge latent position matrix, which you can break apart along the rows to recover latent positions for your individual networks.</p>
+<p>You might be able to predict where this is going. What if we created an Omnibus embedding not with a set of networks, but with a network and covariates?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span>
+
+<span class="c1"># embed with Omni</span>
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OmnibusEmbed</span><span class="p">()</span>
+
+<span class="c1"># Normalize the covariates first</span>
+<span class="n">YYt</span> <span class="o">=</span> <span class="n">Y</span><span class="nd">@Y</span><span class="o">.</span><span class="n">T</span>
+<span class="n">YYt</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">YYt</span><span class="p">)</span>
+
+<span class="c1"># Create a joint embedding</span>
+<span class="n">joint_embedding</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">([</span><span class="n">A</span><span class="p">,</span> <span class="n">YYt</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># network</span>
+<span class="n">network_plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">joint_embedding</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">legend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Omni embedding for topology&quot;</span><span class="p">)</span>
+
+<span class="c1"># covariates</span>
+<span class="n">covariates_plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">joint_embedding</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> 
+                               <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Omni embedding for covariates&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">covariates_plot</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center right&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_49_0.png" src="../../_images/joint-representation-learning_49_0.png" />
+</div>
+</div>
+<p>There’s a few things going on here. First, we had to normalize the covariates by dividing <span class="math notranslate nohighlight">\(YY^\top\)</span> by its maximum. This is because if we didn’t, the covariates and the adjacency matrix would contribute vastly different amounts of information to the omnibus matrix. You can see that by looking at the average value of <span class="math notranslate nohighlight">\(YY^\top\)</span> compared to the average value of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of Y@Y.T:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Y</span><span class="nd">@Y</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of A:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean of Y@Y.T: 0.02
+Mean of A: 0.23
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of normalized Y@Y.T:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">YYt</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of A:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean of normalized Y@Y.T: 0.42
+Mean of A: 0.23
+</pre></div>
+</div>
+</div>
+</div>
+<p>Second, you can see that <em>both embeddings</em> are able to separate all three communities, even though we’re using the same data that we used for the CASE section. This is because the Omnibus Embedding induces dependence on the latent positions it outputs. Remember that the off-diagonals of the Omnibus Matrix contain the averages of pairs of networks fed into it. These off-diagonal elements are responsible for some “information leakage” - the latent representation for the topology uses information from the covariates, and the latent representation for the covariates uses information from the topology.</p>
 <div class="section" id="references">
-<h3><span class="section-number">6.8.4.1. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">6.8.5.1. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
 <p>[1] N. Binkiewicz, J. T. Vogelstein, K. Rohe, Covariate-assisted spectral clustering, Biometrika, Volume 104, Issue 2, June 2017, Pages 361–377, https://doi.org/10.1093/biomet/asx008<br />
 [2] Lloyd, S. (1982). Least squares quantization in PCM. IEEE transactions on information theory, 28(2), 129-137.<br />
 [3] https://scikit-learn.org/stable/modules/clustering.html#k-means<br />
