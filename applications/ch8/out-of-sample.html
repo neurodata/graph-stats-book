@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -633,6 +635,130 @@
                 
   <div class="section" id="out-of-sample-embedding">
 <h1><span class="section-number">8.6. </span>Out-of-sample Embedding<a class="headerlink" href="#out-of-sample-embedding" title="Permalink to this headline">¶</a></h1>
+<p>Imagine you have a citation network of scholars publishing papers. The nodes are the scholars, and an edge exists in a given pair of scholars if they’re published a paper together.</p>
+<p>You’ve already found a representation using ASE or LSE and you have a set of latent positions, which you then clustered to figure out who came from which university. It took a long time for you to get this representation - there are a lot of people doing research out there!</p>
+<p>Now, suppose a new graduate student publishes a paper. Your network gets bigger by a single node, and you’d like to find this person’s latent position (thus adding them to the clustering system). To do that, however, you’d have to get an entirely new representation for the network. Re-embedding the entire network with the new node added seems like it should be unecessary - after all, you already know the latent positions for every other node.</p>
+<p>This section is all about this problem: how to find the representation for new nodes without the computationally expensive task of re-embedding an entire network. As it turns out, there has been some work done, and there is a solution that can get you pretty close the latent position for the new node that you would have had. For more details and formaility, see the 2013 paper “Out-of-sample extension for latent position graphs”, by Tang et al (although, as with most science, the theory in this paper was built on top of other work from related fields).</p>
+<p>Let’s make a network from an SBM, and an additional node that should belong to the first community. Then, we’ll embed the network and explore how to find the latent position for the additional node.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">remove_vertices</span>
+
+<span class="c1"># Generate parameters</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+
+<span class="c1"># Generate a network along with community memberships</span>
+<span class="n">network</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_</span><span class="p">)</span>
+
+<span class="c1"># Grab out-of-sample vertex</span>
+<span class="n">oos_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">oos_label</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">oos_idx</span><span class="p">)</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">remove_vertices</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">oos_idx</span><span class="p">,</span> <span class="n">return_removed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1796</span><span class="o">/</span><span class="mf">1047277327.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="c1"># Generate a network along with community memberships</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">network</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">11</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">12</span> 
+<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="c1"># Grab out-of-sample vertex</span>
+
+<span class="ne">NameError</span>: name &#39;labels_&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<p>What we have now is a network and an additional node. You can see the adjacency matrix for the network below, along with the adjacency vector for the additional node (Here, an “adjacency vector”  is a vector with a 1 in every position that the out-of-sample node has an edge with an in-sample node). The heatmap on the right is a network with two communities, with 100 nodes in each community. The vector on the right is purple on row <span class="math notranslate nohighlight">\(i\)</span> if the <span class="math notranslate nohighlight">\(i^{th}\)</span> in-sample node is connected to the out-of-sample node.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">from</span> <span class="nn">graphbook_code.plotting</span> <span class="kn">import</span> <span class="n">cmaps</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># heatmap</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># adjacency vector</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.85</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">]</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelright</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;in-sample node index&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_label_position</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+
+<span class="c1"># title</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Adjacency matrix (left) and vector for additional </span><span class="se">\n</span><span class="s2">node (right)&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">.19</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/out-of-sample_4_0.png" src="../../_images/out-of-sample_4_0.png" />
+</div>
+</div>
+<p>After embedding with ASE, we have an embedding for the original network - so our rows contain the latent position for each original node - but we still don’t have anything for our new node.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
+
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ase</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions for our original network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/out-of-sample_7_0.png" src="../../_images/out-of-sample_7_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">pinv</span>
+
+<span class="n">np_pinv</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">ase</span><span class="o">.</span><span class="n">_pinv_left</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.00736528, 0.00700151, 0.00689389, 0.00753227, 0.00675647],
+       [0.00847618, 0.00874595, 0.00915071, 0.00835613, 0.0076026 ]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np_pinv</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.00740115, 0.00703738, 0.0069299 , 0.00756818, 0.00679244],
+       [0.00854566, 0.00882142, 0.00923125, 0.00842319, 0.00767085]])
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
