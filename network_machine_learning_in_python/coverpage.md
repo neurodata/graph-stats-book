@@ -5,5 +5,5 @@
 height: 700px
 name: maggot-connectome
 ---
-2D representation of a _Drosophila_ larva brain connectome network. Credit to Ben Pedigo, PhD student at Johns Hopkins University.
+2D representation of a *Drosophila* larva brain connectome network. Credit to Ben Pedigo, PhD student at Johns Hopkins University.
 ```
