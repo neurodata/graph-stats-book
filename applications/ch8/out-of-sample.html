@@ -631,6 +631,39 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-network-and-an-out-of-sample-node">
+   8.6.1. A Network and an Out-of-Sample Node
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-latent-position-matrix-can-be-used-to-estimate-probability-vectors">
+   8.6.2. The Latent Position Matrix Can be used to Estimate Probability Vectors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#going-in-the-other-direction">
+   8.6.3. Going in the Other Direction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-pseudoinverse-gives-us-our-best-guess-for-inverting-a-matrix">
+   8.6.4. The Pseudoinverse Gives Us our Best Guess For Inverting a Matrix
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-the-pseudoinverse-to-estimate-out-of-sample-latent-positions">
+   8.6.5. Using the Pseudoinverse to Estimate out-of-sample Latent Positions
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -646,6 +679,8 @@
 <p>Now, suppose a new graduate student publishes a paper. Your network gets bigger by a single node, and you’d like to find this person’s latent position (thus adding them to the clustering system). To do that, however, you’d have to get an entirely new representation for the network. Re-embedding the entire network with the new node added seems like it should be unecessary - after all, you already know the latent positions for every other node.</p>
 <p>This section is all about this problem: how to find the representation for new nodes without the computationally expensive task of re-embedding an entire network. As it turns out, there has been some work done, and there is a solution that can get you pretty close the latent position for the new node that you would have had. For more details and formaility, see the 2013 paper “Out-of-sample extension for latent position graphs”, by Tang et al (although, as with most science, the theory in this paper was built on top of other work from related fields).</p>
 <p>Let’s make a network from an SBM, and an additional node that should belong to the first community. Then, we’ll embed the network and explore how to find the latent position for the additional node.</p>
+<div class="section" id="a-network-and-an-out-of-sample-node">
+<h2><span class="section-number">8.6.1. </span>A Network and an Out-of-Sample Node<a class="headerlink" href="#a-network-and-an-out-of-sample-node" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -658,26 +693,12 @@
 
 <span class="c1"># Generate a network along with community memberships</span>
 <span class="n">network</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
 
 <span class="c1"># Grab out-of-sample vertex</span>
 <span class="n">oos_idx</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">oos_label</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">oos_idx</span><span class="p">)</span>
 <span class="n">A</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">remove_vertices</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">oos_idx</span><span class="p">,</span> <span class="n">return_removed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1864</span><span class="o">/</span><span class="mf">1047277327.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="c1"># Generate a network along with community memberships</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">network</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">11</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> 
-<span class="g g-Whitespace">     </span><span class="mi">13</span> <span class="c1"># Grab out-of-sample vertex</span>
-
-<span class="ne">NameError</span>: name &#39;labels_&#39; is not defined
 </pre></div>
 </div>
 </div>
@@ -710,10 +731,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_4_0.png" src="../../_images/out-of-sample_4_0.png" />
+<img alt="../../_images/out-of-sample_5_0.png" src="../../_images/out-of-sample_5_0.png" />
 </div>
 </div>
-<p>After embedding with ASE, we have an embedding for the original network - so our rows contain the latent position for each original node - but we still don’t have anything for our new node.</p>
+<p>After embedding with ASE, we have an embedding for the original network. The rows of this embedding contain the latent position for each original node. We’ll call the embedding X.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -728,40 +749,223 @@
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions for our original network&quot;</span><span class="p">);</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions for our original network (X)&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_7_0.png" src="../../_images/out-of-sample_7_0.png" />
+<img alt="../../_images/out-of-sample_8_0.png" src="../../_images/out-of-sample_8_0.png" />
 </div>
 </div>
+</div>
+<div class="section" id="the-latent-position-matrix-can-be-used-to-estimate-probability-vectors">
+<h2><span class="section-number">8.6.2. </span>The Latent Position Matrix Can be used to Estimate Probability Vectors<a class="headerlink" href="#the-latent-position-matrix-can-be-used-to-estimate-probability-vectors" title="Permalink to this headline">¶</a></h2>
+<p>Everything up until now has just been pretty standard stuff. We still haven’t done anything with our new node - all we have is a big vector that tells us which other nodes it’s connected to, and our standard matrix of latent positions. However, it’s time for a bit more exploration into the nature of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, and what happens when you view it as a linear transformation. This will get us closer to understanding the out-of-sample embedding.</p>
+<p>Remember from the section on latent positions that <span class="math notranslate nohighlight">\(X\)</span> can be used to estimate the block probability matrix. When you use ASE on a single network to make <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(XX^\top\)</span> estimates <span class="math notranslate nohighlight">\(P\)</span>: meaning, <span class="math notranslate nohighlight">\(XX^\top_{ij}\)</span>, the element on the <span class="math notranslate nohighlight">\(i^{(th)}\)</span> row and <span class="math notranslate nohighlight">\(j^{(th)}\)</span> column of <span class="math notranslate nohighlight">\(XX^\top\)</span>, will estimate the probability that node <span class="math notranslate nohighlight">\(i\)</span> has an edge with node <span class="math notranslate nohighlight">\(j\)</span>.</p>
+<p>Let’s take a single latent position vector out of <span class="math notranslate nohighlight">\(X\)</span> - call it <span class="math notranslate nohighlight">\(v_i ^\top\)</span>, since we’re taking a row vector <span class="math notranslate nohighlight">\(v_i\)</span> and transposing. What’ll <span class="math notranslate nohighlight">\(X v_i^\top\)</span> look like? Well, that’s essentially the same thing as grabbing the <span class="math notranslate nohighlight">\(i_{th}\)</span> column of <span class="math notranslate nohighlight">\(XX^\top\)</span>. Meaning, <span class="math notranslate nohighlight">\(X v_i^\top\)</span> will be a single vector whose <span class="math notranslate nohighlight">\(j^{(th)}\)</span> element estimates the probability that node <span class="math notranslate nohighlight">\(i\)</span> will connect to node <span class="math notranslate nohighlight">\(j\)</span>.</p>
+<p>You can see this in action below. We took the latent position corresponding to the first node out of the latent position matrix (and called it <span class="math notranslate nohighlight">\(v_0\)</span>), and then multiplied it by the latent position matrix itself. What emerged is what you see below: a vector that shows the estimated probability that node 0 has an edge with each other node in the network. The true probabilities for the first half of nodes (the ones in the same community) should be .8, and the true probabilities for the second half of nodes in the other community should be .2. The average values were .775 and .149 - so, pretty close!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v_0</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">v_est_proba</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">v_0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">v_est_proba</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;average value: </span><span class="si">{</span><span class="n">v_est_proba</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">170</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;average value: </span><span class="si">{</span><span class="n">v_est_proba</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node index&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Estimated probability</span><span class="se">\n</span><span class="s2"> vector&quot;</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot; for first node $X v_0^\top$&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/out-of-sample_12_0.png" src="../../_images/out-of-sample_12_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="going-in-the-other-direction">
+<h2><span class="section-number">8.6.3. </span>Going in the Other Direction<a class="headerlink" href="#going-in-the-other-direction" title="Permalink to this headline">¶</a></h2>
+<p>We know now that we can use the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> to get a set of estimated edge probabilities for every node in a network. Our goal is to go the other direction - to start with “estimated edge probabilities”, and end with a latent position.</p>
+<p>First, let’s think about the term “estimated edge probabilities” for a second. In an ideal world, this would be a vector associated to node <span class="math notranslate nohighlight">\(i\)</span> with <span class="math notranslate nohighlight">\(n\)</span> elements, where the <span class="math notranslate nohighlight">\(j_{th}\)</span> element of the vector contains the probability that node <span class="math notranslate nohighlight">\(i\)</span> will connect to node <span class="math notranslate nohighlight">\(j\)</span>. Adjacency matrices, however, contain only adjacency vectors of 0’s and 1’s - 0 if there isn’t an edge, 1 if there is an edge.</p>
+<p>If you think about it, however, you can think of a big adjacency vector full of 0’s and 1’s as kind of an estimate for edge probabilities. Say you sample a node’s adjacency vector from an RDPG, then you sample again, and again, averaging your samples will get you closer and closer to the connection probabilities. So you can think of a single adjacency vector as an estimate for the edge probabilities - it’s just that the sample size is 1.</p>
+<p>The point here is that if you can start with a latent position and then estimate the edge probabilities, it’s somewhat equivalent (albeit going in the other direction) to start with the adjacency vector for a node and estimate the latent position.</p>
+<p>Let’s call the estimated probability vector <span class="math notranslate nohighlight">\(a_i\)</span>. We know that <span class="math notranslate nohighlight">\(\hat{a_i} = \hat{X} \hat{v_i}^\top\)</span>: you multiply the latent position matrix by the <span class="math notranslate nohighlight">\(i_{th}\)</span> latent position to estimate <span class="math notranslate nohighlight">\(a_i\)</span> (remember that the ^ hats above letters means we’re getting an estimate for something, rather than getting the thing itself). How do we isolate <span class="math notranslate nohighlight">\(v_i\)</span>?</p>
+<p>Well, if <span class="math notranslate nohighlight">\(X\)</span> were invertible, we could do <span class="math notranslate nohighlight">\(\hat{X}^{-1} \hat{a_i} = \hat{v_i}^\top\)</span>: just invert both sides of the equation to get <span class="math notranslate nohighlight">\(v_i\)</span> by itself. Unfortunately, however, <span class="math notranslate nohighlight">\(X\)</span> will almost never be invertible. We’ll have to do the next-best thing, which is to use the <em>pseudoinverse</em>.</p>
+</div>
+<div class="section" id="the-pseudoinverse-gives-us-our-best-guess-for-inverting-a-matrix">
+<h2><span class="section-number">8.6.4. </span>The Pseudoinverse Gives Us our Best Guess For Inverting a Matrix<a class="headerlink" href="#the-pseudoinverse-gives-us-our-best-guess-for-inverting-a-matrix" title="Permalink to this headline">¶</a></h2>
+<p>The Moore-Penrose Pseudoinverse is useful to know about for anybody interested in data science. Say you have a matrix which isn’t invertible. Call it <span class="math notranslate nohighlight">\(T\)</span>.</p>
+<p>The pseudoinverse <span class="math notranslate nohighlight">\(T^+\)</span> is the closest approximation you can get to <span class="math notranslate nohighlight">\(T^{-1}\)</span>. This is best understood visually. Let’s take <span class="math notranslate nohighlight">\(T\)</span> to be a matrix which projects points on the x-y coordinate axis down to the x-axis, then flips them to their negative on the number line. The matrix would look like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    T &amp;=
+    \begin{bmatrix}
+    -1 &amp; 0 \\
+    0 &amp; 0  \\
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>Some information is inherently lost here. Because the second column is all zeroes, any information in the y-axis can’t be recovered. For instance, say we have some vectors with different x-axis and y-axis coordinates:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    v_1 &amp;= \begin{bmatrix} 1 &amp; 1 \end{bmatrix}^\top \\
+    v_2 &amp;= \begin{bmatrix} 2 &amp; 2 \end{bmatrix}^\top
+\end{align*}\]</div>
+<p>When we use <span class="math notranslate nohighlight">\(T\)</span> as a linear transformation to act on <span class="math notranslate nohighlight">\(v_1\)</span> and <span class="math notranslate nohighlight">\(v_2\)</span>, the y-axis coordinates both collapse to the same thing (0, in this case). Information in the x-axis, however, is preserved.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>                 <span class="c1"># v 1.19.2</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>    <span class="c1"># v 3.3.2</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_cartesian</span>
+
+
+<span class="c1"># make axis</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">draw_cartesian</span><span class="p">()</span>
+
+<span class="c1"># Enter x and y coordinates of points and colors</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">]</span>
+
+<span class="c1"># Plot points</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+
+<span class="c1"># Draw lines connecting points to axes</span>
+<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+
+<span class="c1"># Draw arrows</span>
+<span class="n">arrow_fmt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis_transform</span><span class="p">(),</span> <span class="o">**</span><span class="n">arrow_fmt</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis_transform</span><span class="p">(),</span> <span class="o">**</span><span class="n">arrow_fmt</span><span class="p">)</span>
+
+<span class="n">arrow_fmt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">arrow_fmt</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">arrow_fmt</span><span class="p">)</span>
+
+<span class="c1"># Draw text</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$v_1$ (1, 1)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">2.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.9</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$v_2$ (2, 2)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">.3</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$T v_1$ (-1, 0)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">2.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">.6</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$T v_2$ (-2, 0)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/out-of-sample_17_0.png" src="../../_images/out-of-sample_17_0.png" />
+</div>
+</div>
+<p>Our goal is to reverse <span class="math notranslate nohighlight">\(T\)</span> and bring <span class="math notranslate nohighlight">\(Tv_1\)</span> and <span class="math notranslate nohighlight">\(Tv_2\)</span> back to <span class="math notranslate nohighlight">\(v_1\)</span> and <span class="math notranslate nohighlight">\(v_2\)</span>. Unfortunately, since both <span class="math notranslate nohighlight">\(v_1\)</span> and <span class="math notranslate nohighlight">\(v_2\)</span> get squished onto zero in the y-axis position after getting passed through <span class="math notranslate nohighlight">\(T\)</span>, we’ve lost all information about what was happening on the y-axis – that’s a lost cause. So it’s impossible to get perfectly back to <span class="math notranslate nohighlight">\(v_1\)</span> or <span class="math notranslate nohighlight">\(v_2\)</span>.</p>
+<p>If you restrict your attention to the x-axis, however, you’ll see that <span class="math notranslate nohighlight">\(Tv_1\)</span> and <span class="math notranslate nohighlight">\(Tv_2\)</span> landed in different places (<span class="math notranslate nohighlight">\(v_1\)</span> went to -1, and <span class="math notranslate nohighlight">\(v_2\)</span> went to -2). You can use this information about the x-axis location of <span class="math notranslate nohighlight">\(Tv_1\)</span> and <span class="math notranslate nohighlight">\(Tv_2\)</span> to re-orient the x-axis values back to where they were prior to the vectors getting passed through X, even if it’s impossible to figure out where the y-values were.</p>
+<p>That’s what the pseudoinverse does: it reverses what it can, and accepts lost information as a lost cause.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>                 <span class="c1"># v 1.19.2</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>    <span class="c1"># v 3.3.2</span>
+
+<span class="c1"># make axis</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">draw_cartesian</span><span class="p">()</span>
+
+<span class="c1"># Enter x and y coordinates of points and colors</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">xs_out</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">ys_out</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># Plot points</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs_out</span><span class="p">,</span> <span class="n">ys_out</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+
+<span class="c1"># Draw lines connecting points to axes</span>
+<span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">arrow_fmt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Draw text</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$v_1$ (1, 1)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">2.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.9</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$v_2$ (2, 2)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">.4</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$T^+ (X v_1$)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">.4</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$T^+ (X v_2$)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/out-of-sample_19_0.png" src="../../_images/out-of-sample_19_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="using-the-pseudoinverse-to-estimate-out-of-sample-latent-positions">
+<h2><span class="section-number">8.6.5. </span>Using the Pseudoinverse to Estimate out-of-sample Latent Positions<a class="headerlink" href="#using-the-pseudoinverse-to-estimate-out-of-sample-latent-positions" title="Permalink to this headline">¶</a></h2>
+<p>Here’s how this stuff applies to latent position matrices.</p>
+<p>Say you have a nonsquare latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Like we learned before, we can estimate the probability vector <span class="math notranslate nohighlight">\(a_i\)</span> (the vector with its probability of connecting with node <span class="math notranslate nohighlight">\(j\)</span> in the <span class="math notranslate nohighlight">\(j_{th}\)</span> position) for a node by passing its latent position (<span class="math notranslate nohighlight">\(v_i\)</span>) through the latent position matrix.</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\text{estimated probability vector } a_i = X v_i^\top
+\end{align*}\]</div>
+<p>You can think of <span class="math notranslate nohighlight">\(X\)</span> as a matrix the same way you thought of <span class="math notranslate nohighlight">\(T\)</span>: right now, it’s a linear transformation that eats a vector and doesn’t necessarily preserve all the information about that vector when it outputs something (In this case, since <span class="math notranslate nohighlight">\(X\)</span> brings lower-dimensional latent positions to higher-dimensional adjacency vectors, what’s happening is more of a restriction on which high-dimensional vectors you can access than a loss of information, but that’s not particularly important).</p>
+<p>The pseudoinverse, <span class="math notranslate nohighlight">\(\hat{X}^+\)</span>, is the best we can do to bring a higher-dimensional adjacency vector to a lower-dimensional latent position. In practice, the best we can do generally turns out to be a pretty good guess, and so we can get a decent estimation of the latent position <span class="math notranslate nohighlight">\(v_i^\top\)</span>.</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+X^+ a_i \approx X^+ X v_i^\top \approx v_i^\top
+\end{align*}\]</div>
+<p>Let’s see it in action.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">pinv</span>
 
-<span class="n">np_pinv</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">ase</span><span class="o">.</span><span class="n">_pinv_left</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<span class="c1"># Grab the first adjacency vector</span>
+<span class="c1"># and make the pseudoinverse of the latent position matrix</span>
+<span class="n">a_i</span> <span class="o">=</span> <span class="n">A</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">X_pinverse</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># Get its estimated latent position</span>
+<span class="n">v_i</span> <span class="o">=</span> <span class="n">X_pinverse</span> <span class="o">@</span> <span class="n">a_i</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.00736528, 0.00700151, 0.00689389, 0.00753227, 0.00675647],
-       [0.00847618, 0.00874595, 0.00915071, 0.00835613, 0.0076026 ]])
-</pre></div>
 </div>
-</div>
-</div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np_pinv</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.axes_divider</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="nn">gridspec</span>
+
+<span class="c1"># setup</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_gridspec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># adjacency vector</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">a_i</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;average value: </span><span class="si">{</span><span class="n">a_i</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">170</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;average value: </span><span class="si">{</span><span class="n">a_i</span><span class="p">[</span><span class="mi">100</span><span class="p">:]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node index&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Adjacency vector $a_i$&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;for the first node&quot;</span><span class="p">);</span>
+
+<span class="c1"># latent position plot</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions with out-of-sample estimate&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">v_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">v_i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Estimated latent position for $a_i$: $X^+ a_i$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">v_i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">.002</span><span class="p">,</span> <span class="n">v_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.008</span><span class="p">),</span> 
+            <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">v_i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.02</span><span class="p">,</span> <span class="n">v_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.2</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;center right&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[0.00740115, 0.00703738, 0.0069299 , 0.00756818, 0.00679244],
-       [0.00854566, 0.00882142, 0.00923125, 0.00842319, 0.00767085]])
-</pre></div>
+<img alt="../../_images/out-of-sample_23_0.png" src="../../_images/out-of-sample_23_0.png" />
 </div>
 </div>
 </div>
