@@ -1,0 +1,56 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 1117, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 78, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 57, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 558, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 765, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
+import matplotlib.gridspec as gridspec
+
+# setup
+fig = plt.figure(figsize=(12, 9))
+gs = fig.add_gridspec(3, 4)
+
+# adjacency vector
+ax = fig.add_subplot(gs[:, 0])
+sns.heatmap(a[:, np.newaxis], cbar=False, cmap=cmap, xticklabels=False, yticklabels=20, ax=ax)
+ax.text(1.1, 70, s=f"average value: {a[:100].mean():.3f}", rotation=90, c="blue")
+ax.text(1.1, 170, s=f"average value: {a[100:].mean():.3f}", rotation=90, c="orange")
+ax.set_ylabel("Node index")
+ax.set_title(r"Adjacency vector for" + "\n" + " the first node $a$");
+
+# latent position plot
+ax = fig.add_subplot(gs[:, 1:])
+plot = plot_latents(X, ax=ax, labels=labels, title="Latent positions with out-of-sample estimate")
+plot.scatter(x=v[0], y=v[1], marker='*', s=300, edgecolor="black")
+plot.annotate(r"Estimated latent position for" + "\n" + " the first adjacency vector: $X^+ a$", xy=(v[0]+.002, v[1]+.008), 
+            xytext=(v[0]-.02, v_i[1]+.2), arrowprops={"arrowstyle": "->", "color": "k"})
+sns.move_legend(ax, "center right")
+fig.subplots_adjust(wspace=.5)
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+[0;32m/tmp/ipykernel_1720/2146418651.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     19[0m [0mplot[0m[0;34m.[0m[0mscatter[0m[0;34m([0m[0mx[0m[0;34m=[0m[0mv[0m[0;34m[[0m[0;36m0[0m[0;34m][0m[0;34m,[0m [0my[0m[0;34m=[0m[0mv[0m[0;34m[[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mmarker[0m[0;34m=[0m[0;34m'*'[0m[0;34m,[0m [0ms[0m[0;34m=[0m[0;36m300[0m[0;34m,[0m [0medgecolor[0m[0;34m=[0m[0;34m"black"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     20[0m plot.annotate(r"Estimated latent position for" + "\n" + " the first adjacency vector: $X^+ a$", xy=(v[0]+.002, v[1]+.008), 
+[0;32m---> 21[0;31m             xytext=(v[0]-.02, v_i[1]+.2), arrowprops={"arrowstyle": "->", "color": "k"})
+[0m[1;32m     22[0m [0msns[0m[0;34m.[0m[0mmove_legend[0m[0;34m([0m[0max[0m[0;34m,[0m [0;34m"center right"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     23[0m [0mfig[0m[0;34m.[0m[0msubplots_adjust[0m[0;34m([0m[0mwspace[0m[0;34m=[0m[0;36m.5[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mNameError[0m: name 'v_i' is not defined
+NameError: name 'v_i' is not defined
+
