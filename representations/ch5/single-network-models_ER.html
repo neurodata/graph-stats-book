@@ -637,8 +637,12 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#practical-utility">
-   5.3.1. Practical Utility
+  <a class="reference internal nav-link" href="#when-do-we-use-an-er-n-p-network">
+   5.3.1. When do we use an
+   <span class="math notranslate nohighlight">
+    \(ER_n(p)\)
+   </span>
+   Network?
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -681,9 +685,18 @@
 </div>
 </div>
 <p>Using this example, now let’s get down to business. This simple random network model is called the Erdös Rényi (ER) model<sup>1</sup>. The way we can think of the <span class="math notranslate nohighlight">\(ER\)</span> network is that the edges basically depend <em>only</em> on a probability, <span class="math notranslate nohighlight">\(p\)</span>. We can think of this example as though a coin flip is performed, where the coin has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads, and <span class="math notranslate nohighlight">\(1-p\)</span> of landing on tails. For each edge in the network, we basically flip the coin, and if it lands on heads, the edge exists, and if it lands on tails (with probability <span class="math notranslate nohighlight">\(1-p\)</span>) the edge does not exist. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network which is ER with <span class="math notranslate nohighlight">\(n\)</span> nodes and probability <span class="math notranslate nohighlight">\(p\)</span>, we will alternatively say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network.</p>
-<div class="section" id="practical-utility">
-<h2><span class="section-number">5.3.1. </span>Practical Utility<a class="headerlink" href="#practical-utility" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-simulating-a-realization-from-an-er-n-p-network admonition">
+<p class="admonition-title">Simulating a realization from an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> network</p>
+<ol class="simple">
+<li><p>Obtain a weighted coin which has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads, and a probability <span class="math notranslate nohighlight">\(1 - p\)</span> of landing on tails. Note that this probability <span class="math notranslate nohighlight">\(p\)</span> might differ from the “traditional” coin with a probability of landing on heads of approximately <span class="math notranslate nohighlight">\(0.5\)</span>.</p></li>
+<li><p>Flip the once for each <em>possible</em> edge in the network. For a simple network, we will repeat the coin flip <span class="math notranslate nohighlight">\(\binom n 2\)</span> times.</p></li>
+<li><p>For each coin flip which landed on heads, define that the corresponding edge exists. For each coin flip which lands on tails, define that the corresponding edge does not exist.</p></li>
+</ol>
+</div>
+<div class="section" id="when-do-we-use-an-er-n-p-network">
+<h2><span class="section-number">5.3.1. </span>When do we use an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> Network?<a class="headerlink" href="#when-do-we-use-an-er-n-p-network" title="Permalink to this headline">¶</a></h2>
 <p>In practice, the ER model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the ER model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know how many edges on average the nodes of an ER nework should have. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from a network which is ER. For instance, if we see that half the nodes have a ton of edges (meaning, they have a high degree), and half don’t, we should probably use a more complicated model than an Erdos-Renyi. If this is the case, we might look for other models that could describe our network which are more complex.</p>
+<p>Another utility of the ER model is that we might often want to benchmark network algorithms on simulated networks with a given <em>sparsity</em>. <strong>Network sparsity</strong> is a feature of a network which describes the degree to which the network possesses fewer edges than the maximum number of possible edges. As an example, when we know ahead of time that the network is going to be sparse (the network has a <em>small</em> number of edges which exist relative the number of possible edges), we can use network machine learning techniques which anticipate this sparsity to make the algorithm faster. In a simple network, for instance, the maximum number of possible edges is <span class="math notranslate nohighlight">\(\binom n 2\)</span>. In an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we would expect the network to have on average about <span class="math notranslate nohighlight">\(p \binom n 2\)</span> edges; that is, <span class="math notranslate nohighlight">\(p\)</span> describes the fraction of total possible edges that we would expect to exist. ER networks are extremely cheap to simulate computationally, because “flipping weighted coins” (if you are curious, this is called a <em>Bernoulli sample</em> with probability <span class="math notranslate nohighlight">\(p\)</span>) is usually able to be performed with extremely optimized code in most standard programming languages such as python. Being able to generate networks very easily with a given number of nodes <span class="math notranslate nohighlight">\(n\)</span> and a given sparsity allows us to test just how efficient our network machine learning technique is.</p>
 <p>In the next code block, we are going to sample a single ER network with <span class="math notranslate nohighlight">\(50\)</span> nodes and an edge probability <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(0.3\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">

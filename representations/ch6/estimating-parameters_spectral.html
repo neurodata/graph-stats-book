@@ -637,31 +637,18 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#why-don-t-we-just-use-mle">
-   6.4.1. Why don’t we just use MLE?*
+  <a class="reference internal nav-link" href="#random-dot-product-graph">
+   6.4.1. Random Dot Product Graph
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-priori-random-dot-product-graph">
-   6.4.2.
-   <em>
-    a priori
-   </em>
-   Random Dot Product Graph
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-posteriori-stochastic-block-model">
-   6.4.3.
-   <em>
-    a posteriori
-   </em>
-   Stochastic Block Model
+  <a class="reference internal nav-link" href="#stochastic-block-model-with-unknown-communities">
+   6.4.2. Stochastic Block Model with unknown communities
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#number-of-communities-k-is-known">
-     6.4.3.1. Number of communities
+     6.4.2.1. Number of communities
      <span class="math notranslate nohighlight">
       \(K\)
      </span>
@@ -670,12 +657,12 @@
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#pairs-plots">
-     6.4.3.2. Pairs Plots
+     6.4.2.2. Pairs Plots
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#number-of-communities-k-is-not-known">
-     6.4.3.3. Number of communities
+     6.4.2.3. Number of communities
      <span class="math notranslate nohighlight">
       \(K\)
      </span>
@@ -697,27 +684,16 @@
                 
   <div class="section" id="estimating-parameters-in-network-models-via-spectral-methods">
 <h1><span class="section-number">6.4. </span>Estimating Parameters in Network Models via Spectral Methods<a class="headerlink" href="#estimating-parameters-in-network-models-via-spectral-methods" title="Permalink to this headline">¶</a></h1>
-<p>Next up, you might think intuitively we would jump to the a posteriori Stochastic Block Model, but as we will see in a second, estimation for an a posteriori Stochastic Block Model is, in fact, additional steps on top of how we estimate parameters for an <em>a priori</em> Random Dot Product Graph (RDPG).</p>
-<div class="section" id="why-don-t-we-just-use-mle">
-<h2><span class="section-number">6.4.1. </span>Why don’t we just use MLE?*<a class="headerlink" href="#why-don-t-we-just-use-mle" title="Permalink to this headline">¶</a></h2>
-<p>The a posteriori Stochastic Block Model has a pair of parameters, the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, and the community probability vector, <span class="math notranslate nohighlight">\(\vec \pi\)</span>. If you are keeping up with the log-likelihood derivations in the single network models section, you will recall that the log-likelihood for an a posteriori Stochastic Block Model, we obtain that:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(A) &amp;= \sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]
-\end{align*}\]</div>
-<p>That expression, it turns out, is a lot more complicated than what we had to deal with for the <em>a priori</em> Stochastic Block Model. Taking the log gives us that:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\log 
-    \mathbb P_\theta(A) &amp;= \log\left(\sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]\right)
-\end{align*}\]</div>
-<p>Whereas the log of a product of terms is the sum of the logs of the terms, no such easy simplification exists for the log of a <em>sum</em> of terms. This means that we will have to get a bit creative here. Instead, we will turn first to the <em>a priori</em> Random Dot Product Graph, and then figure out how to estimate parameters from an <em>a posteriori</em> SBM using that.</p>
-</div>
-<div class="section" id="a-priori-random-dot-product-graph">
-<h2><span class="section-number">6.4.2. </span><em>a priori</em> Random Dot Product Graph<a class="headerlink" href="#a-priori-random-dot-product-graph" title="Permalink to this headline">¶</a></h2>
-<p>The <em>a priori</em> Random Dot Product Graph has a single parameter, <span class="math notranslate nohighlight">\(X \in \mathbb R^{n \times d}\)</span>, which is a real matrix with <span class="math notranslate nohighlight">\(n\)</span> rows (one for each node) and <span class="math notranslate nohighlight">\(d\)</span> columns (one for each latent dimension). We estimate <span class="math notranslate nohighlight">\(X\)</span> extremely simply for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\pmb A\)</span> which is characterized using the <em>a priori</em> Random Dot Product Graph.</p>
-<p>In order to produce an estimate of <span class="math notranslate nohighlight">\(X\)</span>, we also need to know the number of latent dimensions of <span class="math notranslate nohighlight">\(\pmb A\)</span>, <span class="math notranslate nohighlight">\(d\)</span>. We might have a reasonable ability to “guess” what <span class="math notranslate nohighlight">\(d\)</span> is ahead of time, but this will often not be the case. For this reason, we can instead estimate <span class="math notranslate nohighlight">\(d\)</span> using <span class="math notranslate nohighlight">\(\hat d\)</span> [cite ZG2]. <span class="math notranslate nohighlight">\(\hat d\)</span> represents an estimate of <span class="math notranslate nohighlight">\(d\)</span>, which is selected on the basis of “elbow picking”, as described in the section on spectral embedding. The <span class="math notranslate nohighlight">\(\hat \cdot\)</span> symbol just means that <span class="math notranslate nohighlight">\(\hat d\)</span> is an estimate of the number of latent dimensions <span class="math notranslate nohighlight">\(d\)</span>, and not necessarily the <em>actual</em> number of latent dimensions. The estimate of <span class="math notranslate nohighlight">\(X\)</span> is produced by using the <span class="xref myst">Adjacency Spectral Embedding</span>, by embedding the observed network <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(d\)</span> (if the number of latent dimensions is known) or <span class="math notranslate nohighlight">\(\hat d\)</span> (if the number of latent dimensions is not known) dimensions.</p>
-<p>Let’s try an example of an <em>a priori</em> RDPG. We will use the same example that we used in the single network models section, where we defined the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> as follows. Let’s assume that we have <span class="math notranslate nohighlight">\(60\)</span> people who live along a very long road that is <span class="math notranslate nohighlight">\(60\)</span> miles long, and each person is <span class="math notranslate nohighlight">\(1\)</span> of a mile apart. The nodes of our network represent the people who live along our assumed street. If two people are closer to one another, it might make sense to think that they have a higher probability of being friends. If two people are neighbors, we think that they will have a very high probability of being friends (almost <span class="math notranslate nohighlight">\(1\)</span>) and when people are very far apart, we think that they will have a very low probability of being friends (almost <span class="math notranslate nohighlight">\(0\)</span>). We define <span class="math notranslate nohighlight">\(X\)</span> to have rows given by:</p>
+<p>Now that we have the ability to estimate parameters via MLE for the SBM, you might think we are done discussing SBM estimation. Unfortunately, we have skipped a relatively fundamental problem with SBM parameter estimation. You will notice that everything we have covered about the SBM to date assumes that we the assignments to one of <span class="math notranslate nohighlight">\(K\)</span> possible communities for each node, which is given by the node assignment variable <span class="math notranslate nohighlight">\(\tau_i\)</span> for each node in the network. Why is this problematic? Well, quite simply, when we are learning about <em>many</em> different networks we might come across, we might not actually <em>observe</em> the communities of each node.</p>
+<p>Consider, for instance, the school example we have worked extensively with. In the context of the SBM, for each pair of individuals across one of two schools, we think that if two individuals go to the same school, they will have a higher probability of being friends than if they did not go to the same school. And therein lies the issue: we need to know ahead of time (in statistical speak, <em>a priori</em>, or <em>prior to</em> proceeding) which school each student is from. If we did not know which school each student was from, we would have <em>no way</em> of actually using the technique we described in the preceding chapter to estimate parameters for our SBM. So, what <em>can</em> we do?</p>
+<p>In fact, the way we will proceed is to devise a technique for estimation for RDPGs, and then we will use this technique for RDPG estimation to produce meaningful community assignments for our nodes. Effectively, what we will do is we will use a clever technique we discussed in the preceding sections, called an <em>embedding</em>, to learn not only about each edge, but to <em>learn about each node in relation to all of the other nodes</em>. What do we mean by this? What we mean is that, while looking at a single edge in our network, we only have two possible choices: the edge exists or it does not exist. However, if we instead consider nodes in <em>relation</em> to one another, we can start to deduce patterns about how our nodes might be organized in the community sense. While seeing that two students Bill and Stephanie were friends will not tell us whether Bill and Stephanie were in the same school, if we knew that Bill and Stephanie also shared many other friends (such as Denise, Albert, and Kwan), and those friends also tended to be friends, that piece of information might tell us that they all might happen to be school mates.</p>
+<p>The embedding technique we employ, the <em>spectral embedding</em>, allows us to pick up on these <em>clustered</em> sorts of tendencies. When we call a set of nodes a <strong>cluster</strong> in the context of a network, what we mean is that these nodes tend to be more connected (more edges exist between and amongst them) than with other nodes in the network. The spectral embeddings will help us to identify these clusters of nodes, and hopefully, when we review the clusters of nodes we learn, we will be able to derive some sort of insight. For instance, in our school example, ideally, we might pick up on two clusters of nodes, one for each school.</p>
+<div class="section" id="random-dot-product-graph">
+<h2><span class="section-number">6.4.1. </span>Random Dot Product Graph<a class="headerlink" href="#random-dot-product-graph" title="Permalink to this headline">¶</a></h2>
+<p>The Random Dot Product Graph has a single parameter, the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Remember that the latent position matrix has <span class="math notranslate nohighlight">\(n\)</span> rows, one for each node in the network, and <span class="math notranslate nohighlight">\(d\)</span> columns, one for each latent dimension in the network.</p>
+<p>Remember that when we see a network which we think might be a realization of an RDPG random network, we do not actually have the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> ahead of time. For this reason, we must <em>estimate</em> <span class="math notranslate nohighlight">\(X\)</span>. Unfortunately, we cannot just use MLE like we did for the ER and SBM networks. Instead, we will use spectral methods.</p>
+<p>In order to produce an estimate of <span class="math notranslate nohighlight">\(X\)</span>, we also need to know the number of latent dimensions of <span class="math notranslate nohighlight">\(\pmb A\)</span>, <span class="math notranslate nohighlight">\(d\)</span>. We might have a reasonable ability to “guess” what <span class="math notranslate nohighlight">\(d\)</span> is ahead of time, but this will often not be the case. For this reason, we can instead estimate <span class="math notranslate nohighlight">\(d\)</span> using the strategy described in <span class="xref myst">6.3.7</span>. Once we have an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> and a number of latent dimensions <span class="math notranslate nohighlight">\(d\)</span> (or an estimate of the number of latent dimensions, which we will call <span class="math notranslate nohighlight">\(\hat d\)</span>), producing an estimate of the latent position matrix is very straightforward. We simply use the adjacency spectral embedding to embed the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(d\)</span> (or, <span class="math notranslate nohighlight">\(\hat d\)</span>) dimensions. The resulting embedded adjacency matrix <em>is</em> the estimate of the latent position matrix. We will call the estimate of the latent position matrix <span class="math notranslate nohighlight">\(\hat X\)</span>.</p>
+<p>Let’s try an example of an <em>a priori</em> RDPG. We will use the same example that we used in the single network models section, where we defined the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> as follows. Let’s assume that we have <span class="math notranslate nohighlight">\(60\)</span> people who live along a very long road that is <span class="math notranslate nohighlight">\(60\)</span> miles long, and each person is <span class="math notranslate nohighlight">\(1\)</span> of a mile apart. The nodes of our network represent the people who live along the street. If two people are close to one another, it might make sense to guess that they have a higher chance of being friends. If two people are neighbors, we think that they will have a very high probability of being friends (almost <span class="math notranslate nohighlight">\(1\)</span>) and when people are very far apart, we think that they will have a very low probability of being friends (almost <span class="math notranslate nohighlight">\(0\)</span>). We define <span class="math notranslate nohighlight">\(X\)</span> to have rows given by:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     \vec x_i = \begin{bmatrix}
@@ -755,7 +731,7 @@
 <img alt="../../_images/estimating-parameters_spectral_1_0.png" src="../../_images/estimating-parameters_spectral_1_0.png" />
 </div>
 </div>
-<p>What happens when we fit a <code class="docutils literal notranslate"><span class="pre">rdpg</span></code> model to <span class="math notranslate nohighlight">\(A\)</span>? We will evaluate the performance of the RDPG estimator agaigraspologic.plot the estimated probability matrix, <span class="math notranslate nohighlight">\(\hat P = \hat X \hat X^\top\)</span>, to the true probability matrix, <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. We can do this using the <code class="docutils literal notranslate"><span class="pre">RDPGEstimator</span></code> object, provided directly by graspologic:</p>
+<p>What happens when we fit a <code class="docutils literal notranslate"><span class="pre">rdpg</span></code> model to <span class="math notranslate nohighlight">\(A\)</span>? We will evaluate the performance of the RDPG estimator by comparing the estimated probability matrix, <span class="math notranslate nohighlight">\(\hat P = \hat X \hat X^\top\)</span>, to the true probability matrix, <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. We can do this using the <code class="docutils literal notranslate"><span class="pre">RDPGEstimator</span></code> object, provided directly by graspologic:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">RDPGEstimator</span>
@@ -768,7 +744,7 @@
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
 
@@ -778,14 +754,14 @@
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat P_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated probability matrix&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 <span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;True probability matrix&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 <span class="n">fig</span><span class="p">;</span>
@@ -797,18 +773,19 @@
 </div>
 </div>
 <p>Note that our estimated probability matrix tends to preserve the pattern in the true probability matrix, where the probabilities are highest for pairs of nodes which are closer together, but lower for pairs of nodes which are farther apart.</p>
-<p>What if we did not know that <span class="math notranslate nohighlight">\(d\)</span> was <span class="math notranslate nohighlight">\(2\)</span> ahead of time? The RDPG Estimator handles this situation just as well, and we can estimate the number of latent dimensions with <span class="math notranslate nohighlight">\(\hat d\)</span> instead:</p>
+<p>What if we did not know that there were two latent dimensions ahead of time? The RDPG Estimator handles this situation just as well, and we can estimate the number of latent dimensions with <span class="math notranslate nohighlight">\(\hat d\)</span> instead:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">RDPGEstimator</span><span class="p">(</span><span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># number of latent dimensions is not known</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="n">Phat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">p_mat_</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fit number of latent dimensions: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">latent_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">dhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">latent_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Estimated number of latent dimensions: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dhat</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fit number of latent dimensions: 3
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Estimated number of latent dimensions: 3
 </pre></div>
 </div>
 </div>
@@ -822,14 +799,14 @@
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\hat P_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated probability matrix&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 <span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_</span><span class="si">{RDPG}</span><span class="s2">$&quot;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;True probability matrix&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 <span class="n">fig</span><span class="p">;</span>
@@ -842,13 +819,12 @@
 </div>
 <p>Which also is a decent estimate of the true probability matrix <span class="math notranslate nohighlight">\(P\)</span>.</p>
 </div>
-<div class="section" id="a-posteriori-stochastic-block-model">
-<h2><span class="section-number">6.4.3. </span><em>a posteriori</em> Stochastic Block Model<a class="headerlink" href="#a-posteriori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
-<p>Finally, we can return to our original goal, which was to estimate the parameters of an <em>a posteriori</em> Stochastic Block Model.</p>
-<p>For the <em>a posteriori</em> Stochastic Block Model with <span class="math notranslate nohighlight">\(K\)</span>-communities, recall that we have two parameters, <span class="math notranslate nohighlight">\(\vec \pi\)</span> which is a <span class="math notranslate nohighlight">\(K\)</span>-dimensional probability vector, and <span class="math notranslate nohighlight">\(B\)</span> which is the <span class="math notranslate nohighlight">\(K \times K\)</span> block matrix. We observe the network <span class="math notranslate nohighlight">\(A\)</span>, which is a realization of the random network <span class="math notranslate nohighlight">\(\pmb A\)</span>. To estimate <span class="math notranslate nohighlight">\(\vec \pi\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, the approach we will take will be to use <span class="math notranslate nohighlight">\(A\)</span> to produce a <em>best guess</em> as to which community each node of <span class="math notranslate nohighlight">\(A\)</span> is from, and then use our <em>best guesses</em> as to which community each node is from to learn about <span class="math notranslate nohighlight">\(\vec \pi\)</span> and <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<div class="section" id="stochastic-block-model-with-unknown-communities">
+<h2><span class="section-number">6.4.2. </span>Stochastic Block Model with unknown communities<a class="headerlink" href="#stochastic-block-model-with-unknown-communities" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can return to our original goal, which was to estimate the parameters of an Stochastic Block Model when we don’t know the communities different nodes are in.</p>
 <div class="section" id="number-of-communities-k-is-known">
-<h3><span class="section-number">6.4.3.1. </span>Number of communities <span class="math notranslate nohighlight">\(K\)</span> is known<a class="headerlink" href="#number-of-communities-k-is-known" title="Permalink to this headline">¶</a></h3>
-<p>When the number of communities is known, the procedure for fitting an <em>a posteriori</em> Stochastic Block Model to a network is relatively straightforward. Let’s consider a similar example to the scenario we had above, but with <span class="math notranslate nohighlight">\(3\)</span> communities instead of <span class="math notranslate nohighlight">\(2\)</span>. We will have a block matrix given by:</p>
+<h3><span class="section-number">6.4.2.1. </span>Number of communities <span class="math notranslate nohighlight">\(K\)</span> is known<a class="headerlink" href="#number-of-communities-k-is-known" title="Permalink to this headline">¶</a></h3>
+<p>When the number of communities is known (even if we don’t know which community each node is in), the procedure for fitting a Stochastic Block Model to a network is relatively straightforward. Let’s consider a similar example to the scenario we had above, but with <span class="math notranslate nohighlight">\(3\)</span> communities instead of <span class="math notranslate nohighlight">\(2\)</span>. We will have a block matrix given by:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     B &amp;= \begin{bmatrix}
@@ -857,7 +833,7 @@
         0.2 &amp; 0.2 &amp; 0.8
     \end{bmatrix}
 \end{align*}\]</div>
-<p>Which is a Stochastic block model in which the within-community edge probability is <span class="math notranslate nohighlight">\(0.8\)</span>, and exceeds the between-community edge probability of <span class="math notranslate nohighlight">\(0.2\)</span>. We will let the probability of each node being assigned to different blocks be equal, and we will produce a matrix with <span class="math notranslate nohighlight">\(100\)</span> nodes in total. For simulating from the Stochastic Block Model, we actually only need the number of nodes for each community, since none of the mathematical operations we take to learn about <span class="math notranslate nohighlight">\(\vec \pi\)</span> and <span class="math notranslate nohighlight">\(B\)</span> will produce a different answer if we were to reorder the nodes in the network.</p>
+<p>Which is a Stochastic block model in which the within-community edge probability is <span class="math notranslate nohighlight">\(0.8\)</span>, and exceeds the between-community edge probability of <span class="math notranslate nohighlight">\(0.2\)</span>. We will let the probability of each node being assigned to different blocks be equal, and we will produce a matrix with <span class="math notranslate nohighlight">\(100\)</span> nodes in total.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
@@ -885,8 +861,14 @@
 <img alt="../../_images/estimating-parameters_spectral_11_0.png" src="../../_images/estimating-parameters_spectral_11_0.png" />
 </div>
 </div>
-<p>Remember, however, that we do not <em>actually</em> know the community labels of each node in <span class="math notranslate nohighlight">\(A\)</span>, so this problem is a little more difficult than it might seem. Remember that as we learned in the single network models section, even though the communities eachh node is assigned to <em>look</em> obvious, this is an artifact of the ordering of the nodes. In real data, the nodes might not actually be ordered in a manner which makes the community structure as readily apparent.</p>
-<p>To proceed, we cannot simply use the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class like we did previously. This is because the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> uses node community assignments, which we do not have. Instead, what we will do is turn again to the adjacency spectral embedding, to reduce the observed network <span class="math notranslate nohighlight">\(A\)</span> to a an estimated latent position matrix, <span class="math notranslate nohighlight">\(\hat X\)</span>. Then, we will use K-Means clustering (or an alternative clustering technique, such as Gaussian Mixture Model) to assign each node’s latent position to a particular community. Finally, we will use the communities to which each node is assigned to infer about the block matrix, <span class="math notranslate nohighlight">\(B\)</span>. We will demonstrate how to use K-means clustering to infer block labels here. We begin by first embedding <span class="math notranslate nohighlight">\(A\)</span> to estimate a latent position matrix:</p>
+<p>Remember, however, that we do not <em>actually</em> know the community labels of each node in <span class="math notranslate nohighlight">\(A\)</span>, so this problem is a little more difficult than it might seem. If we reordered the nodes, the coommunity each node is assigned to would not be as visually obvious as it is here in this example, as we showed back in <span class="xref myst">Chapter 5</span>. In real data, the nodes might not actually be ordered in a manner which makes the community structure as readily apparent.</p>
+<p>Our goal is to learn about the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, which is the parameter that we care about for the SBM. However, we cannot just plug <span class="math notranslate nohighlight">\(A\)</span> into the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class like we did back when we <span class="xref myst">fit an SBM using MLE</span>. This is because the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> uses node community assignments, which we do not have. Instead, what we will do is turn again to the adjacency spectral embedding, as follows:</p>
+<ol class="simple">
+<li><p>We begin by reduce the observed network <span class="math notranslate nohighlight">\(A\)</span> to a an estimated latent position matrix, <span class="math notranslate nohighlight">\(\hat X\)</span>.</p></li>
+<li><p>We will use K-Means clustering (or an alternative clustering technique, such as Gaussian Mixture Model) to assign each node’s latent position to a particular community. These will be called our estimates of the community labels for the nodes.</p></li>
+<li><p>Finally, we will use the communities to which each node is assigned to estimate the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, by using the estimated community labels in conjunction with the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class.</p></li>
+</ol>
+<p>We will demonstrate how to use K-means clustering to infer block labels here. We begin by first embedding <span class="math notranslate nohighlight">\(A\)</span> to estimate a latent position matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span>
@@ -897,10 +879,11 @@
 </div>
 </div>
 </div>
+<p>How do we explore the estimated latent position matrix <span class="math notranslate nohighlight">\(\hat X\)</span> to figure out whether we might be able to uncover useful community assignments for the nodes in our network?</p>
 </div>
 <div class="section" id="pairs-plots">
-<h3><span class="section-number">6.4.3.2. </span>Pairs Plots<a class="headerlink" href="#pairs-plots" title="Permalink to this headline">¶</a></h3>
-<p>When embedding a matrix using any embedding techniques of <code class="docutils literal notranslate"><span class="pre">graspologic</span></code>, it is critical to investigate the quality of an embedding. One technique to do so that is particularly useful for uncovering “latent structure” (community assignments which are present, but <em>unknown</em> by us ahead of time) from a graph we suspect might be well-fit by a Stochastic Block Model is known as a “pairs plot”. In a pairs plot, we investigate how effectively the embedding “separates” nodes within the dataset into individual “clusters”. We will ultimately exploit these “clusters” that appear in the latent positions to generate community assignments for each node. To demonstrate the case where the “pairs plot” shows obvious latent community structure, we will use the predicted latent position matrix we just produced, from an adjacency matrix which is a realization of a random network which is truly a Stochastic Block Model. The pairs plot looks like this:</p>
+<h3><span class="section-number">6.4.2.2. </span>Pairs Plots<a class="headerlink" href="#pairs-plots" title="Permalink to this headline">¶</a></h3>
+<p>When embedding a matrix using any embedding techniques in <code class="docutils literal notranslate"><span class="pre">graspologic</span></code>, it is important to figure out how good that embedding is. One particularly useful way to figure out this “latent structure” (community assignments which are present, but <em>unknown</em> by us ahead of time) from a graph we suspect might be well-fit by a Stochastic Block Model is known as a “pairs plot”. In a pairs plot, we investigate how effectively the embedding “separates” nodes within the dataset into individual “clusters”. We will ultimately exploit these “clusters” that appear in the latent positions to generate community assignments for each node. To demonstrate the case where the “pairs plot” shows obvious latent community structure, we will use the predicted latent position matrix we just produced, from an adjacency matrix which is a realization of a random network which is truly a Stochastic Block Model. The pairs plot looks like this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
@@ -913,9 +896,9 @@
 <img alt="../../_images/estimating-parameters_spectral_15_0.png" src="../../_images/estimating-parameters_spectral_15_0.png" />
 </div>
 </div>
-<p>As we can see, the pairs plot is a <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">x</span> <span class="pre">d</span></code> matrix of plots, where <code class="docutils literal notranslate"><span class="pre">d</span></code> is the total number of features of the matrix for which a pairs plot is being produced. For each off-diagonal plot (the plots with the dots), the <span class="math notranslate nohighlight">\(k^{th}\)</span> row and <span class="math notranslate nohighlight">\(l^{th}\)</span> column scatter plot has the points <span class="math notranslate nohighlight">\((x_{ik}, x_{il})\)</span> for each node <span class="math notranslate nohighlight">\(i\)</span> in the adjacency matrix. Stated another way, the off-diagonal plot is a scatter plot for each node of the <span class="math notranslate nohighlight">\(k^{th}\)</span> dimension and the <span class="math notranslate nohighlight">\(l^{th}\)</span> dimension of the latent position matrix. That these scatter plots indicate that the points appear to be separated into individual clusters provides evidence that the latent position matrix contains latent community structure from the realized network, and is a sign that we will find reasonable “guesses” at community assignments further down the line.</p>
-<p>The diagonal elements simply represent histograms of the indicated values for the indicated dimension. Higher bars indicate that more points are have weights in that range. For instance, the top-left histogram indicates a histogram of the first latent dimension for all nodes, the middle histogram is a histogram of the second latent dimension for all nodes, so on and so forth.</p>
-<p>Next, we will show a brief example of what happens when adjacency spectral embedding does not indicate that there is latent community structure. Our example network here will be a realization of a network which is ER, with a probability of <span class="math notranslate nohighlight">\(0.5\)</span> for an edge existing between any pair of nodes. As an ER network does not have community structure, we would not expect the pairs plot to show discernable clusters.</p>
+<p>As we can see, the pairs plot is a <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">x</span> <span class="pre">d</span></code> matrix of plots, where <code class="docutils literal notranslate"><span class="pre">d</span></code> is the total number of features of the matrix for which a pairs plot is being produced. For each off-diagonal plot (the plots with the dots), the <span class="math notranslate nohighlight">\(k^{th}\)</span> row and <span class="math notranslate nohighlight">\(l^{th}\)</span> column scatter plot has the points <span class="math notranslate nohighlight">\((x_{ik}, x_{il})\)</span> for each node <span class="math notranslate nohighlight">\(i\)</span> in the adjacency matrix. Stated another way, the off-diagonal plot is a scatter plot for each node of the <span class="math notranslate nohighlight">\(k^{th}\)</span> dimension and the <span class="math notranslate nohighlight">\(l^{th}\)</span> dimension of the latent position matrix. That these scatter plots indicate that the points appear to be separated into individual clusters provides evidence that the latent position matrix contains latent community structure from the realized network, and is a sign that we’ll be able to guess our community assignments reasonably well.</p>
+<p>The diagonal elements of the pairs plot simply represent histograms of latent positions for each dimension. Higher bars indicate that more points are have weights in that range. For instance, the top-left histogram indicates a histogram of the first latent dimension for all nodes, the middle histogram is a histogram of the second latent dimension for all nodes, so on and so forth.</p>
+<p>Next, we will show a brief example of what happens when adjacency spectral embedding does not indicate that there is latent community structure. Our example network here will be a realization of a network which is ER, with a probability of <span class="math notranslate nohighlight">\(0.5\)</span> for an edge existing between any pair of nodes. As an ER network does not have community structure, we would not expect the pairs plot shouldn’t indicate to us that there are obvious clusters.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
@@ -934,7 +917,7 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ase_er</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># adjacency spectral embedding, with optimal number of latent dimensions selected using elbow picking</span>
 <span class="n">Xhat_er</span> <span class="o">=</span> <span class="n">ase_er</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A_er</span><span class="p">)</span>
 
-<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat_er</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER adjacency spectral embedding&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat_er</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Pairs plot for network without communities&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -942,7 +925,7 @@
 <img alt="../../_images/estimating-parameters_spectral_18_0.png" src="../../_images/estimating-parameters_spectral_18_0.png" />
 </div>
 </div>
-<p>Unlike the SBM example, the scatter plots for the adjacency spectral embedding of a realization of an ER network no longer show the distinct separability into individual communities.</p>
+<p>Unlike with the SBM, we can’t see any obvious clusters in this pairs plot.</p>
 <p>Next, let’s return to our SBM example and obtain some predicted community assignments for our points. Since we do not have any information as to which cluster each node is assigned to, we must use an unsupervised clustering method. We will use the <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> function from <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s cluster module to do so. Since we know that the SBM has 3 communities, we will use 3 clusters for the KMeans algorithm. The clusters produced by the <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> algorithm will be our “predicted” community assignments.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1088,7 +1071,7 @@ pi_2hat: 0.32
 </div>
 </div>
 <div class="section" id="number-of-communities-k-is-not-known">
-<h3><span class="section-number">6.4.3.3. </span>Number of communities <span class="math notranslate nohighlight">\(K\)</span> is not known<a class="headerlink" href="#number-of-communities-k-is-not-known" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">6.4.2.3. </span>Number of communities <span class="math notranslate nohighlight">\(K\)</span> is not known<a class="headerlink" href="#number-of-communities-k-is-not-known" title="Permalink to this headline">¶</a></h3>
 <p>In real data, we almost never have the beautiful canonical modular structure obvious to us from a Stochastic Block Model. This means that it is <em>extremely infrequently</em> going to be the case that we know exactly how we should set the number of communities, <span class="math notranslate nohighlight">\(K\)</span>, ahead of time.</p>
 <p>Let’s first remember back to the single network models section, when we took a Stochastic block model with obvious community structure, and let’s see what happens when we just move the nodes of the adjacency matrix around. We begin with a similar adjacency matrix to <span class="math notranslate nohighlight">\(A\)</span> given above, for the <span class="math notranslate nohighlight">\(3\)</span>-community SBM example, but with the within and between-community edge probabilities a bit closer together so that we can see what happens when we experience errors. The communities are still slightly apparent, but less so than before:</p>
 <div class="cell docutils container">

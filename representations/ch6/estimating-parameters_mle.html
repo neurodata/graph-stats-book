@@ -637,37 +637,18 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-method-of-maximum-likelihood-estimation-mle">
-   6.1.1. The Method of Maximum Likelihood Estimation (MLE)*
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#erdos-renyi-er">
-   6.1.2. Erdös-Rényi (ER)
+   6.1.1. Erdös-Rényi (ER)
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#mle-for-er">
-     6.1.2.1. MLE for ER*
-    </a>
-   </li>
-  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
-   6.1.3.
+   6.1.2.
    <em>
     a priori
    </em>
    Stochastic Block Model
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#mle-for-sbm">
-     6.1.3.1. MLE for SBM*
-    </a>
-   </li>
-  </ul>
  </li>
 </ul>
 
@@ -682,117 +663,10 @@
                 
   <div class="section" id="estimating-parameters-in-network-models-via-mle">
 <h1><span class="section-number">6.1. </span>Estimating Parameters in Network Models via MLE<a class="headerlink" href="#estimating-parameters-in-network-models-via-mle" title="Permalink to this headline">¶</a></h1>
-<p>Throughout Chapter 5, we spent a lot of attention developing intuition for many of the network models that are essential to understanding random networks. Recall that the notation that we use for a random network (more specifically, a network-valued random variable), <span class="math notranslate nohighlight">\(\mathbf A\)</span>, does <em>not</em> refer to any network we could ever hope to see (or as we introduced in the previous chapter, <em>realize</em>) in the real world. This issue is extremely important in network machine learning, so we will try to drive it home one more time: no matter how much data we collected (unless we could get infinite data, which we <em>can’t</em>), we can never hope to understand the true distribution of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. As network scientists, this leaves us with a bit of a problem: what, then, can we do to make useful claims about <span class="math notranslate nohighlight">\(\mathbf A\)</span>, if we can’t actually see <span class="math notranslate nohighlight">\(\mathbf A\)</span> nor its distribution?</p>
-<p>This is where statistics, particularly, <strong>estimation</strong>, comes into play. At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using <em>only</em> the data we are given: finitely many (in network statistics, often just <em>one</em>) samples which we assume are <em>realizations</em> of the random variable we want to learn about. The properties of the random variable that we seek to learn about are called <strong>estimands</strong>, and  In the case of our network models, in particular, we will attempt to obtain reasonable estimates of the parameters (our <em>estimands</em>) associated with random networks.</p>
-<p>The most useful property that we will leverage which was developed in Chapter <span class="math notranslate nohighlight">\(5\)</span> is the independent-edge assumption. As we discussed, when working with independent-edge random network models, we will assume that edges in our random network are <em>independent</em>. This means that the probability of observing a particular realization of a random network is, in fact, the product of the probabilities of observing each edge in the random network. Notationally, what this means is that if <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network with <span class="math notranslate nohighlight">\(n\)</span> nodes and edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, and <span class="math notranslate nohighlight">\(A\)</span> is a realization of that random network with edges <span class="math notranslate nohighlight">\(a_{ij}\)</span>, then:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}), \\
-    &amp;= \prod_{i, j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij}).
-\end{align*}\]</div>
-<p>In the special case where our networks are simple (undirected and loopless), this simplifies to:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(\mathbf A = A) &amp;= \prod_{i &lt; j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij}).
-\end{align*}\]</div>
-<p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>, and we only need to worry about one of the edges (we chose the edges in the upper right triangle of the adjacency matrix arbitrarily).  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops, so we don’t need to worry about the case where <span class="math notranslate nohighlight">\(i = j\)</span> either.</p>
-<p>We will set the scene for the later examples using a common example. Let’s say we flip a coin <span class="math notranslate nohighlight">\(10\)</span> times, and see <span class="math notranslate nohighlight">\(6\)</span> heads. What is the probability that the coin lands on heads? Intuitively, the answer is rather simple! It feels like it should just be <span class="math notranslate nohighlight">\(\frac{6}{10}\)</span>. And in one particular way, that really is the <em>best</em> guess we could make!</p>
-<p>Below, we discuss the nitty-gritty technical details of how we learn about random networks using a particular method known as Maximum Likelihood Estimation (MLE). Maximum likelihood estimation is why <span class="math notranslate nohighlight">\(\frac{6}{10}\)</span> is a great guess for our coin flip example. Finding MLEs can be pretty difficult, so we leave the details in starred sections. If you aren’t familiar with MLE, you can skip these, and still learn how to use the results!</p>
-<div class="section" id="the-method-of-maximum-likelihood-estimation-mle">
-<h2><span class="section-number">6.1.1. </span>The Method of Maximum Likelihood Estimation (MLE)*<a class="headerlink" href="#the-method-of-maximum-likelihood-estimation-mle" title="Permalink to this headline">¶</a></h2>
-<p>Let’s think about what exactly this means using an example that you are likely familiar with. I have a single coin, and I want to know the probability of the outcome of a roll of that coin being a heads. For sake of argument, we will call this coin <em>fair</em>, which means that the true probability it lands on heads (or tails) is <span class="math notranslate nohighlight">\(0.5\)</span>. In this case, I would call the outcome of the <span class="math notranslate nohighlight">\(i^{th}\)</span> coin flip the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>, and it can produce realizations which take one of two possible values: a heads (an outcome of a <span class="math notranslate nohighlight">\(1\)</span>) or a tails (an outcome of a <span class="math notranslate nohighlight">\(0\)</span>). We will say that we see <span class="math notranslate nohighlight">\(10\)</span> total coin flips. We will number these realizations as <span class="math notranslate nohighlight">\(x_i\)</span>, where <span class="math notranslate nohighlight">\(i\)</span> goes from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10\)</span>. To recap, the boldfaced <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> denotes the random variable, and the unbolded <span class="math notranslate nohighlight">\(x_i\)</span> denotes the realization which we actually see. Our question of interest is: how do we estimate the probability of the coin landing on a heads, if we don’t know anything about the true probability value <span class="math notranslate nohighlight">\(p\)</span>, other than the outcomes of the coin flips we got to observe?</p>
-<p>Here, since <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> takes the value <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(0\)</span> each with probability <span class="math notranslate nohighlight">\(0.5\)</span>, we would say that <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> random variable. This means that the random variable <span class="math notranslate nohighlight">\(\mathbf x\)</span> has the Bernoulli distribution, and the probability of a heads, <span class="math notranslate nohighlight">\(p\)</span>, is <span class="math notranslate nohighlight">\(0.5\)</span>. All <span class="math notranslate nohighlight">\(10\)</span> of our <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> are called <em>identically distributed</em>, since they all have the same <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> distribution.</p>
-<p>We will also assume that the outcomes of the coin flips are mutually independent, which is explained in the terminology section.</p>
-<p>For any one coin flip, the probability of observing the outcome <span class="math notranslate nohighlight">\(i\)</span> is, by definition of the Bernoulli distribution:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}.
-\end{align*}\]</div>
-<p>Note that we use the notation <span class="math notranslate nohighlight">\(\mathbb P_\theta\)</span> to indicate that the probability is a function of the parameter set <span class="math notranslate nohighlight">\(\theta\)</span> for the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>. Here, since the only parameter for each <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a probability <span class="math notranslate nohighlight">\(p\)</span>, then <span class="math notranslate nohighlight">\(\theta = p\)</span>.</p>
-<p>If we saw <span class="math notranslate nohighlight">\(n\)</span> total outcomes, the probability is, using the definition of mutual independence:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}\mathbb P(\mathbf x_i = x_i), \\
-    &amp;= \prod_{i = 1}^n p^{x_i}(1 - p)^{1 - x_i}, \\
-    &amp;= p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}.
-\end{align*}\]</div>
-<p>What if we saw <span class="math notranslate nohighlight">\(10\)</span> coin flips, and <span class="math notranslate nohighlight">\(6\)</span> were heads? Can we take a “guess” at what <span class="math notranslate nohighlight">\(p\)</span> might be? Intuitively your first reaction might be to say a good guess of <span class="math notranslate nohighlight">\(p\)</span>, which we will abbreviate <span class="math notranslate nohighlight">\(\hat p\)</span>, would be <span class="math notranslate nohighlight">\(0.6\)</span>, which is <span class="math notranslate nohighlight">\(6\)</span> heads of <span class="math notranslate nohighlight">\(10\)</span> outcomes. In many ways, this intuitive guess is spot on. However, in network machine learning, we like to be really specific about why, exactly, this guess makes sense.</p>
-<p>Looking at the above equation, one thing we can do is use the technique of <strong>maximum likelihood estimation</strong>. We call the function <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)\)</span> the <em>likelihood</em> of our sequence, for a given value of <span class="math notranslate nohighlight">\(p\)</span>. Note that we have added the term “<span class="math notranslate nohighlight">\(; p\)</span>” to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we <em>really</em> want to do is find the value that <span class="math notranslate nohighlight">\(p\)</span> could take, which <em>maximizes</em> the likelihood. Let’s see what the likelihood function looks like as a function of different values of <span class="math notranslate nohighlight">\(p\)</span>:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">.02</span><span class="p">,</span> <span class="mf">.98</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">49</span><span class="p">)</span>
-<span class="n">nflips</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">nheads</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="n">likelihood</span> <span class="o">=</span> <span class="n">p</span><span class="o">**</span><span class="p">(</span><span class="n">nheads</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">nflips</span> <span class="o">-</span> <span class="n">nheads</span><span class="p">)</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">likelihood</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Bernoulli probability parameter, p&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Likelihood, $P_{</span><span class="se">\\</span><span class="s2">theta}(x_1, ..., x_</span><span class="si">{10}</span><span class="s2">)$&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_2_0.png" src="../../_images/estimating-parameters_mle_2_0.png" />
-</div>
-</div>
-<p>As we can see, it turns out that our intuitive answer, that <span class="math notranslate nohighlight">\(p=0.6\)</span>, is in fact the Maximum Likelihood Estimate for the Bernoulli probability parameter <span class="math notranslate nohighlight">\(p\)</span>. Now how do we go about showing this rigorously?</p>
-<p>An easier problem, we often will find, is to instead maximize the <em>log likelihood</em> rather than the likelihood itself. This is because the log function is <em>monotone</em>, which means that if <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span>, then <span class="math notranslate nohighlight">\(\log\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span> as well for some choices <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span>. Without going too down in the weeds, the idea is that the <span class="math notranslate nohighlight">\(\log\)</span> function does not change any critical points of the likelihood. The log likelihood of the above expression is:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \log \left[p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}\right], \\
-&amp;= \sum_{i = 1}^n x_i \log(p) + \left(n - \sum_{i = 1}^n x_i\right)\log(1 - p).
-\end{align*}\]</div>
-<p>And visually, the log-likelihood now looks instead like this:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loglikelihood</span> <span class="o">=</span> <span class="n">nheads</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">nflips</span> <span class="o">-</span> <span class="n">nheads</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
-
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">loglikelihood</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Bernoulli probability parameter, p&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Log Likelihood, $</span><span class="se">\\</span><span class="s2">log P_{</span><span class="se">\\</span><span class="s2">theta}(x_1, ..., x_</span><span class="si">{10}</span><span class="s2">)$&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_5_0.png" src="../../_images/estimating-parameters_mle_5_0.png" />
-</div>
-</div>
-<p>Although we can see that the two plots look <em>almost</em> nothing alike, the key is the word <em>almost</em> here. Notice that the absolute maximum is, in fact, the same regardless of whether we use the likelihood or the log-likelihood. Further, notice that at the maximum, the slope of the tangent line is <span class="math notranslate nohighlight">\(0\)</span>. You may recall from calculus that this is how we typically go about finding a critical point of a function. Now, let’s get make our argument a little more technical. Remembering from calculus <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, to find a maximal point of the log-likelihood function with respect to some variable <span class="math notranslate nohighlight">\(p\)</span>, our process looks like this:</p>
-<ol class="simple">
-<li><p>Take the derivative of the log-likelihood with respect to <span class="math notranslate nohighlight">\(p\)</span>,</p></li>
-<li><p>Set it equal to <span class="math notranslate nohighlight">\(0\)</span> and solve for the critical point <span class="math notranslate nohighlight">\(\tilde p\)</span>,</p></li>
-<li><p>Verify that the critical point <span class="math notranslate nohighlight">\(\tilde p\)</span> is indeed an estimate of a maximum, <span class="math notranslate nohighlight">\(\hat p\)</span>.</p></li>
-</ol>
-<p>Proceeding using the result we derived above, and using the fact that <span class="math notranslate nohighlight">\(\frac{d}{du} \log(u) = \frac{1}{u}\)</span> and that <span class="math notranslate nohighlight">\(\frac{d}{du} \log(1 - u) = -\frac{1}{1 - u}\)</span>:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\frac{d}{d p}\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \frac{\sum_{i = 1}^n x_i}{p} - \frac{n - \sum_{i = 1}^n x_i}{1 - p} = 0, \\
-\Rightarrow \frac{\sum_{i = 1}^n x_i}{p} &amp;= \frac{n - \sum_{i = 1}^n x_i}{1 - p}, \\
-\Rightarrow (1 - p)\sum_{i = 1}^n x_i &amp;= p\left(n - \sum_{i = 1}^n x_i\right), \\
-\sum_{i = 1}^n x_i - p\sum_{i = 1}^n x_i &amp;= pn - p\sum_{i = 1}^n x_i ,\\
-\Rightarrow \tilde p &amp;= \frac{1}{n}\sum_{i = 1}^n x_i.
-\end{align*}\]</div>
-<p>We use the notation <span class="math notranslate nohighlight">\(\tilde p\)</span> here to denote that <span class="math notranslate nohighlight">\(\tilde p\)</span> is a critical point of the function.</p>
-<p>Finally, we must check that this is an estimate of a maximum, which we can do by taking the second derivative and checking that the second derivative is negative. We will omit this since it’s a bit intricate and tangential from our argument, but if you work it through, you will find that the second derivative is indeed negative at <span class="math notranslate nohighlight">\(\tilde p\)</span>. This means that <span class="math notranslate nohighlight">\(\tilde p\)</span> is indeed an estimate of a maximum, which we would denote by <span class="math notranslate nohighlight">\(\hat p\)</span>.</p>
-<p>Finally, using this result, we find that with <span class="math notranslate nohighlight">\(6\)</span> heads in <span class="math notranslate nohighlight">\(10\)</span> outcomes, we would obtain an estimate:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \hat p &amp;= \frac{6}{10} = 0.6.
-\end{align*}\]</div>
-<p>which exactly aligns with our intuition.</p>
-<p>So, why do we need estimation tools, if in our example, our intuition gave us the answer a whole lot faster? Unfortunately, the particular scenario we described was one of the <em>simplest possible examples</em> in which a parameter requires estimation. As the scenario grows more complicated, and <em>especially</em> when we extend to network-valued data, figuring out good ways to estimate parameters is extremely difficult. For this reason, we will describe some tools which are very relevant to network machine learning to learn about network parameters.</p>
-<p>We will review estimation techniques for several of the approaches we discussed in Chapter 5, for Single Network Models.</p>
-</div>
+<p>When we learned about random networks which can be described using single network models, one of the key things we covered were the <em>parameters</em> that define the underlying random networks. If we see a network which is a realization of a random network, we do <em>not</em>, in practice, know what those parameters that describe the random network are. However, we have a slight problem, because learning about the underlying random network <em>requires</em> us to have some understanding of the parameters that define it. What are we to do?</p>
+<p>To overcome this hurdle, we must <em>estimate</em> the parameters of the underlying random network. At a very high level, <strong>estimation</strong> is a procedure to calculate properties about a random variable (or a set of random variables) using only the data we are given: finitely many (in network statistics, often just one) samples which we assume are realizations of the random variable we want to learn about. Here, what we want to obtain are ways in which we can <em>estimate</em> the parameters of the underlying random network, when we have a realization of a random network.</p>
 <div class="section" id="erdos-renyi-er">
-<h2><span class="section-number">6.1.2. </span>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.1.1. </span>Erdös-Rényi (ER)<a class="headerlink" href="#erdos-renyi-er" title="Permalink to this headline">¶</a></h2>
 <p>Recall that the Erdös-Rényi (ER) network has a single parameter: the probability of each edge existing, which we termed <span class="math notranslate nohighlight">\(p\)</span>. Due to the simplicity of a random network which is ER, we can resort to the Maximum Likelihood technique we described above, and it turns out we obtain virtually the same result. We find that the best estimate of the probability of an edge existing in an ER random network is just the ratio of the total number of edges in the network, <span class="math notranslate nohighlight">\(m\)</span>, divided by the total number of edges possible in the network, which is <span class="math notranslate nohighlight">\(\binom n 2\)</span>! Our result is:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -812,7 +686,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_8_0.png" src="../../_images/estimating-parameters_mle_8_0.png" />
+<img alt="../../_images/estimating-parameters_mle_2_0.png" src="../../_images/estimating-parameters_mle_2_0.png" />
 </div>
 </div>
 <p>Next, we fit the appropriate model, from graspologic, and plot the estimated probability matrix <span class="math notranslate nohighlight">\(\hat P\)</span> against the true probability matrix <span class="math notranslate nohighlight">\(P\)</span>:</p>
@@ -863,38 +737,13 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_11_0.png" src="../../_images/estimating-parameters_mle_11_0.png" />
+<img alt="../../_images/estimating-parameters_mle_5_0.png" src="../../_images/estimating-parameters_mle_5_0.png" />
 </div>
 </div>
 <p>Not half bad! The estimated probability matrix <span class="math notranslate nohighlight">\(\hat P\)</span> looks extremely similar to the true probability matrix <span class="math notranslate nohighlight">\(P\)</span>.</p>
-<div class="section" id="mle-for-er">
-<h3><span class="section-number">6.1.2.1. </span>MLE for ER*<a class="headerlink" href="#mle-for-er" title="Permalink to this headline">¶</a></h3>
-<p>In Chapter 5, we explored the derivation for the probability of observing a realization <span class="math notranslate nohighlight">\(A\)</span> of a given random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER, which is equivalent to the likelihood of <span class="math notranslate nohighlight">\(A\)</span>. Recall this was:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(A) &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}.
-\end{align*}\]</div>
-<p>where <span class="math notranslate nohighlight">\(m = \sum_{i &lt; j} a_{ij}\)</span> is the total number of edges in the observed network <span class="math notranslate nohighlight">\(A\)</span>. Our approach here parallels directly the approach for the coin; we begin by taking the log of the probability:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \log \mathbb P_\theta(A) &amp;= \log \left[p^{m} \cdot (1 - p)^{\binom{n}{2} - m}\right], \\
-    &amp;= m \log p + \left(\binom n 2 - m\right)\log (1 - p).
-\end{align*}\]</div>
-<p>Next, we take the derivative with respect to <span class="math notranslate nohighlight">\(p\)</span>, set equal to <span class="math notranslate nohighlight">\(0\)</span>, and we end up with:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\frac{d}{d p}\log \mathbb P_\theta(A) &amp;= \frac{m}{p} - \frac{\binom n 2 - m}{1 - p} = 0, \\
-\Rightarrow \tilde p &amp;= \frac{m}{\binom n 2}.
-\end{align*}\]</div>
-<p>We omitted several detailed steps due to the fact that we show the rigorous derivation above. Checking the second derivative, which we omit since it is rather mathematically tedious, we see that the second derivative at <span class="math notranslate nohighlight">\(\tilde p\)</span> is negative, so we indeed have found an estimate of the maximum, and will be denoted by <span class="math notranslate nohighlight">\(\hat p\)</span>. This gives that the Maximum Likelihood Estimate (or, the MLE, for short) of the probability <span class="math notranslate nohighlight">\(p\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER is:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \hat p &amp;= \frac{m}{\binom n 2}.
-\end{align*}\]</div>
-</div>
 </div>
 <div class="section" id="a-priori-stochastic-block-model">
-<h2><span class="section-number">6.1.3. </span><em>a priori</em> Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.1.2. </span><em>a priori</em> Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
 <p>The <em>a priori</em> Stochastic Block Model also has a single paramter: the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, whose entries <span class="math notranslate nohighlight">\(b_{kk'}\)</span> denote the probabilities of edges existing or not existing between pairs of communities in the Stochastic Block Model. When we apply the method of MLE to the SBM, what we find is that, where <span class="math notranslate nohighlight">\(m_{kk'}\)</span> is the total number of edges between nodes in communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>, and <span class="math notranslate nohighlight">\(n_{kk'}\)</span> is the number of edges possible between nodes in communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -934,7 +783,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_14_0.png" src="../../_images/estimating-parameters_mle_14_0.png" />
+<img alt="../../_images/estimating-parameters_mle_8_0.png" src="../../_images/estimating-parameters_mle_8_0.png" />
 </div>
 </div>
 <p>Next, let’s fit an appropriate SBM, and investigate the estimate of <span class="math notranslate nohighlight">\(B\)</span>:</p>
@@ -980,7 +829,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_17_0.png" src="../../_images/estimating-parameters_mle_17_0.png" />
+<img alt="../../_images/estimating-parameters_mle_11_0.png" src="../../_images/estimating-parameters_mle_11_0.png" />
 </div>
 </div>
 <p>And our estimate <span class="math notranslate nohighlight">\(\hat B\)</span> is very similar to the true block matrix <span class="math notranslate nohighlight">\(B\)</span>. This is further reflected by looking at the probability matrix, like we did for the ER example:</p>
@@ -1022,45 +871,23 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_mle_19_0.png" src="../../_images/estimating-parameters_mle_19_0.png" />
+<img alt="../../_images/estimating-parameters_mle_13_0.png" src="../../_images/estimating-parameters_mle_13_0.png" />
 </div>
 </div>
-<div class="section" id="mle-for-sbm">
-<h3><span class="section-number">6.1.3.1. </span>MLE for SBM*<a class="headerlink" href="#mle-for-sbm" title="Permalink to this headline">¶</a></h3>
-<p>When we derived the probability for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which could be characterized using the <em>a priori</em> Stochasic Block Model, we obtained that:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \mathbb P_\theta(A) &amp;= \prod_{k, k' \in [K]}b_{k'k}^{m_{k'k}} \cdot (1 - b_{k'k})^{n_{k'k - m_{k'k}}},
-\end{align*}\]</div>
-<p>where <span class="math notranslate nohighlight">\(n_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}\)</span> was the number of possible edges between nodes in community <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>, and <span class="math notranslate nohighlight">\(m_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}a_{ij}\)</span> was the number of edges in the realization <span class="math notranslate nohighlight">\(A\)</span> between nodes within communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>.</p>
-<p>Noting that the log of the product is the sum of the logs, or that <span class="math notranslate nohighlight">\(\log \prod_i x_i = \sum_i \log x_i\)</span>, the log of the probability is:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \log \mathbb P_\theta(A) &amp;= \sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}).
-\end{align*}\]</div>
-<p>We notice a side-note that we mentioned briefly in the network models section: in a lot of ways, the probability (and consequently, the log probability) of a random network which is an <em>a priori</em> SBM behaves very similarly to that of a random network which is ER, with the caveat that the probability term <span class="math notranslate nohighlight">\(p\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(\binom n 2\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m\)</span> have been replaced with the probability term <span class="math notranslate nohighlight">\(b_{k'k}\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(n_{k'k}\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m_{k'k}\)</span> which <em>apply only to that particular pair of communities</em>. In this sense, the <em>a priori</em> SBM is kind of like a collection of communities of ER networks. Pretty neat right? Well, it doesn’t stop there. When we take the partial derivative of <span class="math notranslate nohighlight">\(\log \mathbb P_\theta(A)\)</span> with respect to any of the probability terms <span class="math notranslate nohighlight">\(b_{l'l}\)</span>, we see an even more direct consequence of this observation:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= \frac{\partial}{\partial b_{l'l}}\sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}), \\
-    &amp;= \sum_{k, k' \in [K]} \frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right].
-\end{align*}\]</div>
-<p>Now what? Notice that any of the summands in which <span class="math notranslate nohighlight">\(k \neq l\)</span> and <span class="math notranslate nohighlight">\(k' \neq l'\)</span>, the partial derivative with respect to <span class="math notranslate nohighlight">\(b_{l'l}\)</span> is in fact exactly <span class="math notranslate nohighlight">\(0\)</span>! Why is this? Well, let’s consider a <span class="math notranslate nohighlight">\(k\)</span> which is different from <span class="math notranslate nohighlight">\(l\)</span>, and a <span class="math notranslate nohighlight">\(k'\)</span> which is different from <span class="math notranslate nohighlight">\(l'\)</span>. Notice that:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-\frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right] = 0,
-\end{align*}\]</div>
-<p>which simply follows since the quantity to the right of the partial derivative is not a funcion of <span class="math notranslate nohighlight">\(b_{l'l}\)</span> at all! Therefore:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= 0 + \frac{\partial}{\partial b_{l'l}}\left[m_{l'l}\log b_{l'l} + \left(n_{l'l} - m_{l'l}\right)\log(1 - b_{l'l})\right] \\
-    &amp;= \frac{m_{l'l}}{b_{l'l}} - \frac{n_{l'l} - m_{l'l}}{1 - b_{l'l}} = 0, \\
-\Rightarrow b_{l'l}^* &amp;= \frac{m_{l'l}}{n_{l'l}}.
-\end{align*}\]</div>
-<p>Like above, we omit the second derivative test, and conclude that the MLE of the block matrix <span class="math notranslate nohighlight">\(B\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is <em>a priori</em> SBM is the matrix <span class="math notranslate nohighlight">\(\hat B\)</span> with entries:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \hat b_{l'l} &amp;= \frac{m_{l'l}}{n_{l'l}}.
-\end{align*}\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">At</span> <span class="n">a</span> <span class="n">very</span> <span class="n">high</span> <span class="n">level</span><span class="p">,</span> <span class="n">estimation</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">procedure</span> <span class="n">to</span> <span class="n">calculate</span> <span class="n">properties</span> <span class="n">about</span> <span class="n">a</span> <span class="n">random</span> <span class="n">variable</span> <span class="p">(</span><span class="ow">or</span> <span class="n">a</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">random</span> <span class="n">variables</span><span class="p">)</span> <span class="n">using</span> <span class="n">only</span> <span class="n">the</span> <span class="n">data</span> <span class="n">we</span> <span class="n">are</span> <span class="n">given</span><span class="p">:</span> <span class="n">finitely</span> <span class="n">many</span> <span class="p">(</span><span class="ow">in</span> <span class="n">network</span> <span class="n">statistics</span><span class="p">,</span> <span class="n">often</span> <span class="n">just</span> <span class="n">one</span><span class="p">)</span> <span class="n">samples</span> <span class="n">which</span> <span class="n">we</span> <span class="n">assume</span> <span class="n">are</span> <span class="n">realizations</span> <span class="n">of</span> <span class="n">the</span> <span class="n">random</span> <span class="n">variable</span> <span class="n">we</span> <span class="n">want</span> <span class="n">to</span> <span class="n">learn</span> <span class="n">about</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">  File</span><span class="nn"> &quot;/tmp/ipykernel_2041/2503422356.py&quot;</span><span class="gt">, line </span><span class="mi">1</span>
+    <span class="n">At</span> <span class="n">a</span> <span class="n">very</span> <span class="n">high</span> <span class="n">level</span><span class="p">,</span> <span class="n">estimation</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">procedure</span> <span class="n">to</span> <span class="n">calculate</span> <span class="n">properties</span> <span class="n">about</span> <span class="n">a</span> <span class="n">random</span> <span class="n">variable</span> <span class="p">(</span><span class="ow">or</span> <span class="n">a</span> <span class="nb">set</span> <span class="n">of</span> <span class="n">random</span> <span class="n">variables</span><span class="p">)</span> <span class="n">using</span> <span class="n">only</span> <span class="n">the</span> <span class="n">data</span> <span class="n">we</span> <span class="n">are</span> <span class="n">given</span><span class="p">:</span> <span class="n">finitely</span> <span class="n">many</span> <span class="p">(</span><span class="ow">in</span> <span class="n">network</span> <span class="n">statistics</span><span class="p">,</span> <span class="n">often</span> <span class="n">just</span> <span class="n">one</span><span class="p">)</span> <span class="n">samples</span> <span class="n">which</span> <span class="n">we</span> <span class="n">assume</span> <span class="n">are</span> <span class="n">realizations</span> <span class="n">of</span> <span class="n">the</span> <span class="n">random</span> <span class="n">variable</span> <span class="n">we</span> <span class="n">want</span> <span class="n">to</span> <span class="n">learn</span> <span class="n">about</span><span class="o">.</span>
+       <span class="o">^</span>
+<span class="ne">SyntaxError</span>: invalid syntax
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 </div>
