@@ -44,7 +44,7 @@
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -54,7 +54,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="7. Theoretical Results" href="../ch7/ch7.html" />
+    <link rel="next" title="6.9. Model Estimation Theory" href="estimating-parameters_theory.html" />
     <link rel="prev" title="6.7. Multiple-Network Representation Learning" href="multigraph-representation-learning.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -381,6 +381,11 @@
      6.8. Joint Representation Learning
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="estimating-parameters_theory.html">
+     6.9. Model Estimation Theory
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toctree-l1 has-children">
@@ -696,7 +701,7 @@
         
               <div>
                 
-  <div class="section" id="joint-representation-learning">
+  <div class="tex2jax_ignore mathjax_ignore section" id="joint-representation-learning">
 <h1><span class="section-number">6.8. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">¶</a></h1>
 <p>In many problems, our network might be more than just the information contained in its adjacency matrix (called its topology, or its collection of nodes and edges). If we were investigating a social network, we might have access to extra information about each person – their gender, for instance, or their age. If we were investigating a brain network, we might have information about the physical location of neurons, or the volume of a brain region. When we we embed a network, it seems like we should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve our analysis. The techniques and tools that we’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of the network. Because they jointly use both the topology of the network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don’t overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
@@ -864,8 +869,8 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^T\)</span>, notice we’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-5ad02685-5f14-4139-b5e6-837dd0f807b9">
-<span class="eqno">(6.4)<a class="headerlink" href="#equation-5ad02685-5f14-4139-b5e6-837dd0f807b9" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-4f6cbdc2-535a-4a10-8370-5e1db6f83d78">
+<span class="eqno">(6.4)<a class="headerlink" href="#equation-4f6cbdc2-535a-4a10-8370-5e1db6f83d78" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1019,7 +1024,7 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 <h2><span class="section-number">6.8.4. </span>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">¶</a></h2>
 <p>Graspologic’s CovariateAssistedSpectralEmbedding class implements CASE directly. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aYY^T\)</span> down to two dimensions, and then plots the latent positions to show the clustering.</p>
 <div class="admonition-non-assortative-networks admonition">
-<p class="admonition-title">Non-Assortative Networks</p>
+<p class="admonition-title">Non-Assortative Networks </p>
 <p>We don’t always necessarily want to embed <span class="math notranslate nohighlight">\(L + \alpha YY^\top\)</span>. Using the regularized Laplacian by itself, for instance, isn’t always best. If your network is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square our Laplacian. This is because the adjacency matrices of non-assortative networks have a lot of negative eigenvalues; squaring the Laplacian gets rid of a lot of annoying negative eigenvalues, and we end up with a better embedding. In the non-assortative case, we end up embedding <span class="math notranslate nohighlight">\(LL + aYY^\top\)</span>. The <code class="docutils literal notranslate"><span class="pre">embedding_alg</span></code> parameter controls this: you can write <code class="docutils literal notranslate"><span class="pre">embedding_alg=&quot;non-assortative&quot;</span></code> if you’re in the non-assortative situation.</p>
 </div>
 <div class="cell docutils container">
@@ -1201,10 +1206,10 @@ Mean of A: 0.23
         </a>
     </div>
      <div id="next">
-        <a class="right-next" href="../ch7/ch7.html" title="next page">
+        <a class="right-next" href="estimating-parameters_theory.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title"><span class="section-number">7. </span>Theoretical Results</p>
+                <p class="prevnext-title"><span class="section-number">6.9. </span>Model Estimation Theory</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
