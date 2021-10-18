@@ -869,8 +869,8 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^T\)</span>, notice we’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when we take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-3479dfe3-7827-4591-b813-f303431c50b0">
-<span class="eqno">(6.4)<a class="headerlink" href="#equation-3479dfe3-7827-4591-b813-f303431c50b0" title="Permalink to this equation">¶</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-eb3f0d66-c1e7-4ae4-bf2b-1b4f4d243699">
+<span class="eqno">(6.4)<a class="headerlink" href="#equation-eb3f0d66-c1e7-4ae4-bf2b-1b4f4d243699" title="Permalink to this equation">¶</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1119,7 +1119,8 @@ Mean of A: 0.23
 </div>
 </div>
 </div>
-<p>Second, you can see that <em>both embeddings</em> are able to separate all three communities, even though we’re using the same data that we used for the CASE section. This is because the Omnibus Embedding induces dependence on the latent positions it outputs. Remember that the off-diagonals of the Omnibus Matrix contain the averages of pairs of networks fed into it. These off-diagonal elements are responsible for some “information leakage” - the latent representation for the topology uses information from the covariates, and the latent representation for the covariates uses information from the topology.</p>
+<p>Remember the way this data is set up: you can separate the first community from the last two with the topology, you can separate the last community from the first two with the covariates, but you need both data sources to separate all three.</p>
+<p>Here, you can see that <em>both embeddings</em> are able to separate all three communities. This is because the Omnibus Embedding induces dependence on the latent positions it outputs. Remember that the off-diagonals of the Omnibus Matrix contain the averages of pairs of networks fed into it. These off-diagonal elements are responsible for some “information leakage”: so the topology embedding contains information from the covariates, and the covariate embedding contains information from the topology.</p>
 </div>
 <div class="section" id="mase-joint-embedding">
 <h2><span class="section-number">6.8.6. </span>MASE Joint Embedding<a class="headerlink" href="#mase-joint-embedding" title="Permalink to this headline">¶</a></h2>
@@ -1131,6 +1132,7 @@ Mean of A: 0.23
 <li><p>Concate those embeddings into a single latent position matrix with a lot more dimensions</p></li>
 <li><p>Embed that new matrix</p></li>
 </ol>
+<p>The difference here is the same as with Omni – we have the adjacency matrix (topology) and its covariates for a single network. So instead of embedding a bunch of adjacency matrices or Laplacians, we embed the adjacency matrix (or Laplacian) and the similarity matrix for the covariates <span class="math notranslate nohighlight">\(YY^\top\)</span> separately, concatenate, and then embed again.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>

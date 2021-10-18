@@ -17,13 +17,36 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using only the data we are given: finitely many (in network statistics, often just one) samples which we assume are realizations of the random variable we want to learn about.
+from graspologic.embed import AdjacencySpectralEmbed as ASE
+
+# Generate parameters
+B = np.array([[0.8, 0.2],
+              [0.2, 0.8]])
+
+# Generate a network along with community memberships
+network, labels = sbm(n=[101, 100], p=B, return_labels=True)
+labels = list(labels)
+
+# Grab out-of-sample vertex
+oos_idx = 0
+oos_label = labels.pop(oos_idx)
+A, a_1 = remove_vertices(network, indices=oos_idx, return_removed=True)
+
+# Make an ASE model
+ase = ASE(n_components=2)
+X = ase.fit_transform(A)
+
+# Predict out-of-sample latent positions by transforming
+v_1 = ase.transform(a)
 ------------------
 
-[0;36m  File [0;32m"/tmp/ipykernel_2044/2503422356.py"[0;36m, line [0;32m1[0m
-[0;31m    At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using only the data we are given: finitely many (in network statistics, often just one) samples which we assume are realizations of the random variable we want to learn about.[0m
-[0m       ^[0m
-[0;31mSyntaxError[0m[0;31m:[0m invalid syntax
-
-SyntaxError: invalid syntax (2503422356.py, line 1)
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+[0;32m/tmp/ipykernel_1757/4017896129.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     19[0m [0;34m[0m[0m
+[1;32m     20[0m [0;31m# Predict out-of-sample latent positions by transforming[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 21[0;31m [0mv_1[0m [0;34m=[0m [0mase[0m[0;34m.[0m[0mtransform[0m[0;34m([0m[0ma[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;31mNameError[0m: name 'a' is not defined
+NameError: name 'a' is not defined
 
