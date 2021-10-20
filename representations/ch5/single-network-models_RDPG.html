@@ -664,8 +664,13 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#code-examples">
-     5.5.2.1. Code Examples
+    <a class="reference internal nav-link" href="#working-out-edge-probabilities-using-a-latent-position-matrix">
+     5.5.2.1. Working out edge probabilities using a latent position matrix
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#we-can-do-more-complicated-things-with-rdpgs-than-just-sbms">
+     5.5.2.2. We can do more complicated things with RDPGs than just SBMs
     </a>
    </li>
   </ul>
@@ -953,6 +958,52 @@
  \end{bmatrix}
 \end{align*}\]</div>
 <p>We will call the columns of <span class="math notranslate nohighlight">\(X\)</span> the <strong>latent dimensions</strong>, and the total number of columns that <span class="math notranslate nohighlight">\(X\)</span> has will be called the <strong>latent dimensionality</strong>. We will often use the letter <span class="math notranslate nohighlight">\(d\)</span> to denote the latent dimensionality of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. For this reason, we say that <span class="math notranslate nohighlight">\(X\)</span> is an <span class="math notranslate nohighlight">\(n\)</span> row (one for each node) and <span class="math notranslate nohighlight">\(d\)</span> column (one for each latent dimension) matrix. Therefore, the latent position of the node <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\vec x_i\)</span>, is a <span class="math notranslate nohighlight">\(d\)</span>-dimensional vector. In a few words, the latent dimensionality describes the complexity that the resulting probability matrix <span class="math notranslate nohighlight">\(P = XX^\top\)</span> has: if there are more latent dimensions, <span class="math notranslate nohighlight">\(P\)</span> can look much more complicated than what we have seen thus far!</p>
+<p>Let’s think about the latent position matrix in the context of our previous example with the SBM. A common way to explore the latent position matrix is to look at a heatmap (like we did above) or a scatter plot of the latent position matrix. Let’s think about what the scatter plot might look like. The latent dimensionality of the latent position matrix for the SBM example, it turns out, is <span class="math notranslate nohighlight">\(2\)</span>, because we have two total latent dimensions for our latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. We will take the latent dimensions, and make the first latent dimension the <span class="math notranslate nohighlight">\(x\)</span>-axis, and the second latent dimension the <span class="math notranslate nohighlight">\(y\)</span>-axis. We next plot, for each node <span class="math notranslate nohighlight">\(i\)</span>, a single point, whose <span class="math notranslate nohighlight">\(x\)</span>-coordinate will be the first latent dimension for the latent position of node <span class="math notranslate nohighlight">\(i\)</span>, and the <span class="math notranslate nohighlight">\(y\)</span>-coordinate will be the second latent dimension for the latent position of node <span class="math notranslate nohighlight">\(i\)</span>. In symbols, we will plot <span class="math notranslate nohighlight">\((x_{i1}, x_{i2})\)</span>, for each node <span class="math notranslate nohighlight">\(i\)</span>. This means that there will be <span class="math notranslate nohighlight">\(n\)</span>-total points shown in the plot below:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_latent_hm_sc</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">nodename</span><span class="o">=</span><span class="s2">&quot;Student&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Latent Dimension&quot;</span><span class="p">,</span>
+                <span class="n">nodetix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodelabs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dimtix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dimlabs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width_ratios&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="n">sns</span><span class="o">.</span><span class="n">plotting_context</span><span class="p">(</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">lim_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="o">-</span><span class="n">lim_max</span><span class="p">;</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">lim_max</span>
+        <span class="n">X_annot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;U6&#39;</span><span class="p">)</span>
+        <span class="n">X_annot</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">X_annot</span><span class="p">[</span><span class="mi">75</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">75</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">X_annot</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">X_annot</span><span class="p">[</span><span class="mi">75</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">75</span><span class="p">,</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;divergent&quot;</span><span class="p">],</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">shrink</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+                        <span class="n">annot</span><span class="o">=</span><span class="n">X_annot</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Positions as Heatmap&quot;</span><span class="p">)</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">colorbar</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="n">nodename</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="n">ylabel</span><span class="p">)</span>
+
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">99</span><span class="p">])</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;50&quot;</span><span class="p">,</span> <span class="s2">&quot;100&quot;</span><span class="p">])</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_frame_on</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">X_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">X_df</span> <span class="o">=</span> <span class="n">X_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Latent Dimension 1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Latent Dimension 2&quot;</span><span class="p">})</span>
+    <span class="n">comm_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">50</span> <span class="k">else</span> <span class="s2">&quot;2&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)]</span>
+    <span class="n">X_df</span><span class="p">[</span><span class="s2">&quot;School&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm_list</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Latent Dimension 1&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Latent Dimension 2&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;School&quot;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Positions as Scatterplot&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+
+<span class="n">plot_latent_hm_sc</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_RDPG_13_0.png" src="../../_images/single-network-models_RDPG_13_0.png" />
+</div>
+</div>
+<p>Why does our scatter plot look like it only has <span class="math notranslate nohighlight">\(2\)</span> points on it? Quite simply, for an SBM, <em>every</em> node within the same community has an <em>identical</em> latent position! This means that all of the nodes representing students who are in school <span class="math notranslate nohighlight">\(1\)</span> have the same latent positition vector as the other students in school <span class="math notranslate nohighlight">\(1\)</span>. Similarly, all of the nodes representing students who are in school <span class="math notranslate nohighlight">\(2\)</span> have the same latent position vector as the other students in school <span class="math notranslate nohighlight">\(2\)</span>. Even though it looks like there is only <span class="math notranslate nohighlight">\(1\)</span> point for each school community, there are really <span class="math notranslate nohighlight">\(50\)</span> total latent position vectors for each student within that community and they just happen to overlap. This does not need to be the case for the latent positions, as we will see in a more complicated example later on.</p>
 </div>
 </div>
 <div class="section" id="the-random-dot-product-graph-rdpg">
@@ -972,8 +1023,86 @@
 <li><p>The adjacency matrix we produce, <span class="math notranslate nohighlight">\(A\)</span>, is a realization of an <span class="math notranslate nohighlight">\(RDPG_n(X)\)</span> random network.</p></li>
 </ol>
 </div>
-<div class="section" id="code-examples">
-<h3><span class="section-number">5.5.2.1. </span>Code Examples<a class="headerlink" href="#code-examples" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="working-out-edge-probabilities-using-a-latent-position-matrix">
+<h3><span class="section-number">5.5.2.1. </span>Working out edge probabilities using a latent position matrix<a class="headerlink" href="#working-out-edge-probabilities-using-a-latent-position-matrix" title="Permalink to this headline">¶</a></h3>
+<p>As we can see above, for the RDPG, we think of the edge probabilities <span class="math notranslate nohighlight">\(p_{ij}\)</span> as a weighted coin, which lands on heads according to the <em>dot product</em> <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span>. Let’s explore this in the context of our SBM example from above. Remember that the latent position matrix for our example looked like this:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_latent</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent Position Matrix&quot;</span><span class="p">,</span> <span class="n">nodetix</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span>
+              <span class="n">nodelabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;50&quot;</span><span class="p">,</span> <span class="s2">&quot;100&quot;</span><span class="p">],</span> <span class="n">dimtix</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">],</span> <span class="n">dimlabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_RDPG_15_0.png" src="../../_images/single-network-models_RDPG_15_0.png" />
+</div>
+</div>
+<p>Remember that the first <span class="math notranslate nohighlight">\(50\)</span> students were in school <span class="math notranslate nohighlight">\(1\)</span>, and the second <span class="math notranslate nohighlight">\(50\)</span> students were in school <span class="math notranslate nohighlight">\(2\)</span>. Looking at the above matrix, we can see that for a student in school <span class="math notranslate nohighlight">\(1\)</span>, the latent position vector is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec x_i &amp;= \begin{bmatrix}
+        -0.672 \\
+        -0.221
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>Then for a pair of students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> who are both in school <span class="math notranslate nohighlight">\(1\)</span> (the community assignments <span class="math notranslate nohighlight">\(\tau_i\)</span> and <span class="math notranslate nohighlight">\(\tau_j\)</span> are both <span class="math notranslate nohighlight">\(1\)</span>), the probability they are friends is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    b_{11} = p_{ij} &amp;= \vec x_i^\top \vec x_j = \begin{bmatrix}
+        -0.672 &amp;
+        -0.221
+    \end{bmatrix}\begin{bmatrix}
+        -0.672 \\
+        -0.221
+    \end{bmatrix} \\
+    &amp;= (-.672)^2 + (-.221)^2 = .5
+\end{align*}\]</div>
+<p>For a student in school <span class="math notranslate nohighlight">\(2\)</span>, the latent position vector is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec x_i &amp;= \begin{bmatrix}
+        -0.415 \\
+        0.357
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>So for a pair of students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> who are both in school <span class="math notranslate nohighlight">\(2\)</span> (the community assignments <span class="math notranslate nohighlight">\(\tau_i\)</span> and <span class="math notranslate nohighlight">\(\tau_j\)</span> are both <span class="math notranslate nohighlight">\(2\)</span>) the probability that they are friends is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    b_{11} = p_{ij} &amp;= \vec x_i^\top \vec x_j = \begin{bmatrix}
+        -0.415 &amp;
+        0.357
+    \end{bmatrix}\begin{bmatrix}
+        -0.415 \\
+        0.357
+    \end{bmatrix} \\
+    &amp;= (-.415)^2 + (.357)^2 = .3
+\end{align*}\]</div>
+<p>For a pair of students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> whho are in different schools:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+b_{12} =  b_{21} = p_{ij} &amp;= \vec x_i^\top \vec x_j = \vec x_j \vec x_i \\
+&amp;= \begin{bmatrix}
+        -0.672 &amp;
+        -0.221
+    \end{bmatrix}\begin{bmatrix}
+        -0.415 \\
+        0.357
+    \end{bmatrix} \\
+    &amp;= (-.672)\cdot(-.415) + (-.221)\cdot 0.357 = 0.2
+\end{align*}\]</div>
+<p>This shows that using only the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, we have been able to deduce the corresponding block matrix <span class="math notranslate nohighlight">\(B\)</span>, where:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    B &amp;= \begin{bmatrix}
+        b_{11} &amp; b_{12} \\
+        b_{21} &amp; b_{22}
+    \end{bmatrix}
+\end{align*}\]</div>
+</div>
+<div class="section" id="we-can-do-more-complicated-things-with-rdpgs-than-just-sbms">
+<h3><span class="section-number">5.5.2.2. </span>We can do more complicated things with RDPGs than just SBMs<a class="headerlink" href="#we-can-do-more-complicated-things-with-rdpgs-than-just-sbms" title="Permalink to this headline">¶</a></h3>
 <p>We will let <span class="math notranslate nohighlight">\(X\)</span> be a little more complex than in our preceding example. Our <span class="math notranslate nohighlight">\(X\)</span> will produce a <span class="math notranslate nohighlight">\(P\)</span> that still <em>somewhat</em> has a modular structure, but not quite as much as before. Let’s assume that we have <span class="math notranslate nohighlight">\(100\)</span> people who live along a very long road that is <span class="math notranslate nohighlight">\(100\)</span> miles long, and each person is <span class="math notranslate nohighlight">\(1\)</span> mile apart. The nodes of our network represent the people who live along our assumed street. If two people are closer to one another, it might make sense to think that they have a higher probability of being friends. If two people are neighbors, we think that they will have a very high probability of being friends (almost <span class="math notranslate nohighlight">\(1\)</span>) and when people are very far apart, we think that they will have a very low probability of being friends (almost <span class="math notranslate nohighlight">\(0\)</span>). What could we use for <span class="math notranslate nohighlight">\(X\)</span>?</p>
 <p>Remember that the latent positions for each node <span class="math notranslate nohighlight">\(i\)</span> are denoted by the vector <span class="math notranslate nohighlight">\(\vec x_i\)</span>. One possible approach would be to let each <span class="math notranslate nohighlight">\(\vec x_i\)</span> be defined as follows:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -1034,7 +1163,7 @@ p_{30, 100} &amp;= \vec x_{30}^\top x_{100} = \frac{7}{10} \cdot 0 + \frac{3}{10
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_RDPG_15_0.png" src="../../_images/single-network-models_RDPG_15_0.png" />
+<img alt="../../_images/single-network-models_RDPG_18_0.png" src="../../_images/single-network-models_RDPG_18_0.png" />
 </div>
 </div>
 <p>The latent position matrix <span class="math notranslate nohighlight">\(X\)</span> that we plotted above is <span class="math notranslate nohighlight">\(n \times d\)</span> dimensions. There are a number of approaches, other than looking at a heatmap of <span class="math notranslate nohighlight">\(X\)</span>, with which we can visualize <span class="math notranslate nohighlight">\(X\)</span> to derive insights as to its structure. When <span class="math notranslate nohighlight">\(d=2\)</span>, another popular visualization is to look at the latent positions, <span class="math notranslate nohighlight">\(\vec x_i\)</span>, as individual points in <span class="math notranslate nohighlight">\(2\)</span>-dimensional space. This will give us a scatter plot of <span class="math notranslate nohighlight">\(n\)</span> points, each of which has two coordinates. Each point is the latent position for a single node:</p>
@@ -1058,7 +1187,7 @@ p_{30, 100} &amp;= \vec x_{30}^\top x_{100} = \frac{7}{10} \cdot 0 + \frac{3}{10
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_RDPG_17_0.png" src="../../_images/single-network-models_RDPG_17_0.png" />
+<img alt="../../_images/single-network-models_RDPG_20_0.png" src="../../_images/single-network-models_RDPG_20_0.png" />
 </div>
 </div>
 <p>The above scatter plot has been subsampled to show only every <span class="math notranslate nohighlight">\(2^{nd}\)</span> latent position, so that the individual <span class="math notranslate nohighlight">\(2\)</span>-dimensional latent positions are discernable. Due to the way we constructed <span class="math notranslate nohighlight">\(X\)</span>, the scatter plot would otherwise appear to be a line (due to points overlapping one another). The reason that the points fall along a vertical line when plotted as a vector is due to the method we used to construct entries of <span class="math notranslate nohighlight">\(X\)</span>, described above. Next, we will look at the probability matrix:</p>
@@ -1070,7 +1199,7 @@ p_{30, 100} &amp;= \vec x_{30}^\top x_{100} = \frac{7}{10} \cdot 0 + \frac{3}{10
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_RDPG_19_0.png" src="../../_images/single-network-models_RDPG_19_0.png" />
+<img alt="../../_images/single-network-models_RDPG_22_0.png" src="../../_images/single-network-models_RDPG_22_0.png" />
 </div>
 </div>
 <p>Finally, we will sample an RDPG:</p>
@@ -1089,7 +1218,7 @@ p_{30, 100} &amp;= \vec x_{30}^\top x_{100} = \frac{7}{10} \cdot 0 + \frac{3}{10
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_RDPG_21_0.png" src="../../_images/single-network-models_RDPG_21_0.png" />
+<img alt="../../_images/single-network-models_RDPG_24_0.png" src="../../_images/single-network-models_RDPG_24_0.png" />
 </div>
 </div>
 </div>
