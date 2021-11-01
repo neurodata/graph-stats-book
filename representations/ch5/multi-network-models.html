@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>5.6. Multi-Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>5.6. Multiple Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -314,7 +316,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     5.6. Multi-Network Models
+     5.6. Multiple Network Models
     </a>
    </li>
    <li class="toctree-l2">
@@ -612,11 +614,65 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch5/multi-network-models.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#joint-random-dot-product-graphs-jrdpg-model">
+   5.6.1. Joint Random Dot Product Graphs (JRDPG) Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-jrdpg-model-does-not-allow-us-to-convey-unique-aspects-about-the-networks">
+     5.6.1.1. The JRDPG model does not allow us to convey unique aspects about the networks
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-inhomogeous-erdos-renyi-random-network">
+     5.6.1.2. The Inhomogeous Erdos-Renyi Random Network
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#common-subspace-independent-edge-cosie-model">
+   5.6.2. Common Subspace Independent Edge (COSIE) Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-cosie-model-is-defined-by-a-collection-of-score-matrices-and-a-shared-low-rank-subspace">
+     5.6.2.1. The COSIE Model is defined by a collection of score matrices and a shared low-rank subspace
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -625,8 +681,60 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="multi-network-models">
-<h1><span class="section-number">5.6. </span>Multi-Network Models<a class="headerlink" href="#multi-network-models" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="multiple-network-models">
+<h1><span class="section-number">5.6. </span>Multiple Network Models<a class="headerlink" href="#multiple-network-models" title="Permalink to this headline">¶</a></h1>
+<p>To this point in the book, we have studied network models which are relevant for only a single network. What do we do if we have multiple networks?</p>
+<p>Remember that a random network is denoted by a boldfaced uppercase <span class="math notranslate nohighlight">\(\mathbf A\)</span>, and has realizations <span class="math notranslate nohighlight">\(A\)</span>. When we have multiple networks, we will need to be able to index them individually. For this reason, in this section, we will use the convention that a random network is denoted by a boldfaced uppercase <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span>, where <span class="math notranslate nohighlight">\(m\)</span> tells us which of the collection of networks we are talking about. The capital letter <span class="math notranslate nohighlight">\(N\)</span> defines the <em>total</em> number of random networks in our collection. When we use the letter <span class="math notranslate nohighlight">\(m\)</span> itself, we will typically be referring to an arbitrary random network amongst the collection of random networks, where <span class="math notranslate nohighlight">\(m\)</span> beween <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(N\)</span>. When we have <span class="math notranslate nohighlight">\(N\)</span> total networks, we will write down the entire <strong>collection of random networks</strong> using the notation <span class="math notranslate nohighlight">\(\left\{\mathbf A^{(1)}, ..., \mathbf A^{(N)}\right\}\)</span>. With what we have learned to date, for a random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span>, we would be able to use a single nework model to describe <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span>. This means, for instance, if we thought that each network could be represented by an RDPG, that we would have a latent position matrix <span class="math notranslate nohighlight">\(X^{(m)}\)</span> to define each of the <span class="math notranslate nohighlight">\(m\)</span> networks. In symbols, we would write that each <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> is an <span class="math notranslate nohighlight">\(RDPG_n(X^{(m)})\)</span> random nework. What is the problem with this descripion?</p>
+<p>Let’s think about this with an example. Let’s imagine that we have a company with <span class="math notranslate nohighlight">\(20\)</span> total employees which is focused on developing software for network machine learning for business uses. <span class="math notranslate nohighlight">\(5\)</span> of these employees are company administrative executives, <span class="math notranslate nohighlight">\(10\)</span> of these employees are network machine learning experts, and that <span class="math notranslate nohighlight">\(5\)</span> of these employees are marketing experts. For each day over the course of a full <span class="math notranslate nohighlight">\(30\)</span>-day month, we study the emails that go back and forth between the employees in the company. We summarize the emailing habits within the company using a nework, where the nodes of the network are employees, and the edges indicate the emailing behaviors between each pair of employees. An edge is said to exist if the two employees have exchanged an email on that day, and an edge does not exist if the two employees have not exchanged an email on that day. In most companies, it is common for employees in a similar role to tend to work more closely together, so we might expect that there is some level of a community structure to the emailing habits. For instance, if two employees are both network machine learning experts, they might exchange more emails between one another than a machine learning expert and a marketing expert.</p>
+<p>If we were to summarize this situation with an RDPG, we might say that <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> is an <span class="math notranslate nohighlight">\(RDPG_n(X^{(m)})\)</span> random network, where <span class="math notranslate nohighlight">\(m\)</span> goes from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(30\)</span>. What this description lacks is that, over the course of a given <span class="math notranslate nohighlight">\(30\)</span> days, a <em>lot</em> of the networks are going to show similar emailing patterns. We might expect that this implies that, on some level, the latent position matrices should also show some sort of common structure. However, since we used a <em>unique</em> latent position matrix <span class="math notranslate nohighlight">\(X^{(m)}\)</span> for each random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span>, we have inherently stated that we think that the networks have a completely distinct latent position matrix. If we were to perform a task downstream, such as whether we could identify which employees are in which community, we would have to analyze each latent position matrix individually, and we would not be able to learn a latent position matrix with shared structure across all <span class="math notranslate nohighlight">\(30\)</span> days.</p>
+<p>So, how can we think about our collection of random networks and reflect this shared structure?</p>
+<div class="section" id="joint-random-dot-product-graphs-jrdpg-model">
+<h2><span class="section-number">5.6.1. </span>Joint Random Dot Product Graphs (JRDPG) Model<a class="headerlink" href="#joint-random-dot-product-graphs-jrdpg-model" title="Permalink to this headline">¶</a></h2>
+<p>The Joint Random Dot Product Graphs (JRDPG) is the simplest way we can extend the RDPG random network model to multiple random networks. The way we can think of the JRDPG model is that for each of our <span class="math notranslate nohighlight">\(N\)</span> total random neworks, the edges in the random networks depend on a latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. We say that a collection of random networks <span class="math notranslate nohighlight">\(\left\{\mathbf A^{(1)}, ..., \mathbf A^{(N)}\right\}\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes is <span class="math notranslate nohighlight">\(JRDPG_n(X)\)</span> if each random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> is <span class="math notranslate nohighlight">\(RDPG_n(X)\)</span> and if the <span class="math notranslate nohighlight">\(N\)</span> networks are independent. Stated another way, all of the <span class="math notranslate nohighlight">\(N\)</span> random networks share the same latent position matrix under the <span class="math notranslate nohighlight">\(JRDPG_n(X)\)</span> multiple random network model.</p>
+<div class="section" id="the-jrdpg-model-does-not-allow-us-to-convey-unique-aspects-about-the-networks">
+<h3><span class="section-number">5.6.1.1. </span>The JRDPG model does not allow us to convey unique aspects about the networks<a class="headerlink" href="#the-jrdpg-model-does-not-allow-us-to-convey-unique-aspects-about-the-networks" title="Permalink to this headline">¶</a></h3>
+<p>Under the JRDPG model, each of the <span class="math notranslate nohighlight">\(N\)</span> random networks share the same latent position matrix. This means that the <span class="math notranslate nohighlight">\(N\)</span> random networks are <strong>homogeneous</strong>. A <strong>homogeneous</strong> collection of random networks <span class="math notranslate nohighlight">\(\left\{\mathbf A^{(1)}, ..., \mathbf A^{(N)}\right\}\)</span> is a collection of random neworks in which <em>all</em> of the <span class="math notranslate nohighlight">\(N\)</span> random networks have the same marginal distribution. For instance, in the case of the <span class="math notranslate nohighlight">\(JRDPG_n(X)\)</span> multiple random network model, all of the <span class="math notranslate nohighlight">\(N\)</span> networks have the marginal distribution <span class="math notranslate nohighlight">\(RDPG_n(X)\)</span>.</p>
+</div>
+<div class="section" id="the-inhomogeous-erdos-renyi-random-network">
+<h3><span class="section-number">5.6.1.2. </span>The Inhomogeous Erdos-Renyi Random Network<a class="headerlink" href="#the-inhomogeous-erdos-renyi-random-network" title="Permalink to this headline">¶</a></h3>
+<p>To remove this restrictive homogeneity property of the JRDPG, we will need a new single network model, called the Inhomogeneous Erdos-Renyi (IER) random network model. The way we can think of the <span class="math notranslate nohighlight">\(IER\)</span> random network is that a probability matrix <span class="math notranslate nohighlight">\(P\)</span> with <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns defines each of the edge-existence probabilities for pairs of nodes in the network. For each pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, we have a unique coin which has a <span class="math notranslate nohighlight">\(p_{ij}\)</span> chance of landing on heads, and a <span class="math notranslate nohighlight">\(1 - p_{ij}\)</span> chance of laanding on tails. If the coin laands on heads, the edge between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> exists, and if the coin lands on tails, the edge between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> does not exist. This coin flip is performed independent of the coin flips for all of the other edges. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network which is <span class="math notranslate nohighlight">\(IER\)</span> with a probability matrix <span class="math notranslate nohighlight">\(P\)</span>, we say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(IER_n(P)\)</span> random network.</p>
+<p>As before, we can develop a procedure to produce for us a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(IER_n(P)\)</span> random network:</p>
+<div class="admonition-simulating-a-realization-from-an-ier-n-p-random-network admonition">
+<p class="admonition-title">Simulating a realization from an <span class="math notranslate nohighlight">\(IER_n(P)\)</span> random network</p>
+<ol class="simple">
+<li><p>Determine a probability matrix <span class="math notranslate nohighlight">\(P\)</span>, whose entries <span class="math notranslate nohighlight">\(p_{ij}\)</span> are probabilities.</p></li>
+<li><p>For each pair of nodes <span class="math notranslate nohighlight">\(i\)</span> an <span class="math notranslate nohighlight">\(j\)</span>:</p>
+<ul class="simple">
+<li><p>Obtain a weighted coin <span class="math notranslate nohighlight">\((i,j)\)</span> which has a probability <span class="math notranslate nohighlight">\(p_{ij}\)</span> of landing on heads, and a <span class="math notranslate nohighlight">\(1 - p_{ij}\)</span> probability of landing on tails.</p></li>
+<li><p>Flip the <span class="math notranslate nohighlight">\((i,j)\)</span> coin, andd if it lands on heads, the corresponding entry <span class="math notranslate nohighlight">\(a_{ij}\)</span> in the adjacency matrix is <span class="math notranslate nohighlight">\(1\)</span>. If the coin lands on tails, the corresponding entry <span class="math notranslate nohighlight">\(a_{ij}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+</ul>
+</li>
+<li><p>The adjacency matrix we produce, <span class="math notranslate nohighlight">\(A\)</span>, is a realization of an <span class="math notranslate nohighlight">\(IER_n(P)\)</span> random network.</p></li>
+</ol>
+</div>
+<p>It is important to realize that all of the networks we have described so far are also <span class="math notranslate nohighlight">\(IER_n(P)\)</span> random networks. The previous single network models we have described to date simply place restrictions on the way in which we acquire <span class="math notranslate nohighlight">\(P\)</span>. For instance, in an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network, all entries <span class="math notranslate nohighlight">\(p_{ij}\)</span> of <span class="math notranslate nohighlight">\(P\)</span> are equal to <span class="math notranslate nohighlight">\(p\)</span>.</p>
+</div>
+</div>
+<div class="section" id="common-subspace-independent-edge-cosie-model">
+<h2><span class="section-number">5.6.2. </span>Common Subspace Independent Edge (COSIE) Model<a class="headerlink" href="#common-subspace-independent-edge-cosie-model" title="Permalink to this headline">¶</a></h2>
+<p>Unlike the JRDPG model, the Common Subspace Independent Edge (COSIE) model allows for heterogeneity amongst the the <span class="math notranslate nohighlight">\(N\)</span> random networks. A <strong>heterogeneous</strong> collection of random networks is a collection of networks <span class="math notranslate nohighlight">\(\left\{\mathbf A^{(1)}, ..., \mathbf A^{(N)}\right\}\)</span> is a collection of random networks in which the <span class="math notranslate nohighlight">\(N\)</span> networks do not have the same marginal distribution.</p>
+<div class="section" id="the-cosie-model-is-defined-by-a-collection-of-score-matrices-and-a-shared-low-rank-subspace">
+<h3><span class="section-number">5.6.2.1. </span>The COSIE Model is defined by a collection of score matrices and a shared low-rank subspace<a class="headerlink" href="#the-cosie-model-is-defined-by-a-collection-of-score-matrices-and-a-shared-low-rank-subspace" title="Permalink to this headline">¶</a></h3>
+<p>For the RDPG, remember that we used the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> to define the edge-existence probabilities within the network. Let’s imagine that the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is <span class="math notranslate nohighlight">\(RDPG_n(X)\)</span>, where <span class="math notranslate nohighlight">\(X\)</span> is the latent position matrix. We used the probability matrix, <span class="math notranslate nohighlight">\(P\)</span>, where <span class="math notranslate nohighlight">\(P\)</span> could be defined where <span class="math notranslate nohighlight">\(P=XX^\top\)</span>. The edge existence probability <span class="math notranslate nohighlight">\(p_{ij}\)</span> between a pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> was the inner product <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span> of the <span class="math notranslate nohighlight">\(i^{th}\)</span> row and the <span class="math notranslate nohighlight">\(j^{th}\)</span> row of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Stated another way, we thought of the edge between a pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> being represented by a coin flip, where the coin had a <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span> chance of landing on heads. If the coin lands on heads, an edge exists, and if the coin does not land on heads (with a <span class="math notranslate nohighlight">\(1 - \vec x_i^\top \vec x_j\)</span> chance of happening) the edge does not exist. We will use a similar intuition to describe the COSIE model.</p>
+<p>Here, we will use a matrix <span class="math notranslate nohighlight">\(V\)</span>, which is largely similar in intuition to the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. The matrix <span class="math notranslate nohighlight">\(V\)</span> will have <span class="math notranslate nohighlight">\(n\)</span> rows (the number of <em>nodes</em> in each of the <span class="math notranslate nohighlight">\(N\)</span> networks) and <span class="math notranslate nohighlight">\(d\)</span> columns. Like for the RDPG, <span class="math notranslate nohighlight">\(d\)</span> will again refer to the latent dimensionality of the collection of random networks. The matrix <span class="math notranslate nohighlight">\(V\)</span> has the special property that the <span class="math notranslate nohighlight">\(d\)</span> columns of <span class="math notranslate nohighlight">\(V\)</span> are <strong>orthonormal</strong>. The matrix <span class="math notranslate nohighlight">\(V\)</span> looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    V &amp;= \begin{bmatrix}
+        \top &amp; \top &amp; &amp; \top \\
+        \vec v_1 &amp; \vec v_2 &amp; ... &amp; \vec v_d \\
+        \perp &amp; \perp &amp; &amp; \perp
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>That <span class="math notranslate nohighlight">\(V\)</span> is orthonormal means that, for any column <span class="math notranslate nohighlight">\(k\)</span> of the <span class="math notranslate nohighlight">\(d\)</span> total columns, that <span class="math notranslate nohighlight">\(v_k ^\top v_k = 1\)</span>, and for any pair of columns <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(l\)</span> where <span class="math notranslate nohighlight">\(k \neq l\)</span>, then <span class="math notranslate nohighlight">\(v_k^\top v_l = 0\)</span>.</p>
+<p>For the COSIE model, we also have a collection of score matrices, <span class="math notranslate nohighlight">\(\left\{R^{(1)}, ..., R^{(N)}\right\}\)</span>. Each score matrix <span class="math notranslate nohighlight">\(R^{(m)}\)</span> is a matrix with <span class="math notranslate nohighlight">\(d\)</span> columns and <span class="math notranslate nohighlight">\(d\)</span> rows which is symmetric. That <span class="math notranslate nohighlight">\(R^{(m)}\)</span> is symmetric means that for any two latent dimensions <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(l\)</span>, that <span class="math notranslate nohighlight">\(R^{(m)}_{kl} = R^{(m)}_{lk}\)</span>.</p>
+<p>The way we can think about the COSIE model is that for each random network <span class="math notranslate nohighlight">\(m\)</span> of our <span class="math notranslate nohighlight">\(N\)</span> total networks, the edges in the <span class="math notranslate nohighlight">\(m^{th}\)</span> network depend on the orthonormal matrix <span class="math notranslate nohighlight">\(V\)</span> and the score matrix <span class="math notranslate nohighlight">\(R^{(m)}\)</span>. The probability matrix <span class="math notranslate nohighlight">\(P^{(m)}\)</span> for the <span class="math notranslate nohighlight">\(m^{th}\)</span> random network is defined so that <span class="math notranslate nohighlight">\(P^{(m)} = VR^{(m)}V^\top\)</span>. We say that a collection of random networks <span class="math notranslate nohighlight">\(\left\{\mathbf A^{(1)}, ..., \mathbf A^{(N)}\right\}\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes is <span class="math notranslate nohighlight">\(COSIE_n\left(V, \left\{R^{(1)},...,R^{(N)}\right\}\right)\)</span> if each random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> is <span class="math notranslate nohighlight">\(IER(P^{(m)})\)</span>. Stated another way, each of the <span class="math notranslate nohighlight">\(N\)</span> random networks share the same orthonormal matrix <span class="math notranslate nohighlight">\(V\)</span>, but a unique score matrix <span class="math notranslate nohighlight">\(R^{(m)}\)</span>. This allows the random networks to share some underlying structure (which is conveyed by <span class="math notranslate nohighlight">\(V\)</span>) but each random network still has a combination of this shared structure (conveyed by <span class="math notranslate nohighlight">\(R^{(m)}\)</span>).</p>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
