@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>9.2. Graph Matching and Vertex Nomination &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>9.2. Graph Matching &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -54,7 +54,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="9.3. Vertex Nomination" href="vertex-nomination.html" />
+    <link rel="next" title="9.3. Vertex Nomination For Multiple Networks" href="vertex-nomination.html" />
     <link rel="prev" title="9.1. Two-Sample Hypothesis Testing" href="two-sample-hypothesis.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -466,7 +466,7 @@
  </li>
  <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="ch9.html">
-   9. Leveraging Representations for Multiple Graph Applications
+   9. Applications for Two Networks
   </a>
   <input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
   <label for="toctree-checkbox-9">
@@ -481,19 +481,19 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     9.2. Graph Matching and Vertex Nomination
+     9.2. Graph Matching
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="vertex-nomination.html">
-     9.3. Vertex Nomination
+     9.3. Vertex Nomination For Multiple Networks
     </a>
    </li>
   </ul>
  </li>
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="../ch10/ch10.html">
-   10. Algorithms for more than 2 graphs
+   10. Applications for Many Networks
   </a>
   <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
   <label for="toctree-checkbox-10">
@@ -677,8 +677,8 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="graph-matching-and-vertex-nomination">
-<h1><span class="section-number">9.2. </span>Graph Matching and Vertex Nomination<a class="headerlink" href="#graph-matching-and-vertex-nomination" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="graph-matching">
+<h1><span class="section-number">9.2. </span>Graph Matching<a class="headerlink" href="#graph-matching" title="Permalink to this headline">¶</a></h1>
 <p>You work at Facebook and Twitter (wow, both), but there’s been a terrible incident. All twitter users’ names and handles have been somehow been deleted! Your bosses are furious (understandably) and have tasked you with somehow recovering the lost information. How might you go about doing this? Luckily, you’ve been working hard and have somehow earned yourself this dual Facebook/Twitter gig, so you have a great resource at your disposal: the Facebook social network. You know all facebook users and who they are friends with, and since you’ve only lost the twitter usernames, you can still figure out which ghost-users follow each other. You decide to use the Facebook network connectivity data to re-label the twitter social network. Alternatively, you can say the we are “aligning” Twitter based on Facebook. Obviously this isn’t ideal, but you’re making the best out of a bad situation.</p>
 <p>In the example above, the social networks are represented with each user as a node, and an edge exists if two users are friends. We’ll define the facebook and twitter networks as <span class="math notranslate nohighlight">\(F\)</span> and <span class="math notranslate nohighlight">\(T\)</span> respectively, with associated adjacency matrices <span class="math notranslate nohighlight">\(A_F\)</span> and <span class="math notranslate nohighlight">\(A_T\)</span>. This method is known as <span class="math notranslate nohighlight">\(\textit{Graph Matching}\)</span>, because we are matching the node labels of one graph to another. This can also be thought of as a mapping; that is based on the neighborhood structure of a node in the <span class="math notranslate nohighlight">\(F\)</span>, we assign the same label to the node <span class="math notranslate nohighlight">\(T\)</span> with the most similar structure. In other words, one of our twitter users will be assigned the user name of the Facebook user with the most common followers. This is then done for the whole network, such that overall the structure is best preserved.</p>
 <p>As you can imagine, there must be a very large number of these possible mappings. In fact, for network pairs with <span class="math notranslate nohighlight">\(n\)</span> nodes, there are <span class="math notranslate nohighlight">\(n!\)</span> possible mappings. So how would go about solving this mathematically? First, we need a metric that tells us how similar two networks are to each other. For graph matching, this similarity metric is defined as <span class="math notranslate nohighlight">\(f(A, B) = ||A - B||_F^2\)</span> for unweighted adjacency matrices <span class="math notranslate nohighlight">\(A, B \in \mathbb{R}^{n \times n}\)</span>, where <span class="math notranslate nohighlight">\(||.||_F^2\)</span> is the Frobenius norm. To understand this functionally, consider the best possible case where <span class="math notranslate nohighlight">\(A=B\)</span>, ie the maximally similar. The difference will be a matrix of all zeros, and taking the squared norm will then yield <span class="math notranslate nohighlight">\(f(A,B) = 0\)</span>. If we then remove one edge from <span class="math notranslate nohighlight">\(A\)</span>, then <span class="math notranslate nohighlight">\(f(A,B) = 1\)</span>. If we consider the worst possible case (every edge in <span class="math notranslate nohighlight">\(A\)</span> does not exist in <span class="math notranslate nohighlight">\(B\)</span>, and vice versa), then <span class="math notranslate nohighlight">\(f(A,B) = n^2\)</span>. This metric effectively counts the number of adjacnecy disagreements between <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. Thus, we want to find the mapping where <span class="math notranslate nohighlight">\(f(A, B)\)</span> is as small as possible.</p>
@@ -905,7 +905,7 @@ Thus, the graph matching formulation for any two adjacency matrices <span class=
         <a class="right-next" href="vertex-nomination.html" title="next page">
             <div class="prevnext-info">
                 <p class="prevnext-label">next</p>
-                <p class="prevnext-title"><span class="section-number">9.3. </span>Vertex Nomination</p>
+                <p class="prevnext-title"><span class="section-number">9.3. </span>Vertex Nomination For Multiple Networks</p>
             </div>
             <i class="prevnext-label fas fa-angle-right"></i>
         </a>
