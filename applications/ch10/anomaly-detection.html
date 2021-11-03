@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>10.1. Anomaly Detection &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>10.1. Anomaly Detection For Timeseries of Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet" />
   <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -446,7 +448,7 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../ch8/vertex-nomination.html">
+    <a class="reference internal" href="../ch8/single-vertex-nomination.html">
      8.4. Single-Network Vertex Nomination
     </a>
    </li>
@@ -478,13 +480,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../ch9/vertex-nomination.html">
+    <a class="reference internal" href="../ch9/multiple-vertex-nomination.html">
      9.3. Vertex Nomination For Multiple Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch9/anomaly-detection.html">
-     9.4. Anomaly Detection For Timeseries Networks
     </a>
    </li>
   </ul>
@@ -501,7 +498,7 @@
   <ul class="current">
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     10.1. Anomaly Detection
+     10.1. Anomaly Detection For Timeseries of Networks
     </a>
    </li>
    <li class="toctree-l2">
@@ -634,6 +631,34 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#counting-changed-edges">
+   10.1.1. Counting Changed Edges
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   10.1.2.
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   10.1.3. References
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#notes">
+   10.1.4. Notes
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -642,11 +667,35 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="anomaly-detection">
-<h1><span class="section-number">10.1. </span>Anomaly Detection<a class="headerlink" href="#anomaly-detection" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="anomaly-detection-for-timeseries-of-networks">
+<h1><span class="section-number">10.1. </span>Anomaly Detection For Timeseries of Networks<a class="headerlink" href="#anomaly-detection-for-timeseries-of-networks" title="Permalink to this headline">¶</a></h1>
+<p>There is a particular type of sea slug who have gills on the outside of their body. When you squirt water at these gills, they withdraw into the slug. The interesting thing about this type of slug is that the circuitry for this gill-withdrawal circuit has been entirely mapped out, from the neurons which detect and transmit information about the water into the slug’s brain, to the neurons that leave the brain and fire at muscles, causing these muscles to pull back.</p>
+<p>Say you’re a researcher studying these sea slugs, and you have a bunch of brain networks of the same slug. Each node is one of its neurons, and edges denote connections between neurons. Each of the brain networks that you have were taken at different time points: some before water started getting squirted at the slug’s gills, and some as the water was getting squirted. Your goal is to reconstruct when water started to get squirted, using only the networks themselves. You hypothesize that there should be some signal change in your networks which can tell you the particular time at which water started getting squirted. Given the network data you have, how do you figure out which timepoints these are?</p>
+<p>The broader class of problems this question addresses is called <em>anomaly detection</em>. The idea in general is that you have a bunch of snapshots of the same network over time. Although the nodes are the same, the edges are changing at each time point. Your goal is to figure out which time points correspond to the most change, either in the entire network or in particular groups of nodes.</p>
+<p>In particular, what we would really like to do is separate the signal from the noise. All of the nodes in the network are likely changing a bit over time, since there is some variability intrinsic in the system. Random noise might just dictate that some edges get randomly deleted and some get randomly created, but we want to figure out when neurons are changing as the result of the squirting in particular.</p>
+<p>For instance, let’s call the latent positions for our network <span class="math notranslate nohighlight">\(X^{(t)}\)</span> when the we’ve taken a snapshot of the network at time <span class="math notranslate nohighlight">\(t\)</span>. We can assume that  <span class="math notranslate nohighlight">\(||X^{(t)} - X^{(t-1)}|| &lt; c\)</span>: in other words, that the difference in norm between the latent positions at time <span class="math notranslate nohighlight">\(t\)</span> and the latent positions at time <span class="math notranslate nohighlight">\(t-1\)</span> is less than some constant <span class="math notranslate nohighlight">\(c\)</span>. The problem essentially boils down to finding the times for which <span class="math notranslate nohighlight">\(||X^{(t)} - X^{(t-1)}|| &gt; c\)</span>.</p>
+<div class="section" id="counting-changed-edges">
+<h2><span class="section-number">10.1.1. </span>Counting Changed Edges<a class="headerlink" href="#counting-changed-edges" title="Permalink to this headline">¶</a></h2>
+<p>One of the simplest approaches to this problem might just be to figure out which node has the highest count of edge changes across your timeseries. For each node across the timeseries, you’d count the number of new edges that appeared, and the number of existing edges that were deleted. Whichever count is highest is your anomalous node.</p>
+<p>This might give you a rough estimate, but it doesn’t account for other important pieces of information. You might be interested in which other nodes new edges were formed with, and which nodes edges were deleted from, for instance.</p>
+</div>
+<div class="section" id="id1">
+<h2><span class="section-number">10.1.2. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="references">
+<h2><span class="section-number">10.1.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Guodong’s stuff about vertex anomaly detection in time series: https://arxiv.org/pdf/2008.10055.pdf</p></li>
+<li><p>j1’s paper – heritability</p></li>
+<li><p>vivek’s paper – mcc</p></li>
 </ul>
+</div>
+<div class="section" id="notes">
+<h2><span class="section-number">10.1.4. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<p>guodong’s stuff: uses MASE and OMNI combined with DCORR to do hypothesis testing</p>
+<ul class="simple">
+<li><p>vivek did something similar for MCC</p></li>
+</ul>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
