@@ -1,0 +1,91 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 1117, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 78, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 57, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 558, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 765, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import networkx as nx
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from graphbook_code import heatmap
+
+img = mpimg.imread('./img/newyork.png')
+
+G = nx.DiGraph()
+
+G.add_node("SI", pos=(1,1))
+G.add_node("MH", pos=(4,4))
+G.add_node("BK", pos=(4,2))
+G.add_node("Q", pos=(6,3))
+G.add_node("BX", pos=(6,6))
+
+pos = nx.get_node_attributes(G, 'pos')
+G.add_edge("SI", "BK")
+G.add_edge("MH", "BK")
+G.add_edge("MH", "Q")
+G.add_edge("MH", "BX")
+G.add_edge("BK", "Q")
+G.add_edge("Q", "BX")
+
+G.add_edge("BK", "SI")
+G.add_edge("BK", "MH")
+G.add_edge("Q", "MH")
+G.add_edge("BX", "MH")
+G.add_edge("Q", "BK")
+G.add_edge("BX", "Q")
+
+A = nx.to_numpy_matrix(G)
+
+fig, axs = plt.subplots(1,3, figsize=(23, 6))
+axs[0].imshow(img, alpha=.8, interpolation='nearest', aspect='auto')
+axs[0].axis('off')
+axs[0].set_title("Map of New York City Boroughs and Connections")
+nx.draw_networkx(G, pos, ax=axs[1], with_labels=True, node_color="tab:green", node_size = 800,
+        font_size=15, font_color="whitesmoke", arrows=True)
+axs[1].set_title("Layout Plot of New York City Boroughs and Connections")
+heatmap(A, ax=axs[2], xticklabels=[0.5,1.5,2.5,3.5,4.5], yticklabels=[0.5,1.5,2.5,3.5,4.5])
+axs[2].set_title("Adjacency Matrix of New York City Boroughs and Connections")
+axs[2].set_xticklabels(["SI", "MH", "BK", "Q", "BX"])
+axs[2].set_yticklabels(["SI", "MH", "BK", "Q", "BX"])
+fig;
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+[0;32m/tmp/ipykernel_2118/2718909316.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      4[0m [0;32mfrom[0m [0mgraphbook_code[0m [0;32mimport[0m [0mheatmap[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      5[0m [0;34m[0m[0m
+[0;32m----> 6[0;31m [0mimg[0m [0;34m=[0m [0mmpimg[0m[0;34m.[0m[0mimread[0m[0;34m([0m[0;34m'./img/newyork.png'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      7[0m [0;34m[0m[0m
+[1;32m      8[0m [0mG[0m [0;34m=[0m [0mnx[0m[0;34m.[0m[0mDiGraph[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/matplotlib/image.py[0m in [0;36mimread[0;34m(fname, format)[0m
+[1;32m   1499[0m                     [0mresponse[0m [0;34m=[0m [0mio[0m[0;34m.[0m[0mBytesIO[0m[0;34m([0m[0mresponse[0m[0;34m.[0m[0mread[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1500[0m                 [0;32mreturn[0m [0mimread[0m[0;34m([0m[0mresponse[0m[0;34m,[0m [0mformat[0m[0;34m=[0m[0mext[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 1501[0;31m     [0;32mwith[0m [0mimg_open[0m[0;34m([0m[0mfname[0m[0;34m)[0m [0;32mas[0m [0mimage[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   1502[0m         return (_pil_png_to_float_array(image)
+[1;32m   1503[0m                 [0;32mif[0m [0misinstance[0m[0;34m([0m[0mimage[0m[0;34m,[0m [0mPIL[0m[0;34m.[0m[0mPngImagePlugin[0m[0;34m.[0m[0mPngImageFile[0m[0;34m)[0m [0;32melse[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/PIL/ImageFile.py[0m in [0;36m__init__[0;34m(self, fp, filename)[0m
+[1;32m    107[0m         [0;32mif[0m [0misPath[0m[0;34m([0m[0mfp[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    108[0m             [0;31m# filename[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 109[0;31m             [0mself[0m[0;34m.[0m[0mfp[0m [0;34m=[0m [0mopen[0m[0;34m([0m[0mfp[0m[0;34m,[0m [0;34m"rb"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    110[0m             [0mself[0m[0;34m.[0m[0mfilename[0m [0;34m=[0m [0mfp[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    111[0m             [0mself[0m[0;34m.[0m[0m_exclusive_fp[0m [0;34m=[0m [0;32mTrue[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: './img/newyork.png'
+FileNotFoundError: [Errno 2] No such file or directory: './img/newyork.png'
+
