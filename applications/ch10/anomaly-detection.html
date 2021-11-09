@@ -642,28 +642,53 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#detecting-anomaly-times-for-the-whole-network">
-   10.1.2. Detecting anomaly times for the whole network
+  <a class="reference internal nav-link" href="#how-do-we-figure-out-which-time-points-are-anomalies">
+   10.1.2. How Do We Figure Out Which Time Points Are Anomalies?
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#detecting-anomalies-in-the-whole-network">
-   10.1.3. Detecting anomalies in the whole network
+  <a class="reference internal nav-link" href="#detecting-if-the-first-time-series-is-an-anomaly">
+   10.1.3. Detecting if the First Time Series is an anomaly
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#finding-our-test-statistic-with-hypothesis-testing">
+   10.1.4. Finding our Test Statistic With Hypothesis Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-bootstrapping-to-figure-out-the-distribution-of-the-test-statistic">
+   10.1.5. Using Bootstrapping to Figure out the Distribution of the Test Statistic
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-our-test-statistic-to-find-p-values">
+   10.1.6. Using our test statistic to find p-values
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hypothesis-testing-to-figure-out-the-test-statistic">
+   10.1.7. Hypothesis Testing to Figure out the Test Statistic
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#detecting-anomaly-times-for-particular-nodes">
+   10.1.8. Detecting anomaly times for particular nodes
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   10.1.4.
+   10.1.9.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   10.1.5. References
+   10.1.10. References
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#notes">
-   10.1.6. Notes
+   10.1.11. Notes
   </a>
  </li>
 </ul>
@@ -706,7 +731,8 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
 
-<span class="k">def</span> <span class="nf">gen_timepoint</span><span class="p">(</span><span class="n">perturbed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_perturbed</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">perturbation</span><span class="o">=</span><span class="mf">.1</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">gen_timepoint</span><span class="p">(</span><span class="n">perturbed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_perturbed</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">perturbation</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
     <span class="n">nodes</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nodes</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">perturbed</span><span class="p">:</span>
@@ -740,7 +766,7 @@
 </div>
 </div>
 </div>
-<p>You can see the adjacency matrices we generated below. Note that you can’t really distinguish a difference between the ten normal time points and the two perturbed time points with the naked eye, even though the difference is there.</p>
+<p>You can see the adjacency matrices we generated below. Note that you can’t really distinguish a difference between the ten normal time points and the two perturbed time points with the naked eye, even though the difference is there, so it would be pretty difficult to manually mark the time points - and if you have many time points, rather than just a few, you’d want to be able to automate the process.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -775,33 +801,276 @@
 <img alt="../../_images/anomaly-detection_6_0.png" src="../../_images/anomaly-detection_6_0.png" />
 </div>
 </div>
+</div>
+<div class="section" id="how-do-we-figure-out-which-time-points-are-anomalies">
+<h2><span class="section-number">10.1.2. </span>How Do We Figure Out Which Time Points Are Anomalies?<a class="headerlink" href="#how-do-we-figure-out-which-time-points-are-anomalies" title="Permalink to this headline">¶</a></h2>
 <p>It’s time to start thinking about how we’d approach figuring out which of the time points are anomalies.</p>
 <p>One of the simplest approaches to this problem might just be to figure out which node has the highest count of edge changes across your timeseries. For each node across the timeseries, you’d count the number of new edges that appeared (compared to the previous point in time), and the number of existing edges that were deleted. Whichever count is highest could be your anomalous node.</p>
 <p>This might give you a rough estimate – and you could even potentially find perturbed time points with this approach – but it’s not necessarily the best solution. Counting edges doesn’t account for other important pieces of information: for instance, you might be interested in which other nodes new edges were formed with. It seems like deleting or creating edges with more important nodes, for instance, should be weighted higher than deleting or creating edges with unimportant nodes.</p>
 <p>So let’s try another method. You might actually be able to guess it! The idea will be to simply estimate each network’s latent positions, followed by a hypothesis testing approach. Here’s the idea.</p>
 <p>Let’s call the latent positions for our network <span class="math notranslate nohighlight">\(X^{(t)}\)</span> for the snapshot of the network at time <span class="math notranslate nohighlight">\(t\)</span>. You’re trying to find specific time points – <span class="math notranslate nohighlight">\(X^{(i)}\)</span> – which are different from their previous time point <span class="math notranslate nohighlight">\(X^{(i-1)}\)</span> by a large margin. You can define “different” as “difference in matrix norm”. In other words, We’re trying to find a time point where the difference in norm between the latent positions at time <span class="math notranslate nohighlight">\(t\)</span> and the latent positions at time <span class="math notranslate nohighlight">\(t-1\)</span> is greater than some constant <span class="math notranslate nohighlight">\(c\)</span>:  <span class="math notranslate nohighlight">\(||X^{(t)} - X^{(t-1)}|| &gt; c\)</span>. The idea is that non-anomalous time points will probably be a bit different, but that the difference will be within some reasonable range of variability.</p>
 <p>There’s an alternate problem where you restrict your view to <em>nodes</em> rather than entire adjacency matrices. The idea is that you’d find time-points which are anomalous for particular nodes or groups of nodes, rather than the entire network. The general idea is the same: you find latent positions, then test for how big the difference is between time point <span class="math notranslate nohighlight">\(t\)</span> and time point <span class="math notranslate nohighlight">\(t-1\)</span>. This time, however, your test is for particular nodes. You want to figure out if <span class="math notranslate nohighlight">\(||X_i^{(t)} - X_i^{(t-1)}|| &gt; c\)</span>, where you’re looking at a particular latent position <span class="math notranslate nohighlight">\(X_i\)</span> rather than all of them at once.</p>
-<p>Let’s dive into some code. We’ll look at testing for differences for the whole network at particular time points first.</p>
+<p>Let’s dive into some specifics. First, we’ll look at how to estimate the latent positions.</p>
 </div>
-<div class="section" id="detecting-anomaly-times-for-the-whole-network">
-<h2><span class="section-number">10.1.2. </span>Detecting anomaly times for the whole network<a class="headerlink" href="#detecting-anomaly-times-for-the-whole-network" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="detecting-if-the-first-time-series-is-an-anomaly">
+<h2><span class="section-number">10.1.3. </span>Detecting if the First Time Series is an anomaly<a class="headerlink" href="#detecting-if-the-first-time-series-is-an-anomaly" title="Permalink to this headline">¶</a></h2>
+<p>If we were to just estimate the latent positions for each timepoint separately with ASE or LSE, we’d run into the nonidentifiability problem that we’ve seen a few times over the course of this book: The latent positions would be rotated versions of each other, and we’d have to use something like Procrustes (which adds variance, since it’s just an estimate) to rotate them back into the same space.</p>
+<p>However, since we have multiple time points, each of which is associated to an adjacency matrix, it’s natural to use models from the Multiple-Network Representation Learning section (You can go back and read chapter 6.7 if you’re fuzzy on the details here). In that section, we introduced the Omnibus Embedding as a way to estimate latent positions for multiple <em>networks</em> simultaneously, but all we really need for it is multiple <em>adjacency matrices</em>. These exist in our network in the form of its multiple time points; So, we’ll just embed each time point with the Omnibus Embedding.</p>
+<p>We’ll set the embedding dimension to 2. This isn’t actually technically correct – since we generated the data with 1-dimensional latent positions - but the extra dimension makes things easier to visualize and only adds a bit of extra noise.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents_est</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="finding-our-test-statistic-with-hypothesis-testing">
+<h2><span class="section-number">10.1.4. </span>Finding our Test Statistic With Hypothesis Testing<a class="headerlink" href="#finding-our-test-statistic-with-hypothesis-testing" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">latents_est</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">Y</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_latents</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+<span class="n">y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">(</span><span class="n">networks</span><span class="p">[</span><span class="n">t</span><span class="p">:</span><span class="n">t</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="using-bootstrapping-to-figure-out-the-distribution-of-the-test-statistic">
+<h2><span class="section-number">10.1.5. </span>Using Bootstrapping to Figure out the Distribution of the Test Statistic<a class="headerlink" href="#using-bootstrapping-to-figure-out-the-distribution-of-the-test-statistic" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># null hypothesis that X = Y. Bootstrap X.</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">y_vs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">est</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">A_est</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">B_est</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">y_v</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_est</span><span class="p">,</span> <span class="n">B_est</span><span class="p">])</span>
+    <span class="n">y_vs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_v</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">y_vs</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of test statistics under $H_0$&quot;</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Test statistic value&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Test statistic value&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/anomaly-detection_17_1.png" src="../../_images/anomaly-detection_17_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="using-our-test-statistic-to-find-p-values">
+<h2><span class="section-number">10.1.6. </span>Using our test statistic to find p-values<a class="headerlink" href="#using-our-test-statistic-to-find-p-values" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.4161184956670896
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_vs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_vs</span><span class="p">)</span>
+
+<span class="n">y_vs</span> <span class="o">&gt;</span> <span class="n">y</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+        True, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False, False, False, False, False, False, False, False, False,
+       False])
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="hypothesis-testing-to-figure-out-the-test-statistic">
+<h2><span class="section-number">10.1.7. </span>Hypothesis Testing to Figure out the Test Statistic<a class="headerlink" href="#hypothesis-testing-to-figure-out-the-test-statistic" title="Permalink to this headline">¶</a></h2>
+<p>We’ll look at testing for differences for the whole network at particular time points first, and then we’ll explore what it looks like to test for differences in particular nodes.</p>
 <p>We define individual vertex anomaly detection for the i-th vertex at time point <span class="math notranslate nohighlight">\(t^*\)</span> as a test of the null hypothesis <span class="math notranslate nohighlight">\(H_{0i}^{(t*)}\)</span> that t* is an anomaly time for vertex <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<ol class="simple">
+<li><p>embed with MASE or OMNI</p>
+<ul class="simple">
+<li><p>MASE is better when graphs are close to equation (1), OMNI is better when they’re far from eq (2) where<br />
+eq1: exactly COSIE: <span class="math notranslate nohighlight">\(X^{(t)} = VS^{(t)}\)</span><br />
+eq2: allows changes in <span class="math notranslate nohighlight">\(V\)</span> at some time points <span class="math notranslate nohighlight">\(X^{(t)} = VS^{(t)}\)</span>, <span class="math notranslate nohighlight">\(t \in [M] - \{t_1, ..., t_p\}\)</span>, else <span class="math notranslate nohighlight">\(V^{(t)} S^P{(t)}\)</span>, <span class="math notranslate nohighlight">\(t=t_j, j = 1, ..., p\)</span>
+so MASE is better when the networks don’t fundamentally change across time points – for example, when nodes never change community – and OMNI is better when you allow for the network to be evolving at a more fundamental level.</p></li>
+</ul>
+</li>
+<li><p>for each time point, get test statistic: for any <span class="math notranslate nohighlight">\(\hat{X} \in \mathcal{R}^{n \times d}\)</span>, generate iid samples of <span class="math notranslate nohighlight">\(A \sim RDPG(\hat{X})\)</span>, then get test statistics <span class="math notranslate nohighlight">\(y^{(t)}\)</span> or <span class="math notranslate nohighlight">\(y_i^{(t)}\)</span> from it</p>
+<ul class="simple">
+<li><p>using <span class="math notranslate nohighlight">\(y^{(t)} = ||\hat{X}^{(t)} - \hat{X}^{(t-1)}||\)</span> for whole network</p></li>
+<li><p>using <span class="math notranslate nohighlight">\(y_i^{(t)} = ||\hat{X_i}^{(t)} - \hat{X_i}^{(t-1)}||\)</span> for vertex anomaly detection</p></li>
+</ul>
+</li>
+<li><p>Get distribution of test statistic with parametric bootstrap, using <span class="math notranslate nohighlight">\(\hat{X} = \hat{X}^{(t)}\)</span> as the null distribution. Generate B samples of <span class="math notranslate nohighlight">\(y_b^{(t)}\)</span></p></li>
+<li><p>Calculate p-values as <span class="math notranslate nohighlight">\(p^{(t)} = \frac{\sum_{b=1, ..., B} I(y_b^{(t)} &gt; y^{(t)})}{B}\)</span></p></li>
+<li><p>report p-values</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="detecting-anomalies-in-the-whole-network">
-<h2><span class="section-number">10.1.3. </span>Detecting anomalies in the whole network<a class="headerlink" href="#detecting-anomalies-in-the-whole-network" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="section" id="detecting-anomaly-times-for-particular-nodes">
+<h2><span class="section-number">10.1.8. </span>Detecting anomaly times for particular nodes<a class="headerlink" href="#detecting-anomaly-times-for-particular-nodes" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="id1">
-<h2><span class="section-number">10.1.4. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.9. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="references">
-<h2><span class="section-number">10.1.5. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.10. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>j1’s paper – heritability</p></li>
 <li><p>vivek’s paper – mcc</p></li>
 </ul>
 </div>
 <div class="section" id="notes">
-<h2><span class="section-number">10.1.6. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.11. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>guodong’s stuff: uses MASE and OMNI combined with DCORR to do hypothesis testing</p>
 <ul class="simple">
 <li><p>vivek did something similar for MCC</p></li>
