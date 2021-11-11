@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>6.2. Why embed networks? &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet" />
-  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+  <link href="../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
 
     
   <link rel="stylesheet"
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
 
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -57,7 +57,10 @@
     <link rel="next" title="6.3. Spectral Embedding Methods" href="spectral-embedding.html" />
     <link rel="prev" title="6.1. Estimating Parameters in Network Models via MLE" href="estimating-parameters_mle.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
     
   </head>
   <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
@@ -655,15 +658,17 @@
     <a class="reference internal nav-link" href="#the-latent-position-matrix-tells-you-about-edge-probabilities">
      6.2.3.1. The Latent Position Matrix Tells You About Edge Probabilities
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#making-a-block-probability-matrix-from-the-latent-positions">
+       6.2.3.1.1. Making A Block Probability Matrix From The Latent Positions
+      </a>
+     </li>
+    </ul>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#thinking-about-latent-positions-geometrically">
      6.2.3.2. Thinking About Latent Positions Geometrically
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#making-a-block-probability-matrix-from-the-latent-positions">
-     6.2.3.3. Making A Block Probability Matrix From The Latent Positions
     </a>
    </li>
   </ul>
@@ -681,7 +686,7 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="why-embed-networks">
 <h1><span class="section-number">6.2. </span>Why embed networks?<a class="headerlink" href="#why-embed-networks" title="Permalink to this headline">¶</a></h1>
-<p>Networks by themselves are interesting objects, but a network is not how we traditionally organize data in machine learning. In almost any ML algorithm - whether you’re using a neural network or a decision tree, whether your goal is to classify observations or to predict values using regression - you’ll see data organized into a matrix, where the rows represent observations and the columns represent features, or variables. Each observation, or row of the matrix, is traditionally represented as a single point in <span class="math notranslate nohighlight">\(d\)</span>-dimensional space (if there are <span class="math notranslate nohighlight">\(d\)</span> columns in the matrix). If you have two columns, for instance, you could represent data organized in this way on an x/y coordinate plane. The first column would represent the x-axis, and the second column would represent the y-axis.</p>
+<p>Networks by themselves can have interesting properties, but a network is not how we traditionally organize data in machine learning. In almost any ML algorithm - whether you’re using a neural network or a decision tree, whether your goal is to classify observations or to predict values using regression - you’ll see data organized into a matrix, where the rows represent observations and the columns represent features, or variables. Each observation, or row of the matrix, is traditionally represented as a single point in <span class="math notranslate nohighlight">\(d\)</span>-dimensional space (if there are <span class="math notranslate nohighlight">\(d\)</span> columns in the matrix). If you have two columns, for instance, you could represent data organized in this way on an x/y coordinate plane. The first column would represent the x-axis, and the second column would represent the y-axis.</p>
 <p>For example, the data below is organized traditionally. On the left is the data matrix; each observation has its own row, with two features across the columns. The x-column contains the first feature for each observation, and the y-column contains the second feature for each observation. We can see the two clusters of data numerically, through the color mapping.</p>
 <p>On the right is the same data, but plotted in Euclidean space. Each column of the data matrix gets its own axis in the plot. The x and y axis location of the <span class="math notranslate nohighlight">\(i^{th}\)</span> point in the scatterplot is the same as the x and y values of the <span class="math notranslate nohighlight">\(i^{th}\)</span> row of the data matrix. We can see the two clusters of data geometrically, through the location of the points.</p>
 <div class="cell docutils container">
@@ -762,7 +767,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predicted labels:  [1 1 1 1 1 0 0 0 0 0]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predicted labels:  [0 0 0 0 0 1 1 1 1 1]
 </pre></div>
 </div>
 </div>
@@ -832,19 +837,20 @@
 <p>An even bigger shocker: if you pick two random points in a unit square with two dimensions, they’ll be on average 0.52 units of distance away from each other. However, if you pick two random points in a unit hypercube with a million dimensions, they’ll be around 408 units away from each other. This implies that, on average, any set of points that you generate from some random process when you’re in high dimensions will be extremely far away from each other.</p>
 <p>What this comes down to is that almost every point in ultra-high dimensions is extremely lonely, hugging the edge of the space it lives in, all by itself. These facts mess with many traditional machine learning methods which use relative distances, or averages (very few points in high-dimensional space will actually be anywhere near their average!) <span id="id1"></span></p>
 </div>
-<p>This is where network embedding methods come into play. Because networks represented as adjacency matrices are extremely high-dimensional, they run into many of the issues described above. Embedding, much like traditional dimensionality reduction methods in machine learning like Principle Component Analysis (PCA), allows us to move down to a more manageable number of dimensions while still preserving information about the network.</p>
+<p>This is where network embedding methods come into play. Because networks represented as adjacency matrices are extremely high-dimensional, they run into many of the issues described above. Embedding, much like traditional dimensionality reduction methods in machine learning like Principle Component Analysis (PCA), allows us to move down to a more manageable number of dimensions while still preserving useful information about the network.</p>
 </div>
 <div class="section" id="we-often-embed-to-estimate-latent-positions">
 <h2><span class="section-number">6.2.2. </span>We Often Embed To Estimate Latent Positions<a class="headerlink" href="#we-often-embed-to-estimate-latent-positions" title="Permalink to this headline">¶</a></h2>
 <p>The embedding methods which we’ll explore the most in this book are the spectral methods. These methods pull heavily from linear algebra to keep only the information about our network which is useful - and use that information to place nodes in Euclidean space. We’ll explore other methods as well. It’s worth it to know a bit of linear algebra review here, particularly on concepts like eigenvectors and eigenvalues, as well as the properties of symmetric matrices. We’ll guide you as clearly as possible through the math in future sections.</p>
-<p>Spectral embedding methods in particular, which we’ll talk about in the next section, will give you an embedding called the latent position matrix. This is an <span class="math notranslate nohighlight">\(n \times d\)</span> matrix (where this are <span class="math notranslate nohighlight">\(n\)</span> data points, one for each row, and <span class="math notranslate nohighlight">\(d\)</span> dimensions for each data point). The latent position matrix is thus organized like a traditional data table, and you could plot the rows as points in space.</p>
+<p>Spectral embedding methods in particular, which we’ll talk about in the next section, will estimate an embedding called the latent position matrix. This is an <span class="math notranslate nohighlight">\(n \times d\)</span> matrix (where this are <span class="math notranslate nohighlight">\(n\)</span> rows, one for each node, and <span class="math notranslate nohighlight">\(d\)</span> dimensions for each row). The latent position matrix is thus organized like a traditional data table, with nodes corresponding to observations, and you could plot the rows as points in Euclidean space.</p>
 </div>
 <div class="section" id="what-the-heck-is-the-latent-position-matrix-anyway">
 <h2><span class="section-number">6.2.3. </span>What The Heck Is The Latent Position Matrix, Anyway?<a class="headerlink" href="#what-the-heck-is-the-latent-position-matrix-anyway" title="Permalink to this headline">¶</a></h2>
 <p>What actually is a latent position? How can we interpret a latent position matrix?</p>
-<p>Well, assuming you’re viewing your network as some type of random dot product graph (or a stochastic block model - remember that this is a particular kind of random dot product graph), you can think of every node as being secretly associated with a position in space. This position (relative to the position for other nodes) tells you the probability that one node will have an edge with another node.</p>
-<p>Let’s call the latent position matrix, <span class="math notranslate nohighlight">\(X\)</span>. Remember that <span class="math notranslate nohighlight">\(X\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(d\)</span> columns. We’re going to cheat a bit and use an embedding method (in this case, adjacency spectral embedding) before we’ve discussed it. In the next section, you’ll learn how this embedding is happening, but for now, just think of it as a way to estimate the latent positions for the nodes of a network.</p>
-<p>Below is a set of latent positions, where <span class="math notranslate nohighlight">\(n=20\)</span> nodes and <span class="math notranslate nohighlight">\(d=2\)</span> dimensions.</p>
+<p>Well, assuming you’re viewing your network as some type of random dot product graph (remember that this can include SBMs, ER networks, and more), you can think of every node as being secretly associated with a position in Euclidean space. This position (relative to the positions associated with other nodes) tells you the probability that one node will have an edge with another node.</p>
+<p>Let’s call the latent position matrix, <span class="math notranslate nohighlight">\(X\)</span>. Remember that <span class="math notranslate nohighlight">\(X\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows (the number of nodes) and <span class="math notranslate nohighlight">\(d\)</span> columns (the number of dimensions). Although in practice you almost never know what the latent position matrix <em>actually</em> is, you can <em>estimate it</em> by embedding your network.</p>
+<p>We’re going to cheat a bit and use an embedding method (in this case, adjacency spectral embedding) before we’ve discussed it, just to show what this looks like. In the next section, you’ll learn how this embedding is happening, but for now, just think of it as a way to estimate the latent positions for the nodes of a network and move from network space to Euclidean space.</p>
+<p>Below we make a network, which in this case is an SBM. From the network, we can estimate a set of latent positions, where <span class="math notranslate nohighlight">\(n=20\)</span> rows for each node and <span class="math notranslate nohighlight">\(d=2\)</span> dimensions. Usually when something is an estimation for something else in statistics, you put a hat over it: <span class="math notranslate nohighlight">\(\hat{X}\)</span>. We’ll do that here.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
@@ -887,14 +893,53 @@
 <img alt="../../_images/why-embed-networks_18_0.png" src="../../_images/why-embed-networks_18_0.png" />
 </div>
 </div>
-<p>Remember that we’re modeling our networks as <em>random dot-product graphs</em>. This means we can think of a network as having some underlying probability distribution, and any specific network is one of many possible realizations of that distribution. It also means that each edge in our network has some <em>probability</em> of existing: nodes 0 and 3, for instance, may or may not have an edge. The chance they do has some probability.</p>
+<p>It’s good to emphasize here that we’re modeling our networks as <em>random dot-product graphs</em> (RDPGs). One implication is that we can think of a network as having some underlying probability distribution, and any specific network is one of many possible realizations of that distribution. It also means that each edge in our network has some <em>probability</em> of existing: nodes 0 and 3, for instance, may or may not have an edge. The concept of a latent position only works under the assumption that the network is drawn from an RDPG.</p>
 <div class="section" id="the-latent-position-matrix-tells-you-about-edge-probabilities">
 <h3><span class="section-number">6.2.3.1. </span>The Latent Position Matrix Tells You About Edge Probabilities<a class="headerlink" href="#the-latent-position-matrix-tells-you-about-edge-probabilities" title="Permalink to this headline">¶</a></h3>
-<p>The latent position matrix <span class="math notranslate nohighlight">\(X\)</span> that we can find from spectral embedding is related to these edge probabilities: If you take the dot product (or the weighted sum) of row <span class="math notranslate nohighlight">\(i\)</span> with row <span class="math notranslate nohighlight">\(j\)</span>, you’ll get an <em>estimate</em> of the probability that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> have an edge between them. Incidentally, this means that the dot product between any two rows of the latent position matrix has to be bound between 0 and 1.</p>
+<p>We mentioned before that the relative locations of latent positions tell you about edge probabilities, but it’s good to be a bit more specific. If you take the dot product (or the weighted sum) of row <span class="math notranslate nohighlight">\(i\)</span> of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> with row <span class="math notranslate nohighlight">\(j\)</span>, you’ll get the probability that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> have an edge between them. Incidentally, this means that the dot product between any two rows of the latent position matrix has to be bound between 0 and 1.</p>
+<div class="section" id="making-a-block-probability-matrix-from-the-latent-positions">
+<h4><span class="section-number">6.2.3.1.1. </span>Making A Block Probability Matrix From The Latent Positions<a class="headerlink" href="#making-a-block-probability-matrix-from-the-latent-positions" title="Permalink to this headline">¶</a></h4>
+<p>Similarly, you can find the block probability matrix <span class="math notranslate nohighlight">\(P\)</span> for your network using the latent positions. How would you generate <span class="math notranslate nohighlight">\(P\)</span> from <span class="math notranslate nohighlight">\(X\)</span>?</p>
+<p>Well, you’d just multiply it by its transpose: <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. This operation will take the dot product between every row of <span class="math notranslate nohighlight">\(X\)</span> and put it in the result. <span class="math notranslate nohighlight">\((XX^\top)_{ij}\)</span> will just be the dot product between rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of the latent position matrix (which is the probability that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> will be connected). So, <span class="math notranslate nohighlight">\(XX^\top\)</span> is just the <span class="math notranslate nohighlight">\(n \times n\)</span> block probability matrix - and if you’ve estimated your latent positions using real-world data, you can also estimate the block probability matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">text</span>
+
+
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">B0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mf">.8</span><span class="p">)</span>
+<span class="n">B1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mf">.1</span><span class="p">)</span>
+
+<span class="c1"># block probability matrix</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">B0</span><span class="p">,</span> <span class="n">B1</span><span class="p">],</span>
+              <span class="p">[</span><span class="n">B1</span><span class="p">,</span> <span class="n">B0</span><span class="p">]])</span>
+
+
+
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated block </span><span class="se">\n</span><span class="s2">probability matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Actual block </span><span class="se">\n</span><span class="s2">probability matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># text</span>
+<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.8&quot;</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.75</span><span class="p">)</span>
+<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.8&quot;</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
+<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.1&quot;</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
+<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.1&quot;</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mf">.75</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/why-embed-networks_24_0.png" src="../../_images/why-embed-networks_24_0.png" />
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="thinking-about-latent-positions-geometrically">
 <h3><span class="section-number">6.2.3.2. </span>Thinking About Latent Positions Geometrically<a class="headerlink" href="#thinking-about-latent-positions-geometrically" title="Permalink to this headline">¶</a></h3>
-<p>You can think about this dot product edge probabilities stuff geometrically. The dot product between any two vectors <span class="math notranslate nohighlight">\(u_i\)</span> and <span class="math notranslate nohighlight">\(u_j\)</span>, geometrically, is their lengths multiplied together and then weighted by the cosine of the angle between them. Smaller angles have cosines close to 1, and larger angles have cosines close to 0. So, nodes whose latent positions have larger angles between them tend to have lower edge probabilities, and nodes whose latent positions have smaller angles between them tend to have higher edge probabilities. This is the core intuition you need to understand why you can find communities and do downstream inference with latent position matrices: two nodes whose latent positions are further apart will have a smaller probability of having an edge between them!</p>
+<p>You can also think about this stuff geometrically. The dot product between any two vectors <span class="math notranslate nohighlight">\(u_i\)</span> and <span class="math notranslate nohighlight">\(u_j\)</span>, geometrically, is their lengths multiplied together and then weighted by the cosine of the angle between them. Smaller angles have cosines close to 1, and larger angles have cosines close to 0. So, nodes whose latent positions have larger angles between them tend to have lower edge probabilities, and nodes whose latent positions have smaller angles between them tend to have higher edge probabilities. This is the core intuition you need to understand why you can find communities and do downstream inference with latent position matrices: two nodes whose latent positions are further apart will have a smaller probability of having an edge between them!</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">patches</span>
@@ -984,48 +1029,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/why-embed-networks_24_0.png" src="../../_images/why-embed-networks_24_0.png" />
-</div>
-</div>
-</div>
-<div class="section" id="making-a-block-probability-matrix-from-the-latent-positions">
-<h3><span class="section-number">6.2.3.3. </span>Making A Block Probability Matrix From The Latent Positions<a class="headerlink" href="#making-a-block-probability-matrix-from-the-latent-positions" title="Permalink to this headline">¶</a></h3>
-<p>Remember that the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows, with each row corresponding to a node in your network, and the dot product between rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(X\)</span> is the probability that node <span class="math notranslate nohighlight">\(i\)</span> will connect with node <span class="math notranslate nohighlight">\(j\)</span>. (Here, remember that <span class="math notranslate nohighlight">\(X\)</span> is from the adjacency matrix, not the Laplacian). The block probability matrix <span class="math notranslate nohighlight">\(P\)</span> has the edge probability between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> in the <span class="math notranslate nohighlight">\((i, j)_{th}\)</span> position. How would you generate <span class="math notranslate nohighlight">\(P\)</span> from <span class="math notranslate nohighlight">\(X\)</span>?</p>
-<p>Well, you’d just multiply it by its transpose: <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. This operation will take the dot product between every row of <span class="math notranslate nohighlight">\(X\)</span> and put it in the result: <span class="math notranslate nohighlight">\((XX^\top)_{ij}\)</span> will just be the dot product between rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of the latent position matrix (which is the probability that nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> will be connected). So, <span class="math notranslate nohighlight">\(XX^\top\)</span> is just an <span class="math notranslate nohighlight">\(n \times n\)</span> block probability matrix!</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">text</span>
-
-<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">B0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mf">.8</span><span class="p">)</span>
-<span class="n">B1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mf">.1</span><span class="p">)</span>
-
-<span class="c1"># block probability matrix</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">B0</span><span class="p">,</span> <span class="n">B1</span><span class="p">],</span>
-              <span class="p">[</span><span class="n">B1</span><span class="p">,</span> <span class="n">B0</span><span class="p">]])</span>
-
-
-
-<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-
-<span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="nd">@X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated block </span><span class="se">\n</span><span class="s2">probability matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Actual block </span><span class="se">\n</span><span class="s2">probability matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># text</span>
-<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.8&quot;</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.75</span><span class="p">)</span>
-<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.8&quot;</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
-<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.1&quot;</span><span class="p">,</span> <span class="mf">.25</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
-<span class="n">text</span><span class="p">(</span><span class="s2">&quot;.1&quot;</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mf">.75</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.75, 0.75, &#39;.1&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/why-embed-networks_27_1.png" src="../../_images/why-embed-networks_27_1.png" />
+<img alt="../../_images/why-embed-networks_27_0.png" src="../../_images/why-embed-networks_27_0.png" />
 </div>
 </div>
 <p>If you have an <em>estimate</em> for the latent positions, there’s math that shows that you get a pretty good estimate for the block probability matrix as well. In practice, that’s what you’re actually doing: getting an estimate of the latent positions with spectral embedding, then using those to do more downstream tasks or estimating block probability matrices.</p>
@@ -1056,31 +1060,22 @@
               </div>
               
         
-            
-
-
-
-<div class='prev-next-bottom'>
-    
-    <div id="prev">
-        <a class="left-prev" href="estimating-parameters_mle.html" title="previous page">
-            <i class="prevnext-label fas fa-angle-left"></i>
-            <div class="prevnext-info">
-                <p class="prevnext-label">previous</p>
-                <p class="prevnext-title"><span class="section-number">6.1. </span>Estimating Parameters in Network Models via MLE</p>
-            </div>
-        </a>
+            <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="estimating-parameters_mle.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">6.1. </span>Estimating Parameters in Network Models via MLE</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="spectral-embedding.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">6.3. </span>Spectral Embedding Methods</p>
     </div>
-     <div id="next">
-        <a class="right-next" href="spectral-embedding.html" title="next page">
-            <div class="prevnext-info">
-                <p class="prevnext-label">next</p>
-                <p class="prevnext-title"><span class="section-number">6.3. </span>Spectral Embedding Methods</p>
-            </div>
-            <i class="prevnext-label fas fa-angle-right"></i>
-        </a>
-     </div>
-
+    <i class="fas fa-angle-right"></i>
+    </a>
 </div>
         
         </div>
@@ -1101,8 +1096,7 @@
       </div>
     </div>
   
-  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
 
-  
   </body>
 </html>
