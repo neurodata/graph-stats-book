@@ -667,33 +667,38 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#eric-this-is-wrong-and-i-m-trying-to-figure-out-why-maybe-because-of-induced-bias-from-boostrap-but-then-that-means-gudong-s-stuff-doesn-t-work-or-i-did-something-wrong">
+   10.1.5. @eric: this is wrong, and I’m trying to figure out why. Maybe because of induced bias from boostrap? but then that means gudong’s stuff doesn’t work? or I did something wrong
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#using-our-test-statistic-to-find-p-values">
-   10.1.5. Using our test statistic to find p-values
+   10.1.6. Using our test statistic to find p-values
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#hypothesis-testing-to-figure-out-the-test-statistic">
-   10.1.6. Hypothesis Testing to Figure out the Test Statistic
+   10.1.7. Hypothesis Testing to Figure out the Test Statistic
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#detecting-anomaly-times-for-particular-nodes">
-   10.1.7. Detecting anomaly times for particular nodes
+   10.1.8. Detecting anomaly times for particular nodes
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   10.1.8.
+   10.1.9.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   10.1.9. References
+   10.1.10. References
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#notes">
-   10.1.10. Notes
+   10.1.11. Notes
   </a>
  </li>
 </ul>
@@ -734,6 +739,76 @@
 <p>The latent positions are just single numbers, distributed uniformly between 0.2 and 0.8. To make the perturbed time-points, we just add a bit of noise to the first twenty rows of the latent position matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### its broken weeeeeeeeee</span>
+<span class="c1">### test code block</span>
+
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the operator norm of the difference of two matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">latents_est</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">Y</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_latents</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">([</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">])</span>
+
+<span class="n">ys_same</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
+    <span class="n">ys_same</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+    
+<span class="n">ys_diff</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
+    <span class="n">ys_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1931</span><span class="o">/</span><span class="mf">2076824246.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> 
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">A</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">B</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;np&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_same</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrap from same latent&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_diff</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrap from different latent&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x14ae9cb20&gt;
+</pre></div>
+</div>
+<img alt="../../_images/anomaly-detection_5_1.png" src="../../_images/anomaly-detection_5_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
 
@@ -749,27 +824,23 @@
     <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">X</span>
+    <span class="k">return</span> <span class="n">A</span>
     
 
 <span class="n">time_points</span> <span class="o">=</span> <span class="mi">12</span>
 <span class="n">nodes</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nodes</span><span class="p">)</span>
 <span class="n">networks</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">latents</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">time_points</span><span class="o">-</span><span class="mi">2</span><span class="p">):</span>
-    <span class="n">A</span><span class="p">,</span> <span class="n">latent</span> <span class="o">=</span> <span class="n">gen_timepoint</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">gen_timepoint</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
     <span class="n">networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-    <span class="n">latents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">latent</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">perturbed_time</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
-    <span class="n">A</span><span class="p">,</span> <span class="n">latent</span> <span class="o">=</span> <span class="n">gen_timepoint</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">perturbed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">gen_timepoint</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">perturbed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">networks</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">perturbed_time</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
-    <span class="n">latents</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">perturbed_time</span><span class="p">,</span> <span class="n">latent</span><span class="p">)</span>
     
 <span class="n">networks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
-<span class="n">latents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -806,7 +877,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_6_0.png" src="../../_images/anomaly-detection_6_0.png" />
+<img alt="../../_images/anomaly-detection_8_0.png" src="../../_images/anomaly-detection_8_0.png" />
 </div>
 </div>
 </div>
@@ -834,10 +905,13 @@
 <p>This norm, intuitively, will tell us how different two matrices are. If the norm of <span class="math notranslate nohighlight">\(X - Y\)</span> is small, then <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are very similar matrices; whereas if the norm of <span class="math notranslate nohighlight">\(X - Y\)</span> is large, then <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are very different. The norm should be large for anomalies, and small for everything else.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+
+<span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the operator norm of the difference of two matrices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">latents_est</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">)</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">Y</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -850,25 +924,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1935</span><span class="o">/</span><span class="mf">3595308081.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span>         <span class="k">return</span> <span class="n">y</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span> 
-<span class="ne">---&gt; </span><span class="mi">13</span> <span class="n">y</span><span class="p">,</span> <span class="n">Xhat</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">(</span><span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="nn">/tmp/ipykernel_1935/3595308081.py</span> in <span class="ni">get_statistic</span><span class="nt">(adjacencies, return_latents)</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">Get</span> <span class="n">the</span> <span class="n">operator</span> <span class="n">norm</span> <span class="n">of</span> <span class="n">the</span> <span class="n">difference</span> <span class="n">of</span> <span class="n">two</span> <span class="n">matrices</span><span class="o">.</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="s2">&quot;&quot;&quot;</span>
-<span class="ne">----&gt; </span><span class="mi">5</span><span class="s2">     latents_est = omni.fit_transform(adjacencies)</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span><span class="s2">     X, Y = latents_est[0], latents_est[1]</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span><span class="s2">     y = np.linalg.norm(X - Y, ord=2)</span>
-
-<span class="ne">NameError</span>: name &#39;omni&#39; is not defined
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -877,7 +932,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.547
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.401
 </pre></div>
 </div>
 </div>
@@ -915,6 +970,10 @@
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="section" id="eric-this-is-wrong-and-i-m-trying-to-figure-out-why-maybe-because-of-induced-bias-from-boostrap-but-then-that-means-gudong-s-stuff-doesn-t-work-or-i-did-something-wrong">
+<h2><span class="section-number">10.1.5. </span>&#64;eric: this is wrong, and I’m trying to figure out why. Maybe because of induced bias from boostrap? but then that means gudong’s stuff doesn’t work? or I did something wrong<a class="headerlink" href="#eric-this-is-wrong-and-i-m-trying-to-figure-out-why-maybe-because-of-induced-bias-from-boostrap-but-then-that-means-gudong-s-stuff-doesn-t-work-or-i-did-something-wrong" title="Permalink to this headline">¶</a></h2>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
@@ -929,14 +988,13 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_19_0.png" src="../../_images/anomaly-detection_19_0.png" />
+<img alt="../../_images/anomaly-detection_22_0.png" src="../../_images/anomaly-detection_22_0.png" />
 </div>
 </div>
 <p>The test statistic value that we have is not too weird and would be pretty reasonable to see under the assumption that the time-points share latent positions. However, we can’t always eyeball stuff, and we need a way to formalize what it means for a test statistic to be “not too weird”. We’ve already spoken about this formalization: our test statistic is  <span class="math notranslate nohighlight">\(y = ||X^{(t)} - X^{(t-1)}||\)</span>, and so we want to find some <span class="math notranslate nohighlight">\(c\)</span> such that <span class="math notranslate nohighlight">\(P(||X^{(t)} - X^{(t-1)}|| &gt; c)\)</span> is small. This means that we want to have a low probability of seeing a <span class="math notranslate nohighlight">\(y\)</span> greater than <span class="math notranslate nohighlight">\(c\)</span>.</p>
 </div>
-</div>
 <div class="section" id="using-our-test-statistic-to-find-p-values">
-<h2><span class="section-number">10.1.5. </span>Using our test statistic to find p-values<a class="headerlink" href="#using-our-test-statistic-to-find-p-values" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.6. </span>Using our test statistic to find p-values<a class="headerlink" href="#using-our-test-statistic-to-find-p-values" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span>
@@ -944,7 +1002,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.714923226880052
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.4006430188199663
 </pre></div>
 </div>
 </div>
@@ -953,19 +1011,19 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_vs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_vs</span><span class="p">)</span>
 
-<span class="p">(</span><span class="n">y_vs</span> <span class="o">&gt;</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="n">N</span>
+<span class="p">(</span><span class="n">y_vs</span> <span class="o">&gt;</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">N</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.003
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
 </pre></div>
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="hypothesis-testing-to-figure-out-the-test-statistic">
-<h2><span class="section-number">10.1.6. </span>Hypothesis Testing to Figure out the Test Statistic<a class="headerlink" href="#hypothesis-testing-to-figure-out-the-test-statistic" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.7. </span>Hypothesis Testing to Figure out the Test Statistic<a class="headerlink" href="#hypothesis-testing-to-figure-out-the-test-statistic" title="Permalink to this headline">¶</a></h2>
 <p>We’ll look at testing for differences for the whole network at particular time points first, and then we’ll explore what it looks like to test for differences in particular nodes.</p>
 <p>We define individual vertex anomaly detection for the i-th vertex at time point <span class="math notranslate nohighlight">\(t^*\)</span> as a test of the null hypothesis <span class="math notranslate nohighlight">\(H_{0i}^{(t*)}\)</span> that t* is an anomaly time for vertex <span class="math notranslate nohighlight">\(i\)</span>.</p>
 <ol class="simple">
@@ -999,20 +1057,20 @@ so MASE is better when the networks don’t fundamentally change across time poi
 </div>
 </div>
 <div class="section" id="detecting-anomaly-times-for-particular-nodes">
-<h2><span class="section-number">10.1.7. </span>Detecting anomaly times for particular nodes<a class="headerlink" href="#detecting-anomaly-times-for-particular-nodes" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.8. </span>Detecting anomaly times for particular nodes<a class="headerlink" href="#detecting-anomaly-times-for-particular-nodes" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="id1">
-<h2><span class="section-number">10.1.8. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.9. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="references">
-<h2><span class="section-number">10.1.9. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.10. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>j1’s paper – heritability</p></li>
 <li><p>vivek’s paper – mcc</p></li>
 </ul>
 </div>
 <div class="section" id="notes">
-<h2><span class="section-number">10.1.10. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.11. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>guodong’s stuff: uses MASE and OMNI combined with DCORR to do hypothesis testing</p>
 <ul class="simple">
 <li><p>vivek did something similar for MCC</p></li>
