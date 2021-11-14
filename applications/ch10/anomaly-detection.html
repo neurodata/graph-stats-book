@@ -643,6 +643,23 @@
   <a class="reference internal nav-link" href="#simulating-network-timeseries-data">
    10.1.1. Simulating Network Timeseries Data
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#embedding-all-12-and-using-the-first-two">
+     10.1.1.1. EMBEDDING ALL 12 AND USING THE FIRST TWO
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#embedding-only-the-first-two">
+     10.1.1.2. EMBEDDING ONLY THE FIRST TWO
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#embedding-more-during-bootstrap">
+     10.1.1.3. EMBEDDING MORE DURING BOOTSTRAP
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#how-do-we-figure-out-which-time-points-are-anomalies">
@@ -746,7 +763,7 @@
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2000</span><span class="o">/</span><span class="mf">4271615504.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1940</span><span class="o">/</span><span class="mf">4271615504.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
 <span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">latents</span><span class="o">.</span><span class="n">shape</span>
 
 <span class="ne">NameError</span>: name &#39;latents&#39; is not defined
@@ -754,19 +771,23 @@
 </div>
 </div>
 </div>
+<div class="section" id="embedding-all-12-and-using-the-first-two">
+<h3><span class="section-number">10.1.1.1. </span>EMBEDDING ALL 12 AND USING THE FIRST TWO<a class="headerlink" href="#embedding-all-12-and-using-the-first-two" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### its broken weeeeeeeeee</span>
-<span class="c1">### test code block</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### test code block</span>
 
 <span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
 
-
+<span class="c1">#### DIFFERENCE</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">networks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="c1">######</span>
 
 <span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -782,7 +803,7 @@
         <span class="k">return</span> <span class="n">y</span>
 
 <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">([</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">])</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
 
 <span class="n">ys_bootstrap</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
@@ -795,13 +816,8 @@
     <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
     <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
     <span class="n">ys_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+    
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_true</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;true distribution of y&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
@@ -812,10 +828,143 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x145442be0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x145b32400&gt;
 </pre></div>
 </div>
 <img alt="../../_images/anomaly-detection_6_1.png" src="../../_images/anomaly-detection_6_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="embedding-only-the-first-two">
+<h3><span class="section-number">10.1.1.2. </span>EMBEDDING ONLY THE FIRST TWO<a class="headerlink" href="#embedding-only-the-first-two" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### its broken weeeeeeeeee</span>
+<span class="c1">### test code block</span>
+
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+
+
+<span class="c1">#### DIFFERENCE</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">A1</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">A2</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">]</span>
+<span class="c1">####</span>
+
+<span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the operator norm of the difference of two matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">latents_est</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">Y</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_latents</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+
+<span class="n">ys_bootstrap</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
+    <span class="n">ys_bootstrap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+    
+<span class="n">ys_true</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
+    <span class="n">ys_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+    
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_true</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;true distribution of y&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_bootstrap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrapped distribution&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x145cdcc70&gt;
+</pre></div>
+</div>
+<img alt="../../_images/anomaly-detection_8_1.png" src="../../_images/anomaly-detection_8_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="embedding-more-during-bootstrap">
+<h3><span class="section-number">10.1.1.3. </span>EMBEDDING MORE DURING BOOTSTRAP<a class="headerlink" href="#embedding-more-during-bootstrap" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### its broken weeeeeeeeee</span>
+<span class="c1">### test code block</span>
+
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+
+
+<span class="c1">#### DIFFERENCE</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">networks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="c1">######</span>
+
+<span class="k">def</span> <span class="nf">get_statistic</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">,</span> <span class="n">return_latents</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the operator norm of the difference of two matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">latents_est</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">adjacencies</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">latents_est</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">Y</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_latents</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+
+<span class="n">ys_bootstrap</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500</span><span class="p">):</span>
+    <span class="n">bootstrap_temp</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+        <span class="n">bootstrap_temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">(</span><span class="n">bootstrap_temp</span><span class="p">)</span>
+    <span class="n">ys_bootstrap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+    
+<span class="n">ys_true</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
+    <span class="n">ys_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+    
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_true</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;true distribution of y&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_bootstrap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrapped distribution&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x14586efa0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/anomaly-detection_10_1.png" src="../../_images/anomaly-detection_10_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -888,7 +1037,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_9_0.png" src="../../_images/anomaly-detection_9_0.png" />
+<img alt="../../_images/anomaly-detection_13_0.png" src="../../_images/anomaly-detection_13_0.png" />
+</div>
 </div>
 </div>
 </div>
@@ -999,7 +1149,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_23_0.png" src="../../_images/anomaly-detection_23_0.png" />
+<img alt="../../_images/anomaly-detection_27_0.png" src="../../_images/anomaly-detection_27_0.png" />
 </div>
 </div>
 <p>The test statistic value that we have is not too weird and would be pretty reasonable to see under the assumption that the time-points share latent positions. However, we can’t always eyeball stuff, and we need a way to formalize what it means for a test statistic to be “not too weird”. We’ve already spoken about this formalization: our test statistic is  <span class="math notranslate nohighlight">\(y = ||X^{(t)} - X^{(t-1)}||\)</span>, and so we want to find some <span class="math notranslate nohighlight">\(c\)</span> such that <span class="math notranslate nohighlight">\(P(||X^{(t)} - X^{(t-1)}|| &gt; c)\)</span> is small. This means that we want to have a low probability of seeing a <span class="math notranslate nohighlight">\(y\)</span> greater than <span class="math notranslate nohighlight">\(c\)</span>.</p>
