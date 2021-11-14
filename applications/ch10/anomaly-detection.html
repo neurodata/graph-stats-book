@@ -739,6 +739,23 @@
 <p>The latent positions are just single numbers, distributed uniformly between 0.2 and 0.8. To make the perturbed time-points, we just add a bit of noise to the first twenty rows of the latent position matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">latents</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2000</span><span class="o">/</span><span class="mf">4271615504.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">latents</span><span class="o">.</span><span class="n">shape</span>
+
+<span class="ne">NameError</span>: name &#39;latents&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### its broken weeeeeeeeee</span>
 <span class="c1">### test code block</span>
 
@@ -767,98 +784,17 @@
 <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">([</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">])</span>
 
-<span class="n">ys_same</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ys_bootstrap</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
     <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
-    <span class="n">ys_same</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
+    <span class="n">ys_bootstrap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
     
-<span class="n">ys_diff</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ys_true</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
     <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
-    <span class="n">ys_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1927</span><span class="o">/</span><span class="mf">2657621013.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="g g-Whitespace">     </span><span class="mi">36</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">37</span>     <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="ne">---&gt; </span><span class="mi">38</span>     <span class="n">y_</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">])</span>
-<span class="g g-Whitespace">     </span><span class="mi">39</span>     <span class="n">ys_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
-
-<span class="nn">/tmp/ipykernel_1927/2657621013.py</span> in <span class="ni">get_statistic</span><span class="nt">(adjacencies, return_latents)</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span>     <span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span><span class="sd">     omni = OMNI(n_components=2)</span>
-<span class="ne">---&gt; </span><span class="mi">18</span><span class="sd">     latents_est = omni.fit_transform(adjacencies)</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span><span class="sd">     X, Y = latents_est[0], latents_est[1]</span>
-<span class="g g-Whitespace">     </span><span class="mi">20</span><span class="sd">     y = np.linalg.norm(X - Y, ord=2)</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/embed/omni.py</span> in <span class="ni">fit_transform</span><span class="nt">(self, graphs, y)</span>
-<span class="g g-Whitespace">    </span><span class="mi">304</span><span class="sd">             In this case one tensor of shape (n_graphs, n_vertices, 2*n_components) is returned.</span>
-<span class="g g-Whitespace">    </span><span class="mi">305</span><span class="sd">         &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">306</span>         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_transform</span><span class="p">(</span><span class="n">graphs</span><span class="p">)</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/embed/base.py</span> in <span class="ni">_fit_transform</span><span class="nt">(self, graph, *args, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">193</span>         <span class="s2">&quot;Fits the model and returns the estimated latent positions.&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">194</span> 
-<span class="ne">--&gt; </span><span class="mi">195</span>         <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">196</span> 
-<span class="g g-Whitespace">    </span><span class="mi">197</span>         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_right_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/embed/omni.py</span> in <span class="ni">fit</span><span class="nt">(self, graphs, y)</span>
-<span class="g g-Whitespace">    </span><span class="mi">270</span> 
-<span class="g g-Whitespace">    </span><span class="mi">271</span>         <span class="c1"># Embed</span>
-<span class="ne">--&gt; </span><span class="mi">272</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_dim</span><span class="p">(</span><span class="n">omni_matrix</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">273</span> 
-<span class="g g-Whitespace">    </span><span class="mi">274</span>         <span class="c1"># Reshape to tensor</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/embed/base.py</span> in <span class="ni">_reduce_dim</span><span class="nt">(self, A, directed)</span>
-<span class="g g-Whitespace">    </span><span class="mi">107</span>             <span class="n">Adjacency</span> <span class="n">matrix</span> <span class="n">to</span> <span class="n">embed</span><span class="o">.</span>
-<span class="g g-Whitespace">    </span><span class="mi">108</span>         <span class="s2">&quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">109</span><span class="s2">         U, D, V = select_svd(</span>
-<span class="g g-Whitespace">    </span><span class="mi">110</span><span class="s2">             A,</span>
-<span class="g g-Whitespace">    </span><span class="mi">111</span><span class="s2">             n_components=self.n_components,</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/embed/svd.py</span> in <span class="ni">select_svd</span><span class="nt">(X, n_components, n_elbows, algorithm, n_iter, svd_seed)</span>
-<span class="g g-Whitespace">    </span><span class="mi">303</span><span class="s2">         # which is weird because None is a valid starting point too</span>
-<span class="g g-Whitespace">    </span><span class="mi">304</span><span class="s2">         svd_seed = svd_seed if svd_seed is not None else 0</span>
-<span class="ne">--&gt; </span><span class="mi">305</span><span class="s2">         U, D, V = sklearn.utils.extmath.randomized_svd(</span>
-<span class="g g-Whitespace">    </span><span class="mi">306</span><span class="s2">             X, n_components, n_iter=n_iter, random_state=svd_seed</span>
-<span class="g g-Whitespace">    </span><span class="mi">307</span><span class="s2">         )</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/utils/extmath.py</span> in <span class="ni">randomized_svd</span><span class="nt">(M, n_components, n_oversamples, n_iter, power_iteration_normalizer, transpose, flip_sign, random_state)</span>
-<span class="g g-Whitespace">    </span><span class="mi">393</span><span class="s2">         M = M.T</span>
-<span class="g g-Whitespace">    </span><span class="mi">394</span><span class="s2"> </span>
-<span class="ne">--&gt; </span><span class="mi">395</span><span class="s2">     Q = randomized_range_finder(</span>
-<span class="g g-Whitespace">    </span><span class="mi">396</span><span class="s2">         M,</span>
-<span class="g g-Whitespace">    </span><span class="mi">397</span><span class="s2">         size=n_random,</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/sklearn/utils/extmath.py</span> in <span class="ni">randomized_range_finder</span><span class="nt">(A, size, n_iter, power_iteration_normalizer, random_state)</span>
-<span class="g g-Whitespace">    </span><span class="mi">243</span><span class="s2">     # Sample the range of A using by linear projection of Q</span>
-<span class="g g-Whitespace">    </span><span class="mi">244</span><span class="s2">     # Extract an orthonormal basis</span>
-<span class="ne">--&gt; </span><span class="mi">245</span><span class="s2">     Q, _ = linalg.qr(safe_sparse_dot(A, Q), mode=&quot;economic&quot;)</span>
-<span class="g g-Whitespace">    </span><span class="mi">246</span><span class="s2">     return Q</span>
-<span class="g g-Whitespace">    </span><span class="mi">247</span><span class="s2"> </span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/scipy/linalg/decomp_qr.py</span> in <span class="ni">qr</span><span class="nt">(a, overwrite_a, lwork, mode, pivoting, check_finite)</span>
-<span class="g g-Whitespace">    </span><span class="mi">163</span><span class="s2">                       lwork=lwork, overwrite_a=1)</span>
-<span class="g g-Whitespace">    </span><span class="mi">164</span><span class="s2">     elif mode == &#39;economic&#39;:</span>
-<span class="ne">--&gt; </span><span class="mi">165</span><span class="s2">         Q, = safecall(gor_un_gqr, &quot;gorgqr/gungqr&quot;, qr, tau, lwork=lwork,</span>
-<span class="g g-Whitespace">    </span><span class="mi">166</span><span class="s2">                       overwrite_a=1)</span>
-<span class="g g-Whitespace">    </span><span class="mi">167</span><span class="s2">     else:</span>
-
-<span class="nn">/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/scipy/linalg/decomp_qr.py</span> in <span class="ni">safecall</span><span class="nt">(f, name, *args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span><span class="s2">         ret = f(*args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">18</span><span class="s2">         kwargs[&#39;lwork&#39;] = ret[-2][0].real.astype(numpy.int_)</span>
-<span class="ne">---&gt; </span><span class="mi">19</span><span class="s2">     ret = f(*args, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">20</span><span class="s2">     if ret[-1] &lt; 0:</span>
-<span class="g g-Whitespace">     </span><span class="mi">21</span><span class="s2">         raise ValueError(&quot;illegal value in </span><span class="si">%d</span><span class="s2">th argument of internal </span><span class="si">%s</span><span class="s2">&quot;</span>
-
-<span class="ne">KeyboardInterrupt</span>: 
+    <span class="n">ys_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -868,18 +804,18 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_same</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrap from same latent&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_diff</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrap from different latent&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_true</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;true distribution of y&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">ys_bootstrap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bootstrapped distribution&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x1431074c0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x145442be0&gt;
 </pre></div>
 </div>
-<img alt="../../_images/anomaly-detection_5_1.png" src="../../_images/anomaly-detection_5_1.png" />
+<img alt="../../_images/anomaly-detection_6_1.png" src="../../_images/anomaly-detection_6_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -952,7 +888,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_8_0.png" src="../../_images/anomaly-detection_8_0.png" />
+<img alt="../../_images/anomaly-detection_9_0.png" src="../../_images/anomaly-detection_9_0.png" />
 </div>
 </div>
 </div>
@@ -1063,7 +999,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_22_0.png" src="../../_images/anomaly-detection_22_0.png" />
+<img alt="../../_images/anomaly-detection_23_0.png" src="../../_images/anomaly-detection_23_0.png" />
 </div>
 </div>
 <p>The test statistic value that we have is not too weird and would be pretty reasonable to see under the assumption that the time-points share latent positions. However, we can’t always eyeball stuff, and we need a way to formalize what it means for a test statistic to be “not too weird”. We’ve already spoken about this formalization: our test statistic is  <span class="math notranslate nohighlight">\(y = ||X^{(t)} - X^{(t-1)}||\)</span>, and so we want to find some <span class="math notranslate nohighlight">\(c\)</span> such that <span class="math notranslate nohighlight">\(P(||X^{(t)} - X^{(t-1)}|| &gt; c)\)</span> is small. This means that we want to have a low probability of seeing a <span class="math notranslate nohighlight">\(y\)</span> greater than <span class="math notranslate nohighlight">\(c\)</span>.</p>
