@@ -657,8 +657,13 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-degree-matrix">
+     4.1.2.1. The Degree Matrix
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#variations-on-the-laplacian">
-     4.1.2.1. Variations on the Laplacian
+     4.1.2.2. Variations on the Laplacian
     </a>
    </li>
   </ul>
@@ -676,21 +681,38 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="matrix-representations-of-networks">
 <h1><span class="section-number">4.1. </span>Matrix Representations Of Networks<a class="headerlink" href="#matrix-representations-of-networks" title="Permalink to this headline">¶</a></h1>
-<p>When we work with networks, we need a way to represent them mathematically and in our code. A network itself lives in network space, which is just the set of all possible networks. Network space is kind of abstract and inconvenient if we want to use traditional mathematics, so we’d generally like to <em>represent</em> networks with groups of numbers to make everything more concrete.</p>
-<p>More specifically, we would often like to represent networks with <em>matrices</em>. In addition to being computationally convenient, using matrices to represent networks often lets us use a surprising amount of tools from linear algebra.</p>
-<p>The most common matrix representation of a network is called the Adjacency Matrix.</p>
+<p>When we work with networks, we need a way to represent them mathematically and in our code. A network itself lives in network space, which is just the set of all possible networks. Network space is kind of abstract and inconvenient if we want to use traditional mathematics, so we’d generally like to represent networks with groups of numbers to make everything more concrete.</p>
+<p>More specifically, we would often like to represent networks with <em>matrices</em>. In addition to being computationally convenient, using matrices to represent networks lets us bring in a surprising amount of tools from linear algebra and statistics. Programmatically, using matrices also lets us use common Python tools for array manipulation like numpy.</p>
+<p>The most common matrix representation of a network is called the Adjacency Matrix, and we’ll learn about that first.</p>
 <div class="section" id="the-adjacency-matrix">
 <h2><span class="section-number">4.1.1. </span>The Adjacency Matrix<a class="headerlink" href="#the-adjacency-matrix" title="Permalink to this headline">¶</a></h2>
-<p>Adjacency matrices will be the bread and butter, primary way we represent networks throughout this book. The idea is pretty straightforward. Let’s say you have a network with <span class="math notranslate nohighlight">\(n\)</span> nodes:</p>
-<div class="cell docutils container">
+<p>Adjacency matrices will be the bread and butter of matrix representation throughout this book. The idea is pretty straightforward. Let’s say you have a network with <span class="math notranslate nohighlight">\(n\)</span> nodes. In this case, we’ll make a network with only three nodes, since that’s small and easy to understand:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># insert figure:</span>
-<span class="c1"># layoutplot of network with n nodes</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">)</span>
+
+<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">)}</span>
+
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_matrix</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/matrix-representations_4_0.png" src="../../_images/matrix-representations_4_0.png" />
 </div>
-<p>Each of those <span class="math notranslate nohighlight">\(n\)</span> nodes is either connected or not connected with the <span class="math notranslate nohighlight">\(n-1\)</span> other nodes. So we make a square matrix <span class="math notranslate nohighlight">\(A\)</span>, with <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns, so that each node has its own row and column associated to it. The idea is that the value on the <span class="math notranslate nohighlight">\(i_{th}\)</span> row and the <span class="math notranslate nohighlight">\(j_{th}\)</span> column of <span class="math notranslate nohighlight">\(A\)</span> will be a 1 if there is an edge between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, and a 0 otherwise.</p>
+</div>
+<p>Each of those three nodes is either connected or not connected to each of the two other nodes. We can make a square matrix <span class="math notranslate nohighlight">\(A\)</span>, with 3 rows and 3 columns, so that each node has its own row and column associated with it. The idea is that the value on the <span class="math notranslate nohighlight">\(i_{th}\)</span> row and the <span class="math notranslate nohighlight">\(j_{th}\)</span> column of <span class="math notranslate nohighlight">\(A\)</span> will be a 1 if there is an edge between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, and a 0 otherwise. This also means that the adjacency matrix is symmetric in undirected networks.</p>
 <p>So, let’s fill out the matrix. Start with the first row, which corresponds to the first node, and move along the columns. If there is an edge between the first node and the column you’re at, put a 1 in the current location. If the two nodes aren’t connected, add a 0. When you’re done with the first row, move on to the second. Keep going until the whole matrix is filled with 0’s and 1’s.</p>
 <p>The end result is</p>
 <p>\ read the part of homl that goes through notation</p>
@@ -709,8 +731,11 @@ The rows of an adjacency matrix represent all of the edges for a particular node
 </div>
 <div class="section" id="the-laplacian-matrix">
 <h2><span class="section-number">4.1.2. </span>The Laplacian Matrix<a class="headerlink" href="#the-laplacian-matrix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-degree-matrix">
+<h3><span class="section-number">4.1.2.1. </span>The Degree Matrix<a class="headerlink" href="#the-degree-matrix" title="Permalink to this headline">¶</a></h3>
+</div>
 <div class="section" id="variations-on-the-laplacian">
-<h3><span class="section-number">4.1.2.1. </span>Variations on the Laplacian<a class="headerlink" href="#variations-on-the-laplacian" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">4.1.2.2. </span>Variations on the Laplacian<a class="headerlink" href="#variations-on-the-laplacian" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 </div>
