@@ -1,0 +1,91 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 1093, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 559, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 854, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 756, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from matplotlib.gridspec import GridSpec
+import warnings
+
+fig = plt.figure(figsize=(10, 6))
+gs = GridSpec(3, 5)
+ax_laplacian = fig.add_subplot(gs[:, 2:])
+
+# Plot low-rank matrices
+i = 0
+for row in range(3):
+    for col in range(2):
+        ax = fig.add_subplot(gs[row, col])
+        title = f"$\sigma_{i+1} u_{i+1} v_{i+1}^T$"
+        heatmap(low_rank_matrices[i], ax=ax, cbar=False, title=title)
+        i += 1
+        
+# Plot Laplacian
+heatmap(laplacian_sum, ax=ax_laplacian, cbar=False, title="$L = \sum_{i = 1}^n \sigma_i u_i v_i^T$")
+
+# # Colorbar
+cax = fig.add_axes([1, 0, .04, .8])
+vmin, vmax = np.array(laplacian_sum).min(), np.array(laplacian_sum).max()
+norm = Normalize(vmin=vmin, vmax=vmax)
+im = cm.ScalarMappable(cmap=GraphColormap("sequential").color, norm=norm)
+fig.colorbar(im, cax=cax, use_gridspec=False);
+
+
+fig.suptitle("We can recreate our simple Laplacian by summing all the low-rank matrices", fontsize=24)
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    plt.tight_layout();
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+[0;32m/tmp/ipykernel_2548/1364255984.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     30[0m [0;32mwith[0m [0mwarnings[0m[0;34m.[0m[0mcatch_warnings[0m[0;34m([0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     31[0m     [0mwarnings[0m[0;34m.[0m[0msimplefilter[0m[0;34m([0m[0;34m"ignore"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 32[0;31m     [0mplt[0m[0;34m.[0m[0mtight_layout[0m[0;34m([0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/matplotlib/pyplot.py[0m in [0;36mtight_layout[0;34m(pad, h_pad, w_pad, rect)[0m
+[1;32m   2300[0m [0;34m@[0m[0m_copy_docstring_and_deprecators[0m[0;34m([0m[0mFigure[0m[0;34m.[0m[0mtight_layout[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   2301[0m [0;32mdef[0m [0mtight_layout[0m[0;34m([0m[0;34m*[0m[0;34m,[0m [0mpad[0m[0;34m=[0m[0;36m1.08[0m[0;34m,[0m [0mh_pad[0m[0;34m=[0m[0;32mNone[0m[0;34m,[0m [0mw_pad[0m[0;34m=[0m[0;32mNone[0m[0;34m,[0m [0mrect[0m[0;34m=[0m[0;32mNone[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 2302[0;31m     [0;32mreturn[0m [0mgcf[0m[0;34m([0m[0;34m)[0m[0;34m.[0m[0mtight_layout[0m[0;34m([0m[0mpad[0m[0;34m=[0m[0mpad[0m[0;34m,[0m [0mh_pad[0m[0;34m=[0m[0mh_pad[0m[0;34m,[0m [0mw_pad[0m[0;34m=[0m[0mw_pad[0m[0;34m,[0m [0mrect[0m[0;34m=[0m[0mrect[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   2303[0m [0;34m[0m[0m
+[1;32m   2304[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/matplotlib/figure.py[0m in [0;36mtight_layout[0;34m(self, pad, h_pad, w_pad, rect)[0m
+[1;32m   3181[0m         from .tight_layout import (
+[1;32m   3182[0m             get_subplotspec_list, get_tight_layout_figure)
+[0;32m-> 3183[0;31m         [0msubplotspec_list[0m [0;34m=[0m [0mget_subplotspec_list[0m[0;34m([0m[0mself[0m[0;34m.[0m[0maxes[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   3184[0m         [0;32mif[0m [0;32mNone[0m [0;32min[0m [0msubplotspec_list[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   3185[0m             _api.warn_external("This figure includes Axes that are not "
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/matplotlib/tight_layout.py[0m in [0;36mget_subplotspec_list[0;34m(axes_list, grid_spec)[0m
+[1;32m    232[0m [0;34m[0m[0m
+[1;32m    233[0m         [0;32mif[0m [0mhasattr[0m[0;34m([0m[0maxes_or_locator[0m[0;34m,[0m [0;34m"get_subplotspec"[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 234[0;31m             [0msubplotspec[0m [0;34m=[0m [0maxes_or_locator[0m[0;34m.[0m[0mget_subplotspec[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    235[0m             [0msubplotspec[0m [0;34m=[0m [0msubplotspec[0m[0;34m.[0m[0mget_topmost_subplotspec[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    236[0m             [0mgs[0m [0;34m=[0m [0msubplotspec[0m[0;34m.[0m[0mget_gridspec[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/matplotlib/colorbar.py[0m in [0;36mget_subplotspec[0;34m(self)[0m
+[1;32m    281[0m         [0mss[0m [0;34m=[0m [0mgetattr[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m_cbar[0m[0;34m.[0m[0max[0m[0;34m,[0m [0;34m'get_subplotspec'[0m[0;34m,[0m [0;32mNone[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    282[0m         [0;32mif[0m [0mss[0m [0;32mis[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 283[0;31m             [0mss[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_orig_locator[0m[0;34m.[0m[0mget_subplotspec[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    284[0m         [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    285[0m             [0mss[0m [0;34m=[0m [0mss[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mAttributeError[0m: 'NoneType' object has no attribute 'get_subplotspec'
+AttributeError: 'NoneType' object has no attribute 'get_subplotspec'
+
