@@ -17,41 +17,31 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-# Generate a network from an SBM
-B = np.array([[0.02, 0.044, .002, .009], 
-              [0.044, 0.115, .010, .042],
-              [.002, .010, .020, .045],
-              [.009, .042, .045, .117]])
-n = [100, 100, 100, 100]
-A, labels = sbm(n=n, p=B, return_labels=True)
+from graspologic.simulations import sbm
+from matplotlib import pyplot as plt
+from graphbook_code import heatmap
+from numpy.random import beta
 
-# Instantiate an ASE model and find the embedding
-ase = ASE(n_components=2)
-embedding_ase = ase.fit_transform(A)
+wtargsh = [[dict(a=8, b=1), dict(a=2, b=10)],
+          [dict(a=2, b=2), dict(a=8, b=1)]]
 
-# LSE
-lse = LSE(n_components=2)
-embedding_lse = lse.fit_transform(A)
+wtargsa = [[dict(lam=10), dict(lam=5)],
+          [dict(lam=5), dict(lam=10)]]
 
-# plot
-from graphbook_code import draw_layout_plot
+# human brain network
+Ah = sbm(n=[3,3], p=[[1,1], [1,1]], wt=beta, wtargs=wtargsh, loops=False, directed=True)
 
-fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-plot_latents(embedding_ase, labels=labels, ax=axs[0],
-             title="Adjacency Spectral Embedding");
-plot_latents(embedding_lse, labels=labels, ax=axs[1],
-             title="Laplacian Spectral Embedding");
+# alien brain network
+Aa = sbm(n=[3,3], p=[[1, 1], [1, 1]], wt=poisson, wtargs=wtargsa, directed=False)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m/tmp/ipykernel_2696/3718864610.py[0m in [0;36m<module>[0;34m[0m
-[1;32m      1[0m [0;31m# Generate a network from an SBM[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
-[0;32m----> 2[0;31m B = np.array([[0.02, 0.044, .002, .009], 
-[0m[1;32m      3[0m               [0;34m[[0m[0;36m0.044[0m[0;34m,[0m [0;36m0.115[0m[0;34m,[0m [0;36m.010[0m[0;34m,[0m [0;36m.042[0m[0;34m][0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      4[0m               [0;34m[[0m[0;36m.002[0m[0;34m,[0m [0;36m.010[0m[0;34m,[0m [0;36m.020[0m[0;34m,[0m [0;36m.045[0m[0;34m][0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      5[0m               [.009, .042, .045, .117]])
-
-[0;31mNameError[0m: name 'np' is not defined
-NameError: name 'np' is not defined
+[0;32m/tmp/ipykernel_2128/1663019045.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     14[0m [0;34m[0m[0m
+[1;32m     15[0m [0;31m# alien brain network[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 16[0;31m [0mAa[0m [0;34m=[0m [0msbm[0m[0;34m([0m[0mn[0m[0;34m=[0m[0;34m[[0m[0;36m3[0m[0;34m,[0m[0;36m3[0m[0;34m][0m[0;34m,[0m [0mp[0m[0;34m=[0m[0;34m[[0m[0;34m[[0m[0;36m1[0m[0;34m,[0m [0;36m1[0m[0;34m][0m[0;34m,[0m [0;34m[[0m[0;36m1[0m[0;34m,[0m [0;36m1[0m[0;34m][0m[0;34m][0m[0;34m,[0m [0mwt[0m[0;34m=[0m[0mpoisson[0m[0;34m,[0m [0mwtargs[0m[0;34m=[0m[0mwtargsa[0m[0;34m,[0m [0mdirected[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;31mNameError[0m: name 'poisson' is not defined
+NameError: name 'poisson' is not defined
 

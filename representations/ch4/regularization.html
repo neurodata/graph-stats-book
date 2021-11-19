@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -610,11 +612,102 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch4/regularization.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#regularization-of-the-nodes">
+   4.4.1. Regularization of the Nodes
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#degree-trimming-removes-nodes-with-low-degree">
+     4.4.1.1. Degree trimming removes nodes with low degree
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#regularization-of-the-edges">
+   4.4.2. Regularization of the Edges
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#symmetrizing-the-network-gives-us-undirectedness">
+     4.4.2.1. Symmetrizing the network gives us undirectedness
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#ignoring-a-triangle-of-the-adjacency-matrix">
+       4.4.2.1.1. Ignoring a “triangle* of the adjacency matrix
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#taking-a-function-of-the-two-values">
+       4.4.2.1.2. Taking a function of the two values
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#thresholding-converts-weighted-networks-to-binary-networks">
+     4.4.2.2. Thresholding converts weighted networks to binary networks
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sparsification-removes-potentially-spurious-low-weight-edges">
+     4.4.2.3. Sparsification removes potentially spurious low-weight edges
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#diagonal-augmentation">
+     4.4.2.4. Diagonal augmentation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#z-scoring-standardizes-edge-weights-using-the-normal-distribution">
+     4.4.2.5. Z-scoring standardizes edge weights using the normal distribution
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#logging-reduces-magnitudinal-differences-between-edges">
+     4.4.2.6. Logging reduces magnitudinal differences between edges
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ranking-edges-preserves-only-ordinal-relationships">
+     4.4.2.7. Ranking edges preserves only ordinal relationships
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -625,6 +718,240 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="regularization">
 <h1><span class="section-number">4.4. </span>Regularization<a class="headerlink" href="#regularization" title="Permalink to this headline">¶</a></h1>
+<p>In practice, many networks we will face in network machine learning will <em>not</em> be simple networks. As we discussed in the preceding discussion, many of the techniques we discuss will be just fine to use with weighted networks. Unfortunately, these real world networks are often extremely noisy, and it is for this reason that analysis of one real world network might not generalize very well to a similar real world network. For this reason, we turn to <em>regularization</em>. On <a class="reference external" href="#https://en.wikipedia.org/wiki/Regularization_(mathematics)">wikipedia</a>, <strong>regularization</strong> is defined as, “the process of adding information in order to solve an ill-posed problem or to prevent overfitting.” In network machine learning, what this usually will entail is modifying the network (or networks) themselves to allow better generalization of our statistical inference to new datasets. For each section, we’ll pose an example, a simulation, and code for how to implement the desired regularization approach. But it is important to realize that you might use several of these techniques simultaneously in practice, or you might have reasons to use these techniques that go outside of our working examples.</p>
+<div class="section" id="regularization-of-the-nodes">
+<h2><span class="section-number">4.4.1. </span>Regularization of the Nodes<a class="headerlink" href="#regularization-of-the-nodes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="degree-trimming-removes-nodes-with-low-degree">
+<h3><span class="section-number">4.4.1.1. </span>Degree trimming removes nodes with low degree<a class="headerlink" href="#degree-trimming-removes-nodes-with-low-degree" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="regularization-of-the-edges">
+<h2><span class="section-number">4.4.2. </span>Regularization of the Edges<a class="headerlink" href="#regularization-of-the-edges" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="symmetrizing-the-network-gives-us-undirectedness">
+<h3><span class="section-number">4.4.2.1. </span>Symmetrizing the network gives us undirectedness<a class="headerlink" href="#symmetrizing-the-network-gives-us-undirectedness" title="Permalink to this headline">¶</a></h3>
+<p>Let’s say we have two brain networks from humans and aliens. In this case, we’ll say there are six nodes, which are somehow shared across the two life forms. There is one node related to movement, one node related to hearing, one node related to higher-order thinking (like programming!), one node related taste, one node related to smell, and one node related to seeing. The edges <span class="math notranslate nohighlight">\((i, j)\)</span> here will represent the degree to which, if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> is stimulated as well. This network is weighted, and the edges take values between <span class="math notranslate nohighlight">\(-1\)</span> (if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> is definitely <em>not</em> stimulated) and <span class="math notranslate nohighlight">\(1\)</span> (if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> is definitely stimulated). A value of between the two would indicate that if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> might (or might not) be stimulated. Our goal is to measure the extent to which the two networks, <em>ignoring</em> asymmetries, are similar. Unfortunately, there is one big difference: the human network is <em>not</em> symmetric, but the alien network <em>is</em> symmetric! What this means is that in humans, node <span class="math notranslate nohighlight">\(i\)</span> being stimulated leading to node <span class="math notranslate nohighlight">\(j\)</span> does not necessarily mean that node <span class="math notranslate nohighlight">\(j\)</span> being stimulated leads to node <span class="math notranslate nohighlight">\(i\)</span> being stimulated. To accomplish this goal, we will <em>symmetrize</em> the human network. Let’s take a look at two example networks. Notice that the human network is not symmetric:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">beta</span>
+
+<span class="n">wtargsh</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
+          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)]]</span>
+
+<span class="n">wtargsa</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">5</span><span class="p">)],</span>
+          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">10</span><span class="p">)]]</span>
+
+<span class="c1"># human brain network</span>
+<span class="n">Ah</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsh</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># alien brain network</span>
+<span class="n">Aa</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">poisson</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsa</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2128</span><span class="o">/</span><span class="mf">1663019045.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">14</span> 
+<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="c1"># alien brain network</span>
+<span class="ne">---&gt; </span><span class="mi">16</span> <span class="n">Aa</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">poisson</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsa</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;poisson&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Aa</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien Brain Network&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_2_0.png" src="../../_images/regularization_2_0.png" />
+</div>
+</div>
+<p>Remember that in a symmetric network, <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>, so in an <em>asymmetric</em> network, <span class="math notranslate nohighlight">\(a_{ij} \neq a_{ji}\)</span>. To symmetrize this asymmetric adjacency matrix, what we want is a <em>new</em> adjacency value, which we will call <span class="math notranslate nohighlight">\(w_{ij}\)</span>, which will be a function of <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span>. Then, we will construct a new adjacency matrix <span class="math notranslate nohighlight">\(A'\)</span>, where each entry <span class="math notranslate nohighlight">\(a_{ij}'\)</span> <em>and</em> <span class="math notranslate nohighlight">\(a_{ji}'\)</span> are set equal to <span class="math notranslate nohighlight">\(w_{ij}\)</span>.  The little apostraphe just signifies that this is a potentially different value than either <span class="math notranslate nohighlight">\(a_{ij}\)</span> or <span class="math notranslate nohighlight">\(a_{ji}\)</span>. Note that by construction, <span class="math notranslate nohighlight">\(A'\)</span> is in fact symmetric, becaues <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span> due to how we built <span class="math notranslate nohighlight">\(A'\)</span>.</p>
+<div class="section" id="ignoring-a-triangle-of-the-adjacency-matrix">
+<h4><span class="section-number">4.4.2.1.1. </span>Ignoring a “triangle* of the adjacency matrix<a class="headerlink" href="#ignoring-a-triangle-of-the-adjacency-matrix" title="Permalink to this headline">¶</a></h4>
+<p>The easiest way to symmetrize a network <span class="math notranslate nohighlight">\(A\)</span> is to just ignore part of it entirely. In the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, you will remember that we have an upper and a lower triangular part of the matrix:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A &amp;= \begin{bmatrix}
+        a_{11} &amp; \color{red}{a_{12}} &amp; \color{red}{...} &amp; \color{red}{a_{1n}} \\
+        \color{blue}{a_{21}} &amp; \ddots &amp; \color{red}{\ddots} &amp; \color{red}{\vdots} \\
+        \color{blue}{\vdots} &amp;\color{blue}{\ddots} &amp;\ddots &amp; \color{red}{a_{n-1, n}}\\
+        \color{blue}{a_{n1}} &amp; \color{blue}{...} &amp; \color{blue}{a_{n,n-1}} &amp; a_{nn}
+    \end{bmatrix},
+\end{align*}\]</div>
+<p>The entries which are listed in <font color="red">red</font> are called the <strong>upper right triangle of the adjacency matrix above the diagonal</strong>. You will notice that for the entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> in the upper right triangle of the adjacency matrix, that <span class="math notranslate nohighlight">\(a_{ij}\)</span> is such that <span class="math notranslate nohighlight">\(j\)</span> is <em>always</em> greater than <span class="math notranslate nohighlight">\(i\)</span>. Similarly, the entries which are listed in <font color="blue">blue</font> are called the <strong>lower left triangle of the adjacency matrix below the diagonal</strong>. In the lower left triangle, <span class="math notranslate nohighlight">\(i\)</span> is <em>always</em> greater than <span class="math notranslate nohighlight">\(j\)</span>. These are called <em>triangles</em> because of the shape they make when you look at them in matrix form: notice, for instance, that in the upper right triangle, we have a triangle with three corners of values: <span class="math notranslate nohighlight">\(a_{12}\)</span>, <span class="math notranslate nohighlight">\(a_{1n}\)</span>, and <span class="math notranslate nohighlight">\(a_{n-1, n}\)</span>.</p>
+<p>So, how do we ignore a triangle all-together? Well, it’s really quite simple! We will visually show how to ignore the lower left triangle of the adjacency matrix. We start by forming a triangle matrix, <span class="math notranslate nohighlight">\(\Delta\)</span>, as follows:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \Delta &amp;= \begin{bmatrix}
+        0 &amp; \color{red}{a_{12}} &amp; \color{red}{...} &amp; \color{red}{a_{1n}} \\
+        \color{blue}{0} &amp; \ddots &amp; \color{red}{\ddots} &amp; \color{red}{\vdots} \\
+        \color{blue}{\vdots} &amp;\color{blue}{\ddots} &amp;\ddots &amp; \color{red}{a_{n-1, n}}\\
+        \color{blue}{0} &amp; \color{blue}{...} &amp; \color{blue}{0} &amp; 0
+    \end{bmatrix},
+\end{align*}\]</div>
+<p>Notice that this matrix <em>keeps</em> lal of the upper right triangle of the adjacency matrix above the diagonal the same as in the matrix <span class="math notranslate nohighlight">\(A\)</span>, but replaces the lower right triangle of the adjacency matrix below the diagonal and the diagonal with <span class="math notranslate nohighlight">\(0\)</span>s. Notice that the transpose of <span class="math notranslate nohighlight">\(\Delta\)</span> is the matrix:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \Delta^\top &amp;= \begin{bmatrix}
+        0 &amp; \color{blue}{0} &amp; \color{blue}{...} &amp;\color{blue}{0}\\
+        \color{red}{a_{12}}&amp; \ddots &amp; \color{blue}{\ddots} &amp; \color{blue}{\vdots} \\
+        \color{red}{\vdots}&amp;\color{red}{\ddots} &amp; \ddots &amp; \color{blue}{0} \\
+        \color{red}{a_{1n}}&amp;\color{red}{...} &amp;\color{red}{a_{n-1,n}} &amp; 0
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>So when we add the two together, we get this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \Delta + \Delta^\top &amp;= \begin{bmatrix}
+        0 &amp; \color{red}{a_{12}} &amp; \color{red}{...} &amp; \color{red}{a_{1n}} \\
+        \color{red}{a_{12}} &amp; \ddots &amp; \color{red}{\ddots} &amp; \color{red}{\vdots} \\
+        \color{red}{\vdots}&amp;\color{red}{\ddots} &amp;\ddots &amp; \color{red}{a_{n-1, n}}\\
+        \color{red}{a_{1n}}&amp;\color{red}{...} &amp;\color{red}{a_{n-1,n}} &amp; 0
+    \end{bmatrix},
+\end{align*}\]</div>
+<p>We’re almost there! We just need to add back the diagonal of <span class="math notranslate nohighlight">\(A\)</span>, which we will do using the matrix <span class="math notranslate nohighlight">\(diag(A)\)</span> which has values <span class="math notranslate nohighlight">\(diag(A)_{ii} = a_{ii}\)</span>, and <span class="math notranslate nohighlight">\(diag(A)_{ij} = 0\)</span> for any <span class="math notranslate nohighlight">\(i \neq j\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A' &amp;= \Delta + \Delta^\top + diag(A) = \begin{bmatrix}
+        a_{11} &amp; \color{red}{a_{12}} &amp; \color{red}{...} &amp; \color{red}{a_{1n}} \\
+        \color{red}{a_{12}} &amp; \ddots &amp; \color{red}{\ddots} &amp; \color{red}{\vdots} \\
+        \color{red}{\vdots}&amp;\color{red}{\ddots} &amp;\ddots &amp; \color{red}{a_{n-1, n}}\\
+        \color{red}{a_{1n}}&amp;\color{red}{...} &amp;\color{red}{a_{n-1,n}} &amp; a_{nn}
+    \end{bmatrix},
+\end{align*}\]</div>
+<p>Which leaves <span class="math notranslate nohighlight">\(A'\)</span> to be a matrix consisting <em>only</em> of entries which were in the upper right triangle of <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(A'\)</span> is obviously symmetric, because <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. Since the adjacency matrix is symmetric, the network <span class="math notranslate nohighlight">\(A'\)</span> represents is therefore undirected. In graspologic, we can implement this as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">symmetrize</span>
+
+<span class="c1"># symmetrize with upper right triangle</span>
+<span class="n">Ah_upright_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;triu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Asymmetric&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_upright_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Upper-Right Symmetrized&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_5_0.png" src="../../_images/regularization_5_0.png" />
+</div>
+</div>
+<p>Likewise, we can lower-left symmetrize as well:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># symmetrize with lower left triangle</span>
+<span class="n">Ah_lowleft_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;tril&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Asymmetric&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_lowleft_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Lower-Left Symmetrized&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_8_0.png" src="../../_images/regularization_8_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="taking-a-function-of-the-two-values">
+<h4><span class="section-number">4.4.2.1.2. </span>Taking a function of the two values<a class="headerlink" href="#taking-a-function-of-the-two-values" title="Permalink to this headline">¶</a></h4>
+<p>There are many ways we can also take a function of <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span> to end up with a symmetric matrix. One such is we can just average the two. That is, we can let the matrix <span class="math notranslate nohighlight">\(A'\)</span> be the matrix with entries <span class="math notranslate nohighlight">\(a'_{ij} = \frac{a_{ij} + a_{ji}}{2}\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. In matrix form, this operation looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A' &amp;= \frac{1}{2} (A + A^\top) \\
+    &amp;= \frac{1}{2}\left(\begin{bmatrix}
+        a_{11} &amp; ... &amp; a_{1n} \\
+        \vdots &amp; \ddots &amp; \vdots \\
+        a_{n1} &amp; ... &amp; a_{nn}
+    \end{bmatrix} + \begin{bmatrix}
+        a_{11} &amp; ... &amp; a_{n1} \\
+        \vdots &amp; \ddots &amp; \vdots \\
+        a_{1n} &amp; ... &amp; a_{nn}
+    \end{bmatrix}\right)\\
+    &amp;= \begin{bmatrix}
+        \frac{1}{2}(a_{11} + a_{11}) &amp; ... &amp; \frac{1}{2}(a_{1n} + a_{n1}) \\
+        \vdots &amp; \ddots &amp; \vdots \\
+        \frac{1}{2} (a_{n1} + a_{1n}) &amp; ... &amp; \frac{1}{2}(a_{nn} + a_{nn})
+    \end{bmatrix} \\
+    &amp;= \begin{bmatrix}
+        a_{11} &amp; ... &amp; \frac{1}{2}(a_{1n} + a_{n1}) \\
+        \vdots &amp; \ddots &amp; \vdots \\
+        \frac{1}{2} (a_{n1} + a_{1n}) &amp; ... &amp; a_{nn}
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>As we can see, for all of the entries, <span class="math notranslate nohighlight">\(a'_{ij} = \frac{1}{2} (a_{ij} + a_{ji})\)</span>, and also <span class="math notranslate nohighlight">\(a_{ji}' = \frac{1}{2}(a_{ji} + a_{ij})\)</span>. These quantities are the same, so <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span>, and <span class="math notranslate nohighlight">\(A'\)</span> is symmetric. As the adjacency matrix is symmetric, the network thta <span class="math notranslate nohighlight">\(A'\)</span> represents is undirected. We can implement this in graspologic as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># symmetrize with averaging</span>
+<span class="n">Ah_avg_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;avg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Asymmetric&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_avg_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Symmetrized by Averaging&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_11_0.png" src="../../_images/regularization_11_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="thresholding-converts-weighted-networks-to-binary-networks">
+<h3><span class="section-number">4.4.2.2. </span>Thresholding converts weighted networks to binary networks<a class="headerlink" href="#thresholding-converts-weighted-networks-to-binary-networks" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="sparsification-removes-potentially-spurious-low-weight-edges">
+<h3><span class="section-number">4.4.2.3. </span>Sparsification removes potentially spurious low-weight edges<a class="headerlink" href="#sparsification-removes-potentially-spurious-low-weight-edges" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="diagonal-augmentation">
+<h3><span class="section-number">4.4.2.4. </span>Diagonal augmentation<a class="headerlink" href="#diagonal-augmentation" title="Permalink to this headline">¶</a></h3>
+<p>https://github.com/microsoft/graspologic/blob/f9c4353488e29d367dec62fdb4729e6a7344fd89/graspologic/embed/ase.py#L58</p>
+</div>
+<div class="section" id="z-scoring-standardizes-edge-weights-using-the-normal-distribution">
+<h3><span class="section-number">4.4.2.5. </span>Z-scoring standardizes edge weights using the normal distribution<a class="headerlink" href="#z-scoring-standardizes-edge-weights-using-the-normal-distribution" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="logging-reduces-magnitudinal-differences-between-edges">
+<h3><span class="section-number">4.4.2.6. </span>Logging reduces magnitudinal differences between edges<a class="headerlink" href="#logging-reduces-magnitudinal-differences-between-edges" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="ranking-edges-preserves-only-ordinal-relationships">
+<h3><span class="section-number">4.4.2.7. </span>Ranking edges preserves only ordinal relationships<a class="headerlink" href="#ranking-edges-preserves-only-ordinal-relationships" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
