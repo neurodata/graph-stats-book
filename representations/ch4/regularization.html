@@ -694,19 +694,37 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#z-scoring-standardizes-edge-weights-using-the-normal-distribution">
-     4.4.2.6. Z-scoring standardizes edge weights using the normal distribution
+    <a class="reference internal nav-link" href="#edge-weight-normalization">
+     4.4.2.6. Edge-weight normalization
     </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#logging-reduces-magnitudinal-differences-between-edges">
-     4.4.2.7. Logging reduces magnitudinal differences between edges
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#ranking-edges-preserves-only-ordinal-relationships">
-     4.4.2.8. Ranking edges preserves only ordinal relationships
-    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#z-scoring-standardizes-edge-weights-using-the-normal-distribution">
+       4.4.2.6.1.
+       <span class="math notranslate nohighlight">
+        \(z\)
+       </span>
+       -scoring standardizes edge weights using the normal distribution
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#ranking-edges-preserves-ordinal-relationships">
+       4.4.2.6.2. Ranking edges preserves ordinal relationships
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#logging-reduces-magnitudinal-differences-between-edges">
+       4.4.2.6.3. Logging reduces magnitudinal differences between edges
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#id1">
+         4.4.2.6.3.1.
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
@@ -740,19 +758,19 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
-<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">beta</span><span class="p">,</span> <span class="n">poisson</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span>
 
 <span class="n">wtargsh</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
           <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)]]</span>
 
-<span class="n">wtargsa</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">25</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">8</span><span class="p">)],</span>
-          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="mi">25</span><span class="p">)]]</span>
+<span class="n">wtargsa</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">.5</span><span class="p">)],</span>
+          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">.5</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)]]</span>
 
 <span class="c1"># human brain network</span>
 <span class="n">Ah</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsh</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># alien brain network</span>
-<span class="n">Aa</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">poisson</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsa</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">Aa</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsa</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -937,7 +955,7 @@
 <ol class="simple">
 <li><p>Set the threshhold to be zero: set all non-zero weighted entries to one, and all zero-weight entries to zero. This is most commonly used when we see zero-inflated networks, or networks where the adjacency matrix takes values that are either zero or some quantity different from one,</p></li>
 <li><p>Set te threshold to be the mean: set all values below the mean edge-weight to zero, and all values above the mean edge-weight to one,</p></li>
-<li><p>Pick a percentile: the most common appproach is to choose a particular percentile, and then set the edge weights below this percentile to zero and above this percenile to one. This approach has the nice property that if we are performing inference on multiple networks, it preserves the <em>network density</em> between them.</p></li>
+<li><p>Pick a percentile: the most common appproach is to choose a particular percentile, and divide it by <span class="math notranslate nohighlight">\(100\)</span> to obtain the <strong>quantile</strong>. Set the edge weights below this quantile to zero and above this quantile to one. This approach has the nice property that if we are performing inference on multiple networks whosse density exceeds the percentile we pick, it preserves the <em>network density</em> between them.</p></li>
 </ol>
 <p>We will show how to use the percentile approach to binarization, with both our human and alien brains. We will threshold using the edge-weight in the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile, which means that we will take the threshold to be the average of the two edge-weights in the middle and set all edges below this threshold to zero, and above this threshold to one. Note that how you perform the thresholding procedure might be dependent on properties of your network. Our example networks of humans and aliens were loopless, as you could see above. Remember as we learned in the preceding section, that if the network itself is loopless, the diagonal entries simply <em>do not exist</em>; <span class="math notranslate nohighlight">\(0\)</span> is simply a commonly used placeholder. For this reason, when we compute the mean edge-weight or percentiles of edge-weights, we need to exclude the diagonal. We begin by using this procedure on the human brain:</p>
 <div class="cell docutils container">
@@ -1154,14 +1172,195 @@
 <h3><span class="section-number">4.4.2.5. </span>Diagonal augmentation<a class="headerlink" href="#diagonal-augmentation" title="Permalink to this headline">¶</a></h3>
 <p>https://github.com/microsoft/graspologic/blob/f9c4353488e29d367dec62fdb4729e6a7344fd89/graspologic/embed/ase.py#L58</p>
 </div>
+<div class="section" id="edge-weight-normalization">
+<h3><span class="section-number">4.4.2.6. </span>Edge-weight normalization<a class="headerlink" href="#edge-weight-normalization" title="Permalink to this headline">¶</a></h3>
+<p>With weighted networks, it is often the case that we might want to reshape the distributions of edge-weights in our networks to highlight particular properties. Notice that the edge-weights for our human networks take values between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>, but for our alien network take values between <span class="math notranslate nohighlight">\(0\)</span> and almost <span class="math notranslate nohighlight">\(40\)</span>. How can we possibly compare between these two networks when the edge-weights take such different ranges of values? We turn to standardization, which allows us to place values from different networks on the same scale.</p>
 <div class="section" id="z-scoring-standardizes-edge-weights-using-the-normal-distribution">
-<h3><span class="section-number">4.4.2.6. </span>Z-scoring standardizes edge weights using the normal distribution<a class="headerlink" href="#z-scoring-standardizes-edge-weights-using-the-normal-distribution" title="Permalink to this headline">¶</a></h3>
+<h4><span class="section-number">4.4.2.6.1. </span><span class="math notranslate nohighlight">\(z\)</span>-scoring standardizes edge weights using the normal distribution<a class="headerlink" href="#z-scoring-standardizes-edge-weights-using-the-normal-distribution" title="Permalink to this headline">¶</a></h4>
+<p>The first approach to edge-weight standardization is known commonly as <span class="math notranslate nohighlight">\(z\)</span>-scoring. Suppose that <span class="math notranslate nohighlight">\(A\)</span> is the adjacency matrix, with entries <span class="math notranslate nohighlight">\(a_{ij}\)</span>. With a <span class="math notranslate nohighlight">\(z\)</span>-score, we will rescale the weights of the adjacency matrix, such that the new edge-weights (called <span class="math notranslate nohighlight">\(z\)</span>-scores) are approximately normally distributed. The reason this can be useful is that the normal distribution is pretty ubiquitous across many branches of science, and therefore, a <span class="math notranslate nohighlight">\(z\)</span>-score is relatively easy to communicate with other scientists. Further, many things that exist in nature can be well-approximated by a normal distribution, so it seems like a reasonable place to start to use a <span class="math notranslate nohighlight">\(z\)</span>-score for edge-weights, too! The <span class="math notranslate nohighlight">\(z\)</span>-score is defined as follows. We will construct the <span class="math notranslate nohighlight">\(z\)</span>-scored adjacency matrix <span class="math notranslate nohighlight">\(Z\)</span>, whose entries <span class="math notranslate nohighlight">\(z_{ij}\)</span> are the corresponding <span class="math notranslate nohighlight">\(z\)</span>-scores of the adjacency matrix’s entries <span class="math notranslate nohighlight">\(a_{ij}\)</span>. For a weighted, loopless network, we use an estimate of the <em>mean</em>, <span class="math notranslate nohighlight">\(\hat \mu\)</span>, and the <em>unbiased</em> estimate of the <em>variance</em>, <span class="math notranslate nohighlight">\(\hat \sigma^2\)</span>), which can be computed as follows:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat\mu &amp;= \frac{1}{n}\sum_{i \neq j}a_{ij},\\
+    \hat\sigma^2 &amp;= \frac{1}{n - 1}\sum_{i \neq j} (a_{ij} - \hat\mu)^2.
+\end{align*}\]</div>
+<p>The <span class="math notranslate nohighlight">\(z\)</span>-score for the <span class="math notranslate nohighlight">\((i,j)\)</span> entry is simply the quantity:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    z_{ij} &amp;= \frac{a_{ij} - \hat\mu}{\hat\sigma}
+\end{align*}\]</div>
+<p>Since our network is loopless, notice that these sums are for all <em>non-diagonal</em> entries where <span class="math notranslate nohighlight">\(i \neq j\)</span>. If the network were not loopless, we would include diagonal entries in the calculation, and instead would sum over all possible combinations of <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. the interpretation of the <span class="math notranslate nohighlight">\(z\)</span>-score <span class="math notranslate nohighlight">\(z_{ij}\)</span> is the <em>number of stadard deviations</em> that the entry <span class="math notranslate nohighlight">\(a_{ij}\)</span> is from the mean, <span class="math notranslate nohighlight">\(\hat \mu\)</span>.</p>
+<p>We will demonstrate on the network where <span class="math notranslate nohighlight">\(40\%\)</span> of the entries took a value between <span class="math notranslate nohighlight">\(5\)</span> and <span class="math notranslate nohighlight">\(10\)</span>, and the other <span class="math notranslate nohighlight">\(60\%\)</span> took a value of zero. We can implement <span class="math notranslate nohighlight">\(z\)</span>-scoring as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">zscore</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">zeros</span>
+
+<span class="k">def</span> <span class="nf">z_score_loopless</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_loopless</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The network has loops!&quot;</span><span class="p">)</span>
+    <span class="c1"># the entries of the adjacency matrix that are not on the diagonal</span>
+    <span class="n">non_diag_idx</span> <span class="o">=</span> <span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">eye</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">Z</span><span class="p">[</span><span class="n">non_diag_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">zscore</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">non_diag_idx</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Z</span>
+
+<span class="n">ZA</span> <span class="o">=</span> <span class="n">z_score_loopless</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">RA</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After Z-score&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2124</span><span class="o">/</span><span class="mf">3645899076.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> 
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges&quot;</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">RA</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After Z-score&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="ne">NameError</span>: name &#39;RA&#39; is not defined
+</pre></div>
+</div>
+<img alt="../../_images/regularization_34_1.png" src="../../_images/regularization_34_1.png" />
+</div>
+</div>
+<p>Next, we will look at the edge-weight histogram for the alien brain network before and after <span class="math notranslate nohighlight">\(z\)</span>-scoring. An edge-weight histogram is a histogram which indicates the number of edges with weights falling in between a pair of values. Remember that the network is loopless, so again we exclude the diagonal entries:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">seaborn</span> <span class="kn">import</span> <span class="n">histplot</span>
+
+<span class="n">non_diag_idx</span> <span class="o">=</span> <span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">eye</span><span class="p">(</span><span class="n">Aa</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge Weight&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, Before Z-score&quot;</span><span class="p">);</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">ZA</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Z-score&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After Z-score&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_36_0.png" src="../../_images/regularization_36_0.png" />
+</div>
+</div>
+<p>The theory for when, and why, to use <span class="math notranslate nohighlight">\(z\)</span>-scoring for network machine learning tends to go something like this: many things tend to be normally distributed with the same mean and variance, so perhaps that is a reasonable expectation for our network, too. Unfortunately, we find this often to <em>not</em> be the case. In fact, we often find that the specific distribution of edge weights itself often might be lamost infeasible to identify in a population of networks, and therefore <em>almost</em> irrelevant all-together. To this end, we turn to instead <em>ranking</em> the edges.</p>
+</div>
+<div class="section" id="ranking-edges-preserves-ordinal-relationships">
+<h4><span class="section-number">4.4.2.6.2. </span>Ranking edges preserves ordinal relationships<a class="headerlink" href="#ranking-edges-preserves-ordinal-relationships" title="Permalink to this headline">¶</a></h4>
+<p>The idea behind ranking is as follows. We don’t really know much useful information as to how the distribution of edge weights varies between a given pair of networks. For this reason, we want to virtually eliminate the impact of that distribution <em>almost</em> entirely. However, we know that if one edge-weight is larger than another edge-weight, that we do in fact trust that relationship. What this means is that we want something which preserves <em>ordinal</em> relationships in our edge-weights, but ignores other properties of the edge-weights. An ordinal relationship just means that we have a natural ordering to the edge-weights. This means that we can identify a largest edge-weight, a smallest edge-weight, and every position in between. When we want to preserve ordinal relationships in our network, we do something called <em>passing the non-zero edge-weights to ranks</em>. We will often use the abbreviation <code class="docutils literal notranslate"><span class="pre">ptr</span></code> to define this function because it is so useful for weighted networks. We pass non-zero edge-weights to ranks as follows:</p>
+<ol class="simple">
+<li><p>Identify all of the non-zero entries of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p>Count the number of non-zero entries of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(n_{nz}\)</span>.</p></li>
+<li><p>Rank all of the non-zero edges in the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, where for a non-zero entry <span class="math notranslate nohighlight">\(a_{ij}\)</span>, <span class="math notranslate nohighlight">\(rank(a_{ij}) = 1\)</span> if <span class="math notranslate nohighlight">\(a_{ij}\)</span> is the smallest non-zero edge-weight, and <span class="math notranslate nohighlight">\(rank(a_{ij}) = n_{nz}\)</span> if <span class="math notranslate nohighlight">\(a_{ij}\)</span> is the largest edge-weight. Ties are settled by using the average rank of the two entries.</p></li>
+<li><p>Report the weight of each non-zero entry <span class="math notranslate nohighlight">\((i,j)\)</span> as <span class="math notranslate nohighlight">\(r_{ij} = \frac{rank(a_{ij})}{n_{nz} + 1}\)</span>, and for eachh zero entry as <span class="math notranslate nohighlight">\(r_{ij} = 0\)</span>.</p></li>
+</ol>
+<p>Below, we pass-to-ranks for the network with <span class="math notranslate nohighlight">\(40\%\)</span> of the possible edges taking a value between <span class="math notranslate nohighlight">\(5\)</span> and <span class="math notranslate nohighlight">\(10\)</span>, and the other <span class="math notranslate nohighlight">\(60\%\)</span> taking a value of <span class="math notranslate nohighlight">\(0\)</span> using <code class="docutils literal notranslate"><span class="pre">graspologic</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">pass_to_ranks</span>
+
+<span class="n">RA</span> <span class="o">=</span> <span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">RA</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After PTR&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_39_0.png" src="../../_images/regularization_39_0.png" />
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge Weight&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, Before PTR&quot;</span><span class="p">);</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">RA</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">binrange</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;normalized rank&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After PTR&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_40_0.png" src="../../_images/regularization_40_0.png" />
+</div>
+</div>
+<p>The edge-weights for the adjacency matrix <span class="math notranslate nohighlight">\(R\)</span> after <code class="docutils literal notranslate"><span class="pre">ptr</span></code> has the interpretataion that each entry <span class="math notranslate nohighlight">\(r_{ij}\)</span> is the <em>quantile</em> of that entry amongst the other non-zero entries. This is unique in that it is completely <em>distribution-free</em>, which means that we don’t need to assume anything about the distribution of the edge-weights to have a reasonably interpretable quantity. On the other hand, the <span class="math notranslate nohighlight">\(z\)</span>-score had the interpretation of the number of standard deviations from the mean, which is only a sensible quantity to compare if we assume the population of edge-weights are normally distributed.</p>
+<p>Another useful quantity related to pass-to-ranks is known as the zero-boosted pass-to-ranks. Zero-boosted pass-to-ranks is conducted as follows:</p>
+<ol class="simple">
+<li><p>Identify all of the non-zero entries of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p>Count the number of non-zero entries of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(n_{nz}\)</span>, <em>and</em> the number of zero-entries of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(n_z\)</span>. Note that since the values of the adjacency matrix are either zero or non-zero, that <span class="math notranslate nohighlight">\(n_{nz} + n_z = n^2\)</span>, as <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix and therefore has <span class="math notranslate nohighlight">\(n^2\)</span> total entries.</p></li>
+<li><p>Rank all of the non-zero edges in the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, where for a non-zero entry <span class="math notranslate nohighlight">\(a_{ij}\)</span>, <span class="math notranslate nohighlight">\(rank(a_{ij}) = 1\)</span> if <span class="math notranslate nohighlight">\(a_{ij}\)</span> is the smallest non-zero edge-weight, and <span class="math notranslate nohighlight">\(rank(a_{ij}) = n_{nz}\)</span> if <span class="math notranslate nohighlight">\(a_{ij}\)</span> is the largest edge-weight. Ties are settled by using the average rank of the two entries.</p></li>
+<li><p>Report the weight of each non-zero entry <span class="math notranslate nohighlight">\((i,j)\)</span> as <span class="math notranslate nohighlight">\(r_{ij}' = \frac{n_z + rank(a_{ij})}{n^2 + 1}\)</span>, and for each zero entry as <span class="math notranslate nohighlight">\(r_{ij}' = 0\)</span>.</p></li>
+</ol>
+<p>The edge-weights for the adjacency matrix <span class="math notranslate nohighlight">\(R'\)</span> after zero-boosted <code class="docutils literal notranslate"><span class="pre">ptr</span></code> have the interpretation that each entry <span class="math notranslate nohighlight">\(r_{ij}'\)</span> is the quantile of that entry amongst <em>all</em> of the entries. Let’s instead use zero-boosted <code class="docutils literal notranslate"><span class="pre">ptr</span></code> on our network:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">RAzb</span> <span class="o">=</span> <span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;zero-boost&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge Weight&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, Before zb-PTR&quot;</span><span class="p">);</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">RAzb</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">binrange</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">23</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;normalized rank&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After zb-PTR&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_43_0.png" src="../../_images/regularization_43_0.png" />
+</div>
+</div>
 </div>
 <div class="section" id="logging-reduces-magnitudinal-differences-between-edges">
-<h3><span class="section-number">4.4.2.7. </span>Logging reduces magnitudinal differences between edges<a class="headerlink" href="#logging-reduces-magnitudinal-differences-between-edges" title="Permalink to this headline">¶</a></h3>
+<h4><span class="section-number">4.4.2.6.3. </span>Logging reduces magnitudinal differences between edges<a class="headerlink" href="#logging-reduces-magnitudinal-differences-between-edges" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id1">
+<h5><span class="section-number">4.4.2.6.3.1. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h5>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">RAzb</span><span class="p">[</span><span class="n">RAzb</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span>
+</pre></div>
 </div>
-<div class="section" id="ranking-edges-preserves-only-ordinal-relationships">
-<h3><span class="section-number">4.4.2.8. </span>Ranking edges preserves only ordinal relationships<a class="headerlink" href="#ranking-edges-preserves-only-ordinal-relationships" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6222222222222222
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
