@@ -682,28 +682,18 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#hypothesis-testing-to-figure-out-the-test-statistic">
-   10.1.8. Hypothesis Testing to Figure out the Test Statistic
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#detecting-anomaly-times-for-particular-nodes">
-   10.1.9. Detecting anomaly times for particular nodes
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#id1">
-   10.1.10.
+   10.1.8.
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   10.1.11. References
+   10.1.9. References
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#notes">
-   10.1.12. Notes
+   10.1.10. Notes
   </a>
  </li>
 </ul>
@@ -866,7 +856,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.529
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.637
 </pre></div>
 </div>
 </div>
@@ -886,7 +876,7 @@
 <div class="section" id="hypothesis-testing-with-our-test-statistic">
 <h2><span class="section-number">10.1.4. </span>Hypothesis Testing With our Test Statistic<a class="headerlink" href="#hypothesis-testing-with-our-test-statistic" title="Permalink to this headline">¶</a></h2>
 <p>We have our norm <span class="math notranslate nohighlight">\(y\)</span>, which will be our test statistic. It should be a small value if the first two adjacency matrices in the timeseries are distributed the same, and large if they’re distributed differently. Remember that we’re fundamentally trying to figure out whether <span class="math notranslate nohighlight">\(X = X^{(t)}\)</span>, our latent positions at time <span class="math notranslate nohighlight">\(t\)</span>, is the same as <span class="math notranslate nohighlight">\(Y = X^{(t-1)}\)</span>, our latent positions at time <span class="math notranslate nohighlight">\(t-1\)</span>. This is also known as a <em>hypothesis test</em>: we’re testing the the null hypothesis that <span class="math notranslate nohighlight">\(X = Y\)</span> against the alternative hypothesis that <span class="math notranslate nohighlight">\(X \neq Y\)</span>.</p>
-<p>The value of our test statistic is <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">'0.529'</span></code></span>. The problem is that we don’t know how big this is, relatively. Is <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">'0.529'</span></code></span> relatively large? small? how should we determine whether it’s small enough to say that X and Y probably come from the same distribution, and aren’t anomaly time points?</p>
+<p>The value of our test statistic is <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">'0.637'</span></code></span>. The problem is that we don’t know how big this is, relatively. Is <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">'0.637'</span></code></span> relatively large? small? how should we determine whether it’s small enough to say that X and Y probably come from the same distribution, and aren’t anomaly time points?</p>
 <p>Well, what if we could use our estimated latent positions <span class="math notranslate nohighlight">\(\hat{X}\)</span> at time <span class="math notranslate nohighlight">\(t\)</span> to generate a bunch of networks, then make test statistics from those new networks? We’d know for a fact that any pair of those networks are drawn from the same set of latent positions, and we could get a sense for what our test statistic should look like if the latent positions actually were the same. This technique is called <em>bootstrapping</em>, since you’re using estimated parameters to “pull yourself up by your own bootstraps” and generate a bunch of artificial data. Bootstrapping pops up all over the place in machine learning and statistics contexts.</p>
 <div class="section" id="using-bootstrapping-to-figure-out-the-distribution-of-the-test-statistic">
 <h3><span class="section-number">10.1.4.1. </span>Using Bootstrapping to Figure out the Distribution of the Test Statistic<a class="headerlink" href="#using-bootstrapping-to-figure-out-the-distribution-of-the-test-statistic" title="Permalink to this headline">¶</a></h3>
@@ -926,14 +916,18 @@
 
 <span class="n">plot</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;y = difference in norm </span><span class="se">\n</span><span class="s2">between $\hat</span><span class="si">{X}</span><span class="s2">$ and $\hat</span><span class="si">{Y}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">y</span><span class="o">+</span><span class="mf">.005</span><span class="p">,</span> <span class="mi">145</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.50</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;Bootstrapped Distribution&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/anomaly-detection_19_0.png" src="../../_images/anomaly-detection_19_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 20, &#39;Bootstrapped Distribution&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/anomaly-detection_19_1.png" src="../../_images/anomaly-detection_19_1.png" />
 </div>
 </div>
-<p>Fortunately, <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">'0.529'</span></code></span> is well within a reasonable range under the assumption that the time-points share latent positions. However, we can’t always eyeball stuff, and we need a way to formalize what it means for a test statistic to be “within a reasonable range”. Our test statistic is  <span class="math notranslate nohighlight">\(y = ||X^{(t)} - X^{(t-1)}||\)</span>, we’re trying to figure out if <span class="math notranslate nohighlight">\(X^{(t)} = X^{(t-1)}\)</span>, and we have a bunch of bootstrapped test statistics that we know were drawn from the same distribution (and are thus examples of the case where the null hypothesis is true).</p>
+<p>Fortunately, <span class="pasted-inline"><code class="output text_plain docutils literal notranslate"><span class="pre">'0.637'</span></code></span> is well within a reasonable range under the assumption that the time-points share latent positions. However, we can’t always eyeball stuff, and we need a way to formalize what it means for a test statistic to be “within a reasonable range”. Our test statistic is  <span class="math notranslate nohighlight">\(y = ||X^{(t)} - X^{(t-1)}||\)</span>, we’re trying to figure out if <span class="math notranslate nohighlight">\(X^{(t)} = X^{(t-1)}\)</span>, and we have a bunch of bootstrapped test statistics that we know were drawn from the same distribution (and are thus examples of the case where the null hypothesis is true).</p>
 </div>
 </div>
 <div class="section" id="using-our-test-statistic-to-find-p-values">
@@ -954,7 +948,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.839
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.115
 </pre></div>
 </div>
 </div>
@@ -970,35 +964,33 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ys_true</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">adjacency</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">networks</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">get_statistic</span><span class="p">([</span><span class="n">adjacency</span><span class="p">,</span> <span class="n">networks</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-    <span class="n">ys_true</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+    <span class="n">ys_true</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ys_true</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">cmaps</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">ys_true</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">],</span> 
+                   <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Test Statistics for Each Timeseries&quot;</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">([]);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ys_true</span><span class="o">.</span><span class="n">keys</span><span class="p">()));</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Timeseries Pairs&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;0:1&#39;: 0.48218500018621313,
- &#39;1:2&#39;: 0.49440791151080693,
- &#39;2:3&#39;: 0.5199607369177385,
- &#39;3:4&#39;: 0.46435008883205714,
- &#39;4:5&#39;: 0.6802087988862534,
- &#39;5:6&#39;: 0.7664176668677056,
- &#39;6:7&#39;: 0.6333387455468138,
- &#39;7:8&#39;: 0.8489396077325904,
- &#39;8:9&#39;: 0.6164384605633493,
- &#39;9:10&#39;: 0.5949839668485055,
- &#39;10:11&#39;: 0.49440404122526604}
-</pre></div>
+<img alt="../../_images/anomaly-detection_28_0.png" src="../../_images/anomaly-detection_28_0.png" />
 </div>
 </div>
-</div>
-<p>If we were to plot a distribution of bootstrapped test statistics with each of our estimated y-values, it would look like this:</p>
-<div class="cell docutils container">
+<p>If we were to plot a distribution of bootstrapped test statistics with each of our estimated y-values, it would look like the histogram below. Notice that two test statistics are clearly anomalous: the one comparing times five and six, and the one comparing times seven and eight. We know by design that networks six and seven actually are anomolous, and so we can see that our test managed to correctly determine the anomaly times.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
@@ -1006,9 +998,19 @@
 <span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of test statistics with the same latent positions&quot;</span><span class="p">);</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Test statistic value&quot;</span><span class="p">);</span>
 
+<span class="k">for</span> <span class="n">y_val</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">y_val</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+    
+<span class="n">sorted_ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">ys_true</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+<span class="n">x_min</span> <span class="o">=</span> <span class="n">sorted_ys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">x_max</span> <span class="o">=</span> <span class="n">sorted_ys</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Non-Anomalous </span><span class="se">\n</span><span class="s2">Timeseries&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x_min</span><span class="p">,</span> <span class="mi">140</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">x_min</span><span class="o">-</span><span class="mf">.12</span><span class="p">,</span> <span class="mi">140</span><span class="p">),</span> 
+              <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span><span class="s2">&quot;k&quot;</span><span class="p">})</span>
 
-<span class="n">plot</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;y = difference in norm </span><span class="se">\n</span><span class="s2">between $\hat</span><span class="si">{X}</span><span class="s2">$ and $\hat</span><span class="si">{Y}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">y</span><span class="o">+</span><span class="mf">.005</span><span class="p">,</span> <span class="mi">145</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Anomalous </span><span class="se">\n</span><span class="s2">Timeseries&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x_max</span><span class="p">,</span> <span class="mi">140</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">x_max</span><span class="o">-</span><span class="mf">.12</span><span class="p">,</span> <span class="mi">140</span><span class="p">),</span> 
+              <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span><span class="s2">&quot;k&quot;</span><span class="p">});</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.49</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;Bootstrapped Distribution&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">70</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -1019,11 +1021,11 @@
 </div>
 <div class="section" id="the-distribution-of-the-bootstrapped-test-statistic">
 <h2><span class="section-number">10.1.7. </span>The Distribution of the Bootstrapped Test Statistic<a class="headerlink" href="#the-distribution-of-the-bootstrapped-test-statistic" title="Permalink to this headline">¶</a></h2>
+<p>One issue that could pop up is that the bootstrapped test statistic is slightly biased. Since we’re generating it from an estimate <span class="math notranslate nohighlight">\(\hat{X}\)</span> of the true latent positions <span class="math notranslate nohighlight">\(X\)</span>, we’ll have a bias of <span class="math notranslate nohighlight">\(|\hat{X} - X|\)</span>. It’s worth comparing the two distributions to determine if that bias is a big deal in practice.</p>
+<p>Below you can see the true distribution of the test statistic for the real, unperturbed set of latent positions <span class="math notranslate nohighlight">\(X\)</span> we generated the data from (that’s the blue distribution). You can also see a distribution of test statistics bootstrapped from a <span class="math notranslate nohighlight">\(\hat{X}\)</span>. You can see that in this case, they’re fairly close.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### test code block</span>
-
-<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
 
@@ -1071,62 +1073,25 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f616d6e4400&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7fef1563ee80&gt;
 </pre></div>
 </div>
-<img alt="../../_images/anomaly-detection_32_1.png" src="../../_images/anomaly-detection_32_1.png" />
+<img alt="../../_images/anomaly-detection_33_1.png" src="../../_images/anomaly-detection_33_1.png" />
 </div>
 </div>
-</div>
-<div class="section" id="hypothesis-testing-to-figure-out-the-test-statistic">
-<h2><span class="section-number">10.1.8. </span>Hypothesis Testing to Figure out the Test Statistic<a class="headerlink" href="#hypothesis-testing-to-figure-out-the-test-statistic" title="Permalink to this headline">¶</a></h2>
-<p>We’ll look at testing for differences for the whole network at particular time points first, and then we’ll explore what it looks like to test for differences in particular nodes.</p>
-<p>We define individual vertex anomaly detection for the i-th vertex at time point <span class="math notranslate nohighlight">\(t^*\)</span> as a test of the null hypothesis <span class="math notranslate nohighlight">\(H_{0i}^{(t*)}\)</span> that t* is an anomaly time for vertex <span class="math notranslate nohighlight">\(i\)</span>.</p>
-<ol class="simple">
-<li><p>embed with MASE or OMNI</p>
-<ul class="simple">
-<li><p>MASE is better when graphs are close to equation (1), OMNI is better when they’re far from eq (2) where<br />
-eq1: exactly COSIE: <span class="math notranslate nohighlight">\(X^{(t)} = VS^{(t)}\)</span><br />
-eq2: allows changes in <span class="math notranslate nohighlight">\(V\)</span> at some time points <span class="math notranslate nohighlight">\(X^{(t)} = VS^{(t)}\)</span>, <span class="math notranslate nohighlight">\(t \in [M] - \{t_1, ..., t_p\}\)</span>, else <span class="math notranslate nohighlight">\(V^{(t)} S^P{(t)}\)</span>, <span class="math notranslate nohighlight">\(t=t_j, j = 1, ..., p\)</span>
-so MASE is better when the networks don’t fundamentally change across time points – for example, when nodes never change community – and OMNI is better when you allow for the network to be evolving at a more fundamental level.</p></li>
-</ul>
-</li>
-<li><p>for each time point, get test statistic: for any <span class="math notranslate nohighlight">\(\hat{X} \in \mathcal{R}^{n \times d}\)</span>, generate iid samples of <span class="math notranslate nohighlight">\(A \sim RDPG(\hat{X})\)</span>, then get test statistics <span class="math notranslate nohighlight">\(y^{(t)}\)</span> or <span class="math notranslate nohighlight">\(y_i^{(t)}\)</span> from it</p>
-<ul class="simple">
-<li><p>using <span class="math notranslate nohighlight">\(y^{(t)} = ||\hat{X}^{(t)} - \hat{X}^{(t-1)}||\)</span> for whole network</p></li>
-<li><p>using <span class="math notranslate nohighlight">\(y_i^{(t)} = ||\hat{X_i}^{(t)} - \hat{X_i}^{(t-1)}||\)</span> for vertex anomaly detection</p></li>
-</ul>
-</li>
-<li><p>Get distribution of test statistic with parametric bootstrap, using <span class="math notranslate nohighlight">\(\hat{X} = \hat{X}^{(t)}\)</span> as the null distribution. Generate B samples of <span class="math notranslate nohighlight">\(y_b^{(t)}\)</span></p></li>
-<li><p>Calculate p-values as <span class="math notranslate nohighlight">\(p^{(t)} = \frac{\sum_{b=1, ..., B} I(y_b^{(t)} &gt; y^{(t)})}{B}\)</span></p></li>
-<li><p>report p-values</p></li>
-</ol>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
-
-<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">latents</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="detecting-anomaly-times-for-particular-nodes">
-<h2><span class="section-number">10.1.9. </span>Detecting anomaly times for particular nodes<a class="headerlink" href="#detecting-anomaly-times-for-particular-nodes" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="id1">
-<h2><span class="section-number">10.1.10. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.8. </span><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="references">
-<h2><span class="section-number">10.1.11. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.9. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>j1’s paper – heritability</p></li>
 <li><p>vivek’s paper – mcc</p></li>
 </ul>
 </div>
 <div class="section" id="notes">
-<h2><span class="section-number">10.1.12. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">10.1.10. </span>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>guodong’s stuff: uses MASE and OMNI combined with DCORR to do hypothesis testing</p>
 <ul class="simple">
 <li><p>vivek did something similar for MCC</p></li>
