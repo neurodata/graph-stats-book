@@ -652,8 +652,8 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#regularization-of-the-edges">
-   4.4.2. Regularization of the Edges
+  <a class="reference internal nav-link" href="#regularizing-the-edges">
+   4.4.2. Regularizing the Edges
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
@@ -663,7 +663,7 @@
     <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#ignoring-a-triangle-of-the-adjacency-matrix">
-       4.4.2.1.1. Ignoring a “triangle* of the adjacency matrix
+       4.4.2.1.1. Ignoring a “triangle” of the adjacency matrix
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
@@ -734,46 +734,43 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="regularization">
 <h1><span class="section-number">4.4. </span>Regularization<a class="headerlink" href="#regularization" title="Permalink to this headline">¶</a></h1>
-<p>In practice, many networks we will face in network machine learning will <em>not</em> be simple networks. As we discussed in the preceding discussion, many of the techniques we discuss will be just fine to use with weighted networks. Unfortunately, these real world networks are often extremely noisy, and it is for this reason that analysis of one real world network might not generalize very well to a similar real world network. For this reason, we turn to <em>regularization</em>. On <a class="reference external" href="#https://en.wikipedia.org/wiki/Regularization_(mathematics)">wikipedia</a>, <strong>regularization</strong> is defined as, “the process of adding information in order to solve an ill-posed problem or to prevent overfitting.” In network machine learning, what this usually will entail is modifying the network (or networks) themselves to allow better generalization of our statistical inference to new datasets. For each section, we’ll pose an example, a simulation, and code for how to implement the desired regularization approach. But it is important to realize that you might use several of these techniques simultaneously in practice, or you might have reasons to use these techniques that go outside of our working examples.</p>
-<div class="section" id="regularization-of-the-nodes">
-<h2><span class="section-number">4.4.1. </span>Regularization of the Nodes<a class="headerlink" href="#regularization-of-the-nodes" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="degree-trimming-removes-nodes-with-low-degree">
-<h3><span class="section-number">4.4.1.1. </span>Degree trimming removes nodes with low degree<a class="headerlink" href="#degree-trimming-removes-nodes-with-low-degree" title="Permalink to this headline">¶</a></h3>
-</div>
-</div>
-<div class="section" id="regularization-of-the-edges">
-<h2><span class="section-number">4.4.2. </span>Regularization of the Edges<a class="headerlink" href="#regularization-of-the-edges" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="symmetrizing-the-network-gives-us-undirectedness">
-<h3><span class="section-number">4.4.2.1. </span>Symmetrizing the network gives us undirectedness<a class="headerlink" href="#symmetrizing-the-network-gives-us-undirectedness" title="Permalink to this headline">¶</a></h3>
-<p>Let’s say we have two brain networks from humans and aliens. In this case, we’ll say there are six nodes, which are somehow shared across the two life forms. There is one node related to movement, one node related to hearing, one node related to higher-order thinking (like programming!), one node related taste, one node related to smell, and one node related to seeing. The edges <span class="math notranslate nohighlight">\((i, j)\)</span> here will represent the degree to which, if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> is stimulated as well. This network is weighted, and the edges take values between <span class="math notranslate nohighlight">\(-1\)</span> (if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> is definitely <em>not</em> stimulated) and <span class="math notranslate nohighlight">\(1\)</span> (if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> is definitely stimulated). A value of between the two would indicate that if node <span class="math notranslate nohighlight">\(i\)</span> is stimulated, node <span class="math notranslate nohighlight">\(j\)</span> might (or might not) be stimulated. Our goal is to measure the extent to which the two networks, <em>ignoring</em> asymmetries, are similar. Unfortunately, there is one big difference: the human network is <em>not</em> symmetric, but the alien network <em>is</em> symmetric! What this means is that in humans, node <span class="math notranslate nohighlight">\(i\)</span> being stimulated leading to node <span class="math notranslate nohighlight">\(j\)</span> does not necessarily mean that node <span class="math notranslate nohighlight">\(j\)</span> being stimulated leads to node <span class="math notranslate nohighlight">\(i\)</span> being stimulated. To accomplish this goal, we will <em>symmetrize</em> the human network. Let’s take a look at two example networks. Notice that the human network is not symmetric:</p>
+<p>In practice, many networks we will encounter in network machine learning will <em>not</em> be simple networks. As we discussed in the preceding discussion, many of the techniques we discuss will be just fine to use with weighted networks. Unfortunately, real world networks are often extremely noisy, and so the analysis of one real world network might not generalize very well to a similar real world network. For this reason, we turn to <em>regularization</em>. <strong>Regularization</strong> is defined as, “the process of adding information in order to solve an ill-posed problem or to prevent overfitting.” In network machine learning, what this usually will entail is modifying the network (or networks) themselves to allow better generalization of our statistical inference to new datasets. For each section, we’ll pose an example, a simulation, and code for how to implement the desired regularization approach. It is important to realize that you might use several of these techniques simultaneously in practice, or you might have a reason to use these techniques that go outside of our working examples.</p>
+<p>To start this section off, we’re going to introduce an example that’s going to be fundamental in many future sections we see in this book. We have a group of <span class="math notranslate nohighlight">\(50\)</span> local students who attend a school in our area. The first <span class="math notranslate nohighlight">\(25\)</span> of the students polled are athletes, and thhhe second <span class="math notranslate nohighlight">\(25\)</span> of the students polled are in marching band. We want to analyze how good of friends the students are, and to do so, we will use network machine learning. The nodes of the network will be the students. Next, we will describe how the two networks are collected:</p>
+<ol class="simple">
+<li><p>To collect the first network, we ask each student to select from a list of <span class="math notranslate nohighlight">\(50\)</span> school activities and outside hobbies that they enjoy. For a pair of students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, the weight of their interest alignment will be a score between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(50\)</span> indicating how many activities or hobbies that they have in common. We will refer to this network as the common interests network. This network is obviously undirected, since if student <span class="math notranslate nohighlight">\(i\)</span> shares <span class="math notranslate nohighlight">\(x\)</span> activities or hobbies with student <span class="math notranslate nohighlight">\(j\)</span>, then student <span class="math notranslate nohighlight">\(j\)</span> also shares <span class="math notranslate nohighlight">\(x\)</span> activities or hobbies with student <span class="math notranslate nohighlight">\(i\)</span>. This network is weighted, since the score is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(50\)</span>. Finally, this network is loopless, because it would not make sense to look at the activity/hobby alignment of a student with themself, since this number would be largely uninformative as every student would have perfect alignment of activities and hobbies with him or herself.</p></li>
+<li><p>To collect the second network, we ask each student to rate how good of friends they are with other students, on a scale from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(1\)</span>. A score of <span class="math notranslate nohighlight">\(0\)</span> means they are not friends with the student or do not know the student, and a score of <span class="math notranslate nohighlight">\(1\)</span> means the student is their best friend. We will refer to this network as the friendship network. This nework is clearly directed, since two students may differ on their understanding of how good of friends they are. This network is weighted, since the score is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Finally, this network is also loopless, because it would not make sense to ask somebody how good of friends they are with themself.</p></li>
+</ol>
+<p>Our scientific question of interest is how well activities and hobbies align with perceived notions of friendship. We want to use the preceding networks to learn about a hypothetical third network, a network whose nodes are identical to the two networks above, but whose edges are whether the two individuals are friends (or not) on facebook. To answer this question, we have quite the job to do to make our networks better suited to the task! We begin by simulating some example data, shown below as adjacency matrix heatmaps:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
-<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">wtargsh</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">10</span><span class="p">)],</span>
-          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)]]</span>
+<span class="n">wtargsa</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">.09</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">.02</span><span class="p">)],</span>
+          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">.02</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">.06</span><span class="p">)]]</span>
 
-<span class="n">wtargsa</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">.5</span><span class="p">)],</span>
-          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">.5</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="mf">35.5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)]]</span>
+<span class="n">wtargsf</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">)],</span>
+          <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)]]</span>
 
 <span class="c1"># human brain network</span>
-<span class="n">Ah</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsh</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">A_activity</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsa</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># alien brain network</span>
-<span class="n">Aa</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsa</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">A_friend</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[[</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">.4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">wt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="n">wtargsf</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network&quot;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Aa</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien Brain Network&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_activity</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Activities/Hobbies Network&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -782,9 +779,21 @@
 <img alt="../../_images/regularization_2_0.png" src="../../_images/regularization_2_0.png" />
 </div>
 </div>
-<p>Remember that in a symmetric network, <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>, so in an <em>asymmetric</em> network, <span class="math notranslate nohighlight">\(a_{ij} \neq a_{ji}\)</span>. To symmetrize this asymmetric adjacency matrix, what we want is a <em>new</em> adjacency value, which we will call <span class="math notranslate nohighlight">\(w_{ij}\)</span>, which will be a function of <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span>. Then, we will construct a new adjacency matrix <span class="math notranslate nohighlight">\(A'\)</span>, where each entry <span class="math notranslate nohighlight">\(a_{ij}'\)</span> <em>and</em> <span class="math notranslate nohighlight">\(a_{ji}'\)</span> are set equal to <span class="math notranslate nohighlight">\(w_{ij}\)</span>.  The little apostraphe just signifies that this is a potentially different value than either <span class="math notranslate nohighlight">\(a_{ij}\)</span> or <span class="math notranslate nohighlight">\(a_{ji}\)</span>. Note that by construction, <span class="math notranslate nohighlight">\(A'\)</span> is in fact symmetric, becaues <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span> due to how we built <span class="math notranslate nohighlight">\(A'\)</span>.</p>
+<div class="section" id="regularization-of-the-nodes">
+<h2><span class="section-number">4.4.1. </span>Regularization of the Nodes<a class="headerlink" href="#regularization-of-the-nodes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="degree-trimming-removes-nodes-with-low-degree">
+<h3><span class="section-number">4.4.1.1. </span>Degree trimming removes nodes with low degree<a class="headerlink" href="#degree-trimming-removes-nodes-with-low-degree" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="regularizing-the-edges">
+<h2><span class="section-number">4.4.2. </span>Regularizing the Edges<a class="headerlink" href="#regularizing-the-edges" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="symmetrizing-the-network-gives-us-undirectedness">
+<h3><span class="section-number">4.4.2.1. </span>Symmetrizing the network gives us undirectedness<a class="headerlink" href="#symmetrizing-the-network-gives-us-undirectedness" title="Permalink to this headline">¶</a></h3>
+<p>If we wanted to learn from the friendship network about whether two people were friends on facebook, a reasonable first place to start might be to <em>symmetrize</em> the friendship network. The facebook network is <em>undirected</em>, which means that if a student <span class="math notranslate nohighlight">\(i\)</span> is friends on facebook with student <span class="math notranslate nohighlight">\(j\)</span>, then student <span class="math notranslate nohighlight">\(j\)</span> is also friends with student <span class="math notranslate nohighlight">\(i\)</span>. On the other hand, as we learned above, the friendship network was directed. Since our question of interest is about an undirected network but the network we have is directed, it might be useful if we could take the directed friendship network and learn an undirected network from it. This relates directly to the concept of <em>interpretability</em>, in that we need to represent our friendship network in a form that will produce an answer or us about our facebook network which we can understand.</p>
+<p>Another reason we might seek to symmetrize the friendship network is that we might think that asymmetries that exist in the network are just <em>noise</em>. We might assume that the adjacency entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span> relate to one another, so together they might be able to produce a single summary number that better summarizes their relationship all together.</p>
+<p>Remember that in a symmetric network, <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>, so in an <em>asymmetric</em> network, <span class="math notranslate nohighlight">\(a_{ij} \neq a_{ji}\)</span>. To symmetrize the friendship network, what we want is a <em>new</em> adjacency value, which we will call <span class="math notranslate nohighlight">\(w_{ij}\)</span>, which will be a function of <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span>. Then, we will construct a new adjacency matrix <span class="math notranslate nohighlight">\(A'\)</span>, where each entry <span class="math notranslate nohighlight">\(a_{ij}'\)</span> <em>and</em> <span class="math notranslate nohighlight">\(a_{ji}'\)</span> are set equal to <span class="math notranslate nohighlight">\(w_{ij}\)</span>.  The little apostrophe just signifies that this is a potentially different value than either <span class="math notranslate nohighlight">\(a_{ij}\)</span> or <span class="math notranslate nohighlight">\(a_{ji}\)</span>. Note that by construction, <span class="math notranslate nohighlight">\(A'\)</span> is in fact symmetric, because <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span> due to how we built <span class="math notranslate nohighlight">\(A'\)</span>.</p>
 <div class="section" id="ignoring-a-triangle-of-the-adjacency-matrix">
-<h4><span class="section-number">4.4.2.1.1. </span>Ignoring a “triangle* of the adjacency matrix<a class="headerlink" href="#ignoring-a-triangle-of-the-adjacency-matrix" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">4.4.2.1.1. </span>Ignoring a “triangle” of the adjacency matrix<a class="headerlink" href="#ignoring-a-triangle-of-the-adjacency-matrix" title="Permalink to this headline">¶</a></h4>
 <p>The easiest way to symmetrize a network <span class="math notranslate nohighlight">\(A\)</span> is to just ignore part of it entirely. In the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, you will remember that we have an upper and a lower triangular part of the matrix:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -795,7 +804,7 @@
         \color{blue}{a_{n1}} &amp; \color{blue}{...} &amp; \color{blue}{a_{n,n-1}} &amp; a_{nn}
     \end{bmatrix},
 \end{align*}\]</div>
-<p>The entries which are listed in <font color="red">red</font> are called the <strong>upper right triangle of the adjacency matrix above the diagonal</strong>. You will notice that for the entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> in the upper right triangle of the adjacency matrix, that <span class="math notranslate nohighlight">\(a_{ij}\)</span> is such that <span class="math notranslate nohighlight">\(j\)</span> is <em>always</em> greater than <span class="math notranslate nohighlight">\(i\)</span>. Similarly, the entries which are listed in <font color="blue">blue</font> are called the <strong>lower left triangle of the adjacency matrix below the diagonal</strong>. In the lower left triangle, <span class="math notranslate nohighlight">\(i\)</span> is <em>always</em> greater than <span class="math notranslate nohighlight">\(j\)</span>. These are called <em>triangles</em> because of the shape they make when you look at them in matrix form: notice, for instance, that in the upper right triangle, we have a triangle with three corners of values: <span class="math notranslate nohighlight">\(a_{12}\)</span>, <span class="math notranslate nohighlight">\(a_{1n}\)</span>, and <span class="math notranslate nohighlight">\(a_{n-1, n}\)</span>.</p>
+<p>The entries which are listed in <font color="red">red</font> are called the <strong>upper right triangle of the adjacency matrix above the diagonal</strong>. You will notice that for the entries in the upper right triangle of the adjacency matrix, <span class="math notranslate nohighlight">\(a_{ij}\)</span> is such that <span class="math notranslate nohighlight">\(j\)</span> is <em>always</em> greater than <span class="math notranslate nohighlight">\(i\)</span>. Similarly, the entries which are listed in <font color="blue">blue</font> are called the <strong>lower left triangle of the adjacency matrix below the diagonal</strong>. In the lower left triangle, <span class="math notranslate nohighlight">\(i\)</span> is <em>always</em> greater than <span class="math notranslate nohighlight">\(j\)</span>. These are called <em>triangles</em> because of the shape they make when you look at them in matrix form: notice, for instance, that in the upper right triangle, we have a triangle with three corners of values: <span class="math notranslate nohighlight">\(a_{12}\)</span>, <span class="math notranslate nohighlight">\(a_{1n}\)</span>, and <span class="math notranslate nohighlight">\(a_{n-1, n}\)</span>.</p>
 <p>So, how do we ignore a triangle all-together? Well, it’s really quite simple! We will visually show how to ignore the lower left triangle of the adjacency matrix. We start by forming a triangle matrix, <span class="math notranslate nohighlight">\(\Delta\)</span>, as follows:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -806,7 +815,7 @@
         \color{blue}{0} &amp; \color{blue}{...} &amp; \color{blue}{0} &amp; 0
     \end{bmatrix},
 \end{align*}\]</div>
-<p>Notice that this matrix <em>keeps</em> lal of the upper right triangle of the adjacency matrix above the diagonal the same as in the matrix <span class="math notranslate nohighlight">\(A\)</span>, but replaces the lower right triangle of the adjacency matrix below the diagonal and the diagonal with <span class="math notranslate nohighlight">\(0\)</span>s. Notice that the transpose of <span class="math notranslate nohighlight">\(\Delta\)</span> is the matrix:</p>
+<p>Notice that this matrix <em>keeps</em> all of the upper right triangle of the adjacency matrix above the diagonal the same as in the matrix <span class="math notranslate nohighlight">\(A\)</span>, but replaces the lower left triangle of the adjacency matrix below the diagonal and the diagonal with <span class="math notranslate nohighlight">\(0\)</span>s. Notice that the transpose of <span class="math notranslate nohighlight">\(\Delta\)</span> is the matrix:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     \Delta^\top &amp;= \begin{bmatrix}
@@ -836,13 +845,15 @@
         \color{red}{a_{1n}}&amp;\color{red}{...} &amp;\color{red}{a_{n-1,n}} &amp; a_{nn}
     \end{bmatrix},
 \end{align*}\]</div>
-<p>Which leaves <span class="math notranslate nohighlight">\(A'\)</span> to be a matrix consisting <em>only</em> of entries which were in the upper right triangle of <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(A'\)</span> is obviously symmetric, because <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. Since the adjacency matrix is symmetric, the network <span class="math notranslate nohighlight">\(A'\)</span> represents is therefore undirected. In graspologic, we can implement this as follows:</p>
+<p>Which leaves <span class="math notranslate nohighlight">\(A'\)</span> to be a matrix consisting <em>only</em> of entries which were in the upper right triangle of <span class="math notranslate nohighlight">\(A\)</span>. <span class="math notranslate nohighlight">\(A'\)</span> is obviously symmetric, because <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. Since the adjacency matrix is symmetric, the network <span class="math notranslate nohighlight">\(A'\)</span> represents is undirected.</p>
+<p>So what does this mean in terms of the network itself? What this means is that the network originally had edge weights <span class="math notranslate nohighlight">\(a_{ij}\)</span>, where <span class="math notranslate nohighlight">\(a_{ij}\)</span> might not be equal to <span class="math notranslate nohighlight">\(a_{ji}\)</span>. This means student <span class="math notranslate nohighlight">\(i\)</span> might perceive their friendship with student <span class="math notranslate nohighlight">\(j\)</span> as being stronger or weaker than student <span class="math notranslate nohighlight">\(j\)</span> perceived about student <span class="math notranslate nohighlight">\(i\)</span>. What we did here was we basically just ignored any perceived friendships <span class="math notranslate nohighlight">\(a_{ji}\)</span> when <span class="math notranslate nohighlight">\(j\)</span> exceeded <span class="math notranslate nohighlight">\(i\)</span> (the lower left triangle), and simply “replaced” that perceived friendship with the corresponding entry <span class="math notranslate nohighlight">\(a_{ij}\)</span> in the upper right triangle of the adjacency matrix. This produced for us a single friendship strength <span class="math notranslate nohighlight">\(a_{ij}'\)</span> where <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span>.</p>
+<p>In graspologic, we can implement this as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">symmetrize</span>
 
 <span class="c1"># symmetrize with upper right triangle</span>
-<span class="n">Ah_upright_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;triu&quot;</span><span class="p">)</span>
+<span class="n">A_friend_upright_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;triu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -851,21 +862,21 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Asymmetric&quot;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_upright_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Upper-Right Symmetrized&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network, Asymmetric&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend_upright_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network, Upper-Right Symmetrized&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/regularization_5_0.png" src="../../_images/regularization_5_0.png" />
+<img alt="../../_images/regularization_7_0.png" src="../../_images/regularization_7_0.png" />
 </div>
 </div>
 <p>Likewise, we can lower-left symmetrize as well:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># symmetrize with lower left triangle</span>
-<span class="n">Ah_lowleft_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;tril&quot;</span><span class="p">)</span>
+<span class="n">A_friend_lowleft_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;tril&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -874,20 +885,20 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Asymmetric&quot;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_lowleft_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Lower-Left Symmetrized&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network, Asymmetric&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend_lowleft_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network, Lower-Left Symmetrized&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/regularization_8_0.png" src="../../_images/regularization_8_0.png" />
+<img alt="../../_images/regularization_10_0.png" src="../../_images/regularization_10_0.png" />
 </div>
 </div>
 </div>
 <div class="section" id="taking-a-function-of-the-two-values">
 <h4><span class="section-number">4.4.2.1.2. </span>Taking a function of the two values<a class="headerlink" href="#taking-a-function-of-the-two-values" title="Permalink to this headline">¶</a></h4>
-<p>There are many ways we can also take a function of <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span> to end up with a symmetric matrix. One such is we can just average the two. That is, we can let the matrix <span class="math notranslate nohighlight">\(A'\)</span> be the matrix with entries <span class="math notranslate nohighlight">\(a'_{ij} = \frac{a_{ij} + a_{ji}}{2}\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. In matrix form, this operation looks like this:</p>
+<p>There are many other ways we can also take a function of <span class="math notranslate nohighlight">\(a_{ij}\)</span> and <span class="math notranslate nohighlight">\(a_{ji}\)</span> to get a symmetric matrix. One is to just average the two. That is, we can let the matrix <span class="math notranslate nohighlight">\(A'\)</span> be the matrix with entries <span class="math notranslate nohighlight">\(a'_{ij} = \frac{a_{ij} + a_{ji}}{2}\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. In matrix form, this operation looks like this:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     A' &amp;= \frac{1}{2} (A + A^\top) \\
@@ -911,11 +922,13 @@
         \frac{1}{2} (a_{n1} + a_{1n}) &amp; ... &amp; a_{nn}
     \end{bmatrix}
 \end{align*}\]</div>
-<p>As we can see, for all of the entries, <span class="math notranslate nohighlight">\(a'_{ij} = \frac{1}{2} (a_{ij} + a_{ji})\)</span>, and also <span class="math notranslate nohighlight">\(a_{ji}' = \frac{1}{2}(a_{ji} + a_{ij})\)</span>. These quantities are the same, so <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span>, and <span class="math notranslate nohighlight">\(A'\)</span> is symmetric. As the adjacency matrix is symmetric, the network that <span class="math notranslate nohighlight">\(A'\)</span> represents is undirected. We can implement this in graspologic as follows:</p>
+<p>As we can see, for all of the entries, <span class="math notranslate nohighlight">\(a'_{ij} = \frac{1}{2} (a_{ij} + a_{ji})\)</span>, and also <span class="math notranslate nohighlight">\(a_{ji}' = \frac{1}{2}(a_{ji} + a_{ij})\)</span>. These quantities are the same, so <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span>, and <span class="math notranslate nohighlight">\(A'\)</span> is symmetric. As the adjacency matrix is symmetric, the network that <span class="math notranslate nohighlight">\(A'\)</span> represents is undirected.</p>
+<p>Remember that the asymmetry in the friendship network means student <span class="math notranslate nohighlight">\(i\)</span> might perceive their friendship with student <span class="math notranslate nohighlight">\(j\)</span> as being stronger or weaker than student <span class="math notranslate nohighlight">\(j\)</span> perceived about student <span class="math notranslate nohighlight">\(i\)</span>. What we did here was instead of just arbitrarily throwing one of those values away, we said that their friendship might be better indicated by averaging the two values. This produced for us a single friendship strength <span class="math notranslate nohighlight">\(a_{ij}'\)</span> where <span class="math notranslate nohighlight">\(a_{ij}' = a_{ji}'\)</span>.</p>
+<p>We can implement this in graspologic as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># symmetrize with averaging</span>
-<span class="n">Ah_avg_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;avg&quot;</span><span class="p">)</span>
+<span class="n">A_friend_avg_sym</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;avg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -924,48 +937,107 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Asymmetric&quot;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_avg_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Symmetrized by Averaging&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network, Asymmetric&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Friendship Network, Symmetrized by Averaging&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/regularization_11_0.png" src="../../_images/regularization_11_0.png" />
+<img alt="../../_images/regularization_13_0.png" src="../../_images/regularization_13_0.png" />
 </div>
 </div>
-<p>We will operate on the human brain newtork symmetrized by averaging going forward.</p>
+<p>We will use the friendship network symmetrized by averaging going forward in our examples.</p>
 </div>
 </div>
 <div class="section" id="lowering-edge-bias">
 <h3><span class="section-number">4.4.2.2. </span>Lowering edge bias<a class="headerlink" href="#lowering-edge-bias" title="Permalink to this headline">¶</a></h3>
-<p>As you are probably aware, in all of machine learning, we are always concerned with the <em>bias/variance tradeoff</em>. The <strong>bias/variance tradeoff</strong> is an unfortunate side-effect that concerns how well a learning technique will generalize to new datasets. Whereas a low bias model might reasonably fit the nuances of our training data, it might in fact overfit the training data and model spurious noise, which raises the variance. Whereas aa lower variance model might be better suited to the situation when the data we expect to see is noisy, it might not as faithfully represent the underlying dynamics we think the network possesses. Here, we show severaal strategies to reduce the bias due to edge weight noise in network machine learning.</p>
+<p>As you are probably aware, in all of machine learning, we are always concerned with the <em>bias/variance tradeoff</em>. The <a class="reference external" href="https://machinelearningmastery.com/gentle-introduction-to-the-bias-variance-trade-off-in-machine-learning/#:~:text=Bias%20is%20the%20simplifying%20assumptions,change%20given%20different%20training%20data."><strong>bias/variance tradeoff</strong></a> is an unfortunate side-effect that concerns how well a learning technique will generalize to new datasets.</p>
+<ol class="simple">
+<li><p><strong>Bias</strong> is a simplifying assumption of a model that makes the task easier to estimate. For instance, if we have a friendship network, we might make simplifying assumptions, such as an assumption that two athletes frorm different sports have an equally likely chance of being friends with a member of the band.</p></li>
+<li><p>On the other hand, the <strong>variance</strong> is the degree to which the an estimate of a task will change when given new data. An assumption that if a player is a football player he has a higher chance of being friends with a band member might make sense given that the band performs at football games.</p></li>
+</ol>
+<p>The “trade-off” is that these two factors tend to be somewhat at odds, in that raising the bias tends to lower the variance, and vice-versa:</p>
+<ol class="simple">
+<li><p><strong>High bias, but low variance</strong>: Whereas a lower variance model might be better suited to the situation when the data we expect to see is noisy, it might not as faithfully represent the underlying dynamics we think the network possesses. A low variance model might ignore that athletes might have a different chance of being friends with a band member based on their sport all together. This means that while we won’t get the student relationships <em>correct</em>, we might still be able to get a reasonable estimate that we think is not due to overfitting.</p></li>
+<li><p><strong>Low bias, but high variance</strong>: Whereas a low bias model might more faithfully model true relationships in our training data, it might fit our training data a little <em>too</em> well. Fitting the training data too well is a problem known as <strong>overfitting</strong>. If we only had three football team members and tried to assume that football players were better friends with band members, we might not be able to well approximate this relationship because of how few individuals we have who reflect this situation.</p></li>
+</ol>
+<p>Here, we show several strategies to reduce the bias due to edge weight noise in network machine learning.</p>
 </div>
 <div class="section" id="thresholding-converts-weighted-networks-to-binary-networks">
 <h3><span class="section-number">4.4.2.3. </span>Thresholding converts weighted networks to binary networks<a class="headerlink" href="#thresholding-converts-weighted-networks-to-binary-networks" title="Permalink to this headline">¶</a></h3>
 <p>The simplest way to reduce edge bias is the process of <em>thresholding</em>. Through thresholding, we choose a threshold value, <span class="math notranslate nohighlight">\(t\)</span>. Next, we simply set all of the entries of the adjacency matrix less than or equal to <span class="math notranslate nohighlight">\(t\)</span> to zero, and the entries of the adjacency matrix above <span class="math notranslate nohighlight">\(t\)</span> to one.</p>
-<p>Some of the most to choosing this threshold are:</p>
+<p>Some of the most common approaches to choosing this threshold are:</p>
 <ol class="simple">
-<li><p>Set the threshhold to be zero: set all non-zero weighted entries to one, and all zero-weight entries to zero. This is most commonly used when we see zero-inflated networks, or networks where the adjacency matrix takes values that are either zero or some quantity different from one,</p></li>
+<li><p>Set the threshhold to zero: set all non-zero weighted entries to one, and all zero-weight entries to zero. This is most commonly used when we see zero-inflated networks, or networks where the adjacency matrix takes values that are either zero or some quantity different from one,</p></li>
 <li><p>Set te threshold to be the mean: set all values below the mean edge-weight to zero, and all values above the mean edge-weight to one,</p></li>
-<li><p>Pick a percentile: the most common appproach is to choose a particular percentile, and divide it by <span class="math notranslate nohighlight">\(100\)</span> to obtain the <strong>quantile</strong>. Set the edge weights below this quantile to zero and above this quantile to one. This approach has the nice property that if we are performing inference on multiple networks whosse density exceeds the percentile we pick, it preserves the <em>network density</em> between them.</p></li>
+<li><p>Use a quantile: A quantile is a percentile divided by <span class="math notranslate nohighlight">\(100\)</span>. In this strategy, we identify a target quantile of the edge-weight distribution. What this means is that we are selecting the lowest <em>fraction</em> of the edge-weights (where that fraction is the quantile that we choose) and setting these edges to <span class="math notranslate nohighlight">\(0\)</span>, and selecting the remaining edges to <span class="math notranslate nohighlight">\(1\)</span>. If we select a quantile of <span class="math notranslate nohighlight">\(0.5\)</span>, this means that we take the smallest <span class="math notranslate nohighlight">\(50\%\)</span> of edges and set them to zero, and the largest <span class="math notranslate nohighlight">\(50\%\)</span> of edges and set them to <span class="math notranslate nohighlight">\(1\)</span>.</p></li>
 </ol>
-<p>We will show how to use the percentile approach to binarization, with both our human and alien brains. We will threshold using the edge-weight in the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile, which means that we will take the threshold to be the average of the two edge-weights in the middle and set all edges below this threshold to zero, and above this threshold to one. Note that how you perform the thresholding procedure might be dependent on properties of your network. Our example networks of humans and aliens were loopless, as you could see above. Remember as we learned in the preceding section, that if the network itself is loopless, the diagonal entries simply <em>do not exist</em>; <span class="math notranslate nohighlight">\(0\)</span> is simply a commonly used placeholder. For this reason, when we compute the mean edge-weight or percentiles of edge-weights, we need to exclude the diagonal. We begin by using this procedure on the human brain:</p>
-<div class="cell docutils container">
+<p>We will show how to use the percentile approach to binarization, with both our activity/hobby and friendship networks. We will threshold using the edge-weight in the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile. Our example networks of activity/hobby and friendship were loopless, as you could see above. Remember as we learned in the preceding section, that if the network itself is loopless, the diagonal entries simply <em>do not exist</em>; <span class="math notranslate nohighlight">\(0\)</span> is simply a commonly used placeholder. For this reason, when we compute percentiles of edge-weights, we need to <em>exclude the diagonal</em>. Further, since this network is undirected, we also need to restrict our attention to one triangle of the corresponding adjacency matrix. We choose the upper-right triangle arbitrarily, as the adjacency matrix’s symmetry means the upper-right triangle and lower-right triangle have identical edge-weight distributions. We begin by using this procedure on the friendship network. To complete this processs, we first look at the edge-weight distribution for the friendship network, which is shown below, and identified the edge-weight at the <span class="math notranslate nohighlight">\(0.5\)</span> quartile:</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">quantile</span><span class="p">,</span> <span class="n">copy</span><span class="p">,</span> <span class="n">where</span><span class="p">,</span> <span class="n">eye</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># find the indices which are in the upper triangle and not in the diagonal</span>
+<span class="n">upper_tri_non_diag_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">[</span><span class="n">upper_tri_non_diag_idx</span><span class="p">],</span> <span class="n">q</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">seaborn</span> <span class="kn">import</span> <span class="n">histplot</span>
 
-<span class="n">p</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># the percentile we want</span>
-
-<span class="c1"># the entries of the adjacency matrix that are not on the diagonal</span>
-<span class="n">non_diag_idx</span> <span class="o">=</span> <span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">eye</span><span class="p">(</span><span class="n">Ah_avg_sym</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
-<span class="c1"># use the quantile function to obtain the threshold</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">quantile</span><span class="p">(</span><span class="n">Ah_avg_sym</span><span class="p">[</span><span class="n">non_diag_idx</span><span class="p">],</span> <span class="n">q</span><span class="o">=</span><span class="n">p</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># quantile = percentile / 100</span>
-<span class="n">Ah_thresh</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">Ah_avg_sym</span><span class="p">)</span>  <span class="c1"># copy the network over</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">histplot</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">[</span><span class="n">upper_tri_non_diag_idx</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge Weight&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Symmetric Friendship Network Off-Diagonal Edge-Weight Distribution&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mf">.03</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;0.5 quantile, t = </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/regularization_17_0.png" src="../../_images/regularization_17_0.png" />
+</div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(0.5\)</span> quantile, it turns out, is about <span class="math notranslate nohighlight">\(0.3\)</span>. This is because about <span class="math notranslate nohighlight">\(50\%\)</span> of the edges are less than this threshold, and about <span class="math notranslate nohighlight">\(50\%\)</span> of the edges are greater than this threshold. There is exactly one more edge in less than or equal to <span class="math notranslate nohighlight">\(t\)</span>, because this edge is exactly the median (an alternative name for the <span class="math notranslate nohighlight">\(0.5\)</span> quartile) value:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of edges less than or equal to t: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">[</span><span class="n">upper_tri_non_diag_idx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of edges greater than or equal to t: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">[</span><span class="n">upper_tri_non_diag_idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of edges less than or equal to t: 613
+Number of edges greater than or equal to t: 612
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we will assign the edges less than or equal to <span class="math notranslate nohighlight">\(t\)</span> to zero, and the edges greater than or equal to <span class="math notranslate nohighlight">\(t\)</span> to one:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A_friend_thresh</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">)</span>  <span class="c1"># copy the network over</span>
 
 <span class="c1"># threshold using t</span>
-<span class="n">Ah_thresh</span><span class="p">[</span><span class="n">Ah_thresh</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">Ah_thresh</span><span class="p">[</span><span class="n">Ah_thresh</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">A_friend_thresh</span><span class="p">[</span><span class="n">A_friend_thresh</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">A_friend_thresh</span><span class="p">[</span><span class="n">A_friend_thresh</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2482</span><span class="o">/</span><span class="mf">3934279779.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">A_friend_thresh</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">)</span>  <span class="c1"># copy the network over</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> 
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># threshold using t</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">A_friend_thresh</span><span class="p">[</span><span class="n">A_friend_thresh</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">A_friend_thresh</span><span class="p">[</span><span class="n">A_friend_thresh</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="ne">NameError</span>: name &#39;copy&#39; is not defined
 </pre></div>
 </div>
 </div>
@@ -974,73 +1046,68 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_avg_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Weighted&quot;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Ah_thresh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Human Brain Network, Thresholded at 50-ptile&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend_avg_sym</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Symmetric Friendship Network, Weighted&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_friend_thresh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Symmetric Friendship Network, Thresholded at 50-ptile&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/regularization_15_0.png" src="../../_images/regularization_15_0.png" />
+<img alt="../../_images/regularization_22_0.png" src="../../_images/regularization_22_0.png" />
 </div>
 </div>
-<p>Likewise, we can do the same thing for the alien brain:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">quantile</span><span class="p">,</span> <span class="n">copy</span>
-
-<span class="n">p</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># the percentile we want</span>
-
-<span class="c1"># use the quantile function to obtain the threshold</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">quantile</span><span class="p">(</span><span class="n">Aa</span><span class="p">[</span><span class="n">non_diag_idx</span><span class="p">],</span> <span class="n">q</span><span class="o">=</span><span class="n">p</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># quantile = percentile / 100</span>
-<span class="n">Aa_thresh</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">Aa</span><span class="p">)</span>  <span class="c1"># copy the network over</span>
-
-<span class="c1"># threshold using t</span>
-<span class="n">Aa_thresh</span><span class="p">[</span><span class="n">Aa_thresh</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">Aa_thresh</span><span class="p">[</span><span class="n">Aa_thresh</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Aa</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien Brain Network, Weighted&quot;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Aa_thresh</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien Brain Network, Thresholded at 50-ptile&quot;</span><span class="p">)</span>
-<span class="n">fig</span><span class="p">;</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_18_0.png" src="../../_images/regularization_18_0.png" />
-</div>
-</div>
-<p>Since the human and alien brain networks are now undirected, unweighted, and loopless, we have turned them into simple networks. Remember that the network density for a simple network was defined as:</p>
+<p>Since the friendship network is now undirected (we made the adjacency matrix symmetric through averaging), loopless (because we defined it that way), and binary (because we thresholded the edges), we have now turned it into a <em>simple</em> network! Great job. Next, we will discuss an important property as to <em>why</em> thresholding using a quantile tends to be a very common tactic to obtaining simple networks from networks which are undirected and loopless. Remember that in the last section, we defined the network density for a simple network as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     density(A) &amp;= \frac{2\sum_{j &gt; i}a_{ij}}{n(n - 1)}.
 \end{align*}\]</div>
-<p>Since we have thresholded at the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile for both the human and alien networks, then note that <em>exactly</em> <span class="math notranslate nohighlight">\(50\)</span> percent of the possible edges will exist, and <span class="math notranslate nohighlight">\(50\)</span> percent of the possible edges will not exist. Remembering that the number of possible edges was <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span> for an undirected network, this means that <span class="math notranslate nohighlight">\(\sum_{j &gt; i}a_{ij}\)</span> must be half of <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span>, or <span class="math notranslate nohighlight">\(\frac{1}{4}n(n - 1)\)</span>. Therefore:</p>
+<p>Since we have thresholded at the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile for the symmetric friendship network, this means that about <span class="math notranslate nohighlight">\(50\)</span> percent of the possible edges will exist (the <em>largest</em> <span class="math notranslate nohighlight">\(50\)</span> percent of edges), and <span class="math notranslate nohighlight">\(50\)</span> percent of the possible edges will not exist (the <em>smallest</em> <span class="math notranslate nohighlight">\(50\)</span> percent of edges). Remembering that the number of possible edges was <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span> for an undirected network, this means that <span class="math notranslate nohighlight">\(\sum_{j &gt; i}a_{ij}\)</span> must be half of <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span>, or <span class="math notranslate nohighlight">\(\frac{1}{4}n(n - 1)\)</span>. Therefore:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    density(A^{(h)}) = density(A^{(a)}) &amp;= \frac{2\sum_{j &gt; i}a_{ij}}{n(n - 1)}, \\
+    density(A) &amp;= \frac{2\sum_{j &gt; i}a_{ij}}{n(n - 1)}, \\
     &amp;= \frac{2\cdot \frac{1}{4}n(n - 1)}{n(n - 1)},\;\;\;\sum_{j &gt; i}a_{ij} = \frac{1}{4}n(n - 1) \\
     &amp;= 0.5.
 \end{align*}\]</div>
-<p>So if we threshold two networks at the same percentile, we end up with networks of equal density, and that density is equal to the fraction which is equivalent to the percentile we chose.</p>
-<p>Note that a common pitfall you might run into with thresholding (and other sparsification approaches) that rely on percentiles occurs when a weighted network can only take non-negative edge-weights. This corresponds to a network with an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> where every <span class="math notranslate nohighlight">\(a_{ij}\)</span> is greater than or equal to <span class="math notranslate nohighlight">\(0\)</span>. In this case, one must be careful to choose a threshold which is not zero. Let’s consider a network were <span class="math notranslate nohighlight">\(60\%\)</span> of the entries are zeros, and <span class="math notranslate nohighlight">\(40\%\)</span> of the entries take a random value between <span class="math notranslate nohighlight">\(5\)</span> and <span class="math notranslate nohighlight">\(10\)</span>:</p>
+<p>So when we threshold the network at a quantile <span class="math notranslate nohighlight">\(t\)</span>, we end up with a network of density also equal to <span class="math notranslate nohighlight">\(t\)</span>! Let’s confirm that this is the case for our symmetric friendship network:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">is_unweighted</span><span class="p">,</span> <span class="n">is_loopless</span><span class="p">,</span> <span class="n">is_symmetric</span>
+
+<span class="k">def</span> <span class="nf">simple_network_dens</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+    <span class="c1"># make sure the network is simple</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_unweighted</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_loopless</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_symmetric</span><span class="p">(</span><span class="n">X</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Network is not simple!&quot;</span><span class="p">)</span>
+    <span class="c1"># count the non-zero entries in the upper-right triangle</span>
+    <span class="c1"># for a simple network X</span>
+    <span class="n">nnz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="c1"># number of nodes</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># number of possible edges is 1/2 * n * (n-1)</span>
+    <span class="n">poss_edges</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nnz</span><span class="o">/</span><span class="n">poss_edges</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Network Density: </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">simple_network_dens</span><span class="p">(</span><span class="n">A_friend_thresh</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Network Density: 0.500
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is desirable for network machine learning because many network properties (such as the summary statistics we have discussed so far, and numerous other properties we will discuss in later chapters) can vary when the network density changes. This means that a network of a different density might have a higher clustering coefficient than a network of a lower density simply due to the fact that its density is higher (and therefore, there are more opportunities for closed triangles because each node has more connections). This means that when we threshold groups of networks and compare them, thresholding using a quantile will be very valuable.</p>
+<p>Note that a common pitfall you might run into with thresholding (and the broader class of techniques known as <em>sparsification</em> approaches) that rely on quantiles occurs when a weighted network can only take non-negative edge-weights. This corresponds to a network with an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> where every <span class="math notranslate nohighlight">\(a_{ij}\)</span> is greater than or equal to <span class="math notranslate nohighlight">\(0\)</span>. In this case, one must be careful to choose a threshold which is not zero. Let’s consider a network were <span class="math notranslate nohighlight">\(60\%\)</span> of the entries are zeros, and <span class="math notranslate nohighlight">\(40\%\)</span> of the entries take a random value between <span class="math notranslate nohighlight">\(5\)</span> and <span class="math notranslate nohighlight">\(10\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_nm</span>
-<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">uniform</span>
 
 <span class="c1"># 10 nodes</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="c1"># total number of edges is 40% of the number of possible edges</span>
 <span class="c1"># 1/2 * n * (n-1)</span>
 <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.4</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">er_nm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">uniform</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_nm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">,</span> <span class="n">wtargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1054,14 +1121,14 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/regularization_21_0.png" src="../../_images/regularization_21_0.png" />
+<img alt="../../_images/regularization_27_0.png" src="../../_images/regularization_27_0.png" />
 </div>
 </div>
 <p>If we threshold at the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile, since <span class="math notranslate nohighlight">\(60\)</span> percent of the edges do not exist, then the <span class="math notranslate nohighlight">\(50^{th}\)</span> percentile is still just zero:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use the quantile function to obtain the threshold</span>
-<span class="n">t</span> <span class="o">=</span> <span class="n">quantile</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">non_diag_idx</span><span class="p">],</span> <span class="n">q</span><span class="o">=</span><span class="n">p</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># quantile = percentile / 100</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">quantile</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">triu</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">))],</span> <span class="n">q</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># quantile = percentile / 100</span>
 <span class="n">A_thresh</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>  <span class="c1"># copy the network over</span>
 
 <span class="c1"># threshold using t</span>
@@ -1080,23 +1147,7 @@
 <p>And we don’t actually end up with a network having a density of <span class="math notranslate nohighlight">\(0.5\)</span>, but rather, the same as the fraction of non-zero edges in the original network (which was <span class="math notranslate nohighlight">\(40\%\)</span>, or <span class="math notranslate nohighlight">\(0.4\)</span>):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">triu</span>
-<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">is_unweighted</span><span class="p">,</span> <span class="n">is_loopless</span><span class="p">,</span> <span class="n">is_symmetric</span>
-
-<span class="k">def</span> <span class="nf">simple_network_dens</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
-    <span class="c1"># make sure the network is simple</span>
-    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_unweighted</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_loopless</span><span class="p">(</span><span class="n">X</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">is_symmetric</span><span class="p">(</span><span class="n">X</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Network is not simple!&quot;</span><span class="p">)</span>
-    <span class="c1"># count the non-zero entries in the upper-right triangle</span>
-    <span class="c1"># for a simple network X</span>
-    <span class="n">nnz</span> <span class="o">=</span> <span class="n">triu</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="c1"># number of nodes</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="c1"># number of possible edges is 1/2 * n * (n-1)</span>
-    <span class="n">poss_edges</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">nnz</span><span class="o">/</span><span class="n">poss_edges</span>
-
-<span class="n">dens</span> <span class="o">=</span> <span class="n">simple_network_dens</span><span class="p">(</span><span class="n">A_thresh</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dens</span> <span class="o">=</span> <span class="n">simple_network_dens</span><span class="p">(</span><span class="n">A_thresh</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1110,10 +1161,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/regularization_26_0.png" src="../../_images/regularization_26_0.png" />
+<img alt="../../_images/regularization_32_0.png" src="../../_images/regularization_32_0.png" />
 </div>
 </div>
-<p>So the take-home message is that we need to be careful that if we want to conclude that two percentile-thresholded networks have the same network density (equal to the percentile we thresholded at) it is critical that we have enough non-zero entries to threshold with across both (or all) of the networks.</p>
+<p>So the take-home message is that we need to be careful that if we want to conclude that two percentile-thresholded networks have the same network density (equal to the percentile we thresholded at), that we have enough non-zero entries to threshold with across both (or all) of the networks.</p>
 </div>
 <div class="section" id="sparsification-removes-potentially-spurious-low-weight-edges">
 <h3><span class="section-number">4.4.2.4. </span>Sparsification removes potentially spurious low-weight edges<a class="headerlink" href="#sparsification-removes-potentially-spurious-low-weight-edges" title="Permalink to this headline">¶</a></h3>
@@ -1125,9 +1176,6 @@
 <span class="n">heatmap</span><span class="p">(</span><span class="n">Aa</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien Brain Network&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_28_0.png" src="../../_images/regularization_28_0.png" />
 </div>
 </div>
 <p>Notice that for a <em>lot</em> of the off-diagonal entries, many of the values are really tiny compared to the maximum value in the network which is almost <span class="math notranslate nohighlight">\(40\)</span>. What if the way we measured these edges was very sensitive to high values, but had trouble discerning whether a value was actually zero, or was just really small?</p>
@@ -1154,9 +1202,6 @@
 <span class="n">heatmap</span><span class="p">(</span><span class="n">Aa_sparse</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien Brain Network, Sparsified at 70th ptile&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_31_0.png" src="../../_images/regularization_31_0.png" />
 </div>
 </div>
 <p>Notice that many of the small entries in the off-diagonal areas now have a value of zero. Again, we have the same pitfalls for sparsification as we did with thresholding, where if the network takes only non-negative edge weights and the percentile we choose corresponds to a threshold of zero, we might not actually end up changing anything.</p>
@@ -1211,9 +1256,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_34_0.png" src="../../_images/regularization_34_0.png" />
-</div>
 </div>
 <p>Next, we will look at the edge-weight histogram for the alien brain network before and after <span class="math notranslate nohighlight">\(z\)</span>-scoring. An edge-weight histogram is a histogram which indicates the number of edges with weights falling in between a pair of values. Remember that the network is loopless, so again we exclude the diagonal entries:</p>
 <div class="cell docutils container">
@@ -1232,9 +1274,6 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After Z-score&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_36_0.png" src="../../_images/regularization_36_0.png" />
 </div>
 </div>
 <p>The theory for when, and why, to use <span class="math notranslate nohighlight">\(z\)</span>-scoring for network machine learning tends to go something like this: many things tend to be normally distributed with the same mean and variance, so perhaps that is a reasonable expectation for our network, too. Unfortunately, we find this often to <em>not</em> be the case. In fact, we often find that the specific distribution of edge weights itself often might be lamost infeasible to identify in a population of networks, and therefore <em>almost</em> irrelevant all-together. To this end, we turn to instead <em>ranking</em> the edges.</p>
@@ -1267,9 +1306,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_39_0.png" src="../../_images/regularization_39_0.png" />
-</div>
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1284,9 +1320,6 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network with 40</span><span class="si">% o</span><span class="s2">f possible edges, After PTR&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_40_0.png" src="../../_images/regularization_40_0.png" />
 </div>
 </div>
 <p>The edge-weights for the adjacency matrix <span class="math notranslate nohighlight">\(R\)</span> after <code class="docutils literal notranslate"><span class="pre">ptr</span></code> has the interpretataion that each entry <span class="math notranslate nohighlight">\(r_{ij}\)</span> is the <em>quantile</em> of that entry amongst the other non-zero entries. This is unique in that it is completely <em>distribution-free</em>, which means that we don’t need to assume anything about the distribution of the edge-weights to have a reasonably interpretable quantity. On the other hand, the <span class="math notranslate nohighlight">\(z\)</span>-score had the interpretation of the number of standard deviations from the mean, which is only a sensible quantity to compare if we assume the population of edge-weights are normally distributed.</p>
@@ -1319,9 +1352,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_43_0.png" src="../../_images/regularization_43_0.png" />
-</div>
 </div>
 </div>
 <div class="section" id="logging-reduces-magnitudinal-differences-between-edges">
@@ -1335,9 +1365,6 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_46_0.png" src="../../_images/regularization_46_0.png" />
 </div>
 </div>
 <p>Notice that <em>most</em> of the edges havae weights which are comparatively small, between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(10\)</span>, but some of the edges have weights which are much (much) larger. A <strong>right-skew</strong> exists when the majority of edge-weights are small, but some of the edge-weights take values which are much larger.</p>
@@ -1357,13 +1384,6 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$log_</span><span class="si">{10}</span><span class="s2">(x)$&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-  warnings.warn(
-</pre></div>
-</div>
-<img alt="../../_images/regularization_48_1.png" src="../../_images/regularization_48_1.png" />
 </div>
 </div>
 <p>What is key to noice about this function is that, as <span class="math notranslate nohighlight">\(x\)</span> increases, the log of <span class="math notranslate nohighlight">\(x\)</span> increases by a <em>decreasing</em> amount. Let’s imagine we have three values, <span class="math notranslate nohighlight">\(x = .001\)</span>, <span class="math notranslate nohighlight">\(y = .1\)</span>, and <span class="math notranslate nohighlight">\(z = 10\)</span>. A calculator will give you that <span class="math notranslate nohighlight">\(log_{10}(x) = -3, log_{10}(y) = -1\)</span>, and <span class="math notranslate nohighlight">\(log_{10}(z) = 1\)</span>. Even though <span class="math notranslate nohighlight">\(y\)</span> is only <span class="math notranslate nohighlight">\(.099\)</span> units bigger than <span class="math notranslate nohighlight">\(x\)</span>, its logarithm <span class="math notranslate nohighlight">\(log_{10}(y)\)</span> exceeds <span class="math notranslate nohighlight">\(log_{10}(x)\)</span> by two units. on the other hand, <span class="math notranslate nohighlight">\(z\)</span> is <span class="math notranslate nohighlight">\(9.9\)</span> units bigger than <span class="math notranslate nohighlight">\(y\)</span>, but yet its logarithm <span class="math notranslate nohighlight">\(log_{10}(z)\)</span> is still the same two units bigger than <span class="math notranslate nohighlight">\(log_{10}(y)\)</span>. This is because thhe logarithm is instead looking at the fact that <span class="math notranslate nohighlight">\(z\)</span> is <em>one</em> power of ten, <span class="math notranslate nohighlight">\(y\)</span> is <span class="math notranslate nohighlight">\(-1\)</span> powers of ten, and <span class="math notranslate nohighlight">\(z\)</span> is <span class="math notranslate nohighlight">\(-3\)</span> powers of ten. The logarithm has <em>collapsed</em> the huge size difference between <span class="math notranslate nohighlight">\(z\)</span> and the other two values <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> by using exponentiation.</p>
@@ -1400,9 +1420,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_51_0.png" src="../../_images/regularization_51_0.png" />
-</div>
 </div>
 <p>When we plot the augmented and log-transformed data, what we see is that many of the edge-weights we originally might have thought were zero if we only looked at a plot were, in actuality, <em>not</em> zero. In this sense, for non-negative weighted networks, log transforming after zero-augmentation is often very useful for visualization to get a sense of the magnitudinal differences that might be present between edges.</p>
 <p>Our edge-weight histogram becomes:</p>
@@ -1414,9 +1431,6 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Edges&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/regularization_53_0.png" src="../../_images/regularization_53_0.png" />
 </div>
 </div>
 </div>
