@@ -54,7 +54,7 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="5.2. Network Models" href="single-network-models.html" />
+    <link rel="next" title="5.2. Erdös-Rényi (ER) Random Networks" href="single-network-models_ER.html" />
     <link rel="prev" title="5. Why Use Statistical Models?" href="ch5.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -298,38 +298,33 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models.html">
-     5.2. Network Models
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_ER.html">
-     5.3. Erdös-Rényi (ER) Random Networks
+     5.2. Erdös-Rényi (ER) Random Networks
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_SBM.html">
-     5.4. Stochastic Block Models (SBM)
+     5.3. Stochastic Block Models (SBM)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_RDPG.html">
-     5.5. Random Dot Product Graphs (RDPG)
+     5.4. Random Dot Product Graphs (RDPG)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="multi-network-models.html">
-     5.6. Multiple Network Models
+     5.5. Multiple Network Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="models-with-covariates.html">
-     5.7. Network Models with Covariates
+     5.6. Network Models with Covariates
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_theory.html">
-     5.8. Single network model theory
+     5.7. Single network model theory
     </a>
    </li>
   </ul>
@@ -657,35 +652,23 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="why-use-statistical-models">
 <h1><span class="section-number">5.1. </span>Why Use Statistical Models?<a class="headerlink" href="#why-use-statistical-models" title="Permalink to this headline">¶</a></h1>
-<p>In network data science, we typically begin with a question of interest, and a network we use to answer that question. Consider, for instance, we may want to know whether two people being from the same school increases their chances of being friends. The data we have is a social network from a social media site, in which nodes represent students from the community, and the edges represent whether two people are friends on the social media site. Unfortunately, in addressing this question of interest, our social network dataset includes much with uncertainty. Perhaps a pair of students might be friends, but they never got around to adding each other on the social media site. Maybe our students had a fight and are no longer friends, but never bothered to delete one another as friends on the site. Other factors might exist that we don’t know about (sports, hobbies, special interests) that influence whether two people are friends. Our social network might not capture all of the students, and we might be missing a large portion of the community all together. In many additional ways, our social network is noisy, and in order to address our question of interest, we need procedures which account for this uncertainty. To this end, we turn to <em>statistical modelling</em>. In statistical modelling, we explicitly specify our assumptions about uncertainty in the data we use to address our question of interest. Stated another way, our observed network is assumed to be a <em>realization</em> of a governing <strong>random network</strong>. From now on, when we say the word <strong>network</strong> without the word random in front of it, we are referring to the <em>realizations</em> of random networks.</p>
-<p>In machine learning, we typically encounter situations in which we have <span class="math notranslate nohighlight">\(n\)</span> observations in <span class="math notranslate nohighlight">\(d\)</span> dimensions. Traditional statistical models include univariate statistical models (models for data with <span class="math notranslate nohighlight">\(1\)</span> dimension) and multivariate statistical models (models for data with <span class="math notranslate nohighlight">\(d &gt; 1\)</span> dimensions), which can capture this traditional data representation. These models are well suited for discovering new insights about individual observations or collections of individual observations. Why do we need special statistical models for networks? Our realizations are not <span class="math notranslate nohighlight">\(n\)</span> disparate observations in <span class="math notranslate nohighlight">\(d\)</span>-dimensions; a realization in network machine learning <strong>is the full network itself</strong>, consisting of nodes, edges, and potential network attributes. We seek to model a representation of the <em>entire</em> network so that we can convey insights about properties of the network. To address our question of interest above, we need to characterize how students relate to other students in the network, not describe individual students. To this end, we describe our random network using sets of statistical assumptions, referred to as the <strong>statistical network model</strong>. In this book, we typically describe networks using an approach called <em>generative modeling</em>, which means that we use models which describe <em>how</em> the random network governing our realization could have come about. Several models also use <em>discrimative modeling</em>, in which we have a target variable, and wish to model the probability of the target given an observed network.</p>
-<div class="admonition-comparing-a-univariate-statistical-model-to-a-random-network-model admonition">
-<p class="admonition-title">Comparing a Univariate Statistical Model to a Random Network Model</p>
-<p>Let’s imagine we are tossing a coin, and we want to determine what the probability of the coin landing on heads is. Every time we toss the coin, we will get an outcome that we can see (did the coin land on heads, or did it land on tails?). We call the outcome of this coin toss <span class="math notranslate nohighlight">\(x\)</span>. To determine the probability of the coin landing on heads, we will assume that the outcome of the coin is random, and that each time we toss the coin, we are <em>realizing</em> a random variable <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>. It is important to emphasize (again!) that <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is random: it doesn’t take any fixed value, whereas realizations <span class="math notranslate nohighlight">\(x\)</span> take one of two possible values: heads or tails. If a coin toss was heads the first time (that is, a particular realization <span class="math notranslate nohighlight">\(x\)</span> is heads), when we flip the coin again, we might not get a heads the second time (since the coin toss <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is random until we realize it). We describe <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> using a <em>univariate statistical model</em>. For instance, we might think that <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is a Bernoulli-distributed random variable, which means that if we knew the Bernoulli probability <span class="math notranslate nohighlight">\(p\)</span>, we would know that <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> has a <span class="math notranslate nohighlight">\(p\)</span> chance of landing on heads. In this case, the Bernoulli distribution is the model for <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>.</p>
-<p>In much the same way, let’s think about our social network example again. We have a simple network, <span class="math notranslate nohighlight">\(A\)</span>, where the nodes represent school students in a county, and the edges represent whether a given pair of students are friends on a social media site. Like each of the coin toss outcomes above, we get to see <span class="math notranslate nohighlight">\(A\)</span>, and know exactly what values <span class="math notranslate nohighlight">\(A\)</span> takes. In the same way as above, we will assume that the network <span class="math notranslate nohighlight">\(A\)</span> is a realization of a <strong>random network</strong> <span class="math notranslate nohighlight">\(\mathbf A\)</span>. Like the coin flip, we can describe <span class="math notranslate nohighlight">\(\mathbf A\)</span> using a statistical model, because it is a random variable. The friends an individual has when we realize <span class="math notranslate nohighlight">\(\mathbf A\)</span> are random, in the sense that they may be friends with some people they aren’t actually friends with, not friends with some of their actual friends, or friends with arbitrary people they came into contact with in their lives. This level of uncertainty is captured in the randomness of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. This time, we will describe <span class="math notranslate nohighlight">\(\mathbf A\)</span> using a random network model, which we will learn more about in the next few sections.</p>
-<p>Let’s summarize what we learned above in a table to familiarize ourselves with the vocabulary:</p>
-<table class="colwidths-auto table">
-<thead>
-<tr class="row-odd"><th class="head"><p></p></th>
-<th class="head"><p>Coin-Toss</p></th>
-<th class="head"><p>Social Network</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Observed Data</p></td>
-<td><p>Outcome of a coin toss <span class="math notranslate nohighlight">\(x\)</span></p></td>
-<td><p>Simple network <span class="math notranslate nohighlight">\(A\)</span></p></td>
-</tr>
-<tr class="row-odd"><td><p>Random Variable</p></td>
-<td><p><span class="math notranslate nohighlight">\(\mathbf{x}\)</span>, where <span class="math notranslate nohighlight">\(x\)</span> is said to be a <em>realization</em> of <span class="math notranslate nohighlight">\(\mathbf{x}\)</span></p></td>
-<td><p>random-network <span class="math notranslate nohighlight">\(\mathbf A\)</span>, where <span class="math notranslate nohighlight">\(A\)</span> is a realization of <span class="math notranslate nohighlight">\(\mathbf A\)</span></p></td>
-</tr>
-<tr class="row-even"><td><p>Statistical Model</p></td>
-<td><p>the Bernoulli distribution</p></td>
-<td><p>a Random Network Model</p></td>
-</tr>
-</tbody>
-</table>
+<p>In network data science, we typically begin with a question of interest, and a network we use to answer that question. To answer this question, we will turn to statistical models. Consider the simplest possible statistical model which has been used for years: the coin flip model. Let’s say we are playing a game with a gambler, and we bet one dollar. If the coin lands on heads, we get our dollar back, and an additional dollar. If the coin lands on tails, we lose our dollar. We get to watch ten coin flips before deciding whether or not to join the game. So, should we play?</p>
+<p>A coin has a probability, which we will denote <span class="math notranslate nohighlight">\(p\)</span>, of landing on heads. Since the coin either lands on heads or tails, this means that the probability that the coin lands on tails is <span class="math notranslate nohighlight">\(1-p\)</span>. Reasonably, we might guess that the probability that this coin lands on heads is just <span class="math notranslate nohighlight">\(0.5\)</span> (the coin has an equal chance of landing on heads and tails). Unfortunatetly, the universe is a nefarious place! We could easily construct coins which slightly favor heads (perhaps a coin with a chance of landing on heads of <span class="math notranslate nohighlight">\(0.51\)</span>) <em>or</em> a coin which slightly favors tails (perhaps a coin with a chance of landing on tails of <span class="math notranslate nohighlight">\(0.51\)</span>).</p>
+<p>To understand whether or not we should play this game, we turn to <em>statistical modelling</em>. A <strong>statistical model</strong> is a set of assumptions as to how a random system operates. The statistical model delineates what we think comes down to random chance in our system. In our coin flip example, this means that we describe the coin flip using the <em>Bernoulli model</em>, which means that the coin lands on heads with probability <span class="math notranslate nohighlight">\(p\)</span> and tails with probability <span class="math notranslate nohighlight">\(1-p\)</span>. The statistical model is the set of all possible coins which could be used for the game.</p>
+<p>A <strong>random variable</strong> is an object whose outcome comes down to random chance. In our coin flip example, the coin flip itself <em>is</em> the random variable. The coin possesses a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads and a probability <span class="math notranslate nohighlight">\(1-p\)</span> of landing on tails. To learn about the coin, we conduct an <em>experiment</em>. The experiment here is watching the coin flip ten times, and observing the outcome of the flips. The outcome of the coin flip is called a <em>realization</em> of the random variable. We will never truly understand the coin flip perfectly (we can never say for sure whether the coin will definitely land on heads or tails unless it has two heads or two tails). If we observe enough realizations of coin flips, however, we might be able to describe the coin flip in a way which could work this game in our favor.</p>
+<p>The coin flip example is obviously very trivial, but it extends directly to statistical network models which we will use for simple networks. Consider a network of <span class="math notranslate nohighlight">\(100\)</span> students, in which each of the students attends one of two schools. We are interested in understanding whether students are more likely to be friends on a social networking site with students in their school than with students from the other school. Unlike traditional machine learning, in network machine learning we do not observe <span class="math notranslate nohighlight">\(n\)</span> outcomes (or realizations) with <span class="math notranslate nohighlight">\(d\)</span> dimensions. Rather, we see an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, whose nodes are the <span class="math notranslate nohighlight">\(100\)</span> students, and whose edges are the entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> which take a value of one if the two students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are friends on the social networking site and a value of zero if the two students are not friends on the social networking site.</p>
+<p>Like the coin flip example, there is randomness and uncertainty to our social network. Perhaps a pair of students might be friends in real life, but they never got around to adding each other on the social media site. Maybe our students had a fight and are no longer friends, but never bothered to delete one another as friends on the site. Other factors might exist that we don’t know about (sports, hobbies, special interests) that influence whether two people are friends. Our social network might not capture all of the students, and we might be missing a large portion of the community all together. In many additional ways, our social network is noisy, and in order to address our question of interest, we need procedures which account for this uncertainty.</p>
+<p>In machine learning, we typically encounter situations in which we have <span class="math notranslate nohighlight">\(n\)</span> observations in <span class="math notranslate nohighlight">\(d\)</span> dimensions. Traditional statistical models include univariate statistical models (models for data with <span class="math notranslate nohighlight">\(1\)</span> dimension) and multivariate statistical models (models for data with <span class="math notranslate nohighlight">\(d &gt; 1\)</span> dimensions), which can capture this traditional data representation. These models are well suited for discovering new insights about individual observations or collections of individual observations. Why do we need special statistical models for networks? Our realizations are not <span class="math notranslate nohighlight">\(n\)</span> disparate observations in <span class="math notranslate nohighlight">\(d\)</span>-dimensions; a realization in network machine learning <strong>is the full network itself</strong>, consisting of nodes, edges, and potential network attributes. We seek to model a representation of the <em>entire</em> network so that we can convey insights about properties of the network. To address our question of interest above, we need to characterize how students relate to other students in the network, not describe individual stdents. To this end, we describe our random network using sets of statistical assumptions, referred to as the <strong>statistical network model</strong>. The coin flip model might haave felt really simple, but we will see how we can use collections of coins to describe pretty complicated random networks throughout this chapter. We break down the key aspects of the coin flip experiment because it is so crucial:</p>
+<div class="admonition-the-coin-flip-experiment admonition">
+<p class="admonition-title">The Coin Flip Experiment</p>
+<p>We had the following items we were concerned with in the coin flip example:</p>
+<ol class="simple">
+<li><p>The outcomes: The outcomes are either heads or tails. These outcomes will be denoted by the letter <span class="math notranslate nohighlight">\(x\)</span>, which takes values which are H (Heads) or T (Tails). The value <span class="math notranslate nohighlight">\(x\)</span> is called a <strong>realization</strong>.</p></li>
+<li><p>The coin which was used: The specific coin being used in the coin flip experiment has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads and a probability <span class="math notranslate nohighlight">\(1 - p\)</span> of landing on tails. We will denote the specific coin being used by the letter <span class="math notranslate nohighlight">\(\mathbf x\)</span>. The bold-faced font means that the coin being used has a random outcome (it might be heads, it might be tails) to differentiate it from the coin flips which we saw and have known outcomes indicated by <span class="math notranslate nohighlight">\(x\)</span> (which has a fixed value, since we flipped the coin and <em>realized</em> the outcome). We don’t know anything about <span class="math notranslate nohighlight">\(p\)</span> just yet, so we can’t describe the coin’s specific random behavior just yet. The value <span class="math notranslate nohighlight">\(\mathbf x\)</span> is called the <strong>random variable</strong>.</p></li>
+<li><p>Feasible coins: A possible coin that could have been used in the coin flipping experiment is one which has a probability <span class="math notranslate nohighlight">\(q\)</span> (which might be different from <span class="math notranslate nohighlight">\(p\)</span>) of landing on heads, and <span class="math notranslate nohighlight">\(1 - q\)</span> of landing on tails. A feasible coin will be denoted by <span class="math notranslate nohighlight">\(Bern(q)\)</span>, which just means that the coin lands on heads with probability <span class="math notranslate nohighlight">\(q\)</span> and tails with probability <span class="math notranslate nohighlight">\(1 - q\)</span>.</p></li>
+<li><p>The Bernoulli model: The collection of all feasible coins which could have been used. This is described by the set <span class="math notranslate nohighlight">\(\left\{Bern(q) : q \text{ is a probability between \)</span>0<span class="math notranslate nohighlight">\( and \)</span>1<span class="math notranslate nohighlight">\(}\right\}\)</span>. This set is infinitely large, since it contains a feasible coin for <em>any</em> specified probability. The commonality between the feasible coins is that they each have a unique probability of landing on heads and a unique probability of landing on tails. The statistical model is simply the collection of all possible feasible coin which feature this commonality. For instance, there is a coin <span class="math notranslate nohighlight">\(Bern(0.1)\)</span> which has a probability <span class="math notranslate nohighlight">\(0.1\)</span> of landing on heads in this set, and another coin <span class="math notranslate nohighlight">\(Bern(0.9)\)</span> which has a probabiliy <span class="math notranslate nohighlight">\(0.9\)</span> of landing on heads in this set.
+The specific coin being used, the random variable <span class="math notranslate nohighlight">\(\mathbf x\)</span> which lands on heads with probability <span class="math notranslate nohighlight">\(p\)</span>, behaves <em>exactly</em> like the coin <span class="math notranslate nohighlight">\(Bern(p)\)</span> from the statistical model. For this reason, we will say that the coin <span class="math notranslate nohighlight">\(\mathbf x\)</span> is a <span class="math notranslate nohighlight">\(Bern(p)\)</span> coin.</p></li>
+</ol>
 </div>
 <div class="section" id="models-aren-t-right-why-do-we-care">
 <h2><span class="section-number">5.1.1. </span>Models aren’t Right. Why do we Care?<a class="headerlink" href="#models-aren-t-right-why-do-we-care" title="Permalink to this headline">¶</a></h2>
@@ -697,9 +680,9 @@
 </ol>
 <p>Therefore, it is crucial to incorporate randomness and uncertainty to understand network data. In practice, we select a model which is appropriate from a family of candidate models on the basis of three primary factors:</p>
 <ol class="simple">
-<li><p>Utility: The model of interest possesses the level of refinement or complexity that we need to answer our scientific question of interest,</p></li>
-<li><p>Estimation: The data has the level of breadth to facilitate estimation of the parameters of the model of interest, and</p></li>
-<li><p>Appropriateness: The model is appropriate for the data we are given.</p></li>
+<li><p>Utility: The model of interest possesses the level of refinement or complexity that we need to answer our scientific question of interest. What this means is that the coin flip model will allow us to determine whether or not we should gamble.</p></li>
+<li><p>Estimation: The data has the level of breadth to facilitate estimation of the parameters of the model of interest. This means that we can use the outcomes of coin flips to guess what the probability that the coin will land on heads is.</p></li>
+<li><p>Appropriateness: The model is appropriate for the data we are given. This means that there are not major factors which are unaccounted for by the statistical model, such as if the coin thrower holds a magnet which will alter the outcome of the coin flip.</p></li>
 </ol>
 <p>For the rest of this section, we will develop intuition for the first point. Later sections will cover estimation of parameters and model selection.</p>
 </div>
@@ -737,10 +720,10 @@
             <p class="prev-next-title"><span class="section-number">5. </span>Why Use Statistical Models?</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="single-network-models.html" title="next page">
+    <a class='right-next' id="next-link" href="single-network-models_ER.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">5.2. </span>Network Models</p>
+        <p class="prev-next-title"><span class="section-number">5.2. </span>Erdös-Rényi (ER) Random Networks</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>5.4. Stochastic Block Models (SBM) &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>5.3. Stochastic Block Models (SBM) &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -54,8 +54,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="5.5. Random Dot Product Graphs (RDPG)" href="single-network-models_RDPG.html" />
-    <link rel="prev" title="5.3. Erdös-Rényi (ER) Random Networks" href="single-network-models_ER.html" />
+    <link rel="next" title="5.4. Random Dot Product Graphs (RDPG)" href="single-network-models_RDPG.html" />
+    <link rel="prev" title="5.2. Erdös-Rényi (ER) Random Networks" href="single-network-models_ER.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -298,38 +298,33 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models.html">
-     5.2. Network Models
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_ER.html">
-     5.3. Erdös-Rényi (ER) Random Networks
+     5.2. Erdös-Rényi (ER) Random Networks
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     5.4. Stochastic Block Models (SBM)
+     5.3. Stochastic Block Models (SBM)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_RDPG.html">
-     5.5. Random Dot Product Graphs (RDPG)
+     5.4. Random Dot Product Graphs (RDPG)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="multi-network-models.html">
-     5.6. Multiple Network Models
+     5.5. Multiple Network Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="models-with-covariates.html">
-     5.7. Network Models with Covariates
+     5.6. Network Models with Covariates
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_theory.html">
-     5.8. Single network model theory
+     5.7. Single network model theory
     </a>
    </li>
   </ul>
@@ -641,22 +636,22 @@
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#defining-the-paramaters-of-an-sbm-random-network">
-   5.4.1. Defining the paramaters of an SBM random network
+   5.3.1. Defining the paramaters of an SBM random network
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">
-     5.4.1.1. The community assignment vector assigns nodes in the random network to communities
+     5.3.1.1. The community assignment vector assigns nodes in the random network to communities
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">
-     5.4.1.2. The block matrix defines the edge existence probabilities between communities in the random network
+     5.3.1.2. The block matrix defines the edge existence probabilities between communities in the random network
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#how-do-we-simulate-realizations-of-sbm-n-vec-z-b-random-networks">
-     5.4.1.3. How do we simulate realizations of
+     5.3.1.3. How do we simulate realizations of
      <span class="math notranslate nohighlight">
       \(SBM_n(\vec z, B)\)
      </span>
@@ -677,7 +672,7 @@
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="stochastic-block-models-sbm">
-<h1><span class="section-number">5.4. </span>Stochastic Block Models (SBM)<a class="headerlink" href="#stochastic-block-models-sbm" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">5.3. </span>Stochastic Block Models (SBM)<a class="headerlink" href="#stochastic-block-models-sbm" title="Permalink to this headline">¶</a></h1>
 <p>Let’s imagine that we have <span class="math notranslate nohighlight">\(100\)</span> students, each of whom can go to one of two possible schools: school one or school two. Our network has <span class="math notranslate nohighlight">\(100\)</span> nodes, and each node represents a single student. The edges of this network represent whether a pair of students are friends. Intuitively, if two students go to the same school, the probably have a higher chance of being friends than if they do not go to the same school. If we were to try to characterize this using an ER random network, we would run into a problem: we have no way to capture the impact that school has on friendships. Intuitively, there must be a better way!</p>
 <p>The Stochastic Block Model, or SBM, captures this idea by assigning each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities. A <strong>community</strong> is a group of nodes within the network. In our example case, the communities would represent the schools that students are able to attend. We use <span class="math notranslate nohighlight">\(K\)</span> here to just denote an integer greater than <span class="math notranslate nohighlight">\(1\)</span> (for example, in the school example we gave above, <span class="math notranslate nohighlight">\(K\)</span> is <span class="math notranslate nohighlight">\(2\)</span>) for the number of <em>possible</em> communities that nodes could be members of. In an SBM, instead of describing all pairs of nodes with a fixed probability like with the ER model, we instead describe properties that hold for edges between <em>pairs of communities</em>. In our example, what this means is that if two students go to school one, the probability that they are friends might be different than if the two students went to school two, or if one student went to school one and the other to school two. Let’s take a look at what a realization of this setup we have described might look like:</p>
 <div class="cell tag_hide-input docutils container">
@@ -700,9 +695,9 @@
 </div>
 </div>
 <div class="section" id="defining-the-paramaters-of-an-sbm-random-network">
-<h2><span class="section-number">5.4.1. </span>Defining the paramaters of an SBM random network<a class="headerlink" href="#defining-the-paramaters-of-an-sbm-random-network" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.3.1. </span>Defining the paramaters of an SBM random network<a class="headerlink" href="#defining-the-paramaters-of-an-sbm-random-network" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">
-<h3><span class="section-number">5.4.1.1. </span>The community assignment vector assigns nodes in the random network to communities<a class="headerlink" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">5.3.1.1. </span>The community assignment vector assigns nodes in the random network to communities<a class="headerlink" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities" title="Permalink to this headline">¶</a></h3>
 <p>To describe an SBM random network, we proceed very similarly to an ER random network, with a twist. An SBM random network has a parameter, <span class="math notranslate nohighlight">\(\vec z\)</span>, which has a single element for each of the node. We call <span class="math notranslate nohighlight">\(\vec z\)</span> the <strong>community assignment vector</strong>, which means that for each node of our random network, <span class="math notranslate nohighlight">\(z_i\)</span> tells us which community the node is in. To state this another way, <span class="math notranslate nohighlight">\(\vec z\)</span> is a vector where each element <span class="math notranslate nohighlight">\(z_i\)</span> can take one of <span class="math notranslate nohighlight">\(K\)</span> possible values, where <span class="math notranslate nohighlight">\(K\)</span> is the total number of communities in the network. For example, if we had an SBM random network with four nodes in total, and two total communities, each element <span class="math notranslate nohighlight">\(z_i\)</span> can be either <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(2\)</span>. If the first two nodes were in community <span class="math notranslate nohighlight">\(1\)</span>, and the second two in community <span class="math notranslate nohighlight">\(2\)</span>, we would say that <span class="math notranslate nohighlight">\(z_1 = 1\)</span>, <span class="math notranslate nohighlight">\(z_2 = 1\)</span>, <span class="math notranslate nohighlight">\(z_3 = 2\)</span>, and <span class="math notranslate nohighlight">\(z_4 = 2\)</span>, which means that <span class="math notranslate nohighlight">\(\vec z\)</span> looks like:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -710,7 +705,7 @@
 \end{align*}\]</div>
 </div>
 <div class="section" id="the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">
-<h3><span class="section-number">5.4.1.2. </span>The block matrix defines the edge existence probabilities between communities in the random network<a class="headerlink" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">5.3.1.2. </span>The block matrix defines the edge existence probabilities between communities in the random network<a class="headerlink" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network" title="Permalink to this headline">¶</a></h3>
 <p>The other parameter for an SBM random network is called the block matrix, for which we will use the capital letter <span class="math notranslate nohighlight">\(B\)</span>. If there are <span class="math notranslate nohighlight">\(K\)</span> communities in the SBM random network, then <span class="math notranslate nohighlight">\(B\)</span> is a <span class="math notranslate nohighlight">\(K \times K\)</span> matrix, with one entry for each pair of communities. For instance, if <span class="math notranslate nohighlight">\(K\)</span> were two like above, <span class="math notranslate nohighlight">\(B\)</span> would be a <span class="math notranslate nohighlight">\(2 \times 2\)</span> matrix, and would look like this:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -723,7 +718,7 @@
 <p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network which is an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes, the community vector <span class="math notranslate nohighlight">\(\vec z\)</span>, and the block matrix <span class="math notranslate nohighlight">\(B\)</span>, we say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network.</p>
 </div>
 <div class="section" id="how-do-we-simulate-realizations-of-sbm-n-vec-z-b-random-networks">
-<h3><span class="section-number">5.4.1.3. </span>How do we simulate realizations of <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random networks?<a class="headerlink" href="#how-do-we-simulate-realizations-of-sbm-n-vec-z-b-random-networks" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">5.3.1.3. </span>How do we simulate realizations of <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random networks?<a class="headerlink" href="#how-do-we-simulate-realizations-of-sbm-n-vec-z-b-random-networks" title="Permalink to this headline">¶</a></h3>
 <p>The procedure below will produce for us a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network:</p>
 <div class="admonition-simulating-a-realization-from-an-sbm-n-vec-z-b-random-network admonition">
 <p class="admonition-title">Simulating a realization from an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network</p>
@@ -904,13 +899,13 @@
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">5.3. </span>Erdös-Rényi (ER) Random Networks</p>
+            <p class="prev-next-title"><span class="section-number">5.2. </span>Erdös-Rényi (ER) Random Networks</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="single-network-models_RDPG.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">5.5. </span>Random Dot Product Graphs (RDPG)</p>
+        <p class="prev-next-title"><span class="section-number">5.4. </span>Random Dot Product Graphs (RDPG)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

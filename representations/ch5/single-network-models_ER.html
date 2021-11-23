@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>5.3. Erdös-Rényi (ER) Random Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>5.2. Erdös-Rényi (ER) Random Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -54,8 +54,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="5.4. Stochastic Block Models (SBM)" href="single-network-models_SBM.html" />
-    <link rel="prev" title="5.2. Network Models" href="single-network-models.html" />
+    <link rel="next" title="5.3. Stochastic Block Models (SBM)" href="single-network-models_SBM.html" />
+    <link rel="prev" title="5.1. Why Use Statistical Models?" href="why-use-models.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -297,39 +297,34 @@
      5.1. Why Use Statistical Models?
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models.html">
-     5.2. Network Models
-    </a>
-   </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     5.3. Erdös-Rényi (ER) Random Networks
+     5.2. Erdös-Rényi (ER) Random Networks
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_SBM.html">
-     5.4. Stochastic Block Models (SBM)
+     5.3. Stochastic Block Models (SBM)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_RDPG.html">
-     5.5. Random Dot Product Graphs (RDPG)
+     5.4. Random Dot Product Graphs (RDPG)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="multi-network-models.html">
-     5.6. Multiple Network Models
+     5.5. Multiple Network Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="models-with-covariates.html">
-     5.7. Network Models with Covariates
+     5.6. Network Models with Covariates
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_theory.html">
-     5.8. Single network model theory
+     5.7. Single network model theory
     </a>
    </li>
   </ul>
@@ -641,12 +636,12 @@
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability">
-   5.3.1. The Erdös Rényi random network is parametrized by the independent-edge probability
+   5.2.1. The Erdös Rényi random network is parametrized by the independent-edge probability
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#how-do-we-simulate-realizations-of-er-n-p-random-networks">
-   5.3.2. How do we simulate realizations of
+   5.2.2. How do we simulate realizations of
    <span class="math notranslate nohighlight">
     \(ER_n(p)\)
    </span>
@@ -655,7 +650,7 @@
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#when-do-we-use-an-er-n-p-network">
-   5.3.3. When do we use an
+   5.2.3. When do we use an
    <span class="math notranslate nohighlight">
     \(ER_n(p)\)
    </span>
@@ -663,8 +658,17 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#just-how-many-networks-are-possible-for-a-network-with-n-nodes">
+   5.2.4. Just how many networks are possible for a network with
+   <span class="math notranslate nohighlight">
+    \(n\)
+   </span>
+   nodes?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   5.3.4. References
+   5.2.5. References
   </a>
  </li>
 </ul>
@@ -679,9 +683,9 @@
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="erdos-renyi-er-random-networks">
-<h1><span class="section-number">5.3. </span>Erdös-Rényi (ER) Random Networks<a class="headerlink" href="#erdos-renyi-er-random-networks" title="Permalink to this headline">¶</a></h1>
-<p>We will start our description with the simplest random network model. Consider a social network, with <span class="math notranslate nohighlight">\(50\)</span> students. Our network will have <span class="math notranslate nohighlight">\(50\)</span> nodes, where each node represents a single student in the network. Edges in the social network represent whether or not a pair of students are friends. What is the simplest way we could describe whether two people are friends?</p>
-<p>In this case, we have a yes or no question: are a pair of people friends, or are they not friends? In this case, the simplest possible thing to do would be to say, for any two students in our network, there is some probability (which we will call <span class="math notranslate nohighlight">\(p\)</span>) that describes how likely they are to be friends. In the below example, for the sake of argument, we will let <span class="math notranslate nohighlight">\(p=0.3\)</span>. What does a realization from this network look like?</p>
+<h1><span class="section-number">5.2. </span>Erdös-Rényi (ER) Random Networks<a class="headerlink" href="#erdos-renyi-er-random-networks" title="Permalink to this headline">¶</a></h1>
+<p>We will start our description with the simplest random network model. Consider a social network, with 50 students. Our network will have 50 nodes, where each node represents a single student in the network. Edges in the social network represent whether or not a pair of students are friends. What is the simplest way we could describe whether two people are friends?</p>
+<p>In this case, the simplest possible thing to do would be to say, for any two students in our network, there is some probability (which we will call <span class="math notranslate nohighlight">\(p\)</span>) that describes how likely they are to be friends. In the below example, for the sake of argument, we will let <span class="math notranslate nohighlight">\(p=0.3\)</span>. What does a realization from this network look like?</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
@@ -701,12 +705,14 @@
 <img alt="../../_images/single-network-models_ER_1_0.png" src="../../_images/single-network-models_ER_1_0.png" />
 </div>
 </div>
+<p>As we mentioned in the preface for this chapter, every statisical model in this book will come down to the coin flip model. In network machine learning, we get to see an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> whose entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> are one if the students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are friends on the social networking site, and <span class="math notranslate nohighlight">\(0\)</span> if the students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are not friends on the social networking site. Just like we had a random coin <span class="math notranslate nohighlight">\(\mathbf x\)</span> which behaved like a <span class="math notranslate nohighlight">\(Bern(p)\)</span> coin from the collection <span class="math notranslate nohighlight">\(\left\{Bern(q) : q \text{ is a probability between \)</span>0<span class="math notranslate nohighlight">\( and \)</span>1<span class="math notranslate nohighlight">\(}\right\}\)</span>, we will assume that the network <span class="math notranslate nohighlight">\(A\)</span> is a realization of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which behaves like an element of a collection of random neworks. This might seem like a big stretch, so let’s try to put it into perspective.</p>
+<p>Since <span class="math notranslate nohighlight">\(A\)</span> was an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> random matrix. The elements of <span class="math notranslate nohighlight">\(\mathbf A\)</span> will be given by the symbols <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, which means that each edge <span class="math notranslate nohighlight">\(a_{ij}\)</span> of <span class="math notranslate nohighlight">\(A\)</span> is a realization of the random edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>. Just how do we describe this <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>? Remember that our realizations <span class="math notranslate nohighlight">\(a_{ij}\)</span> are just <span class="math notranslate nohighlight">\(0\)</span>s and <span class="math notranslate nohighlight">\(1\)</span>s, which <em>feels</em> a lot like flipping a coin, doesn’t it? Did the coin land on heads, or did it land on tails? Are the two people <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> friends, or are they not friends? If we had a coin with some probability of landing on heads, we could describe <span class="math notranslate nohighlight">\(a_{ij}\)</span> as a realization of this coin flip. We could assume that a value of one is analogous to the coin landing on heads, and value of zero is analogous to the coin landing on tails. Perhaps we could even model the network using the same approach we took before with the coin flip. This is starting to go somewhere, so let’s continue with the analogies.</p>
 <div class="section" id="the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability">
-<h2><span class="section-number">5.3.1. </span>The Erdös Rényi random network is parametrized by the independent-edge probability<a class="headerlink" href="#the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability" title="Permalink to this headline">¶</a></h2>
-<p>This simple random network model is called the Erdös Rényi (ER) model<sup>1</sup>. The way we can think of an ER random network is that the edges depend <em>only</em> on a probability, <span class="math notranslate nohighlight">\(p\)</span>, and each edge is totally independent of all other edges. We can think of this example as though a coin flip is performed, where the coin has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads, and <span class="math notranslate nohighlight">\(1-p\)</span> of landing on tails. For each edge in the network, we conceptually flip the coin, and if it lands on heads (with probability <span class="math notranslate nohighlight">\(p\)</span>), the edge exists, and if it lands on tails (with probability <span class="math notranslate nohighlight">\(1-p\)</span>) the edge does not exist. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes and probability <span class="math notranslate nohighlight">\(p\)</span>, we will often say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network.</p>
+<h2><span class="section-number">5.2.1. </span>The Erdös Rényi random network is parametrized by the independent-edge probability<a class="headerlink" href="#the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability" title="Permalink to this headline">¶</a></h2>
+<p>This simple random network model is called the Erdös Rényi (ER) model<sup>1</sup>. The way we can think of an ER random network is that the edges depend <em>only</em> on a probability, <span class="math notranslate nohighlight">\(p\)</span>, and each edge is totally independent of all other edges. We can think of this example as though a coin flip is performed, where the coin has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads, and <span class="math notranslate nohighlight">\(1-p\)</span> of landing on tails. For each edge in the network, we conceptually flip the coin, and if it lands on heads (with probability <span class="math notranslate nohighlight">\(p\)</span>), the edge exists, and if it lands on tails (with probability <span class="math notranslate nohighlight">\(1-p\)</span>) the edge does not exist. The meaning of <em>independence</em> is a little technical and goes a bit outside of the scope of this book, so we will leave it at a very high level as meaning that the outcome of particular coin flips do not impact the outcomes of other coin flips. This is not a very precise definition, but it will be plenty for our purposes. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes and probability <span class="math notranslate nohighlight">\(p\)</span>, we will often say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network.</p>
 </div>
 <div class="section" id="how-do-we-simulate-realizations-of-er-n-p-random-networks">
-<h2><span class="section-number">5.3.2. </span>How do we simulate realizations of <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks?<a class="headerlink" href="#how-do-we-simulate-realizations-of-er-n-p-random-networks" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.2.2. </span>How do we simulate realizations of <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks?<a class="headerlink" href="#how-do-we-simulate-realizations-of-er-n-p-random-networks" title="Permalink to this headline">¶</a></h2>
 <p>This approach which we will use to describe random networks is called a <em>generative model</em>, which means that we have described an observable network realization <span class="math notranslate nohighlight">\(A\)</span> of the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> in terms of the parameters of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In the case of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks, we have described <span class="math notranslate nohighlight">\(\mathbf A\)</span> in terms of the probability parameter, <span class="math notranslate nohighlight">\(p\)</span>. Generative models are convenient in that we can easily adapt them to tell us exactly how to simulate realizations of the underlying random network. The procedure below will produce for us a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network  <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network:</p>
 <div class="admonition-simulating-a-realization-from-an-er-n-p-random-network admonition">
 <p class="admonition-title">Simulating a realization from an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network</p>
@@ -720,7 +726,7 @@
 </div>
 </div>
 <div class="section" id="when-do-we-use-an-er-n-p-network">
-<h2><span class="section-number">5.3.3. </span>When do we use an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> Network?<a class="headerlink" href="#when-do-we-use-an-er-n-p-network" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.2.3. </span>When do we use an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> Network?<a class="headerlink" href="#when-do-we-use-an-er-n-p-network" title="Permalink to this headline">¶</a></h2>
 <p>In practice, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know how many edges on average the nodes of an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random nework should have. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network. For instance, if we see that half the nodes have a ton of edges (meaning, they have a high degree), and half don’t, we might be able to determine that the network is poorly described by an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network. If this is the case, we might look for other models that could describe our network which are more complex.</p>
 <!-- Another utility of the $ER_n(p)$ model is that we might often want to benchmark network algorithms on simulated networks with a given *sparsity*. **Network sparsity** is a feature of a network which describes the degree to which the network possesses fewer edges than the maximum number of possible edges. As an example, when we know ahead of time that the network is going to be sparse (the network has a *small* number of edges which exist relative the number of possible edges), we can use network machine learning techniques which anticipate this sparsity to make the algorithm faster. In a simple network, for instance, the maximum number of possible edges is $\binom n 2$. In an $ER_n(p)$ network with probability $p$, we would expect the network to have on average about $p \binom n 2$ edges; that is, $p$ describes the fraction of total possible edges that we would expect to exist. $ER_n(p)$ networks are extremely cheap to simulate computationally, because "flipping weighted coins" (if you are curious, this is called a *Bernoulli sample* with probability $p$) is usually able to be performed with extremely optimized code in most standard programming languages such as python. Being able to generate networks very easily with a given number of nodes $n$ and a given sparsity allows us to test just how efficient our network machine learning technique is.
 -->
@@ -765,8 +771,43 @@
 </div>
 <p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
 </div>
+<div class="section" id="just-how-many-networks-are-possible-for-a-network-with-n-nodes">
+<h2><span class="section-number">5.2.4. </span>Just how many networks are possible for a network with <span class="math notranslate nohighlight">\(n\)</span> nodes?<a class="headerlink" href="#just-how-many-networks-are-possible-for-a-network-with-n-nodes" title="Permalink to this headline">¶</a></h2>
+<p>As you’re going to become accustomed to, we’re going to boil this down again to coin flips. If we had one coin, there are two possible outcomes: either heads or tails. If we had two coins, the first coin could be heads or tails, and the second coin could be heads or tails. Let’s break this down by fixing the outcome of the first coin. If the first coin were heads, there are two possible outcomes for the second coin. If the first coin were tails, there are two possible outcomes for the second coin. This means that the total number of possible outcomes is the sum of the number of possible outcomes if the first coin is heads with the number of possible outcomes if the first coin were tails. This gives us that with two coins, we have four possible outcomes. When we add a third coin, we repeat this process again. If the first coin were heads, the second two coins could take any of four possible outcomes as we just learned. if the first coin were tails, the second two coins could also taake any of four possible outcomes. Therefore, with three coins, we have eight possible outcomes. As we continue this procedure, we quickly will realize that with <span class="math notranslate nohighlight">\(x\)</span> coin flips, we have <span class="math notranslate nohighlight">\(2^x\)</span> possible outcomes.</p>
+<p>Remember in Chapter 4 when discussing the <a class="reference external" href="#link?">properties of networks</a>, we determined that there are <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span> possible edges in a simple network, which we could represent using the notation <span class="math notranslate nohighlight">\(\binom n 2\)</span>. In a realized network, each of these edges could exist or not exist, so there are again two possibilities just like the coin flips. Since edges existing or not existing boils down to a coin flip, the number of possible networks with <span class="math notranslate nohighlight">\(n\)</span> nodes is just <span class="math notranslate nohighlight">\(2\)</span> to the power of the number of coin flips that are performed in the network. Here, this is <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span>. This quantity gets <em>really</em> big <em>really</em> fast! Let’s see just how fast below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">comb</span>
+
+<span class="n">ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">51</span><span class="p">)</span>
+<span class="n">nposs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ns</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">ns</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">nposs</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of Nodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Possible Networks (log scale)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;$10^{{</span><span class="si">{pow:d}</span><span class="s2">}}$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">pow</span><span class="o">=</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">]])</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_10_0.png" src="../../_images/single-network-models_ER_10_0.png" />
+</div>
+</div>
+<p>This is an enormous quantity! When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(6\)</span>, the number of possible networks is <span class="math notranslate nohighlight">\(2^{\binom 6 2} = 2^{6}\)</span> which is over <span class="math notranslate nohighlight">\(32,000\)</span>. When <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(15\)</span>, the number of posssible networks balloons up to <span class="math notranslate nohighlight">\(2^{\binom{15}{2}} = 2^{105}\)</span> which is over <span class="math notranslate nohighlight">\(10^{30}\)</span>. As the number of nodes increases, the number of possible network balloons really, really fast!</p>
+</div>
 <div class="section" id="references">
-<h2><span class="section-number">5.3.4. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.2.5. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p>[1] Erdös P, Rényi A. 1959. “On random graphs, I.” Publ. Math. Debrecen 6:290–297.</p>
 </div>
 </div>
@@ -796,17 +837,17 @@
         
             <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
-    <a class='left-prev' id="prev-link" href="single-network-models.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="why-use-models.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">5.2. </span>Network Models</p>
+            <p class="prev-next-title"><span class="section-number">5.1. </span>Why Use Statistical Models?</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="single-network-models_SBM.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">5.4. </span>Stochastic Block Models (SBM)</p>
+        <p class="prev-next-title"><span class="section-number">5.3. </span>Stochastic Block Models (SBM)</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
