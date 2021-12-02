@@ -638,32 +638,35 @@
   <a class="reference internal nav-link" href="#the-adjacency-matrix">
    4.1.1. The Adjacency Matrix
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#augmenting-the-adjacency-matrix">
-     4.1.1.1. Augmenting the Adjacency Matrix
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-incidence-matrix">
-     4.1.1.2. The Incidence Matrix
-    </a>
-   </li>
-  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-incidence-matrix">
+   4.1.2. The Incidence Matrix
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-oriented-incidence-matrix">
+   4.1.3. The Oriented Incidence Matrix
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-degree-matrix">
+   4.1.4. The Degree Matrix
+  </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-laplacian-matrix">
-   4.1.2. The Laplacian Matrix
+   4.1.5. The Laplacian Matrix
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-degree-matrix">
-     4.1.2.1. The Degree Matrix
+    <a class="reference internal nav-link" href="#the-symmetric-laplacian">
+     4.1.5.1. The Symmetric Laplacian
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#variations-on-the-laplacian">
-     4.1.2.2. Variations on the Laplacian
+    <a class="reference internal nav-link" href="#the-random-walk-laplacian">
+     4.1.5.2. The Random-Walk Laplacian
     </a>
    </li>
   </ul>
@@ -686,25 +689,28 @@
 <p>The most common matrix representation of a network is called the Adjacency Matrix, and we’ll learn about that first.</p>
 <div class="section" id="the-adjacency-matrix">
 <h2><span class="section-number">4.1.1. </span>The Adjacency Matrix<a class="headerlink" href="#the-adjacency-matrix" title="Permalink to this headline">¶</a></h2>
-<p>Adjacency matrices will be the bread and butter of matrix representation throughout this book. The idea is pretty straightforward. Let’s say you have a network with <span class="math notranslate nohighlight">\(n\)</span> nodes. In this case, we’ll make a network with only three nodes, since that’s small and easy to understand:</p>
+<p>The beating heart of matrix representations for networks throughout this book is the adjacency matrix. The idea is pretty straightforward: Let’s say you have a network with <span class="math notranslate nohighlight">\(n\)</span> nodes. You give each node an index – usually some value between 0 and n – and then you create an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix. If there is an edge between node <span class="math notranslate nohighlight">\(i\)</span> and node <span class="math notranslate nohighlight">\(j\)</span>, you fill the <span class="math notranslate nohighlight">\((i, j)_{th}\)</span> value of the matrix with an entry, usually <span class="math notranslate nohighlight">\(1\)</span> if your network has unweighted edges. In the case of undirected networks, you end up with a symmetric matrix with full of 1’s and 0’s, which completely represents the topology of your network.</p>
+<p>Let’s see this in action. We’ll make a network with only three nodes, since that’s small and easy to understand, and then we’ll show what it looks like as an adjacency matrix.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 
 <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
 
-<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">)}</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">)}</span>
 
-<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:purple&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
                 <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
                 <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_matrix</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">to_numpy_matrix</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -712,48 +718,142 @@
 <img alt="../../_images/matrix-representations_4_0.png" src="../../_images/matrix-representations_4_0.png" />
 </div>
 </div>
-<p>Each of those three nodes is either connected or not connected to each of the two other nodes. We can make a square matrix <span class="math notranslate nohighlight">\(A\)</span>, with 3 rows and 3 columns, so that each node has its own row and column associated with it. The idea is that the value on the <span class="math notranslate nohighlight">\(i_{th}\)</span> row and the <span class="math notranslate nohighlight">\(j_{th}\)</span> column of <span class="math notranslate nohighlight">\(A\)</span> will be a 1 if there is an edge between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, and a 0 otherwise. This also means that the adjacency matrix is symmetric in undirected networks.</p>
-<p>So, let’s fill out the matrix. Start with the first row, which corresponds to the first node, and move along the columns. If there is an edge between the first node and the column you’re at, put a 1 in the current location. If the two nodes aren’t connected, add a 0. When you’re done with the first row, move on to the second. Keep going until the whole matrix is filled with 0’s and 1’s.</p>
+<p>Our network has three nodes, labeled <span class="math notranslate nohighlight">\(1\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, and <span class="math notranslate nohighlight">\(3\)</span>. Each of these three nodes is either connected or not connected to each of the two other nodes. We’ll make a square matrix <span class="math notranslate nohighlight">\(A\)</span>, with 3 rows and 3 columns, so that each node has its own row and column associated to it.</p>
+<p>So, let’s fill out the matrix. We start with the first row, which corresponds to the first node, and move along the columns. If there is an edge between the first node and the node whose index matches the current column, put a 1 in the current location. If the two nodes aren’t connected, add a 0. When you’re done with the first row, move on to the second. Keep going until the whole matrix is filled with 0’s and 1’s.</p>
+<p>The end result looks like the matrix below. Since the second and third nodes aren’t connected, there is a <span class="math notranslate nohighlight">\(0\)</span> in locations <span class="math notranslate nohighlight">\(A_{2, 1}\)</span> and <span class="math notranslate nohighlight">\(A_{1, 2}\)</span>. There are also zeroes along the diagonals, since nodes don’t have edges with themselves.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
-<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> 
-            <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjacency matrix&quot;</span><span class="p">,</span> 
+               <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+
+<span class="c1"># ticks</span>
+<span class="n">yticks</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">()</span>
+<span class="n">yticks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="s1">&#39;node 0&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">yticks</span><span class="p">)</span>
+
+<span class="n">xticks</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">()</span>
+<span class="n">xticks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="s1">&#39;node 0&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xticks</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Nodes 0 and 2 </span><span class="se">\n</span><span class="s2">are connected&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Nodes 2 and 1 </span><span class="se">\n</span><span class="s2">aren&#39;t connected&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.03</span><span class="p">,</span> <span class="mf">2.9</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:purple&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Nodes 0 and 2 </span><span class="se">\n</span><span class="s2">are connected&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">63</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Nodes 2 and 1 </span><span class="se">\n</span><span class="s2">aren&#39;t connected&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">63</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Layout plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
-</pre></div>
-</div>
-<img alt="../../_images/matrix-representations_6_1.png" src="../../_images/matrix-representations_6_1.png" />
+<img alt="../../_images/matrix-representations_6_0.png" src="../../_images/matrix-representations_6_0.png" />
 </div>
 </div>
-<p>\ read the part of homl that goes through notation</p>
-<p>Although we’ve been using adjacency matrices for awhile now, we haven’t dug too deep into them…</p>
-<p><em>simplest case (undirected/unweighted)</em>
-The rows of an adjacency matrix represent all of the edges for a particular node. The first row, for instance, represents all of the connections that the first node has with other nodes.</p>
-<ul class="simple">
-<li><p>nice linear algebraic properties of symmetric matrices?</p></li>
-<li></li>
-</ul>
-<p><em>directed</em></p>
-<p><em>weighted</em></p>
-<div class="section" id="augmenting-the-adjacency-matrix">
-<h3><span class="section-number">4.1.1.1. </span>Augmenting the Adjacency Matrix<a class="headerlink" href="#augmenting-the-adjacency-matrix" title="Permalink to this headline">¶</a></h3>
+<p>Although the adjacency matrix is straightforward and easy to understand, it isn’t the only way to represent networks.</p>
 </div>
 <div class="section" id="the-incidence-matrix">
-<h3><span class="section-number">4.1.1.2. </span>The Incidence Matrix<a class="headerlink" href="#the-incidence-matrix" title="Permalink to this headline">¶</a></h3>
+<h2><span class="section-number">4.1.2. </span>The Incidence Matrix<a class="headerlink" href="#the-incidence-matrix" title="Permalink to this headline">¶</a></h2>
+<p>Instead of having values in a symmetric matrix represent possible edges, like with the Adjacency Matrix, we could have rows represent nodes and columns represent edges. This is called the <em>Incidence Matrix</em>, and it’s useful to know about – although it won’t appear too much in this book. If there are <span class="math notranslate nohighlight">\(n\)</span> nodes and <span class="math notranslate nohighlight">\(m\)</span> edges, you make an <span class="math notranslate nohighlight">\(n \times m\)</span> matrix. Then, to determine whether a node is a member of a given edge, you’d go to that node’s row and the edge’s column. If the entry is nonzero (<span class="math notranslate nohighlight">\(1\)</span> if the network is unweighted), then the node is a member of that edge, and if there’s a <span class="math notranslate nohighlight">\(0\)</span>, the node is not a member of that edge.</p>
+<p>You can see the incidence matrix for our network below. Notice that with incidence plots, edges are (generally arbitrarily) assigned indices as well as nodes.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">networkx.linalg.graphmatrix</span> <span class="kn">import</span> <span class="n">incidence_matrix</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span> <span class="n">n_colors</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">I</span> <span class="o">=</span> <span class="n">incidence_matrix</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">A</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                   <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edges&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Nodes&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Incidence matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:purple&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.24</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Edge 1&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">65</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.45</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Edge 0&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Layout plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/matrix-representations_10_0.png" src="../../_images/matrix-representations_10_0.png" />
+</div>
+</div>
+<p>When networks are large, incidence matrices tend to be extremely sparse – meaning, their values are mostly 0’s. This is because each column must have exactly two nonzero values along its rows: one value for the first node its edge is connected to, and another for the second. Because of this, incidence matrices are usually represented in Python computationally as scipy’s <em>sparse matrices</em> rather than as numpy arrays, since this data type is much better-suited for matrices which contain mostly zeroes.</p>
+<p>You can also add orientation to incidence matrices, even in undirected networks, which we’ll discuss next.</p>
+</div>
+<div class="section" id="the-oriented-incidence-matrix">
+<h2><span class="section-number">4.1.3. </span>The Oriented Incidence Matrix<a class="headerlink" href="#the-oriented-incidence-matrix" title="Permalink to this headline">¶</a></h2>
+<p>The oriented incidence matrix is extremely similar to the normal incidence matrix, except that you assign a direction or orientation to each edge: you define one of its nodes as being the head node, and the other as being the tail. For undirected networks, you can assign directionality arbitrarily. Then, for the column in the incidence matrix corresponding to a given edge, the tail node has a value of <span class="math notranslate nohighlight">\(-1\)</span>, and the head node has a value of <span class="math notranslate nohighlight">\(0\)</span>. Nodes who aren’t a member of a particular edge are still assigned values of <span class="math notranslate nohighlight">\(0\)</span>.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">networkx.linalg.graphmatrix</span> <span class="kn">import</span> <span class="n">incidence_matrix</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span> <span class="n">n_colors</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">OI</span> <span class="o">=</span> <span class="n">incidence_matrix</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">oriented</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">OI</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+                   <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edges&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Nodes&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Oriented Incidence matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Tail Node&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">.05</span><span class="p">,</span> <span class="mf">.95</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Head Node&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">.05</span><span class="p">,</span> <span class="mf">1.95</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:purple&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.24</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Edge 1&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">65</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.45</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Edge 0&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Layout plot&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.05</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Tail Node&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">.05</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Head Node&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.9, -0.05, &#39;Head Node&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/matrix-representations_14_1.png" src="../../_images/matrix-representations_14_1.png" />
+</div>
+</div>
+<p>Although we won’t use incidence matrices, oriented or otherwise, in this book too much, we introduced them because there’s a deep connection between incidence matrices, adjacency matrices, and a matrix representation that we haven’t introduced yet called the Laplacian. Before we can explore that connection, we’ll discuss one more representation: the degree matrix.</p>
+</div>
+<div class="section" id="the-degree-matrix">
+<h2><span class="section-number">4.1.4. </span>The Degree Matrix<a class="headerlink" href="#the-degree-matrix" title="Permalink to this headline">¶</a></h2>
+<p>The degree matrix isn’t a full representation of our network, because you wouldn’t be able to reconstruct an entire network from a degree matrix.</p>
 </div>
 <div class="section" id="the-laplacian-matrix">
-<h2><span class="section-number">4.1.2. </span>The Laplacian Matrix<a class="headerlink" href="#the-laplacian-matrix" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="the-degree-matrix">
-<h3><span class="section-number">4.1.2.1. </span>The Degree Matrix<a class="headerlink" href="#the-degree-matrix" title="Permalink to this headline">¶</a></h3>
+<h2><span class="section-number">4.1.5. </span>The Laplacian Matrix<a class="headerlink" href="#the-laplacian-matrix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-symmetric-laplacian">
+<h3><span class="section-number">4.1.5.1. </span>The Symmetric Laplacian<a class="headerlink" href="#the-symmetric-laplacian" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="variations-on-the-laplacian">
-<h3><span class="section-number">4.1.2.2. </span>Variations on the Laplacian<a class="headerlink" href="#variations-on-the-laplacian" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="the-random-walk-laplacian">
+<h3><span class="section-number">4.1.5.2. </span>The Random-Walk Laplacian<a class="headerlink" href="#the-random-walk-laplacian" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 </div>
