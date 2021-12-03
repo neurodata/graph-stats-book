@@ -665,8 +665,8 @@
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#finding-an-good-permutation-with-gradient-descent">
-   9.2.3. Finding an Good Permutation with Gradient Descent
+  <a class="reference internal nav-link" href="#finding-an-good-permutation-with-gradient-descent-optimization">
+   9.2.3. Finding an Good Permutation with Gradient Descent Optimization
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -707,14 +707,176 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="graph-matching">
 <h1><span class="section-number">9.2. </span>Graph Matching<a class="headerlink" href="#graph-matching" title="Permalink to this headline">¶</a></h1>
-<p>You work at Facebook and Twitter, but there’s been a terrible incident. All twitter users’ names and handles have been somehow been deleted! Your bosses are furious and have tasked you with somehow recovering the lost information. How might you go about doing this? Luckily, you’ve been working hard and have somehow earned yourself this dual Facebook/Twitter gig, so you have a great resource at your disposal: the Facebook social network. You know all facebook users and who they are friends with, and since you’ve only lost the twitter usernames, you can still figure out which ghost-users follow each other (make this sentence more specific, split it up into more sentences). You decide to use the Facebook network connectivity data to re-label the twitter social network. Alternatively, you can say the we are “aligning” Twitter based on Facebook.</p>
-<p>In the example above, the social networks are represented with each user as a node, and an edge exists if two users are friends. We’ll define the facebook and twitter networks as <span class="math notranslate nohighlight">\(F\)</span> and <span class="math notranslate nohighlight">\(T\)</span> respectively, with associated adjacency matrices <span class="math notranslate nohighlight">\(A_F\)</span> and <span class="math notranslate nohighlight">\(A_T\)</span>. This method is known as <span class="math notranslate nohighlight">\(\textit{Graph Matching}\)</span>, because we are matching the node labels of one graph to another. This can also be thought of as a mapping; that is, based on the neighborhood structure of a node in the <span class="math notranslate nohighlight">\(F\)</span> network, we assign the same label to the node in <span class="math notranslate nohighlight">\(T\)</span> with the most similar structure. In other words, one of our twitter users will be assigned the user name of the Facebook user with the most followers in common. This is then done for the whole network, such that overall the structure is best preserved.</p>
-<p>As you can imagine, there are a very large number of these possible mappings. In fact, for network pairs with <span class="math notranslate nohighlight">\(n\)</span> nodes, there are <span class="math notranslate nohighlight">\(n!\)</span> possible mappings. So how would we go about solving this(more specific) mathematically? First, we need a metric that tells us how similar two networks are to each other. For graph matching, this similarity metric is defined as <span class="math notranslate nohighlight">\(f(A, B) = ||A - B||_F^2\)</span> for unweighted adjacency matrices <span class="math notranslate nohighlight">\(A, B \in \mathbb{R}^{n \times n}\)</span>. In other words, <span class="math notranslate nohighlight">\(f(A, B)\)</span> is the sum of the squared elementwise differences between <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. To understand this functionally, consider the best possible case where <span class="math notranslate nohighlight">\(A=B\)</span>, that is, the networks are identical. The difference will be a matrix of all zeros, and taking the squared norm will then yield <span class="math notranslate nohighlight">\(f(A,B) = 0\)</span>. If we remove one edge from <span class="math notranslate nohighlight">\(A\)</span>, then <span class="math notranslate nohighlight">\(f(A,B) = 1\)</span>. If we consider the worst possible case (every edge in <span class="math notranslate nohighlight">\(A\)</span> does not exist in <span class="math notranslate nohighlight">\(B\)</span>, and vice versa), then <span class="math notranslate nohighlight">\(f(A,B) = n^2\)</span>. This metric effectively counts the number of adjacnecy disagreements between <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. Thus, we want to find the mapping where <span class="math notranslate nohighlight">\(f(A, B)\)</span> is as small as possible.</p>
+<p>You work at Facebook and Twitter, but there’s been a terrible incident on the Twitter end. All Twitter users’ names and handles have been somehow been deleted! Your bosses are furious and have tasked you with somehow recovering the lost information. How might you go about doing this? Luckily, you’ve been working hard and have somehow earned yourself this dual Facebook/Twitter gig, so you have a great resource at your disposal: the Facebook social network. You know all facebook users and who they are friends with, and since you’ve only lost the twitter usernames, you can still figure out which unnamed twitter users follow each other. You decide to use the Facebook network connectivity data to re-label the twitter social network. Alternatively, you can say the we are “aligning” Twitter based on Facebook.</p>
+<p>In the two social networks above, each user is a node and an edge exists if two users are friends. We’ll define the facebook and twitter networks as <span class="math notranslate nohighlight">\(F\)</span> and <span class="math notranslate nohighlight">\(T\)</span> respectively, with associated adjacency matrices <span class="math notranslate nohighlight">\(A_F\)</span> and <span class="math notranslate nohighlight">\(A_T\)</span>. Aligning the nodes of two networks is known as <span class="math notranslate nohighlight">\(\textit{Graph Matching}\)</span>, because we are matching the node indices of one graph to another. This can also be thought of as a mapping; that is, based on the neighbors of a node in <span class="math notranslate nohighlight">\(F\)</span>, you find a node in <span class="math notranslate nohighlight">\(T\)</span> with the most similar neighborhood structure, then give the two nodes the same index. In other words, one of our Twitter users will be assigned the user name of the Facebook user with the most connections in common. This is done for the whole network, with the end result being that overall the structure is best preserved.</p>
+<p>There are a ton of ways to match the nodes of two networks. In fact, for network pairs with <span class="math notranslate nohighlight">\(n\)</span> nodes, there are <span class="math notranslate nohighlight">\(n!\)</span> possible mappings; for example, when <span class="math notranslate nohighlight">\(n=100\)</span>, there are more than <span class="math notranslate nohighlight">\(10^{157}\)</span> possible matchings. So how would we go about figuring out which mapping is best without the computationally gargantuan task of checking each one? First, we need a metric that tells us how similar two networks are to each other. For graph matching, this similarity metric is defined as <span class="math notranslate nohighlight">\(f(A, B) = ||A - B||_F^2\)</span> for unweighted adjacency matrices <span class="math notranslate nohighlight">\(A, B \in \mathbb{R}^{n \times n}\)</span>. In other words, <span class="math notranslate nohighlight">\(f(A, B)\)</span> is the sum of the squared elementwise differences between <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. To understand this functionally, consider the best possible case where where the two networks (here they are two triangles) are identical: <span class="math notranslate nohighlight">\(A=B\)</span>.</p>
+<div class="math">
+\[
+A = 
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & 1\\
+1 & 1 & 0\end{array}
+\right)\end{array}
+\quad \quad
+B = 
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & 1\\
+1 & 1 & 0\end{array}
+\right)\end{array}
+\\
+A-B =
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 0 & 0\\
+0 & 0 & 1\\
+0 & 1 & 0\end{array}
+\right)\end{array}
+\\
+||A - B||_F^2 = 2
+\]
+    </div>
+As we seen above, the difference will be a matrix of all zeros, and taking the squared norm will then yield $f(A,B) = 0$. Below we remove one edge from $B$,
+<div class="math">
+\[
+A = 
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & 1\\
+1 & 1 & 0\end{array}
+\right)\end{array}
+\quad \quad
+B = 
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & 0\\
+1 & 0 & 0\end{array}
+\right)\end{array}
+\\
+A-B =
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & \\
+1 & 1 & 0\end{array}
+\right)\end{array}
+\\
+||A - B||_F^2 = 0
+\]
+    </div>
+<p>then <span class="math notranslate nohighlight">\(f(A,B) = 2\)</span>. If we consider the worst possible case (every edge in <span class="math notranslate nohighlight">\(A\)</span> does not exist in <span class="math notranslate nohighlight">\(B\)</span>),</p>
+<div class="math">
+\[
+A = 
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & 1\\
+1 & 1 & 0\end{array}
+\right)\end{array}
+\quad \quad
+B = 
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 0 & 0\\
+0 & 0 & 0\\
+0 & 0 & 0\end{array}
+\right)\end{array}
+\\
+A-B =
+\begin{array}{cc} &
+\begin{array}{ccc} 0 & 1 & 2 \end{array}
+\\
+\begin{array}{ccc}
+0 \\
+1 \\
+2 \end{array}
+&
+\left(
+\begin{array}{ccc}
+0 & 1 & 1\\
+1 & 0 & 1\\
+1 & 1 & 0\end{array}
+\right)\end{array}
+\\
+||A - B||_F^2 = 0
+\]
+    </div>
+then $f(A,B) = n^2$. This metric effectively counts the number of adjacnecy disagreements between $A$ and $B$. Thus, we want to find the mapping where $f(A, B)$ is as small as possible.
 <div class="section" id="graph-matching-small-networks">
 <h2><span class="section-number">9.2.1. </span>Graph Matching Small Networks<a class="headerlink" href="#graph-matching-small-networks" title="Permalink to this headline">¶</a></h2>
-<p>Say we have the network pairs below, <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span>. They are four nodes each, <span class="math notranslate nohighlight">\(\{1, 2, 3, 4\}\)</span> for <span class="math notranslate nohighlight">\(T\)</span>, and <span class="math notranslate nohighlight">\(\{a, b, c, d\}\)</span> for <span class="math notranslate nohighlight">\(F\)</span>. The two networks are clearly equal to each other.</p>
+<p>Say we have the network pairs below, <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span>. They have four nodes each, <span class="math notranslate nohighlight">\(\{1, 2, 3, 4\}\)</span> for <span class="math notranslate nohighlight">\(T\)</span>, and <span class="math notranslate nohighlight">\(\{a, b, c, d\}\)</span> for <span class="math notranslate nohighlight">\(F\)</span>. The two networks are equal to each other.</p>
 <p><img alt="gm_11" src="../../_images/gm_1.png" /></p>
-<p>However, the spatial layout of a network’s nodes is arbirary, and in reality it can often be much harder to tell whether two networks are the same. For instance, we can swap the spatial location of nodes <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(d\)</span> in network <span class="math notranslate nohighlight">\(F\)</span>, as shown below. Even with such a small network, it’s hard to tell whether the networks are the same. Nonetheless, by looking at the adjacency matrices, we see that the networks are in fact the same, with <span class="math notranslate nohighlight">\(f(A_T, A_F) = 0\)</span></p>
+<p>However, the spatial layout of a network’s nodes is arbirary, and in reality it can often be much harder to tell whether two networks are the same. For instance, we can swap the spatial location of nodes <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(d\)</span> in network <span class="math notranslate nohighlight">\(F\)</span>, as shown below. Even with such a small network, it’s hard to tell whether the networks are the same. Nonetheless, by looking at the adjacency matrices, we see that the networks are the same, with <span class="math notranslate nohighlight">\(f(A_T, A_F) = 0\)</span></p>
 <p><img alt="gm_22" src="../../_images/gm_2.png" /></p>
 <div class="math">
 \[
@@ -755,7 +917,7 @@ d \end{array}
 \right)\end{array}
 \]
     </div>
-<p>Next, we swap the actual the node labels of nodes 2 and 3 in network <span class="math notranslate nohighlight">\(F\)</span>.</p>
+<p>Next, we swap the actual the node indices of nodes 2 and 3 in network <span class="math notranslate nohighlight">\(F\)</span>.</p>
 <p><img alt="gm_33" src="../../_images/gm_3.png" /></p>
 <div class="math">
 \[
@@ -796,19 +958,17 @@ d \end{array}
 \right)\end{array}
 \]
     </div>
-<p>As we see the networks are no longer the same, with <span class="math notranslate nohighlight">\(f(A_T,A_F) = 8\)</span>. This might seem a bit high, but note that due to the graph being undirected, adjecency disagreements are effectively counted twice, since all edges (in and out) appear twice in the adjacency matrix. After showing how networks with a low number of edge disagreements are considered to be better matches, we will now demonstrate how to manipulate our networks and adjacency matrices such that we can find alignments that match well.</p>
+<p>As we see the networks are no longer the same, with <span class="math notranslate nohighlight">\(f(A_T,A_F) = 8\)</span>. This might seem a bit high, but note that because the graph is undirected, adjecency disagreements are effectively counted twice, since all edges (in and out) appear twice in the adjacency matrix. Now that we’ve shown how networks with a low number of edge disagreements are considered to be better matches, we will now demonstrate how to manipulate our adjacency matrices such that we can find alignments that match well. You can do this using something called a permutation matrix.</p>
 </div>
 <div class="section" id="permutation-matrices">
 <h2><span class="section-number">9.2.2. </span>Permutation Matrices<a class="headerlink" href="#permutation-matrices" title="Permalink to this headline">¶</a></h2>
-<p>Mappings are represented via <span class="math notranslate nohighlight">\(\textit{Permutation Matrices}\)</span> when solving the graph matching problem. A permutation matrix is a matrix of all ones and zeros, where each row and column adds up to one. In other words, each row and column has exactly one entry equal to one, with the rest being zeros.</p>
+<p>Permutation matrices are used to shuffle around the rows and columns of other matrices. A permutation matrix is a matrix of all ones and zeros, where each row and column adds up to one. In other words, each row has exactly one entry equal to one, with the rest being zeros; the same is true for the columns.</p>
 <div class="section" id="pb-moves-the-rows-bp-t-moves-the-columns">
 <h3><span class="section-number">9.2.2.1. </span><span class="math notranslate nohighlight">\(PB\)</span> moves the rows, <span class="math notranslate nohighlight">\(BP^T\)</span> moves the columns<a class="headerlink" href="#pb-moves-the-rows-bp-t-moves-the-columns" title="Permalink to this headline">¶</a></h3>
 <p>Permutation matrices are commonly used as a method to move around the rows and columns of a square matrix. Consider the following example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
@@ -819,31 +979,35 @@ d \end{array}
               <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
-
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Original Matrix $B$&#39;</span><span class="p">)</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="nd">@B</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Row Permutation $PB$:&#39;</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="nd">@P</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Row Permutation $BP^T$:&#39;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="nd">@P</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Column Permutation $BP^T$:&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Row Permutation $BP^T$:&#39;}&gt;
-</pre></div>
-</div>
-<img alt="../../_images/graph-matching-vertex_7_1.png" src="../../_images/graph-matching-vertex_7_1.png" />
+<img alt="../../_images/graph-matching-vertex_8_0.png" src="../../_images/graph-matching-vertex_8_0.png" />
 </div>
 </div>
-<p>The permutation matrix represents the following mapping:<br />
+<p>The permutation matrix above represents the following mapping:<br />
 <span class="math notranslate nohighlight">\(0 \rightarrow 1\)</span><br />
 <span class="math notranslate nohighlight">\(1 \rightarrow 0\)</span><br />
 <span class="math notranslate nohighlight">\(2 \rightarrow 2\)</span><br />
 <span class="math notranslate nohighlight">\(3 \rightarrow 3\)</span><br />
-The matrix multiplication <span class="math notranslate nohighlight">\(PB\)</span> moves the rows based on the mapping, and <span class="math notranslate nohighlight">\(BP^T\)</span> moves the columns based on the mapping. In other words, in this case <span class="math notranslate nohighlight">\(PB\)</span> swaps rows 0 and 1 of <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(BP^T\)</span> swaps columns 0 and 1 of <span class="math notranslate nohighlight">\(B\)</span>. Therefore by combined these two operations <span class="math notranslate nohighlight">\(PBP^T\)</span>, we can move both the rows and columns based on a single bijection.</p>
+<span class="math notranslate nohighlight">\(PB\)</span> moves the rows and <span class="math notranslate nohighlight">\(BP^T\)</span> moves the columns based on the mapping. In other words, in this case <span class="math notranslate nohighlight">\(PB\)</span> swaps rows 0 and 1 of <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(BP^T\)</span> swaps columns 0 and 1 of <span class="math notranslate nohighlight">\(B\)</span>. Therefore by combined these two operations <span class="math notranslate nohighlight">\(PBP^T\)</span>, we can move both the rows and columns based on a single mapping.</p>
 </div>
 <div class="section" id="permutation-matrices-to-match-graphs">
 <h3><span class="section-number">9.2.2.2. </span>Permutation Matrices to Match Graphs<a class="headerlink" href="#permutation-matrices-to-match-graphs" title="Permalink to this headline">¶</a></h3>
-<p>Next, we again consider the previous simple network pair example of swapping the node labels of 2 and 3 in network H:
+<p>Next, we again consider the previous simple network pair example of swapping the node labels of c and d in network F:
 <img alt="gm_3" src="../../_images/gm_3.png" /></p>
 <div class="math">
 \[
@@ -884,11 +1048,11 @@ d \end{array}
 \right)\end{array}
 \]
     </div>
-<p>This swap is represented by the following bijection to recover the node correspondence between <span class="math notranslate nohighlight">\(G\)</span> and <span class="math notranslate nohighlight">\(H\)</span><br />
-<span class="math notranslate nohighlight">\(0 \rightarrow 0\)</span><br />
-<span class="math notranslate nohighlight">\(1 \rightarrow 1\)</span><br />
-<span class="math notranslate nohighlight">\(2 \rightarrow 3\)</span><br />
-<span class="math notranslate nohighlight">\(3 \rightarrow 2\)</span></p>
+<p>This swap is represented by the following bijection to recover the node correspondence between <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span><br />
+<span class="math notranslate nohighlight">\(a \rightarrow a\)</span><br />
+<span class="math notranslate nohighlight">\(b \rightarrow b\)</span><br />
+<span class="math notranslate nohighlight">\(c \rightarrow d\)</span><br />
+<span class="math notranslate nohighlight">\(d \rightarrow c\)</span></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
@@ -904,8 +1068,13 @@ d \end{array}
               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$A_T$&#39;</span><span class="p">)</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$A_F$&#39;</span><span class="p">)</span>
 <span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="nd">@B@P</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$A_F$ with row and column permutation&#39;</span><span class="p">)</span>
@@ -916,24 +1085,24 @@ d \end{array}
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;$A_F$ with row and column permutation&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_10_1.png" src="../../_images/graph-matching-vertex_10_1.png" />
+<img alt="../../_images/graph-matching-vertex_12_1.png" src="../../_images/graph-matching-vertex_12_1.png" />
 </div>
 </div>
 <p>As shown in the code block above, using the permutation matrix we are able to recover the correspondence between <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span>.<br />
-Thus, the graph matching formulation for any two adjacency matrices <span class="math notranslate nohighlight">\(A, B\)</span>, seeks to minimize <span class="math notranslate nohighlight">\(|| A - PBP^\intercal||_F^2\)</span> such that <span class="math notranslate nohighlight">\(P\)</span> is a permuation matrix. This means that you shuffle the rows and columns of <span class="math notranslate nohighlight">\(B\)</span>, such that it is as close as possible to <span class="math notranslate nohighlight">\(A\)</span>. In mathematics, the process of minimizing (or maximizing) a function based on some constraint is known as optimization.</p>
+Thus, the graph matching formulation for any two adjacency matrices <span class="math notranslate nohighlight">\(A, B\)</span>, seeks to minimize the cost function <span class="math notranslate nohighlight">\(f(A,B,P) = || A - PBP^\intercal||_F^2\)</span> such that <span class="math notranslate nohighlight">\(P\)</span> is a permuation matrix. This means that you shuffle the rows and columns of <span class="math notranslate nohighlight">\(B\)</span>, such that it is as close as possible to <span class="math notranslate nohighlight">\(A\)</span>. In mathematics, the process of minimizing (or maximizing) a function based on some constraint is known as optimization.</p>
 </div>
 </div>
-<div class="section" id="finding-an-good-permutation-with-gradient-descent">
-<h2><span class="section-number">9.2.3. </span>Finding an Good Permutation with Gradient Descent<a class="headerlink" href="#finding-an-good-permutation-with-gradient-descent" title="Permalink to this headline">¶</a></h2>
-<p>The algorithm used for solving graph matching is a variation of gradient descent.  The specifics of the algorithm are beyond the scope of this book, but for now you can simply imagine it as gradient descent. A gradient can be thought of as a vector valued slope; it is simply the slope of a function in all of it’s dimensions, at a single point in space. Gradient Descent is a very common optimization method using to find optimal solutions for a wide range of problems.</p>
-<p>A simple way to think of the method is gravity.  Consider an inspector who might use a golf ball to find the lowest point when installing a drain. The ball rolls down hill until it comes to a stop; once stopped, we know we’ve found the lowest point. Gradient descent works in a similar way, taking steps in the direction of the local gradient with respect to some parameter. Once the gradient is zero, the minimum has been found.</p>
+<div class="section" id="finding-an-good-permutation-with-gradient-descent-optimization">
+<h2><span class="section-number">9.2.3. </span>Finding an Good Permutation with Gradient Descent Optimization<a class="headerlink" href="#finding-an-good-permutation-with-gradient-descent-optimization" title="Permalink to this headline">¶</a></h2>
+<p>The algorithm used for solving graph matching optimization problem we described above is a variation of gradient descent.  The specifics of the algorithm are beyond the scope of this book, but for now you can simply imagine it as gradient descent. A gradient can be thought of as a vector valued slope; it is simply the slope of a function in all of it’s dimensions, at a single point in space. Gradient Descent is a very common optimization method using to find optimal solutions for a wide range of problems.</p>
+<p>A simple way to think of the method is gravity.  Consider an inspector using a golf ball to find the lowest point when installing a drain. The ball rolls down hill until it comes to a stop; once it stops, we know we’ve found the lowest point. Gradient descent works in a similar way, taking steps in the direction of the local gradient with respect to some parameter. Once the gradient is zero, a local minimum has been found and the algorithm is stopped.</p>
 <p>The main steps of a gradient descent method are choosing a suitable initial position (can be chosen randomly), then gradually improving the cost function one step at a time, until the function is changing by a very small amount, converging to a minimum. The main issue with gradient descent is that it does not guarantee that you will find a global minimum, only that you will find the local minimum of your initial position.</p>
 <p><img alt="grad_desc" src="../../_images/grad_desc.png" /></p>
-<p>The image above is a simplification in two dimensions; the network functions we optimize over are n dimensional when matching networks with n nodes, making the problem incredibly difficult to solve. For this reason (among others outside of the scope), the state-of-the-art graph matching algorithm is an approximation algorithm.</p>
+<p>The image above is a simplification in two dimensions; the network functions we optimize over are n dimensional when matching networks with n nodes, making the problem incredibly difficult to solve. For this reason (among others outside of the scope of this book), the state-of-the-art graph matching algorithm is an approximation algorithm.</p>
 </div>
 <div class="section" id="graph-matching-with-graspologic">
 <h2><span class="section-number">9.2.4. </span>Graph Matching with graspologic<a class="headerlink" href="#graph-matching-with-graspologic" title="Permalink to this headline">¶</a></h2>
-<p>For the example below, we will match two networks with a known to be have a node bijection that preserves a common network structure. To do this, we simulate a single Erdos-Reyni network, <span class="math notranslate nohighlight">\(A\)</span>, with six nodes and edge probability of 30. Then, we generate <span class="math notranslate nohighlight">\(B\)</span> by randomly permuting the node labels of <span class="math notranslate nohighlight">\(A\)</span>. Thus, <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are said to be <span class="math notranslate nohighlight">\(\textit{isomorphic}\)</span>.</p>
+<p>For the example below, we will match two networks with a known node mapping that preserves a common network structure. To do this, we simulate a single Erdos-Reyni network, <span class="math notranslate nohighlight">\(A\)</span>, with six nodes and an edge probability of 0.5. Then, we generate <span class="math notranslate nohighlight">\(B\)</span> by randomly permuting the node labels of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
@@ -944,7 +1113,7 @@ Thus, the graph matching formulation for any two adjacency matrices <span class=
 <span class="c1"># np.random.seed(1)</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
 <span class="n">node_shuffle_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">node_shuffle_input</span><span class="p">,</span> <span class="n">node_shuffle_input</span><span class="p">)]</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">node_shuffle_input</span><span class="p">][:,</span> <span class="n">node_shuffle_input</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of adjecnecy disagreements: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">A</span><span class="o">-</span><span class="n">B</span><span class="p">)))</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
@@ -954,23 +1123,23 @@ Thus, the graph matching formulation for any two adjacency matrices <span class=
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjecnecy disagreements:  4.0
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjecnecy disagreements:  16.0
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;B [A Randomly Shuffled]&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_16_2.png" src="../../_images/graph-matching-vertex_16_2.png" />
+<img alt="../../_images/graph-matching-vertex_18_2.png" src="../../_images/graph-matching-vertex_18_2.png" />
 </div>
 </div>
-<p>Below, we create a model to solve the Graph Matching Problem. The model is then fitted for the two graphs A and B.</p>
+<p>Below, we create a model to solve the Graph Matching Problem. The model is then fit for the two graphs A and B.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.match</span> <span class="kn">import</span> <span class="n">GraphMatch</span>
 
 <span class="n">gmp</span> <span class="o">=</span> <span class="n">GraphMatch</span><span class="p">()</span>
 <span class="n">gmp</span> <span class="o">=</span> <span class="n">gmp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">,</span> <span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">)]</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">][:,</span> <span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of adjecnecy disagreements: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">A</span><span class="o">-</span><span class="n">B</span><span class="p">)))</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
@@ -987,14 +1156,14 @@ Thus, the graph matching formulation for any two adjacency matrices <span class=
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;A-B [Unshuffled]&#39;}&gt;
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_18_2.png" src="../../_images/graph-matching-vertex_18_2.png" />
+<img alt="../../_images/graph-matching-vertex_20_2.png" src="../../_images/graph-matching-vertex_20_2.png" />
 </div>
 </div>
 <p>The graph matching algorithm is able to successfully unshuffle <span class="math notranslate nohighlight">\(B\)</span>, with zero adjacency disagreements between <span class="math notranslate nohighlight">\(A\)</span> and the matched <span class="math notranslate nohighlight">\(B\)</span>.</p>
 </div>
 <div class="section" id="seeds">
 <h2><span class="section-number">9.2.5. </span>Seeds<a class="headerlink" href="#seeds" title="Permalink to this headline">¶</a></h2>
-<p>As mentioned previously, as network become larger, they quickly become more difficult to match. One method to mitigate this difficulty is to use <span class="math notranslate nohighlight">\(\textit{seeds}\)</span>. Seeds are a subset of matches that we already know before we perform the graph matching. For example, if we are given two graphs <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span> with 300 nodes each, we might already know ten node matches between <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span>. Having this prior information greatly improves our ability to match the networks.</p>
+<p>As mentioned previously, as networks become larger, they quickly become more difficult to match. One method to mitigate this difficulty is to use <span class="math notranslate nohighlight">\(\textit{seeds}\)</span>. Seeds are a subset of matches that we already know before we perform the graph matching. For example, if we are given two graphs <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span> with 300 nodes each, we might already know ten node matches between <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(F\)</span>. Having this prior information greatly improves our ability to match the networks.</p>
 </div>
 <div class="section" id="seeded-graph-matching-on-correlated-graph-pairs">
 <h2><span class="section-number">9.2.6. </span>Seeded Graph Matching on Correlated Graph Pairs<a class="headerlink" href="#seeded-graph-matching-on-correlated-graph-pairs" title="Permalink to this headline">¶</a></h2>
@@ -1031,7 +1200,7 @@ rho &amp;= 0.9
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_23_0.png" src="../../_images/graph-matching-vertex_23_0.png" />
+<img alt="../../_images/graph-matching-vertex_25_0.png" src="../../_images/graph-matching-vertex_25_0.png" />
 </div>
 </div>
 <p>To emphasize the effectiveness of SGM, as well as why having seeds is important, we will randomly shuffle the vertices of Graph 2. This random permutation is stored, and unshuffled, such that we have available the optimal permutation that returns the original graph 2.</p>
@@ -1051,7 +1220,7 @@ rho &amp;= 0.9
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_25_0.png" src="../../_images/graph-matching-vertex_25_0.png" />
+<img alt="../../_images/graph-matching-vertex_27_0.png" src="../../_images/graph-matching-vertex_27_0.png" />
 </div>
 </div>
 </div>
@@ -1075,10 +1244,10 @@ rho &amp;= 0.9
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Match Ratio with no seeds:  0.013333333333333308
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Match Ratio with no seeds:  0.01777777777777778
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_27_1.png" src="../../_images/graph-matching-vertex_27_1.png" />
+<img alt="../../_images/graph-matching-vertex_29_1.png" src="../../_images/graph-matching-vertex_29_1.png" />
 </div>
 </div>
 <p>While the predicted permutation for graph 2 did recover the basic structure of the stochastic block model (i.e. graph 1 and graph 2 look qualitatively similar), we see that the number of edge disagreements between them is still quite high, and the match ratio quite low.</p>
@@ -1109,7 +1278,7 @@ rho &amp;= 0.9
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Match Ratio with 10 seeds:  1.0
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_30_1.png" src="../../_images/graph-matching-vertex_30_1.png" />
+<img alt="../../_images/graph-matching-vertex_32_1.png" src="../../_images/graph-matching-vertex_32_1.png" />
 </div>
 </div>
 <p>From the results above, we see that when running SGM on the same two graphs, with no seeds there is match ratio is quite low. However including 10 seeds increases the match ratio to 100% (meaning that the shuffled graph 2 was completely correctly unshuffled).</p>
