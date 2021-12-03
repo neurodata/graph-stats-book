@@ -3,7 +3,7 @@
 ```{figure} Images/umap_pedigo_small.jpg
 ---
 height: 700px
-name: worm-connectome
+name: maggot-connectome
 ---
-Model of a C. Elegans connectome network. Credit to Ben Pedigo, PhD student at Johns Hopkins University.
+2D representation of a *Drosophila* larva brain connectome network. Credit to Ben Pedigo, PhD student at Johns Hopkins University.
 ```
