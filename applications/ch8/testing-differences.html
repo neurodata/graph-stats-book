@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>8.2. Testing for Differences between Communities &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>8.2. Testing for Differences between Groups of Edges &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -435,7 +437,7 @@
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     8.2. Testing for Differences between Communities
+     8.2. Testing for Differences between Groups of Edges
     </a>
    </li>
    <li class="toctree-l2">
@@ -627,6 +629,63 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector">
+   8.2.1. The Structured Independent Edge Model is parametrized by a Cluster-Assignment Matrix and a probability vector
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-cluster-assignment-matrix">
+     8.2.1.1. The Cluster-Assignment Matrix
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-probability-vector">
+     8.2.1.2. The Probability vector
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-we-simulate-realizations-from-an-siem-n-z-vec-p-random-network">
+     8.2.1.3. How do we simulate realizations from an
+     <span class="math notranslate nohighlight">
+      \(SIEM_n(Z, \vec p)\)
+     </span>
+     random network?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-do-we-care-about-the-siem">
+   8.2.2. Why do we care about the SIEM?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#hypothesis-testing-with-coin-flips">
+     8.2.2.1. Hypothesis Testing with coin flips
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#p-values-tell-us-the-chances-of-observing-an-outcome-if-the-null-hypothesis-is-true">
+       8.2.2.1.1.
+       <span class="math notranslate nohighlight">
+        \(p\)
+       </span>
+       -values tell us the chances of observing an outcome if the null hypothesis is true
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -635,8 +694,290 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="testing-for-differences-between-communities">
-<h1><span class="section-number">8.2. </span>Testing for Differences between Communities<a class="headerlink" href="#testing-for-differences-between-communities" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="testing-for-differences-between-groups-of-edges">
+<h1><span class="section-number">8.2. </span>Testing for Differences between Groups of Edges<a class="headerlink" href="#testing-for-differences-between-groups-of-edges" title="Permalink to this headline">¶</a></h1>
+<p>Let’s recall back to our school example. We have a network consisting of <span class="math notranslate nohighlight">\(100\)</span> students who attend one of two schools, with the first <span class="math notranslate nohighlight">\(50\)</span> students attending school one and the second <span class="math notranslate nohighlight">\(50\)</span> students attending school two. The nodes are students, and the edges are whether a pair of students attend the same school. What we want to know is whether there is a higher chance two students are friends if they go to the same school than if they go to two different schools. We don’t know which student goes to which school, so we have some work to do. The network is given to us looking something like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># define the parameters for the SBM</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">B</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]]</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># generate a reordering of the n nodes</span>
+<span class="n">vtx_perm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">Aperm</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">vtx_perm</span><span class="p">])]</span> <span class="p">[:,</span><span class="n">vtx_perm</span><span class="p">]</span>
+<span class="n">yperm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)[</span><span class="n">vtx_perm</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">Aperm</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;School Network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_2_0.png" src="../../_images/testing-differences_2_0.png" />
+</div>
+</div>
+<p>The true, but <em>unknown</em>, probability matrix looks something like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">+</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">z</span> <span class="o">@</span> <span class="n">B</span> <span class="o">@</span> <span class="n">z</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">Pperm</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">vtx_perm</span><span class="p">])]</span> <span class="p">[:,</span><span class="n">vtx_perm</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">Pperm</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;True Probability Matrix, School Network&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_5_0.png" src="../../_images/testing-differences_5_0.png" />
+</div>
+</div>
+<p>How do we proceed?</p>
+<p>We begin by using spectral methods whichh were developed in <a class="reference external" href="#link?">Chapter 6</a>. Specifically, here we will use the adjacency spectral embedding, without specifying a number of embedding dimensions:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span>
+
+<span class="n">ase</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">()</span>  <span class="c1"># adjacency spectral embedding, with optimal number of latent dimensions selected using elbow picking</span>
+<span class="n">Xhat</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Aperm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We visualize the estimated latent positions using a pairs plot:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Pairs plot for school network&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_9_0.png" src="../../_images/testing-differences_9_0.png" />
+</div>
+</div>
+<p>It seems pretty obvious that thhere are two distinct communities indicated by the latent positions, which makes sense given that there are students from two schools present. This is indicated in two off-diagonal plots, as we can see that in the upper-right plot for instance, the second latent dimension separates two clusters of latent positions approximately right down the middle. <code class="docutils literal notranslate"><span class="pre">K-means</span></code> picks up on this trend, too:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.cluster</span> <span class="kn">import</span> <span class="n">KMeansCluster</span>
+
+<span class="n">km_clust</span> <span class="o">=</span> <span class="n">KMeansCluster</span><span class="p">(</span><span class="n">max_clusters</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">km_clust</span> <span class="o">=</span> <span class="n">km_clust</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xhat</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We start by visualizing the number of clusters produced by <code class="docutils literal notranslate"><span class="pre">K-means</span></code>, using the silhouette score:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nclusters</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>  <span class="c1"># graspologic nclusters goes from 2 to max_clusters</span>
+<span class="n">silhouette</span> <span class="o">=</span> <span class="n">km_clust</span><span class="o">.</span><span class="n">silhouette_</span>  <span class="c1"># obtain the respective silhouette scores</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span> <span class="k">as</span> <span class="n">df</span>
+
+<span class="n">silhouette_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">({</span><span class="s2">&quot;Number of Clusters&quot;</span><span class="p">:</span> <span class="n">nclusters</span><span class="p">,</span> <span class="s2">&quot;Silhouette Score&quot;</span><span class="p">:</span> <span class="n">silhouette</span><span class="p">})</span>  <span class="c1"># place into pandas dataframe</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">silhouette_df</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Number of Clusters&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Silhouette Score&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Silhouette Analysis of KMeans Clusterings&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_14_0.png" src="../../_images/testing-differences_14_0.png" />
+</div>
+</div>
+<p>It i clear that the silhouette score is maximized for <span class="math notranslate nohighlight">\(K=2\)</span> clusters, so <code class="docutils literal notranslate"><span class="pre">K-means</span></code> has indicated that there are two clusters in the latent positions, and consequently two communities of nodes. Next, we produce community estimates for each of the nodes according to their latent positions. Further, since this example is a simulated network, we can also re-align the predicted labels with the true labels. Finally, we computer the overall quality of the clustering using the Adjusted Rand Index, and we visualize the node predictions:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">remap_labels</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">adjusted_rand_score</span>
+
+<span class="n">labels_autokmeans</span> <span class="o">=</span> <span class="n">km_clust</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">Xhat</span><span class="p">)</span>
+<span class="n">labels_autokmeans</span> <span class="o">=</span> <span class="n">remap_labels</span><span class="p">(</span><span class="n">yperm</span><span class="p">,</span> <span class="n">labels_autokmeans</span><span class="p">)</span>
+
+<span class="n">ari_kmeans</span> <span class="o">=</span> <span class="n">adjusted_rand_score</span><span class="p">(</span><span class="n">labels_autokmeans</span><span class="p">,</span> <span class="n">yperm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat</span><span class="p">,</span>
+         <span class="n">labels</span><span class="o">=</span><span class="n">labels_autokmeans</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;KMeans on embedding, ARI: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ari_kmeans</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+         <span class="n">legend_name</span><span class="o">=</span><span class="s1">&#39;Predicted label&#39;</span><span class="p">,</span>
+         <span class="n">height</span><span class="o">=</span><span class="mf">3.5</span><span class="p">,</span>
+         <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;muted&#39;</span><span class="p">,);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_17_0.png" src="../../_images/testing-differences_17_0.png" />
+</div>
+</div>
+<p>Since the ARI is <span class="math notranslate nohighlight">\(1.0\)</span>, <code class="docutils literal notranslate"><span class="pre">K-means</span></code> has perfectly predicted which community each node is assigned to. Finally, let’s take the original adjacency matrix, and just resort the nodes based on the predicted node communities:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use argsort to sort by the kmeans labels</span>
+<span class="n">node_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">labels_autokmeans</span><span class="p">)</span>
+
+<span class="c1"># resort the adjacency matrix</span>
+<span class="n">Asrt</span> <span class="o">=</span> <span class="n">Aperm</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">node_order</span><span class="p">])][:,</span><span class="n">node_order</span><span class="p">]</span>
+<span class="n">ysrt</span> <span class="o">=</span> <span class="n">labels_autokmeans</span><span class="p">[</span><span class="n">node_order</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">draw_multiplot</span><span class="p">(</span><span class="n">Asrt</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">ysrt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;School Network, nodes sorted by predicted community&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_20_0.png" src="../../_images/testing-differences_20_0.png" />
+</div>
+</div>
+<p>So, our question of interest is whether the within-school connectivity exceeds the between-school connectivity. Let’s think of how to better formulate this problem.</p>
+<p>Notice that the edges amongst students of school one are all in the upper left square of the adjacency matrix, and the edges amongst students of school two are all in the lower right square of the adjacency matrix. We will call these edges the “within-school” edges (Cluster <span class="math notranslate nohighlight">\(1\)</span>). The edges between students of school one and two are in the upper right and upper left squares of the adjacency matrix (Cluster <span class="math notranslate nohighlight">\(2\)</span>). In a picture, the edges are grouped as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">chararray</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">),</span> <span class="n">itemsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># within-school edge</span>
+<span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># between-school edge</span>
+<span class="n">Z</span><span class="p">[</span><span class="mi">50</span><span class="p">:</span><span class="mi">100</span><span class="p">,</span><span class="mi">50</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># within-school edge</span>
+<span class="n">Z</span><span class="p">[</span><span class="mi">50</span><span class="p">:</span><span class="mi">100</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># between-school edge</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">cmaps</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Asrt</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;School Network, sorted&#39;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;qualitative&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Edge Cluster&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_23_0.png" src="../../_images/testing-differences_23_0.png" />
+</div>
+</div>
+<p>So now, we know which cluster each edge is in, and we have a realization of a network. Recall that our original question was whether the indivduals within-school (cluster <span class="math notranslate nohighlight">\(1\)</span>) were better friends than individuals between-schools (cluster <span class="math notranslate nohighlight">\(2\)</span>). Reformulating this question in terms of the network, our question becomes whether the edges which are assigned to cluster <span class="math notranslate nohighlight">\(1\)</span> have a <em>higher</em> probability of existing than the edges of cluster <span class="math notranslate nohighlight">\(2\)</span>. For this purpose, we introduce a <em>different</em> generalization of the Stochastic Block Model, the <em>Structured Independent Edge Model</em> (SIEM).</p>
+<div class="section" id="the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector">
+<h2><span class="section-number">8.2.1. </span>The Structured Independent Edge Model is parametrized by a Cluster-Assignment Matrix and a probability vector<a class="headerlink" href="#the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector" title="Permalink to this headline">¶</a></h2>
+<p>To describe the Structured Independent Edge Model (SIEM), we will return to our old coin flipping example.</p>
+<div class="section" id="the-cluster-assignment-matrix">
+<h3><span class="section-number">8.2.1.1. </span>The Cluster-Assignment Matrix<a class="headerlink" href="#the-cluster-assignment-matrix" title="Permalink to this headline">¶</a></h3>
+<p>The cluster assignment matrix <span class="math notranslate nohighlight">\(Z\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix which assigns potential edges in the random network to clusters. What do we mean by this?</p>
+<p>Remember that the adjacency matrix <span class="math notranslate nohighlight">\(\mathbf A\)</span> for a random network is <em>also</em> an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, where each entry <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is a random variable which takes the value <span class="math notranslate nohighlight">\(0\)</span> or the value <span class="math notranslate nohighlight">\(1\)</span> with a particular probability. The cluster assignment matrix takes each of these <span class="math notranslate nohighlight">\(n^2\)</span> random variables, and uses a parameter <span class="math notranslate nohighlight">\(z_{ij}\)</span> to indicate which of <span class="math notranslate nohighlight">\(K\)</span> possible clusters this edge is part of. In the school example, for instance, the edges in the upper left and lower right are in cluster <span class="math notranslate nohighlight">\(1\)</span> (‘within-school’ edges), and the edges in the upper right and lower left are in cluster <span class="math notranslate nohighlight">\(2\)</span> (‘between-school’ edges). In the school example, <span class="math notranslate nohighlight">\(K=2\)</span>.</p>
+</div>
+<div class="section" id="the-probability-vector">
+<h3><span class="section-number">8.2.1.2. </span>The Probability vector<a class="headerlink" href="#the-probability-vector" title="Permalink to this headline">¶</a></h3>
+<p>the second parameter for the SIEM is a probability vector, <span class="math notranslate nohighlight">\(\vec p\)</span>. If there are <span class="math notranslate nohighlight">\(K\)</span> edge clusters in the SIEM, then <span class="math notranslate nohighlight">\(\vec p\)</span> is a length-<span class="math notranslate nohighlight">\(K\)</span> vector. Each entry <span class="math notranslate nohighlight">\(p_k\)</span> indicates the probablity of an edge in the <span class="math notranslate nohighlight">\(k^{th}\)</span> cluster existing in the network. For example, <span class="math notranslate nohighlight">\(p_1\)</span> indicates the probability of an edge in the first edge cluster, <span class="math notranslate nohighlight">\(p_2\)</span> indicates the probability of an edge in the second edge cluster, so on and so-forth. In the school example, for instance, the probability <span class="math notranslate nohighlight">\(p_1\)</span> indicates the probability of a within-school edge, and the probability <span class="math notranslate nohighlight">\(p_2\)</span> indicates the probability of a between-school edge.</p>
+<p>Like usual, we will formulate the SIEM using our old coin flip example. We begin by obtaining <span class="math notranslate nohighlight">\(K\)</span> coins, where the <span class="math notranslate nohighlight">\(k^{th}\)</span> coin has a chance of landing on heads of <span class="math notranslate nohighlight">\(p_k\)</span>, and a chance of landing on tails of <span class="math notranslate nohighlight">\(1 - p_k\)</span>. For each entry <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, we identify the corresponding cluster <span class="math notranslate nohighlight">\(z_{ij}\)</span> that this edge is in. Remember that <span class="math notranslate nohighlight">\(z_{ij}\)</span> takes one of <span class="math notranslate nohighlight">\(K\)</span> possible values. We flip the <span class="math notranslate nohighlight">\(z_{ij}\)</span> coin, and if it lands on heads (with probability <span class="math notranslate nohighlight">\(p_{z_{ij}}\)</span>), the edge exists, and if it lands on tails (with probability <span class="math notranslate nohighlight">\(1 - p_{z_{ij}}\)</span>) the edge does not exist.</p>
+<p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an SIEM random network with <span class="math notranslate nohighlight">\(n\)</span> nodes, the cluster assignment matrix <span class="math notranslate nohighlight">\(Z\)</span>, and the probability vector <span class="math notranslate nohighlight">\(\vec p\)</span>, we say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network.</p>
+</div>
+<div class="section" id="how-do-we-simulate-realizations-from-an-siem-n-z-vec-p-random-network">
+<h3><span class="section-number">8.2.1.3. </span>How do we simulate realizations from an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network?<a class="headerlink" href="#how-do-we-simulate-realizations-from-an-siem-n-z-vec-p-random-network" title="Permalink to this headline">¶</a></h3>
+<p>The procedure below will produce for us a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network:</p>
+<div class="admonition-simulating-a-realization-from-an-siem-n-z-vec-p-random-network admonition">
+<p class="admonition-title">Simulating a realization from an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network</p>
+<ol class="simple">
+<li><p>Determine a cluster assignment matrix <span class="math notranslate nohighlight">\(Z\)</span> for each edge of the network. Each edge entry <span class="math notranslate nohighlight">\(z_{ij}\)</span> can take one of <span class="math notranslate nohighlight">\(K\)</span> possible values.</p></li>
+<li><p>Determine a length-<span class="math notranslate nohighlight">\(K\)</span> probability vector for each of the <span class="math notranslate nohighlight">\(K\)</span> edge clusters.</p></li>
+<li><p>For each of the <span class="math notranslate nohighlight">\(K\)</span> clusters, obtain <span class="math notranslate nohighlight">\(K\)</span> total weighted coins, where the <span class="math notranslate nohighlight">\(k^{th}\)</span> coin lands on heads with probability <span class="math notranslate nohighlight">\(p_k\)</span> and tails with probability <span class="math notranslate nohighlight">\(1 - p_k\)</span>.</p></li>
+<li><p>For each edge <span class="math notranslate nohighlight">\((i, j)\)</span>:</p>
+<ul class="simple">
+<li><p>Denote <span class="math notranslate nohighlight">\(z_{ij}\)</span> to be the cluster assignment of the potential edge between node <span class="math notranslate nohighlight">\(i\)</span> and node <span class="math notranslate nohighlight">\(j\)</span>.</p></li>
+<li><p>Flip the <span class="math notranslate nohighlight">\(z_{ij}\)</span> coin, and if it lands on heads, the corresponding entry in the adjacency matrix <span class="math notranslate nohighlight">\(a_{ij}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>. If it lands on tails, the coresponding entry in the adjacency matrix <span class="math notranslate nohighlight">\(a_{ij}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+</ul>
+</li>
+<li><p>The adjacency matrix we produce, <span class="math notranslate nohighlight">\(A\)</span>, is a realization of an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network.</p></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="why-do-we-care-about-the-siem">
+<h2><span class="section-number">8.2.2. </span>Why do we care about the SIEM?<a class="headerlink" href="#why-do-we-care-about-the-siem" title="Permalink to this headline">¶</a></h2>
+<p>Remember that our question boiled down to whether the edges which are assigned to cluster <span class="math notranslate nohighlight">\(1\)</span> have a <em>higher</em> probability of existing than the edges of cluster <span class="math notranslate nohighlight">\(2\)</span>. In other words, we <em>hypothesize</em> that the edges assigned to cluster <span class="math notranslate nohighlight">\(1\)</span> have a higher probability of existing than the edges of cluster <span class="math notranslate nohighlight">\(2\)</span>. In terms of the probability vector, what we are saying is that we think that <span class="math notranslate nohighlight">\(p_1 &gt; p_2\)</span>. Obviously, we are wrong if <span class="math notranslate nohighlight">\(p_1 \leq p_2\)</span>. This type of statistical question is known as a <em>hypothesis test</em>. <strong>Hypothesis testing</strong> is an approach by which we formulate statistical questions and present approaches which, <em>using the data</em>, indicates how much the data supports or doess not support the statistical questions we asked (or, provide us with the ability to <em>infer</em> something). For this reason, hypothesis testing is often an essential component of <em>statistical inference</em>, which is the name given to the process of learning something from data using statistical models.</p>
+<p>The way hypothesis testing works is we call one hypothesis a <em>null hypothesis</em> and the other an <em>alternative hypothesis</em>. The <strong>null hypothesis</strong> is the hypothesis where, if true, indicates that we were <em>wrong</em> about what how we thought the system behaved. In our example data, the null hypothesis is that <span class="math notranslate nohighlight">\(p_1 \leq p_2\)</span>. We typically would write this out notationally as <span class="math notranslate nohighlight">\(H_0: p_1 \leq p_2\)</span>. The capital <span class="math notranslate nohighlight">\(H\)</span> is used to denote that this is a hypothesis, and the little “<span class="math notranslate nohighlight">\(0\)</span>” is just to indicate “null”. The <strong>alternative hypothesis</strong> is the hypothesis where, if true, indicates that we werer <em>correct</em> about how we thought the system behaved. In our example, the alternative hypothesis is that <span class="math notranslate nohighlight">\(p_1 &gt; p_2\)</span>, which we write out as <span class="math notranslate nohighlight">\(H_A: p_1 &gt; p_2\)</span>. Here, the subscript <span class="math notranslate nohighlight">\(A\)</span> denotes that this is the alternative hypothesis. When describing our hypothesis, we say that we are testing <span class="math notranslate nohighlight">\(H_A: p_1 &gt; p_2\)</span> <em>against</em> <span class="math notranslate nohighlight">\(H_0: p_1 \leq p_2\)</span>. This is because a hypothesis test must specifically delineate the possible situations in which we are <em>right</em> (the alternative <span class="math notranslate nohighlight">\(H_A\)</span>) and when we are <em>wrong</em> (the null <span class="math notranslate nohighlight">\(H_0\)</span>). We perform statisical inference by looking at how well the data we are presented with supports, or reflects, the alternative hypothesis.</p>
+<div class="section" id="hypothesis-testing-with-coin-flips">
+<h3><span class="section-number">8.2.2.1. </span>Hypothesis Testing with coin flips<a class="headerlink" href="#hypothesis-testing-with-coin-flips" title="Permalink to this headline">¶</a></h3>
+<p>To describe how hypothesis testing works from an implementation perspective, we’ll naturally return to coin flips. If you remember way back to the <a class="reference external" href="#link?">Preface of Chapter 5</a>, we introduced a game. The game was as follows: a gambler has a coin, and asks us to gamble one dollar. If the coin lands on heads, we obtain our dollar back, and an additional dollar. If the coin lands on tails, we lose our dollar. We get to observe <span class="math notranslate nohighlight">\(10\)</span> coin flips, and determine whether we want to play the game.</p>
+<p>As it turns out, if this coin has a probability of landing on heads greater than <span class="math notranslate nohighlight">\(0.5\)</span>, we will, over time, <em>make</em> money if we continue to play the game. If the coin has a probablity off landing on heads lesss than <span class="math notranslate nohighlight">\(0.5\)</span>, we will, over time, <em>lose</em> money if we continue to play the game. So, if we are going to play the game in a principled way, we want to be really sure that we are going to gain money by playing. How can we use hypothesis testing to use a little bit of math to determine whether we should play or not?</p>
+<p>To begin, we need to delineate our hypotheses. Here, our question of interest is, should we play the game? Therefore, the alternative hypothesis is the one where we <em>should</em> play the game, or the coin has a probability greater than <span class="math notranslate nohighlight">\(0.5\)</span>. The null hypothesis is that we should <em>not</em> play the game, or the coin has a probability that is not greaterr than <span class="math notranslate nohighlight">\(0.5\)</span>. If we use <span class="math notranslate nohighlight">\(p\)</span> to denote the probability that the gambler’s coin lands on heads, we write this as <span class="math notranslate nohighlight">\(H_A: p &gt; 0.5\)</span>, against the null hypothesis that <span class="math notranslate nohighlight">\(H_0: p \leq 0.5\)</span>.</p>
+<p>Let’s say that we observe <span class="math notranslate nohighlight">\(10\)</span> coin flips, and we see that the coin lands on heads <span class="math notranslate nohighlight">\(6\)</span> times. If we were to estimate the coin’s probability of landing on heads, like we did in the <a class="reference external" href="#link?">Preface of the Section on MLE</a>, we would get that <span class="math notranslate nohighlight">\(\hat p = \frac{6}{10}\)</span>, or that our estimate <span class="math notranslate nohighlight">\(\hat p = 0.6\)</span>. It’s pretty obvious that <span class="math notranslate nohighlight">\(\hat p\)</span> is greater than <span class="math notranslate nohighlight">\(0.5\)</span>, so we should play the game, right?</p>
+<p>The answer is a little more complicated than that. If you take a fair coin (one that is roughly equally likely to land on heads and tails) and flip it enough times, you will probably find a sequence of ten flips with six heads. We are scientists, after all, so we want to be <em>really</em> sure that if we play we are going to make money. In statistical speak, we want to be sure that if we play the game, there is a low chance that we are actually wrong. We want to know exactly what the chances are that, if we were <em>wrong</em>, we could still have seen the estimate <span class="math notranslate nohighlight">\(\hat p\)</span> that we calculated. This is where a concept called a <em>p-value</em> comes into play.</p>
+<div class="section" id="p-values-tell-us-the-chances-of-observing-an-outcome-if-the-null-hypothesis-is-true">
+<h4><span class="section-number">8.2.2.1.1. </span><span class="math notranslate nohighlight">\(p\)</span>-values tell us the chances of observing an outcome if the null hypothesis is true<a class="headerlink" href="#p-values-tell-us-the-chances-of-observing-an-outcome-if-the-null-hypothesis-is-true" title="Permalink to this headline">¶</a></h4>
+<p>To understand the <span class="math notranslate nohighlight">\(p\)</span>-value, we must first introduce a concept called a <em>test statistic</em>. A test-statistic is a fancy word for a data-derived quantity that summarizes our data with a single number which will be used for hypothesis testing. The test statistic should capture a property of the data that is relevant to our question of interest (here, the probability that the coin lands on heads), so it makes sense in our example to just use the estimate of the probability that the coin lands on heads as our test statistic.</p>
+<p>Next, we need to think about what types of values we would see from the test statistic if the null hypothesis were true. If the coin really had a probability of <span class="math notranslate nohighlight">\(0.5\)</span> of landing on heads and we flipped it <span class="math notranslate nohighlight">\(10\)</span> times, there is a non-zero probabaility that we would see all heads and our estimate would have been <span class="math notranslate nohighlight">\(1.0\)</span>, that we would see <span class="math notranslate nohighlight">\(9\)</span> heads and <span class="math notranslate nohighlight">\(1\)</span> tails and our estimate would have been <span class="math notranslate nohighlight">\(0.9\)</span>, so on and so-forth all the way to the outcome where we see only tails and our estimate would have been <span class="math notranslate nohighlight">\(0.0\)</span>. Which one we observed when watching the gambler flip the coin would come down to <em>random chance</em>, so we will use the random variable <span class="math notranslate nohighlight">\(\mathbf{\hat p}_0\)</span> to describe this quantity. Specifically, <span class="math notranslate nohighlight">\(\mathbf{\hat p}_0\)</span> is a random variable which takes values between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> in <span class="math notranslate nohighlight">\(0.1\)</span> probability increments. <span class="math notranslate nohighlight">\(\mathbf{\hat p}_0\)</span>’s probability of taking a given increment <span class="math notranslate nohighlight">\(k\)</span> is equal to the probability that we would have estimated the probability to be <span class="math notranslate nohighlight">\(k\)</span> if the null hypothesis (the coin is fair and lands on heads with probability <span class="math notranslate nohighlight">\(0.5\)</span>) were true. <span class="math notranslate nohighlight">\(\mathbf{\hat p}_0\)</span> takes each increment with the following probabilities:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">binom</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="n">incr</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">/</span><span class="mi">10</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+<span class="n">probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">binom</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">incr</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">incr</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Estimate of probability of landing on heads, $\hat p_0$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Probability of seeing this estimate if $H_0$ true&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of $\hat p_0$&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,</span> <span class="s2">&quot;Estimate we observed, $\hat p = 0.6$&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_26_0.png" src="../../_images/testing-differences_26_0.png" />
+</div>
+</div>
+<p>So, this is a little surprising! Even if the null hypothesis were true and the coin really landed on heads with a probability of <span class="math notranslate nohighlight">\(0.5\)</span>, there is still a pretty good chance we would observe a probability of at least <span class="math notranslate nohighlight">\(0.6\)</span> if we were to flip a fair coin <span class="math notranslate nohighlight">\(10\)</span> times. We describe this quantity using a <span class="math notranslate nohighlight">\(p\)</span>-value, which is the probability of seeing a test statistic at least as extreme as the one we calculated from our data if the null hypothesis were true. Here, the <span class="math notranslate nohighlight">\(p\)</span>-value is the probability that, if the coin were fair, we would produce an estimate of <span class="math notranslate nohighlight">\(0.6\)</span>, <span class="math notranslate nohighlight">\(0.7\)</span>, <span class="math notranslate nohighlight">\(0.8\)</span>, <span class="math notranslate nohighlight">\(0.9\)</span>, or <span class="math notranslate nohighlight">\(1.0\)</span>. This is the sum of all of the heights of the corresponding bars in the above plot, which turns out to be <span class="math notranslate nohighlight">\(0.377\)</span>. This means that, even if the coin were fair, we still would have produced an estimate of <span class="math notranslate nohighlight">\(0.6\)</span> about <span class="math notranslate nohighlight">\(37.7\%\)</span> of the time, and we would be <em>wrong</em> to play the game. This might be enough for you to play the game, but as scientists we usually like to be a little more confident then this when we report something. We use the term the “<span class="math notranslate nohighlight">\(\alpha\)</span> of the test” to describe what an acceptable chance of being incorrect is for us. We can pick <span class="math notranslate nohighlight">\(\alpha\)</span> to be anything we want really so long as decide this threshold before calculating the <span class="math notranslate nohighlight">\(p\)</span>-value. Usually, scientists coose <span class="math notranslate nohighlight">\(0.05\)</span>, which means that we want there to be less than a <span class="math notranslate nohighlight">\(5\%\)</span> chance that we are wrong before making a decision. In other words, we look for a <span class="math notranslate nohighlight">\(p\)</span>-value that is less than <span class="math notranslate nohighlight">\(0.05\)</span>.</p>
+</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
