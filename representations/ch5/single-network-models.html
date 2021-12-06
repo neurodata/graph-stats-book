@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>Inhomogeneous Erdos Renyi (IER) Random Network Model &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -43,8 +43,6 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -316,13 +314,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="models-with-covariates.html">
-     5.6. Network Models with Covariates
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="single-network-models_theory.html">
-     5.7. Single network model theory
+     5.6. Single network model theory
     </a>
    </li>
   </ul>
@@ -627,6 +620,19 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-inhomogeneous-erdos-renyi-ier-random-network-model-is-parametrized-by-a-matrix-of-independent-edge-probabilities">
+   The Inhomogeneous Erdos-Renyi (IER) Random Network Model is parametrized by a matrix of independent-edge probabilities
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -635,52 +641,12 @@
         
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="network-models">
-<h1>Network Models<a class="headerlink" href="#network-models" title="Permalink to this headline">¶</a></h1>
-<p>Probably the easiest kinds of statistical models for us to think about are the <em>network models</em>. These types of models (like the name imples) describe the random processes which you’d find when you’re only looking at one network. We can have models which assume all of the nodes connect to each other essentially randomly, models which assume that the nodes are in distinct <em>communities</em>, and many more.</p>
-<p>The important realization to make about statistical models is that a model is <em>not</em> a network: it’s the random process that <em>creates</em> a network. You can sample from a model a bunch of times, and because it’s a random process, you’ll end up with networks that look a little bit different each time – but if you sampled a lot of networks and then averaged them, then you’d likely be able to get a reasonable ballpark estimation of what the model that they come from looks like.</p>
-<p>Let’s pretend that we have a network, and the network is unweighted (meaning, we only have edges or not-edges) and undirected (meaning, edges connect nodes both ways). It’d have an adjacency matrix which consists of only 1’s and 0’s, because the only information we care about is whether there’s an edge or not. The model that generated this network is pretty straightforward: there’s just some universal probability that each node connects to each other node, and there are 10 nodes.</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
-<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">binary_heatmap</span>
-<span class="o">%</span><span class="k">config</span> InlineBackend.figure_format = &#39;retina&#39;
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">p</span> <span class="o">=</span> <span class="mf">.5</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-<span class="n">binary_heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;A small, simple network&quot;</span><span class="p">);</span>
-</pre></div>
+  <div class="tex2jax_ignore mathjax_ignore section" id="inhomogeneous-erdos-renyi-ier-random-network-model">
+<h1>Inhomogeneous Erdos Renyi (IER) Random Network Model<a class="headerlink" href="#inhomogeneous-erdos-renyi-ier-random-network-model" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-inhomogeneous-erdos-renyi-ier-random-network-model-is-parametrized-by-a-matrix-of-independent-edge-probabilities">
+<h2>The Inhomogeneous Erdos-Renyi (IER) Random Network Model is parametrized by a matrix of independent-edge probabilities<a class="headerlink" href="#the-inhomogeneous-erdos-renyi-ier-random-network-model-is-parametrized-by-a-matrix-of-independent-edge-probabilities" title="Permalink to this headline">¶</a></h2>
+<p>As we just said, we’re going to keep rolling with</p>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_1_0.png" src="../../_images/single-network-models_1_0.png" />
-</div>
-</div>
-<p>This small, simple network is one of many possible networks that we can generate with this model. Here are some more:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-
-<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">:</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-    <span class="n">hmap</span> <span class="o">=</span> <span class="n">binary_heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">linecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Three small, simple networks&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;Three small, simple networks&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/single-network-models_3_1.png" src="../../_images/single-network-models_3_1.png" />
-</div>
-</div>
-<p>One reasonable question to ask is how <em>many</em> possible networks we could make in this simple scenario? We’ve already made four, and it seems like there are more that this model could potentially generate.</p>
-<p>As it turns out, “more” is a pretty massive understatement. To actually figure out the number, think about the first potential edge: there are two possibilities (edge or no edge), so you can generate two networks from a one-node model. Now, let’s add an additional node. For each of the first two possibilities, there are two more – so there are <span class="math notranslate nohighlight">\(2 \times 2 = 4\)</span> total possible networks. Every node that we add doubles the number of networks - and since a network with <span class="math notranslate nohighlight">\(n\)</span> nodes has <span class="math notranslate nohighlight">\(n \times n\)</span> edges, the total number of possible networks ends up being <span class="math notranslate nohighlight">\(2^{n \times n} = 2^{n^2}\)</span>! So this ten-node model can generate <span class="math notranslate nohighlight">\(2^{10^2} = 2^{100}\)</span> networks, which is, when you think carefully, an absurdly, ridiculously big number.</p>
-<p>Throughout many of the succeeding sections, we will attempt to make the content accessible to readers with, and without, a more technical background. To this end, we have added sections with trailing asterisks (*). While we believe these sections build technical depth, we don’t think they are critical to understanding many of the core ideas for network machine learning. In contrast with unstarred sections, these sections will assume familiarity with more advanced mathematical and probability concepts.</p>
 </div>
 
     <script type="text/x-thebe-config">

@@ -318,13 +318,8 @@
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
-     5.6. Network Models with Covariates
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../representations/ch5/single-network-models_theory.html">
-     5.7. Single network model theory
+     5.6. Single network model theory
     </a>
    </li>
   </ul>
@@ -686,6 +681,30 @@
      </li>
     </ul>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#hypothesis-testing-using-the-siem">
+     8.2.2.2. Hypothesis Testing using the SIEM
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#unweighted-networks">
+       8.2.2.2.1. Unweighted networks
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#weighted-networks">
+     8.2.2.3. Weighted Networks
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-distance-correlation">
+       8.2.2.3.1. The Distance Correlation
+      </a>
+     </li>
+    </ul>
+   </li>
   </ul>
  </li>
 </ul>
@@ -879,7 +898,7 @@
 <p>Notice that the edges amongst students of school one are all in the upper left square of the adjacency matrix, and the edges amongst students of school two are all in the lower right square of the adjacency matrix. We will call these edges the “within-school” edges (Cluster <span class="math notranslate nohighlight">\(1\)</span>). The edges between students of school one and two are in the upper right and upper left squares of the adjacency matrix (Cluster <span class="math notranslate nohighlight">\(2\)</span>). In a picture, the edges are grouped as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">chararray</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">),</span> <span class="n">itemsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
 
 <span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># within-school edge</span>
 <span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">50</span><span class="p">,</span><span class="mi">50</span><span class="p">:</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># between-school edge</span>
@@ -891,7 +910,7 @@
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">cmaps</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
@@ -941,6 +960,18 @@
 </div>
 <div class="section" id="why-do-we-care-about-the-siem">
 <h2><span class="section-number">8.2.2. </span>Why do we care about the SIEM?<a class="headerlink" href="#why-do-we-care-about-the-siem" title="Permalink to this headline">¶</a></h2>
+<p>If you recall from the <a class="reference external" href="#link?">Section on RDPGs</a>, we learned that for every <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network, there is a corresponding latent position matrix <span class="math notranslate nohighlight">\(X\)</span> such that the probability matrices of the <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network and an <span class="math notranslate nohighlight">\(RDPG_n(X)\)</span> random network are the same. In this sense, the RDPG random networks <em>generalize</em> the SBM random networks, in that all SBM random networks are RDPG random networks, but not all RDPG random networks are SBM random networks. We can find latent position matrices which produce networks which cannot be summarized with an SBM, such as the <a class="reference external" href="#link?">later example we saw in the RDPG section</a>. The SIEM has a similar relationship with the SBM: all SBM random networks are SIEM random networks, but not all SIEM random networks are SBM random networks. If you want the gorey details of how this works, check out the block below. If not, you can skip on to the next paragraph.</p>
+<div class="admonition-all-sbms-are-siems admonition">
+<p class="admonition-title">All SBMs are SIEMs</p>
+<p>What this means is that for any <span class="math notranslate nohighlight">\(SBM_n(\vec z', B)\)</span> random network, there is a corresponding <span class="math notranslate nohighlight">\(Z\)</span> and <span class="math notranslate nohighlight">\(\vec p\)</span> such that an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network has the same probability matrix. We can see this pretty easily: if <span class="math notranslate nohighlight">\(K\)</span> was the number of communities of the SBM, we can define an SIEM to have a single edge cluster for each <em>pair</em> of communities. We can see this as follows:</p>
+<ol class="simple">
+<li><p>Define the number of edge clusters: Edge cluster <span class="math notranslate nohighlight">\(1\)</span> consists of edges between nodes both in community <span class="math notranslate nohighlight">\(1\)</span>, edge cluster <span class="math notranslate nohighlight">\(2\)</span> consists of edges between a node in community <span class="math notranslate nohighlight">\(1\)</span> and a node in community <span class="math notranslate nohighlight">\(2\)</span>, so on and so forth up to edges between a node in community <span class="math notranslate nohighlight">\(1\)</span> and a node in community <span class="math notranslate nohighlight">\(K\)</span>. Edge cluster <span class="math notranslate nohighlight">\(K+1\)</span> consists of edges between a node in community <span class="math notranslate nohighlight">\(2\)</span> and a node in community <span class="math notranslate nohighlight">\(1\)</span>, and again we repeat this up to edge cluster <span class="math notranslate nohighlight">\(2K\)</span> which delineates edges between a node in community <span class="math notranslate nohighlight">\(2\)</span> and a node in community <span class="math notranslate nohighlight">\(K\)</span>. We continue this procedure up to edge cluster <span class="math notranslate nohighlight">\(K^2\)</span> which is between two nodes in community <span class="math notranslate nohighlight">\(K\)</span>. This gives us a map, where for each pair of communities <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(l'\)</span>, we have an edge cluster <span class="math notranslate nohighlight">\(k\)</span> whch corresponds to this pair of communities.</p></li>
+<li><p>Define the edge cluster matrix: Proceed edge-by-edge through the network looking at the community asignment vector <span class="math notranslate nohighlight">\(\vec z'\)</span>. The edge cluster for an edge <span class="math notranslate nohighlight">\((i, j)\)</span> is the edge cluster we identified above between the communities for node <span class="math notranslate nohighlight">\(i\)</span> and node <span class="math notranslate nohighlight">\(j\)</span>, <span class="math notranslate nohighlight">\(z_i'\)</span> and <span class="math notranslate nohighlight">\(z_j'\)</span> respectively.</p></li>
+<li><p>Define the edge cluster probability vector: Let the probability vector <span class="math notranslate nohighlight">\(\vec p\)</span> be defined such that, iff the <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(l'\)</span> communities correspond to edge cluster <span class="math notranslate nohighlight">\(k\)</span>, then <span class="math notranslate nohighlight">\(p_k\)</span> has the same value as <span class="math notranslate nohighlight">\(b_{ll'}\)</span> in the block matrix.
+This produces an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network with the same probability matrix as an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network.</p></li>
+</ol>
+</div>
+<p>For this reason, we will develop statistical tools for the SIEM, but it is important to note that they apply equally well to an SBM random network.</p>
 <p>Remember that our question boiled down to whether the edges which are assigned to cluster <span class="math notranslate nohighlight">\(1\)</span> have a <em>higher</em> probability of existing than the edges of cluster <span class="math notranslate nohighlight">\(2\)</span>. In other words, we <em>hypothesize</em> that the edges assigned to cluster <span class="math notranslate nohighlight">\(1\)</span> have a higher probability of existing than the edges of cluster <span class="math notranslate nohighlight">\(2\)</span>. In terms of the probability vector, what we are saying is that we think that <span class="math notranslate nohighlight">\(p_1 &gt; p_2\)</span>. Obviously, we are wrong if <span class="math notranslate nohighlight">\(p_1 \leq p_2\)</span>. This type of statistical question is known as a <em>hypothesis test</em>. <strong>Hypothesis testing</strong> is an approach by which we formulate statistical questions and present approaches which, <em>using the data</em>, indicates how much the data supports or doess not support the statistical questions we asked (or, provide us with the ability to <em>infer</em> something). For this reason, hypothesis testing is often an essential component of <em>statistical inference</em>, which is the name given to the process of learning something from data using statistical models.</p>
 <p>The way hypothesis testing works is we call one hypothesis a <em>null hypothesis</em> and the other an <em>alternative hypothesis</em>. The <strong>null hypothesis</strong> is the hypothesis where, if true, indicates that we were <em>wrong</em> about what how we thought the system behaved. In our example data, the null hypothesis is that <span class="math notranslate nohighlight">\(p_1 \leq p_2\)</span>. We typically would write this out notationally as <span class="math notranslate nohighlight">\(H_0: p_1 \leq p_2\)</span>. The capital <span class="math notranslate nohighlight">\(H\)</span> is used to denote that this is a hypothesis, and the little “<span class="math notranslate nohighlight">\(0\)</span>” is just to indicate “null”. The <strong>alternative hypothesis</strong> is the hypothesis where, if true, indicates that we werer <em>correct</em> about how we thought the system behaved. In our example, the alternative hypothesis is that <span class="math notranslate nohighlight">\(p_1 &gt; p_2\)</span>, which we write out as <span class="math notranslate nohighlight">\(H_A: p_1 &gt; p_2\)</span>. Here, the subscript <span class="math notranslate nohighlight">\(A\)</span> denotes that this is the alternative hypothesis. When describing our hypothesis, we say that we are testing <span class="math notranslate nohighlight">\(H_A: p_1 &gt; p_2\)</span> <em>against</em> <span class="math notranslate nohighlight">\(H_0: p_1 \leq p_2\)</span>. This is because a hypothesis test must specifically delineate the possible situations in which we are <em>right</em> (the alternative <span class="math notranslate nohighlight">\(H_A\)</span>) and when we are <em>wrong</em> (the null <span class="math notranslate nohighlight">\(H_0\)</span>). We perform statisical inference by looking at how well the data we are presented with supports, or reflects, the alternative hypothesis.</p>
 <div class="section" id="hypothesis-testing-with-coin-flips">
@@ -1039,7 +1070,121 @@
 </div>
 </div>
 </div>
-<p>This means that, there is only about a <span class="math notranslate nohighlight">\(2\%\)</span> chance that the two coins have the same probability of landing on heads, as the <span class="math notranslate nohighlight">\(p\)</span>-value is <span class="math notranslate nohighlight">\(0.02\)</span>. If we were to again use <span class="math notranslate nohighlight">\(\alpha=0.05\)</span> as our decision threshold, this means we should play this game as many times as the gambler will allow before he catches on.</p>
+<p>This means that, there is only about a <span class="math notranslate nohighlight">\(2\%\)</span> chance that the two coins have the same probability of landing on heads, as the <span class="math notranslate nohighlight">\(p\)</span>-value is <span class="math notranslate nohighlight">\(0.02\)</span>. If we were to again use <span class="math notranslate nohighlight">\(\alpha=0.05\)</span> as our decision threshold, this means we should play this game as many times as the gambler will allow before he catches on. Next, we’ll see how this strategy of coin flipping applies to the SIEM.</p>
+</div>
+</div>
+<div class="section" id="hypothesis-testing-using-the-siem">
+<h3><span class="section-number">8.2.2.2. </span>Hypothesis Testing using the SIEM<a class="headerlink" href="#hypothesis-testing-using-the-siem" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="unweighted-networks">
+<h4><span class="section-number">8.2.2.2.1. </span>Unweighted networks<a class="headerlink" href="#unweighted-networks" title="Permalink to this headline">¶</a></h4>
+<p>To shift back to our network, we had the following network realization and edge cluster matrix:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">cmaps</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Asrt</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;School Network, sorted&#39;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;qualitative&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Edge Cluster&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_35_0.png" src="../../_images/testing-differences_35_0.png" />
+</div>
+</div>
+<p>The probability vector for the SIEM is estimated very similar to how we used maximum likelihood estimation for the SBM, in that we just take the fraction of edges which exist in the network for each edge cluster:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Asrt</span><span class="p">[</span><span class="n">Z</span> <span class="o">==</span> <span class="n">i</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Asrt</span><span class="p">[</span><span class="n">Z</span> <span class="o">==</span> <span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Probability for cluster </span><span class="si">{}</span><span class="s2">, p</span><span class="si">{}</span><span class="s2">: </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]];</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Probability for cluster 1, p1: 0.598
+Probability for cluster 2, p2: 0.279
+</pre></div>
+</div>
+</div>
+</div>
+<p>These estimates are pretty different, but the core question we want to answer is, how confident are we that this discrepancy between the estimated probabilities is not due to random chance?</p>
+<p>It turns out that this question is effectively the same question as we asked for the coin flips. Specifically, we want to formulate the hypothesis test with <span class="math notranslate nohighlight">\(H_0: p_1 \leq p_2\)</span> against <span class="math notranslate nohighlight">\(H_A: p_1 &gt; p_2\)</span>. We proceed with exactly the same framework as we used for the coin tosses. We again construct a contingency table, with the following table margins:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>Cluster 1, the within-school edges</p></th>
+<th class="head"><p>Cluster 2, the between-school edges</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Number of edges</p></td>
+<td><p><span class="math notranslate nohighlight">\(a\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(b\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Number of non-edges</p></td>
+<td><p><span class="math notranslate nohighlight">\(c\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(d\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>The entry <span class="math notranslate nohighlight">\(a\)</span> is the total number of edges in the first cluster, and <span class="math notranslate nohighlight">\(b\)</span> is the total number of edge in the second cluster. The entry <span class="math notranslate nohighlight">\(c\)</span> is the total number of possible edges in cluster one which do not exist (the number of adjacencies in cluster one with an adjacency of zero), and the entry <span class="math notranslate nohighlight">\(d\)</span> is the total number of possible edges in the second cluster which do not exist (the number of adjacencies in cluster two with a value of zero). We can fill in the entries of this table using some basic <code class="docutils literal notranslate"><span class="pre">numpy</span></code> functions. Note that since this network is undirected and loopless, we want to look only at the edges which are in the upper triangle of the adjacency martix, and exclude the diagonal:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get the indices of the upper triangle of Asrt</span>
+<span class="n">upper_tri_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="n">Asrt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># create a boolean array that is nxn</span>
+<span class="n">upper_tri_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Asrt</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="c1"># set indices which correspond to the upper triangle to True</span>
+<span class="n">upper_tri_mask</span><span class="p">[</span><span class="n">upper_tri_idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="p">[[(</span><span class="n">Asrt</span><span class="p">[(</span><span class="n">Z</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">upper_tri_mask</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Asrt</span><span class="p">[(</span><span class="n">Z</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">upper_tri_mask</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)],</span>
+         <span class="p">[(</span><span class="n">Asrt</span><span class="p">[(</span><span class="n">Z</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">upper_tri_mask</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Asrt</span><span class="p">[(</span><span class="n">Z</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">upper_tri_mask</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">cmaps</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">],</span>
+            <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Count&quot;</span><span class="p">})</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;Cluster 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Cluster 2&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;Number of edges&quot;</span><span class="p">,</span> <span class="s2">&quot;Number of non-edges&quot;</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Contingency Table, School Network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/testing-differences_40_0.png" src="../../_images/testing-differences_40_0.png" />
+</div>
+</div>
+<p>We again use Fisher’s exact test to test our hypothesis:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test_statistic</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;p-value: </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pval</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value: 0.000
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we end up with a <span class="math notranslate nohighlight">\(p\)</span>-value that is approximately zero. With our decision threshold still at <span class="math notranslate nohighlight">\(\alpha = 0.05\)</span>, since the <span class="math notranslate nohighlight">\(p\)</span>-value is less than <span class="math notranslate nohighlight">\(\alpha\)</span>, this means we have evidence to support that the alternative hypothesis is true. So, after a <em>lot</em> of build up spanning numerous sections, we have shown that the probability of two individuals being friends if they attend the same school is higher than the probability of two students being friends if they go to different schoools. Pretty exciting, huh?</p>
+</div>
+</div>
+<div class="section" id="weighted-networks">
+<h3><span class="section-number">8.2.2.3. </span>Weighted Networks<a class="headerlink" href="#weighted-networks" title="Permalink to this headline">¶</a></h3>
+<p>When the networks were unweighted, everything made complete sense in the context o our coin flip regime. For weighted networks, on the other hand, things can go a <em>little</em> bit differently. To understand this question in the context of weighted networks, we’ll return to our discussion on the SIEM, and reformulate it a little bit for the case where the adjacency matrix’s entries take non-binary values (they aren’t just zeros and ones).</p>
+<div class="section" id="the-distance-correlation">
+<h4><span class="section-number">8.2.2.3.1. </span>The Distance Correlation<a class="headerlink" href="#the-distance-correlation" title="Permalink to this headline">¶</a></h4>
 </div>
 </div>
 </div>
