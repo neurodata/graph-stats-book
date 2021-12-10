@@ -351,7 +351,7 @@
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../representations/ch6/estimating-parameters_spectral.html">
-     6.4. Estimating Parameters in Network Models via Spectral Methods
+     6.4. Estimating Parameters with Spectaal Methods
     </a>
    </li>
    <li class="toctree-l2">
@@ -630,28 +630,28 @@
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-network-and-an-out-of-sample-node">
-   8.5.1. A Network and an Out-of-Sample Node
+  <a class="reference internal nav-link" href="#data-generation">
+   8.5.1. Data Generation
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-latent-position-matrix-can-be-used-to-estimate-probability-vectors">
-   8.5.2. The Latent Position Matrix Can be used to Estimate Probability Vectors
+  <a class="reference internal nav-link" href="#probability-vector-estimation">
+   8.5.2. Probability Vector Estimation
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#going-in-the-other-direction">
-   8.5.3. Going in the Other Direction
+  <a class="reference internal nav-link" href="#inversion-of-probability-vector-estimation">
+   8.5.3. Inversion of Probability Vector Estimation
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-pseudoinverse-gives-us-our-best-guess-for-inverting-a-matrix">
-   8.5.4. The Pseudoinverse Gives Us our Best Guess For Inverting a Matrix
+  <a class="reference internal nav-link" href="#the-moore-penrose-pseudoinverse">
+   8.5.4. The Moore-Penrose Pseudoinverse
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-the-pseudoinverse-to-estimate-out-of-sample-latent-positions">
-   8.5.5. Using the Pseudoinverse to Estimate out-of-sample Latent Positions
+  <a class="reference internal nav-link" href="#using-the-pseudoinverse-for-out-of-sample-estimation">
+   8.5.5. Using the Pseudoinverse for Out-of-Sample Estimation
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -675,10 +675,10 @@
 <p>Imagine you have a citation network of scholars publishing papers. The nodes are the scholars, and an edge exists in a given pair of scholars if they’re published a paper together.</p>
 <p>You’ve already found a representation using ASE or LSE and you have a set of latent positions, which you then clustered to figure out who came from which university. It took a long time for you to get this representation - there are a lot of people doing research out there!</p>
 <p>Now, suppose a new graduate student publishes a paper. Your network gets bigger by a single node, and you’d like to find this person’s latent position (thus adding them to the clustering system). To do that, however, you’d have to get an entirely new representation for the network: your latent position matrix is <span class="math notranslate nohighlight">\(n \times d\)</span>, and it would need to become <span class="math notranslate nohighlight">\((n+1) \times d\)</span>. Re-embedding the entire network with the new node added seems like it should be unecessary - after all, you already know the latent positions for every other node.</p>
-<p>This section is all about this problem: how to find the representation for new nodes without the computationally expensive task of re-embedding an entire network. As it turns out, there has been some work done, and there is a solution that can get you pretty close the latent position for the new node that you would have had. For more details and formaility, see the 2013 paper “Out-of-sample extension for latent position graphs”, by Tang et al (although, as with most science, the theory in this paper was built on top of other work from related fields).</p>
+<p>This section is all about this problem: how to find the representation for new nodes without the computationally expensive task of re-embedding an entire network. As it turns out, there has been some work done, and there is a solution that can get you pretty close the latent position for the new node that you would have had. For more details and formality, see the 2013 paper “Out-of-sample extension for latent position graphs”, by Tang et al (although, as with most science, the theory in this paper was built on top of other work from related fields).</p>
 <p>Let’s make a network from an SBM, and an additional node that should belong to the first community. Then, we’ll embed the network and explore how to find the latent position for the additional node.</p>
-<div class="section" id="a-network-and-an-out-of-sample-node">
-<h2><span class="section-number">8.5.1. </span>A Network and an Out-of-Sample Node<a class="headerlink" href="#a-network-and-an-out-of-sample-node" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="data-generation">
+<h2><span class="section-number">8.5.1. </span>Data Generation<a class="headerlink" href="#data-generation" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -728,11 +728,15 @@
 
 <span class="c1"># title</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Adjacency matrix (left) and vector for additional </span><span class="se">\n</span><span class="s2">node (right)&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">.19</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="s2">&quot;Figure 7.1&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_5_0.png" src="../../_images/out-of-sample_5_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, -0.1, &#39;Figure 7.1&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_5_1.png" src="../../_images/out-of-sample_5_1.png" />
 </div>
 </div>
 <p>After embedding with ASE, we have an embedding for the original network. The rows of this embedding contain the latent position for each original node. We’ll call the embedding <span class="math notranslate nohighlight">\(X\)</span>.</p>
@@ -751,16 +755,20 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions for our original network (X)&quot;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Figure 7.2&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_8_0.png" src="../../_images/out-of-sample_8_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 7.2&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_8_1.png" src="../../_images/out-of-sample_8_1.png" />
 </div>
 </div>
 </div>
-<div class="section" id="the-latent-position-matrix-can-be-used-to-estimate-probability-vectors">
-<h2><span class="section-number">8.5.2. </span>The Latent Position Matrix Can be used to Estimate Probability Vectors<a class="headerlink" href="#the-latent-position-matrix-can-be-used-to-estimate-probability-vectors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="probability-vector-estimation">
+<h2><span class="section-number">8.5.2. </span>Probability Vector Estimation<a class="headerlink" href="#probability-vector-estimation" title="Permalink to this headline">¶</a></h2>
 <p>Everything up until now has just been pretty standard stuff. We still haven’t done anything with our new node - all we have is a big vector that tells us which other nodes it’s connected to, and our standard matrix of latent positions. However, it’s time for a bit more exploration into the nature of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, and what happens when you view it as a linear transformation. This will get us closer to understanding the out-of-sample embedding.</p>
 <p>Remember from the section on latent positions that <span class="math notranslate nohighlight">\(X\)</span> can be used to estimate the block probability matrix. When you use ASE on a single network to make <span class="math notranslate nohighlight">\(X\)</span>, <span class="math notranslate nohighlight">\(XX^\top\)</span> estimates <span class="math notranslate nohighlight">\(P\)</span>: meaning, <span class="math notranslate nohighlight">\((XX^\top)_{ij}\)</span>, the element on the <span class="math notranslate nohighlight">\(i^{(th)}\)</span> row and <span class="math notranslate nohighlight">\(j^{(th)}\)</span> column of <span class="math notranslate nohighlight">\(XX^\top\)</span>, will estimate the probability that node <span class="math notranslate nohighlight">\(i\)</span> has an edge with node <span class="math notranslate nohighlight">\(j\)</span>.</p>
 <p>Let’s take a single latent position vector - call it <span class="math notranslate nohighlight">\(v_i\)</span> (this will be the <span class="math notranslate nohighlight">\(i_{th}\)</span> row of the latent position matrix). What’ll <span class="math notranslate nohighlight">\(X v_i\)</span> look like? Well, it’ll look the same as grabbing the <span class="math notranslate nohighlight">\(i_{th}\)</span> column of <span class="math notranslate nohighlight">\(XX^\top\)</span>. Meaning, <span class="math notranslate nohighlight">\(X v_i\)</span> will be a single vector whose <span class="math notranslate nohighlight">\(j^{(th)}\)</span> element estimates the probability that node <span class="math notranslate nohighlight">\(i\)</span> will connect to node <span class="math notranslate nohighlight">\(j\)</span>.</p>
@@ -782,16 +790,21 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node index&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Estimated probability</span><span class="se">\n</span><span class="s2"> vector&quot;</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot; for first node $X v_1$&quot;</span><span class="p">);</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;Figure 7.3&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_12_0.png" src="../../_images/out-of-sample_12_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.1, &#39;Figure 7.3&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_12_1.png" src="../../_images/out-of-sample_12_1.png" />
 </div>
 </div>
 </div>
-<div class="section" id="going-in-the-other-direction">
-<h2><span class="section-number">8.5.3. </span>Going in the Other Direction<a class="headerlink" href="#going-in-the-other-direction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="inversion-of-probability-vector-estimation">
+<h2><span class="section-number">8.5.3. </span>Inversion of Probability Vector Estimation<a class="headerlink" href="#inversion-of-probability-vector-estimation" title="Permalink to this headline">¶</a></h2>
 <p>Remember that our goal is to take the adjacency vector for a new node and use it to estimate that node’s latent position without re-embedding the whole network. So far, we’ve essentially figured out how to use the node’s latent position to get an estimated probability vector.</p>
 <p>Let’s think about the term “estimated probability vector” for a second. This should be a vector associated to node <span class="math notranslate nohighlight">\(i\)</span> with <span class="math notranslate nohighlight">\(n\)</span> elements, where the <span class="math notranslate nohighlight">\(j^{(th)}\)</span> element of the vector contains the probability that node <span class="math notranslate nohighlight">\(i\)</span> will connect to node <span class="math notranslate nohighlight">\(j\)</span>. The thing we’re starting with for the out-of-sample node, however, is an adjacency vector full of 0’s and 1’s - 0 if there isn’t an edge, 1 if there is an edge.</p>
 <p>If you think about it, however, you can think of this adjacency vector as kind of an estimate for edge probabilities. Say you sample a node’s adjacency vector from an RDPG, then you sample again, and again. Averaging all of your samples will get you closer and closer to the actual edge connection probabilities. So you can think of a single adjacency vector as an estimate for the edge probability vector!</p>
@@ -800,8 +813,8 @@
 <p>Well, if <span class="math notranslate nohighlight">\(X\)</span> were invertible, we could do <span class="math notranslate nohighlight">\(\hat{X}^{-1} \hat{a_i} = \hat{v_i}\)</span>: just invert both sides of the equation to get <span class="math notranslate nohighlight">\(v_i\)</span> by itself. Unfortunately, in practice, <span class="math notranslate nohighlight">\(X\)</span> will almost never be invertible. We’ll have to do the next-best thing, which is to use the <em>pseudoinverse</em>.</p>
 <p>We’ll take a brief break in the coming section to talk about the pseudoinverse for a bit, then we’ll come back and use it to estimate the out-of-sample latent position.</p>
 </div>
-<div class="section" id="the-pseudoinverse-gives-us-our-best-guess-for-inverting-a-matrix">
-<h2><span class="section-number">8.5.4. </span>The Pseudoinverse Gives Us our Best Guess For Inverting a Matrix<a class="headerlink" href="#the-pseudoinverse-gives-us-our-best-guess-for-inverting-a-matrix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-moore-penrose-pseudoinverse">
+<h2><span class="section-number">8.5.4. </span>The Moore-Penrose Pseudoinverse<a class="headerlink" href="#the-moore-penrose-pseudoinverse" title="Permalink to this headline">¶</a></h2>
 <p>The Moore-Penrose Pseudoinverse is useful to know in general, since it pops up a lot in a lot of different places. Say you have a matrix which isn’t invertible. Call it <span class="math notranslate nohighlight">\(T\)</span>.</p>
 <p>The pseudoinverse <span class="math notranslate nohighlight">\(T^+\)</span> is the closest approximation you can get to the inverse <span class="math notranslate nohighlight">\(T^{-1}\)</span>. This is best understood visually. Let’s take <span class="math notranslate nohighlight">\(T\)</span> to be a matrix which projects points on the x-y coordinate axis down to the x-axis, then flips them to their negative on the number line. The matrix would look like this:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -862,11 +875,17 @@
 <span class="c1"># input/output</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">2.3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;input vectors&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=-</span><span class="mf">2.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;output vectors&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">));</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;A Noninvertible Linear Transformation&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Figure 7.4&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_17_0.png" src="../../_images/out-of-sample_17_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 7.4&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_17_1.png" src="../../_images/out-of-sample_17_1.png" />
 </div>
 </div>
 <p>Our goal is to reverse <span class="math notranslate nohighlight">\(T\)</span> and bring <span class="math notranslate nohighlight">\(Tv_1\)</span> and <span class="math notranslate nohighlight">\(Tv_2\)</span> back to <span class="math notranslate nohighlight">\(v_1\)</span> and <span class="math notranslate nohighlight">\(v_2\)</span>. Unfortunately, since both <span class="math notranslate nohighlight">\(v_1\)</span> and <span class="math notranslate nohighlight">\(v_2\)</span> get squished onto zero in the y-axis position after getting passed through <span class="math notranslate nohighlight">\(T\)</span>, we’ve lost all information about what was happening on the y-axis – that’s a lost cause. So it’s impossible to get perfectly back to <span class="math notranslate nohighlight">\(v_1\)</span> or <span class="math notranslate nohighlight">\(v_2\)</span>.</p>
@@ -904,16 +923,22 @@
 
 <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">.4</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$T^+ (X v_1$)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">.4</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;$T^+ (X v_2$)&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">));</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;The Best Approximation the Pseudoinverse Can Do&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Figure 7.5&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_19_0.png" src="../../_images/out-of-sample_19_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 7.5&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_19_1.png" src="../../_images/out-of-sample_19_1.png" />
 </div>
 </div>
 </div>
-<div class="section" id="using-the-pseudoinverse-to-estimate-out-of-sample-latent-positions">
-<h2><span class="section-number">8.5.5. </span>Using the Pseudoinverse to Estimate out-of-sample Latent Positions<a class="headerlink" href="#using-the-pseudoinverse-to-estimate-out-of-sample-latent-positions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-the-pseudoinverse-for-out-of-sample-estimation">
+<h2><span class="section-number">8.5.5. </span>Using the Pseudoinverse for Out-of-Sample Estimation<a class="headerlink" href="#using-the-pseudoinverse-for-out-of-sample-estimation" title="Permalink to this headline">¶</a></h2>
 <p>Let’s get back to estimating our out-of-sample latent position.</p>
 <p>Remember that we had a nonsquare latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Like we learned before, we can get the probability vector <span class="math notranslate nohighlight">\(a_i\)</span> (the vector with its probability of connecting with node <span class="math notranslate nohighlight">\(j\)</span> in the <span class="math notranslate nohighlight">\(j_{th}\)</span> position) for a node by passing its latent position (<span class="math notranslate nohighlight">\(v_i\)</span>) through the latent position matrix.</p>
 <div class="amsmath math notranslate nohighlight">
@@ -947,7 +972,7 @@ X^+ \hat{a_i} \approx X^+ (X v_i) \approx v_i
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.75498456, -0.57466747])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 0.6726473 , -0.62305083])
 </pre></div>
 </div>
 </div>
@@ -971,17 +996,23 @@ X^+ \hat{a_i} \approx X^+ (X v_i) \approx v_i
 
 <span class="c1"># latent position plot</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
-<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions with out-of-sample estimate&quot;</span><span class="p">)</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated latent positions with out-of-sample estimate&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Estimated latent position for&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; the first adjacency vector: $X^+ a$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">.002</span><span class="p">,</span> <span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.008</span><span class="p">),</span> 
             <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.02</span><span class="p">,</span> <span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mf">.2</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">})</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;center right&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Estimating the Out-of-Sample Latent Position&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Figure 7.6&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_24_0.png" src="../../_images/out-of-sample_24_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 7.6&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_24_1.png" src="../../_images/out-of-sample_24_1.png" />
 </div>
 </div>
 </div>
@@ -1024,14 +1055,19 @@ X^+ \hat{a_i} \approx X^+ (X v_i) \approx v_i
 <span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions with out-of-sample estimate&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Estimated latent position for&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; the first adjacency vector: $X^+ a_0$&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">.002</span><span class="p">,</span> <span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.008</span><span class="p">),</span> 
-            <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mf">.3</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">})</span>
+            <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">v_1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="n">v_1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.3</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">})</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">move_legend</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;center right&quot;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figtext</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Figure 7.7&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/out-of-sample_28_0.png" src="../../_images/out-of-sample_28_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 7.7&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/out-of-sample_28_1.png" src="../../_images/out-of-sample_28_1.png" />
 </div>
 </div>
 </div>
