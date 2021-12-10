@@ -49,7 +49,9 @@
 
 # ## Prerequisites
 
-# We assume you have a basic knowledge of mathematics. If you care about what's under the hood, we have certain sections marked as "advanced material" - you should have a reasonable understanding of college-level math, such as calculus, linear algebra, probability, and statistics for these sections. For the rest of the book, you won't need advanced math to understand the content.
+# We assume you have a basic knowledge of mathematics. Because network science uses a lot of linear algebra, requiring a bit of linear algebra knowledge is unfortunately unavoidable. (You should know what an eigenvalue is!) 
+# 
+# If you care about what's under the hood mathematically, we have certain sections marked as "advanced material" - you should have a reasonable understanding of college-level math, such as calculus, linear algebra, probability, and statistics for these sections.
 # 
 # You should also probably have some background in programming - we'll mainly be using Python to build and explore our networks. If you don't have too much of a Python or math background, don't worry - we'll link some resources to give you a head start.
 # 
@@ -80,11 +82,10 @@
 # - Figuring out if communities in your networks are different from each other
 # - Selecting a reasonable model to represent your data
 # - Finding nodes, edges, or communities in your networks that are interesting
-# - Finding nodes or edges which are anomalies in a particular network
-# - Detecting networks which are anomalies when you have a group of networks
+# - Finding time points which are anomalies in a network which is evolving over time
 # - What to do when you have new data after you've already trained a network model
 # - How hypothesis testing works on networks
-# - Pairing nodes that represent the same thing between two networks
+# - Figuring out which nodes are the most similar in a pair of networks
 
 # ## Conventions Used In This Book
 
@@ -100,11 +101,21 @@
 # 
 # **Dr. Carey E. Priebe** is Professor of Applied Mathematics and Statistics, and a founding member of the Center for Imaging Science (CIS) and the Mathematical Institute for Data Science (MINDS) at Johns Hopkins University. He is a leading researcher in theoretical, methodological, and applied statistics / data science; much of his recent work focuses on spectral network analysis and subsequent statistical inference. Professor Priebe is Senior Member of the IEEE, Elected Member of the International Statistical Institute, Fellow of the Institute of Mathematical Statistics, and Fellow of the American Statistical Association.
 # 
-# **Chris White** is Managing Director, Microsoft Research Special Projects. He leads mission-oriented research and software development teams focusing on high risk problems. Prior to joining Microsoft, he was a Fellow at Harvard for network statistics and machine learning. Chris’s work has been featured in media outlets including Popular Science, CBS’s 60 Minutes, CNN, the Wall Street Journal, Rolling Stone Magazine, TEDx, and Google’s Solve for X. Chris was profiled in a cover feature for the Sept/Oct 2016 issue of Popular Science.
+# **Dr. Christopher M. White** is Managing Director, Microsoft Research Special Projects. He leads mission-oriented research and software development teams focusing on high risk problems. Prior to joining Microsoft, he was a Fellow at Harvard for network statistics and machine learning. Chris’s work has been featured in media outlets including Popular Science, CBS’s 60 Minutes, CNN, the Wall Street Journal, Rolling Stone Magazine, TEDx, and Google’s Solve for X. Chris was profiled in a cover feature for the Sept/Oct 2016 issue of Popular Science.
 # 
 # **Weiwei Yang** is a Principal Development Manager at Microsoft Research. Her interests are in resource efficient alt-SGD ML methods inspired by biological learning. The applied research group she leads aims to democratize AI by addressing issues of sustainability, robustness, scalability, and efficiency in ML. Her group has applied ML to address social issues such as countering human trafficking and to energy grid stabilizations.
 # 
 
 # ## Acknowledgements
 
-# First of all, big thanks to everybody who has been reading the book as we write and giving feedback. So far, this list includes Ross Lawrence, Geoff Loftus, Alexandra McCoy, Olivia Taylor, and Peter Brown.
+# First of all, big thanks to everybody who has been reading the book as we write and giving feedback. So far, this list includes Dax Pryce, Ross Lawrence, Geoff Loftus, Alexandra McCoy, Olivia Taylor, and Peter Brown.
+
+# ## Finished Sections
+
+# (lots more in progress...)
+
+# 1. Preface: [](preface.ipynb)
+# 2. Why Use Statistical Models: [](../representations/ch5/why-use-models.ipynb)
+# 3. Single-Network Models: [](../representations/ch5/single-network-models.ipynb)
+# 4. Multi-Network Representation Learning: [](../representations/ch6/multigraph-representation-learning.ipynb)
+# 5. Joint Representation Learning: [](../representations/ch6/joint-representation-learning.ipynb)

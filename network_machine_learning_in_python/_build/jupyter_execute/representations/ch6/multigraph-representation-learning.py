@@ -54,45 +54,14 @@ aliens = [make_sbm(p3, p1, p1, p3, n=n) for i in range(4)]
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import ImageGrid
-from graspologic.plot import binary_heatmap, adjplot, heatmap
+from graspologic.plot import adjplot, heatmap
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from graphbook_code import lined_heatmap, add_legend
 
 get_ipython().run_line_magic('config', "InlineBackend.figure_format = 'retina'")
 
-def lined_heatmap(data, binary=True, lines_every_n=None, alpha=.8, *args, **kwargs):
-    if binary:
-        ax = binary_heatmap(data, *args, **kwargs)
-    else:
-        ax = heatmap(data, *args, **kwargs)
-    if lines_every_n is None:
-        n = len(data) // 2
-    else:
-        n = lines_every_n
-    ax.vlines(n, 0, n*2, colors="black", lw=.9, linestyle="dashed", alpha=alpha)
-    ax.hlines(n, 0, n*2, colors="black", lw=.9, linestyle="dashed", alpha=alpha)
-    return ax
 
-def add_legend(ax=None, legend_labels=["No Edge", "Edge"], colors=["white", "black"], bbox_to_anchor=(1.15, .5), **kwargs):
-    fig = plt.gcf()
-    if ax is None:
-        ax = plt.gca()
-        
-    patches = []
-    for c, l in zip(colors, legend_labels):
-        patches.append(mpl.patches.Patch(facecolor=c, label=l, edgecolor="black"))
-                       
-    fig.legend(
-        patches,
-        legend_labels,
-        facecolor="white",
-        edgecolor="black",
-        framealpha=1,
-        fontsize="x-large",
-        loc="center right",
-        bbox_to_anchor=bbox_to_anchor,
-        **kwargs
-    )
 
 fig = plt.figure(figsize=(14,7))
 
@@ -141,25 +110,8 @@ alien_latents = ase.fit_transform(alien_mean_network)
 # In[5]:
 
 
+from graphbook_code import plot_latents
 import seaborn as sns
-
-def plot_latents(latent_positions, *, title=None, labels=None, ax=None, legend=True,
-                 fontdict=None, **kwargs):
-    if ax is None:
-        ax = plt.gca()
-    plot = sns.scatterplot(latent_positions[:, 0], latent_positions[:, 1], hue=labels, 
-                           s=10, ax=ax, palette="Set1", color='k', **kwargs)
-    if title is not None:
-        plot.set_title(title, wrap=True, fontdict=fontdict, loc="left");
-    ax.axes.xaxis.set_visible(False)
-    ax.axes.yaxis.set_visible(False)
-    h, _ = plot.get_legend_handles_labels()
-    if legend and h:
-        ax.legend(title="Community")
-    elif not legend and np.any(labels):
-        ax.get_legend().remove()
-    
-    return plot
 
 # plot
 fig, axs = plt.subplots(ncols=2, figsize=(10, 5))
@@ -167,20 +119,16 @@ plot_latents(human_latents, title="Embedding when we average the human \nnetwork
 plot_latents(alien_latents, title="Embedding when we average the alien \nnetworks", ax=axs[1]);
 
 
-# Both of these embeddings have clear clustering: there are two communities of nodes in both the human and the alien networks. We can recover the labels for these communities fairly easily using our pick of unsupervised clustering method. We know that the latent positions in each community of an Adjacency Spectral Embedding are normally distributed under this simulation setting, and we have two communities. That means that the above embeddings are distributed according to a Gaussian Mixture. Here, "Gaussian" just means "normal", and a gaussian mixture just means that we have groups of normally distributed data clusters. As a result, it makes sense to cluster these data using scikit-learn's GaussianMixture implementation. We'll also use graspologic's `remap_labels` utility function to make sure that index of the nodes matches for both our predicted alien and human labels.
+# Both of these embeddings have clear clustering: there are two communities of nodes in both the human and the alien networks. We can recover the labels for these communities fairly easily using our pick of unsupervised clustering method. We know that the latent positions in each community of an Adjacency Spectral Embedding are normally distributed under this simulation setting, and we have two communities. That means that the above embeddings are distributed according to a Gaussian Mixture. Here, "Gaussian" just means "normal", and a gaussian mixture just means that we have groups of normally distributed data clusters. As a result, it makes sense to cluster these data using scikit-learn's GaussianMixture implementation.
 
 # In[6]:
 
 
 from sklearn.mixture import GaussianMixture as GMM
-from graspologic.utils import remap_labels
 
 # Predict labels for the human and alien brains
 human_labels = GMM(n_components=2).fit_predict(human_latents)
 alien_labels = GMM(n_components=2).fit_predict(alien_latents)
-
-# Make corresponding communities have the same values
-alien_labels = remap_labels(human_labels, alien_labels)
 
 
 # You can see a plot that predicts our community structure below. Success! When we embed the human and the alien networks separately, averaging them clearly lets us cluster the brain regions by hemisphere. However, as you can see, the colors are flipped: the communities are in different places relative to each other. This is because the alien networks are drawn from a different distribution than the human networks. 
@@ -262,15 +210,11 @@ hm.hlines(n, 0, n*2, colors="black", lw=.9, linestyle="dashed", alpha=.8)
 # # colorbar
 add_legend(hm, legend_labels=["Edge in no networks", "Edge in one network", "Edge in both networks"],
            colors=["white", "grey", "black"], bbox_to_anchor=(1.3, .5))
-# cax = fig.add_axes([.8, 0.25, 0.05, 0.5])
-# im = ax.imshow(averaged, cmap=cmap, vmin=-0.2, vmax=1.2)
-# cbar = plt.colorbar(im, cax=cax, ticks=[0, .5, 1], )
-# cbar.set_ticklabels(["Edge in no networks", "Edge in one network", "Edge in both networks"])
 
 
 # By averaging, we've lost all of the community structure used to exist. That's why our big averaged embedding failed. 
 # 
-# We've just discovered that even though it's oten a great idea to simply average all of your networks together - for example, if they were drawn from the same distribution - it's often a horrible idea to average all of your networks if they might come from different distributions. This is a case of averaging networks which are "heterogeneous": Not only are your networks slightly different, but they're *expected* to be different because, again, they're drawn from different distributions. Sampling a lot of heterogenous networks and then averaging them, as you can see from our exploration above, can result in losing the community signal you might have had.
+# We've just discovered that even though it's oten a great idea to simply average all of your networks together - for example, if they were drawn from the same distribution - it's often a horrible idea to average all of your networks if they might come from different distributions. This is a case of averaging networks which are "heterogeneous": Not only are your networks slightly different, but they're *should* to be different because their edge probabilities aren't the same. Sampling a lot of heterogenous networks and then averaging them, as you can see from our exploration above, can result in losing the community signal you might have had.
 # 
 # We'd like to find a way to compare these heterogeneous networks directly, so that we can embed all of our networks into the same space and still keep that nice community structure. Figuring out the best way to do this is a topic under active research, and the set of techniques and tools that have developed as a result are together called multiple-network representation learning.
 
@@ -289,6 +233,7 @@ from graspologic.embed import MultipleASE as MASE
 from graspologic.embed import OmnibusEmbed as OMNI
 from graspologic.embed.omni import _get_omni_matrix
 from graspologic.plot import heatmap
+from graphbook_code import binary_heatmap
 
 fig = plt.figure();
 
@@ -501,7 +446,7 @@ plot_latents(latents_mase,
 
 # ### How Does MASE Work?
 
-# Below, you can see how MASE works. We start with networks, drawn as nodes in space connected to each other. We turn them into adjacency matrices, and then we embed the adjacency matrices of a bunch of networks separately, using our standard Adjacency Spectral Embedding algorithm. Then, we take all of those embeddings, concatenate horizontally into a single matrix, and embed the entire concatenated matrix. The colors are the true communities each node belongs to: there's a red and an orange community. MASE is an unsupervised learning technique and so it doesn't need any information about the true communities to embed, but they're useful to see.
+# Below, you can see how MASE works. We start with networks, drawn as nodes in space connected to each other. We turn them into adjacency matrices, and then we embed the adjacency matrices of a bunch of networks separately, using our standard Adjacency Spectral Embedding. Then, we take all of those embeddings, concatenate horizontally into a single matrix, and embed the entire concatenated matrix. The colors are the true communities each node belongs to: there's a red and an orange community. MASE is an unsupervised learning technique and so it doesn't need any information about the true communities to embed, but they're useful to see.
 
 # ```{figure} ../../Images/mase1.jpeg
 # ---
@@ -575,6 +520,9 @@ for network in networks:
 # In[21]:
 
 
+get_ipython().run_line_magic('autoreload', '2')
+from graphbook_code import plot_latents
+
 fig, axs = plt.subplots(2, 2, figsize=(7,7), sharex=True, sharey=True)
 for i, ax in enumerate(axs.flat):
     plot_latents(latents_mase[i], title=f"Embedding for network {i+1}", 
@@ -605,8 +553,9 @@ plt.tight_layout()
 
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
+from graphbook_code import GraphColormap
 
-cmap = 'rocket_r'
+cmap = GraphColormap("divergent", discrete=False).palette
 fig, axs = plt.subplots(ncols=4, figsize=(16, 8), sharex=True, sharey=True)
 for i, ax in enumerate(axs.flat):
     hm = sns.heatmap(latents_mase[i], cmap=cmap, 
@@ -654,14 +603,15 @@ hm.set_ylabel("Latent Position", fontsize=16);
 # In[25]:
 
 
-from graspologic.embed import selectSVD
-joint_embedding, *_ = selectSVD(concatenated, n_components=2)
+from graspologic.embed import select_svd
+joint_embedding, *_ = select_svd(concatenated, n_components=2)
 
 
 # In[26]:
 
 
 from matplotlib.gridspec import GridSpec
+from graphbook_code import cmaps
 
 # TODO: add legend
 fig = plt.figure(figsize=(12, 8))
@@ -678,7 +628,7 @@ hm.set_ylabel("Latent Positions", fontdict={"fontsize": 14})
 
 # Euclidean representation
 splot = sns.scatterplot(joint_embedding[:, 0], joint_embedding[:, 1], ax=axs, hue=labels,
-                        palette="Set1", edgecolor=None, s=10)
+                        palette=cmaps["qualitative"], edgecolor=None, s=10)
 splot.set_xlabel("Dimension 0", fontdict={"fontsize": 14})
 splot.set_ylabel("Dimension 1", fontdict={"fontsize": 14})
 splot.set_title("Euclidean visualization of our Joint Embedding", loc="left", fontdict={"fontsize": 14})
@@ -820,28 +770,28 @@ plt.tight_layout()
 
 # ### OMNI on our four networks
 
-# We'll begin with an example. Let's go back to the four networks we created in the MASE section and look at their embeddings. Notice that they're all *rotations* of each other - this is because of the nonidentifiability problem in spectral embeddings.
+# We'll begin with an example. Let's go back to the four networks we created in the MASE section and look at their embeddings. Notice that the way the blue cluster of points and the red cluster of points is rotated is somewhat arbitrary across the embeddings for our different networks - this is because of the nonidentifiability problem in spectral embeddings.
 
 # ```{admonition} Non-Identifiability
 # Let's take a network generated from an RDPG with $n$ nodes. Each of these $n$ nodes is associated with a latent position vector, corresponding to that node's row in the network's embedding. What it means for a node to have a latent position vector is that the probability for an edge to exist between two nodes $i$ and $j$ is the dot product of their latent position vectors.
 # 
 # More specifically, if $\textbf{P}$ is a matrix of edge probabilities, and $\textbf{X}$ is our latent position matrix, then $\textbf{P} = \textbf{X} \textbf{X}^\top$.
 # 
-# The nonidentifiability problem is as follows: Take any orthogonal matrix (a matrix which only rotates or flips other matrices). Call it $\textbf{W}$. By definition, the transpose of any orthogonal matrix is its inverse -- $\textbf{W} \textbf{W}^\top = \textbf{I}$, where $\textbf{I}$ is the identity matrix. So,
+# The nonidentifiability problem is as follows: Take any orthogonal matrix (a matrix which only rotates or flips other matrices). Call it $\textbf{W}$. By definition, the transpose of any orthogonal matrix is its inverse: $\textbf{W} \textbf{W}^\top = \textbf{I}$, where $\textbf{I}$ is the identity matrix. So,
 # 
 # \begin{align}
-# P &= \textbf{X} \textbf{X}^\top
-#   &= \textbf{X} \textbf{I} \textbf{X}^\top
-#   &= (\textbf{X} \textbf{W}) (\textbf{W}^\top \textbf{X}^\top)
-#   &= (\textbf{X} \textbf{W}) (\textbf{X} \textbf{W})^\top
+# P &= \textbf{X} \textbf{X}^\top \\
+#   &= \textbf{X} \textbf{I} \textbf{X}^\top \\
+#   &= (\textbf{X} \textbf{W}) (\textbf{W}^\top \textbf{X}^\top) \\
+#   &= (\textbf{X} \textbf{W}) (\textbf{X} \textbf{W})^\top \\
 # \end{align}
 # 
-# What this means is that you can take any latent position matrix and rotate it, and the rotated version will still create the same matrix of edge probabilities. So, when you try to estimate latent positions, separate estimations will potentially produce rotated versions of each other.
+# What this means is that you can take any latent position matrix and rotate it, and the rotated version will still generate the same matrix of edge probabilities. So, when you try to estimate latent positions, separate estimations can produce rotated versions of each other.
 # 
-# This is very bad in situations where you're trying to directly compare more than one embedding. You wouldn't be able to figure out the average position of a node, for instance, when you have multiple embeddings of that node.
+# You need to be aware of this in situations where you're trying to directly compare more than one embedding. You wouldn't be able to figure out the average position of a node, for instance, when you have multiple embeddings of that node.
 # ```
 
-# You can see the nonidentifiability problem in action below. The embeddings for network 1 and for network 2 are particularly illustrative; community 0 is generally top in network 1, but on the right in network two. There isn't a way to compare any two nodes directly. Another way to say this is that, right now, all of our embeddings live in different *latent spaces*: direct comparison between embeddings for nodes in network 1 and nodes in network 2 isn't possible. You can also see the latent position corresponding to the first node as a big circle in each network so that you can track a single point.
+# You can see the nonidentifiability problem in action below. The embeddings for network 1 and for network 2 are particularly illustrative; community 0 is generally top in network 1, but on the right in network two. There isn't a way to compare any two nodes directly. Another way to say this is that, right now, all of our embeddings live in different *latent spaces*: direct comparison between embeddings for nodes in network 1 and nodes in network 2 isn't possible. You can also see the latent position corresponding to the first node as a big red circle in each network so that you can track a single point - you can see that the red points are likely to be rotated or flipped across networks.
 
 # In[34]:
 
@@ -851,7 +801,7 @@ for i, ax in enumerate(axs.flat):
     plot_latents(latents_mase[i], title=f"Embedding for network {i+1}", 
                  labels=labels, ax=ax, legend=False)
     _x, _y = np.array(latents_mase)[i, 0]
-    ax.plot(_x, _y, 'ro', markersize=10, linewidth=1, markeredgecolor='k')
+    ax.plot(_x, _y, 'ro', markersize=10)
     ax.yaxis.set_major_locator(plt.MaxNLocator(3))
 plt.suptitle("Adjacency Spectral Embedding for our four networks", fontsize=20);
 
@@ -899,7 +849,7 @@ fig.supylabel("Dimension 2");
 plt.tight_layout()
 
 
-# As you can see, unlike when we embedded the four networks separately, the clusters created by the Omnibus Embedding *live in the same space*: you don't have to rotate or flip your points to line them up across embeddings. The cluster of blue points is always in the top left, and the cluster of red points is always in the bottom right.
+# Unlike when we embedded the four networks separately, the clusters created by the Omnibus Embedding *live in the same space*: you don't have to rotate or flip your points to line them up across embeddings. The cluster of blue points is always in the top left, and the cluster of red points is always in the bottom right. This means that we can compare points directly; the relative location of the node in your network corresponding to the red circle, for instance, now means something across the four networks, and we can do stuff like measure the distance of the red circle in network 1 to the red circle in network two to gain information.
 
 # ### How Does OMNI work?
 
@@ -935,6 +885,8 @@ omni = np.block([[a0, (a0+a1)/2],
 # In[38]:
 
 
+from graphbook_code import text
+
 # fig, axs = plt.subplots(1, 3, figsize=(15, 5))
 fig = plt.figure(figsize=(12, 8))
 gs = GridSpec(2, 3)
@@ -943,15 +895,15 @@ ax1 = fig.add_subplot(gs[1, 0])
 ax_omni = fig.add_subplot(gs[:, 1:])
 
 # first two
-cmap = list(np.array(sns.color_palette("PuOr_r", 3, ))[[1, 2, 0]])
+omni_cmap = list(np.array(sns.color_palette("PuOr_r", 3))[[1, 2, 0]])
 for i, (ax, data) in enumerate(zip([ax0, ax1], [a0, a1])):
     title = r"First network ($A_1$)" if i==0 else r"Second network ($A_2$)"
     hm = lined_heatmap(data, ax=ax, legend=False, title=title, 
-                       colors=[cmap[0], cmap[2]])
+                       colors=[omni_cmap[0], omni_cmap[2]])
 
 
 # big one
-hm = lined_heatmap(omni, ax=ax_omni, binary=False, cmap=cmap,
+hm = lined_heatmap(omni, ax=ax_omni, binary=False, cmap=omni_cmap,
                    title="Omnibus Matrix for first \nand second network",
                    cbar=False, center=None)
 
@@ -966,16 +918,6 @@ for i in [.25, .75]:
     hm.hlines(len(omni)*i, 0, len(omni), colors="black", lw=.9, linestyle="dashed", alpha=.6)
     
 # text
-def text(label, x, y,):
-    ax = plt.gca()
-    left, width, bottom, height = .25, .5, .25, .5
-    right = left + width
-    top = bottom + height
-    t = ax.text(x * (left + right), y * (bottom + top), label,
-                horizontalalignment='center',
-                verticalalignment='center',
-                transform=ax.transAxes, size=32, bbox=dict(facecolor="white", edgecolor="none", alpha=.5))
-
 text(r"$A_1$", .25, .75)
 text(r"$A_2$", .75, .25)
 text(r"$\frac{(A_2 + A_1)}{2}$", .25, .25)
@@ -983,7 +925,7 @@ text(r"$\frac{(A_1 + A_2)}{2}$", .75, .75)
 
 # legend
 omni_labels = np.unique(omni)
-add_legend(legend_labels=omni_labels, colors=cmap)
+add_legend(legend_labels=omni_labels, colors=omni_cmap)
 
 plt.tight_layout()
 
@@ -998,8 +940,7 @@ plt.tight_layout()
 from graspologic.embed.omni import _get_omni_matrix
 omni = _get_omni_matrix(networks)
 
-cmap = list(np.array(sns.color_palette("PuOr_r", 3))[[1, 2, 0]])
-hm = lined_heatmap(omni, binary=False, cmap=cmap, cbar=False,
+hm = lined_heatmap(omni, binary=False, cmap=omni_cmap, cbar=False,
                    title="Full omnibus matrix for all four networks", center=None, alpha=0)
 sns.despine(ax=hm, top=False, bottom=False, left=False, right=False)
 for i in np.arange(4)*1/4:
@@ -1024,14 +965,14 @@ hm.hlines(n*.75, n//2, n, colors="black", lw=.9, alpha=1);
 
 # #### Embedding the Omnibus Matrix
 
-# The next step is fairly standard. We embed the Omnibus Matrix normally, using ASE, as if it were just a normal adjacency matrix. This will create an $nm \times d$ sized latent position matrix (where, remember, $n$ is the number of nodes in each network, $m$ is the number of networks, and $d$ is the number of embedding dimensions). Here, since each of our four networks has 200 nodes, $mn$ is 800, and we chose to embed down to two dimensions.
+# You should understand the next step fairly well by now. We embed the Omnibus Matrix normally, using ASE, as if it were just a normal adjacency matrix. This will create an $nm \times d$ sized latent position matrix (where, remember, $n$ is the number of nodes in each network, $m$ is the number of networks, and $d$ is the number of embedding dimensions). Here, since each of our four networks has 200 nodes, $mn$ is 800, and we chose to embed down to two dimensions.
 
 # In[40]:
 
 
-from graspologic.embed import selectSVD
+from graspologic.embed import select_svd
 
-U, D, V = selectSVD(omni, n_components=2)
+U, D, V = select_svd(omni, n_components=2)
 joint_embedding = U @ np.diag(np.sqrt(D))
 
 joint_embedding.shape
@@ -1039,7 +980,7 @@ joint_embedding.shape
 
 # #### Creating Separate Latent Positions In The Same Latent Space
 
-# Now, the only question is how to actually pull the separate latent positions for each network from this matrix. It turns out that the individual latent positions for each network are actually stacked on top of each other: the first $n$ rows of the joint matrix we just made correspond to the nodes of the first network, the second $n$ rows correspond to the nodes of the second network, and so on. 
+# Now, the only question we have remaining is how to actually pull the separate latent positions for each network from this matrix. It turns out that the individual latent positions for each network are actually stacked on top of each other: the first $n$ rows of the joint matrix we just made correspond to the nodes of the first network, the second $n$ rows correspond to the nodes of the second network, and so on. 
 # 
 # If we want, we can pull out the separate latent positions for each network explicitly. Below, we reshape our 2-dimensional $mn \times d$ numpy array for the omnbus embedding into a $m \times n \times d$ array: the embeddings for each network are now simply stacked on top of each other on the third dimension (and the first axis of our numpy array).
 
@@ -1053,16 +994,18 @@ latent_networks = joint_embedding.reshape(m, n, -1)
 latent_networks.shape
 
 
-# Below, you can see the embeddings we just created. On the left is the full $mn \times d$ omnibus matrix, and on the right are the slices of the $m \times n \times d$ 3-D array we created above. If you look carefully, you can see that the top two rows of colors in the larger embedding are the latent positions for network 0, the second two rows are the embeddings for network 1, and so on.
+# Below, you can see the embeddings we just created. On the left is the full $mn \times d$ omnibus matrix, and on the right are the slices of the $m \times n \times d$ 3-D array we created above. If you look carefully, you can see that the top two blocks of colors (row-wise) in the larger embedding correspond to the latent positions for network 1, the second two blocks correspond to the latent positions for network 2, and so on. They're a bit squished, so that everything lines up nicely, but they're there.
 
 # In[42]:
 
+
+from myst_nb import glue
 
 fig = plt.figure(figsize=(10, 8))
 gs = GridSpec(4, 4)
 
 hm_ax = fig.add_subplot(gs[:, :2])
-hm = sns.heatmap(joint_embedding, cmap="rocket_r", ax=hm_ax, yticklabels=50, cbar=False);
+hm = sns.heatmap(joint_embedding, cmap=cmap, ax=hm_ax, yticklabels=50, cbar=False);
 hm.set_title("Omnibus Embedding", fontsize=14)
 # hm.set(xlabel="Dimension", ylabel="Latent Positions")
 
@@ -1071,7 +1014,7 @@ ax1 = fig.add_subplot(gs[:2, 3])
 ax2 = fig.add_subplot(gs[2:, 2])
 ax3 = fig.add_subplot(gs[2:, 3])
 for i, ax in enumerate([ax0, ax1, ax2, ax3]):
-    plot = sns.heatmap(latent_networks[i], cmap="rocket_r", ax=ax, 
+    plot = sns.heatmap(latent_networks[i], cmap=cmap, ax=ax, 
                        yticklabels=50, cbar=False)
     plot.set_title(f"Latent positions \nfor network {i+1}")
     if ax in {ax0, ax1}:
@@ -1087,21 +1030,24 @@ fig.supylabel("Latent Position", x=.005, fontsize=16)
 # colorbar
 vmin, vmax = np.array(joint_embedding).min(), np.array(joint_embedding).max()
 norm = Normalize(vmin=vmin, vmax=vmax)
-im = cm.ScalarMappable(cmap="rocket_r", norm=norm)
+im = cm.ScalarMappable(cmap=cmap, norm=norm)
 
 plt.tight_layout()
 fig.colorbar(im, ax=np.array([hm_ax, ax0, ax1, ax2, ax3]));
 
+glue("omnibus_latent_fig", fig, display=False)
+
+
+# ```{glue:figure} omnibus_latent_fig
+# :figwidth: 300px
+# :name: "fig-omnibus"
+# 
+# This is a **caption**, with an embedded `{glue:text}` element: {glue:text}`boot_mean:.2f`!
+# ```
 
 # And finally, below is the above embeddings, plotted in Euclidean space. Each point is a row of the embedding above, and the dots are colored according to their class label. The big matrix on the left (the joint OMNI embedding) just contains every latent position we have, across all of our networks. This means that, on the lefthand plot, there will be four points for every node (remember that we're operating under the assumption that we have the same set of nodes across all of our networks).
 
 # In[43]:
-
-
-joint_embedding.shape
-
-
-# In[44]:
 
 
 # set up
@@ -1128,4 +1074,147 @@ fig.supylabel("Dimension 2", x=-.01);
 
 # ## How Can You Use The Omnibus Embedding?
 
+# Fundamentally, the omnibus embedding is useful is because it lets you avoid the somewhat annoying and noise-generating process of figuring out a good way to rotate your separate embeddings to line them up. For instance, say you want to figure out if two networks are generated from the same distribution (This means that the matrix that contains edge probabilities, $\textbf{P}$, is the same for both networks). Then, it's reasonable to assume that their latent positions will be pretty close to each other. Look at the equation below:
 # 
+# $\min_{W} ||{\hat{N_1} - \hat{N_2}W}||_F$
+# 
+# Here:
+# - $W$ is a matrix that just rotates or flips (called an isometry, or an orthonormal matrix)
+# - $\hat{N_1}$ and $\hat{N_2}$ are the estimated latent positions for networks one and two, respectively
+# 
+# the $||X||_F$ syntax means that we're taking the frobenius norm of $X$. Taking the frobenius norm of a matrix is the same as unwrapping the matrix into a giant vector and measuring that vector's length. So, this equation is saying that the latent position for a given node in network one should be close to the latent position in network two.
+# 
+# But, there's that $W$ there, the rotation matrix. We actually wish we didn't have to find it. We have to because of the same problem we keep running into: you can rotate latent positions and they'll still have the same dot product relative to each other, and so you can only embed a network up to a rotation. In practice, you can find this matrix and rotate latent positions for separate networks using it to compare them directly, but again, it's annoying, adds compute power that you probably don't want to use, and it'll add noise to any kind of inference you want to do later.
+# 
+# The Omnibus Embedding is fundamentally a solution to this problem. Because the embeddings for all of your networks live in the same space, you don't have to rotate them manually -- and you cut out the noise that gets created when you have to *infer* a good rotation matrix. We'll explore all the downstream use cases in future chapters, but below is a sneak peak. 
+# 
+# The figure below (adapted from Gopalakrishnan et al. 2021 {cite}`mcc`,  is the omnibus embedding for 32 networks created from a bunch of mouse brains, some of which have been genetically modified. The nodes of these networks represent the regions of a mouse brain and the edges represent how well-connected the neurons in a given pair of regions are. The figure below actually only shows two nodes: the node representing one region in the left hemisphere, and the node representing its corresponding region in the right hemisphere.
+# 
+# So what we're actually *plotting* in this embedding is a bit different than normal, because rather than being nodes, the points we plot are *networks*: one for each of our thirty-two mice. The only reason we're able to get away with doing this is the omnibus embedding: each network lives in the same space!
+
+# In[44]:
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+from graspologic.embed import OmnibusEmbed
+from graspologic.datasets import load_mice
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib.patches import Ellipse
+from scipy.stats.distributions import chi2
+
+
+def _get_parameters(x, y):
+    mu = np.array([x.mean(), y.mean()])
+    cov = np.cov(x, y)
+    return mu, cov
+
+
+def _get_eigen(cov):
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    order = eigvals.argsort()[::-1]
+    eigvals, eigvecs = eigvals[order], eigvecs[:, order]
+    return eigvals, eigvecs
+
+
+def _get_ellipse_parameters(cov, ci):
+
+    eigvals, eigvecs = _get_eigen(cov)
+
+    # Calculate angle of displacement from x-axis
+    theta = np.arctan2(*eigvecs[:, 0][::-1])
+    theta = np.degrees(theta)
+
+    # Calculate scaling factor based on probability
+    dof = len(eigvals)
+    alpha = 1 - (1 - ci) / 2
+    scale = chi2.ppf(alpha, dof)
+    width, height = 2 * np.sqrt(scale * eigvals)
+
+    return width, height, theta
+
+
+def make_ellipse(x, y, ci, **kwargs):
+    mu, cov = _get_parameters(x, y)
+    width, height, theta = _get_ellipse_parameters(cov, ci)
+    ellipse = Ellipse(mu, width, height, theta, alpha=0.5, **kwargs)
+    return ellipse
+
+
+def draw_probability_ellipse(x, y, ci, **kwargs):
+    ellipse = make_ellipse(x, y, ci, **kwargs)
+    ax = plt.gca()
+    ax.add_artist(ellipse)
+
+    plot_kws = dict(alpha=0.75, s=15, linewidth=0, marker="o")
+    ax.scatter(x, y, **plot_kws, **kwargs)
+
+
+def munge_embedding(embedding, labels):
+    col_names = [f"Dimension {i}" for i in range(1, embedding.shape[1] + 1)]
+    df = pd.DataFrame(embedding, columns=col_names)
+    df["Strain"] = labels
+    return df
+
+
+def _pairgrid(embedding, labels):
+    df = munge_embedding(embedding, labels)
+
+    palette = ["#e7298a", "#1b9e77", "#d95f02", "#7570b3"]
+    plot_kws = dict(alpha=0.75, s=15, linewidth=0, marker="o")
+
+    with sns.plotting_context("paper", font_scale=1):
+        g = sns.PairGrid(df, hue="Strain", palette=palette, height=1.5)
+        g = g.map_upper(sns.scatterplot, **plot_kws)
+        g = g.map_diag(sns.kdeplot, lw=1, shade=True)
+        g.set(xticks=[], yticks=[])
+
+    return g
+
+
+def ellipse_pairgrid(embedding, labels, ci, **kwargs):
+    g = _pairgrid(embedding, labels)
+    kwargs["ci"] = ci
+    g = g.map_lower(draw_probability_ellipse, **kwargs)
+    return g
+
+# Load the full mouse dataset
+mice = load_mice()
+
+# Stack all adjacency matrices in a 3D numpy array
+graphs = np.array(mice.graphs)
+
+# Sort the connectomes and genotypic labels so BTBR is first
+label_indices = np.argsort(mice.labels).reshape(4, 8)
+label_indices = label_indices[[1, 0, 2, 3]].reshape(-1)
+
+labels = mice.labels[label_indices]
+mapping = dict(BTBR="Genetically Modified Mice", B6="First Normal Group", 
+               CAST="Second Normal Group", DBA2="Third Normal Group")
+labels = [mapping[old] for old in labels]
+graphs = graphs[label_indices]
+
+# Jointly embed graphs using omnibus embedding
+embedder = OmnibusEmbed()
+omni_embedding = embedder.fit_transform(graphs)
+
+
+# Get index for the input structure
+index = mice.atlas.query(f"Structure == 'Corpus_Callosum'")["ROI"].values[0]
+index -= 1
+
+# Make the plot
+g = ellipse_pairgrid(omni_embedding[:, index, :3], labels, ci=0.9)
+g.fig.suptitle("Mouse Networks Corresponding to a Single Node \nAfter Omnibus Embedding", y=1.08)
+g.fig.set(dpi=300)
+g.add_legend()
+plt.show()
+g.add_legend(title="Type of Mouse");
+sns.move_legend(g, "center right", frameon=True)
+
+
+# You can clearly see a difference between the genetically modified mice and the normal mice. The genetically modified mice are off in their own cluster; if you're familiar with classical statistics, you could do a MANOVA here and find that the genetically modified mice are significantly different from the rest - if we wanted to, we could figure out which mice are genetically modified, even without having that information in advance!

@@ -1,0 +1,860 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2.2. Erdös-Rényi (ER) Random Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="2.3. Stochastic Block Models (SBM)" href="single-network-models_SBM.html" />
+    <link rel="prev" title="2.1. Why Use Statistical Models?" href="why-use-models.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../coverpage.html">
+   Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology and Math Refresher
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What Is A Network?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. Why Study Networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.3. Examples of applications
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-of-networks.html">
+     1.4. Types of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-of-learning-probs.html">
+     1.5. Types of Network Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/main-challenges.html">
+     1.6. Main Challenges of Network Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/exercises.html">
+     1.7. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/transformation-techniques.html">
+     2.4. Transformation Techniques
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/select-and-train.html">
+     2.5. Select and Train a Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/fine-tune.html">
+     2.6. Fine-Tune your Model
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch3/ch3.html">
+   3. End-to-end Business Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/big-picture.html">
+     3.1. Look at the Big Picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/get-the-data.html">
+     3.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/discover-and-visualize.html">
+     3.3. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/prepare-the-data.html">
+     3.4. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch4/ch4.html">
+   1. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/matrix-representations.html">
+     1.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/network-representations.html">
+     1.2. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/properties-of-networks.html">
+     1.3. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/regularization.html">
+     1.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="ch5.html">
+   2. Why Use Statistical Models?
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="why-use-models.html">
+     2.1. Why Use Statistical Models?
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     2.2. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_SBM.html">
+     2.3. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_RDPG.html">
+     2.4. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multi-network-models.html">
+     2.5. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="models-with-covariates.html">
+     2.6. Network Models with Covariates
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_theory.html">
+     2.7. Single network model theory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch6/ch6.html">
+   3. Learning Network Representations
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/estimating-parameters_mle.html">
+     3.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/why-embed-networks.html">
+     3.2. Why embed networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/spectral-embedding.html">
+     3.3. Spectral Embedding Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/estimating-parameters_spectral.html">
+     3.4. Estimating Parameters in Network Models via Spectral Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/random-walk-diffusion-methods.html">
+     3.5. Random-Walk and Diffusion-based Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/graph-neural-networks.html">
+     3.6. Graph Neural Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/multigraph-representation-learning.html">
+     3.7. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/joint-representation-learning.html">
+     3.8. Joint Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/estimating-parameters_theory.html">
+     3.9. Model Estimation Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch7/ch7.html">
+   4. Theoretical Results
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/theory-single-network.html">
+     4.1. Theory for Single Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/theory-multigraph.html">
+     4.2. Theory for Multiple-Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/theory-matching.html">
+     4.3. Theory for Graph Matching
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch8/ch8.html">
+   1. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/community-detection.html">
+     1.1. Community Detection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/testing-differences.html">
+     1.2. Testing for Differences between Communities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/model-selection.html">
+     1.3. Model Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/single-vertex-nomination.html">
+     1.4. Single-Network Vertex Nomination
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/out-of-sample.html">
+     1.5. Out-of-sample Embedding
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch9/ch9.html">
+   2. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/two-sample-hypothesis.html">
+     2.1. Two-Sample Hypothesis Testing
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/graph-matching-vertex.html">
+     2.2. Graph Matching
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/multiple-vertex-nomination.html">
+     2.3. Vertex Nomination For Multiple Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch10/ch10.html">
+   3. Applications for Many Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/anomaly-detection.html">
+     3.1. Anomaly Detection For Timeseries of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/significant-edges.html">
+     3.2. Testing for Significant Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/significant-vertices.html">
+     3.3. Testing for Significant Vertices
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/significant-communities.html">
+     3.4. Testing for Significant Communities
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/representations/ch5/single-network-models_ER.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/neurodata/graph-stats-book"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Frepresentations/ch5/single-network-models_ER.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/representations/ch5/single-network-models_ER.ipynb"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch5/single-network-models_ER.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability">
+   2.2.1. The Erdös Rényi random network is parametrized by the independent-edge probability
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-do-we-simulate-realizations-of-er-n-p-random-networks">
+   2.2.2. How do we simulate realizations of
+   <span class="math notranslate nohighlight">
+    \(ER_n(p)\)
+   </span>
+   random networks?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-do-we-use-an-er-n-p-network">
+   2.2.3. When do we use an
+   <span class="math notranslate nohighlight">
+    \(ER_n(p)\)
+   </span>
+   Network?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#just-how-many-networks-are-possible-for-a-network-with-n-nodes">
+   2.2.4. Just how many networks are possible for a network with
+   <span class="math notranslate nohighlight">
+    \(n\)
+   </span>
+   nodes?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   2.2.5. References
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="erdos-renyi-er-random-networks">
+<h1><span class="section-number">2.2. </span>Erdös-Rényi (ER) Random Networks<a class="headerlink" href="#erdos-renyi-er-random-networks" title="Permalink to this headline">¶</a></h1>
+<p>We will start our description with the simplest random network model. Consider a social network, with 50 students. Our network will have 50 nodes, where each node represents a single student in the network. Edges in the social network represent whether or not a pair of students are friends. What is the simplest way we could describe whether two people are friends?</p>
+<p>In this case, the simplest possible thing to do would be to say, for any two students in our network, there is some probability (which we will call <span class="math notranslate nohighlight">\(p\)</span>) that describes how likely they are to be friends. In the below example, for the sake of argument, we will let <span class="math notranslate nohighlight">\(p=0.3\)</span>. What does a realization from this network look like?</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># network with 50 nodes</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of an edge existing is .3</span>
+
+<span class="c1"># sample a single simple adjacency matrix from ER(50, .3)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(0.3) Simulation&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_1_0.png" src="../../_images/single-network-models_ER_1_0.png" />
+</div>
+</div>
+<p>As we mentioned in the preface for this chapter, every statisical model in this book will come down to the coin flip model. In network machine learning, we get to see an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> whose entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> are one if the students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are friends on the social networking site, and <span class="math notranslate nohighlight">\(0\)</span> if the students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are not friends on the social networking site. Just like we had a random coin <span class="math notranslate nohighlight">\(\mathbf x\)</span> which behaved like a <span class="math notranslate nohighlight">\(Bern(p)\)</span> coin from the collection <span class="math notranslate nohighlight">\(\left\{Bern(q) : q \text{ is a probability between \)</span>0<span class="math notranslate nohighlight">\( and \)</span>1<span class="math notranslate nohighlight">\(}\right\}\)</span>, we will assume that the network <span class="math notranslate nohighlight">\(A\)</span> is a realization of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which behaves like an element of a collection of random neworks. This might seem like a big stretch, so let’s try to put it into perspective.</p>
+<p>Since <span class="math notranslate nohighlight">\(A\)</span> was an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> random matrix. The elements of <span class="math notranslate nohighlight">\(\mathbf A\)</span> will be given by the symbols <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, which means that each edge <span class="math notranslate nohighlight">\(a_{ij}\)</span> of <span class="math notranslate nohighlight">\(A\)</span> is a realization of the random edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>. Just how do we describe this <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>? Remember that our realizations <span class="math notranslate nohighlight">\(a_{ij}\)</span> are just <span class="math notranslate nohighlight">\(0\)</span>s and <span class="math notranslate nohighlight">\(1\)</span>s, which <em>feels</em> a lot like flipping a coin, doesn’t it? Did the coin land on heads, or did it land on tails? Are the two people <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> friends, or are they not friends? If we had a coin with some probability of landing on heads, we could describe <span class="math notranslate nohighlight">\(a_{ij}\)</span> as a realization of this coin flip. We could assume that a value of one is analogous to the coin landing on heads, and value of zero is analogous to the coin landing on tails. Perhaps we could even model the network using the same approach we took before with the coin flip. This is starting to go somewhere, so let’s continue with the analogies.</p>
+<div class="section" id="the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability">
+<h2><span class="section-number">2.2.1. </span>The Erdös Rényi random network is parametrized by the independent-edge probability<a class="headerlink" href="#the-erdos-renyi-random-network-is-parametrized-by-the-independent-edge-probability" title="Permalink to this headline">¶</a></h2>
+<p>This simple random network model is called the Erdös Rényi (ER) model<sup>1</sup>. The way we can think of an ER random network is that the edges depend <em>only</em> on a probability, <span class="math notranslate nohighlight">\(p\)</span>, and each edge is totally independent of all other edges. We can think of this example as though a coin flip is performed, where the coin has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads, and <span class="math notranslate nohighlight">\(1-p\)</span> of landing on tails. For each edge in the network, we conceptually flip the coin, and if it lands on heads (with probability <span class="math notranslate nohighlight">\(p\)</span>), the edge exists, and if it lands on tails (with probability <span class="math notranslate nohighlight">\(1-p\)</span>) the edge does not exist. The meaning of <em>independence</em> is a little technical and goes a bit outside of the scope of this book, so we will leave it at a very high level as meaning that the outcome of particular coin flips do not impact the outcomes of other coin flips. This is not a very precise definition, but it will be plenty for our purposes. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes and probability <span class="math notranslate nohighlight">\(p\)</span>, we will often say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network.</p>
+</div>
+<div class="section" id="how-do-we-simulate-realizations-of-er-n-p-random-networks">
+<h2><span class="section-number">2.2.2. </span>How do we simulate realizations of <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks?<a class="headerlink" href="#how-do-we-simulate-realizations-of-er-n-p-random-networks" title="Permalink to this headline">¶</a></h2>
+<p>This approach which we will use to describe random networks is called a <em>generative model</em>, which means that we have described an observable network realization <span class="math notranslate nohighlight">\(A\)</span> of the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> in terms of the parameters of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In the case of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random networks, we have described <span class="math notranslate nohighlight">\(\mathbf A\)</span> in terms of the probability parameter, <span class="math notranslate nohighlight">\(p\)</span>. Generative models are convenient in that we can easily adapt them to tell us exactly how to simulate realizations of the underlying random network. The procedure below will produce for us a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network  <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network:</p>
+<div class="admonition-simulating-a-realization-from-an-er-n-p-random-network admonition">
+<p class="admonition-title">Simulating a realization from an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network</p>
+<ol class="simple">
+<li><p>Determine a probability, <span class="math notranslate nohighlight">\(p\)</span>, of an edge existing.</p></li>
+<li><p>Obtain a weighted coin which has a probability <span class="math notranslate nohighlight">\(p\)</span> of landing on heads, and a probability <span class="math notranslate nohighlight">\(1 - p\)</span> of landing on tails. Note that this probability <span class="math notranslate nohighlight">\(p\)</span> might differ from the “traditional” coin with a probability of landing on heads of approximately <span class="math notranslate nohighlight">\(0.5\)</span>.</p></li>
+<li><p>Flip the once for each <em>possible</em> edge <span class="math notranslate nohighlight">\((i, j)\)</span> between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> in the network. For a simple network, we will repeat the coin flip <span class="math notranslate nohighlight">\(\binom n 2\)</span> times.</p></li>
+<li><p>For each coin flip which landed on heads, define that the corresponding edge exists, and define that the corresponding entry <span class="math notranslate nohighlight">\(a_{ij}\)</span> in the adjacency matrix is <span class="math notranslate nohighlight">\(1\)</span>. For each coin flip which lands on tails, define that the corresponding edge does not exist, and define that <span class="math notranslate nohighlight">\(a_{ij} = 0\)</span>.</p></li>
+<li><p>The adjacency matrix we produce, <span class="math notranslate nohighlight">\(A\)</span>, is a realization of an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network.</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="when-do-we-use-an-er-n-p-network">
+<h2><span class="section-number">2.2.3. </span>When do we use an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> Network?<a class="headerlink" href="#when-do-we-use-an-er-n-p-network" title="Permalink to this headline">¶</a></h2>
+<p>In practice, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model seems like it might be a little too simple to be useful. Why would it ever be useful to think that the best we can do to describe our network is to say that connections exist with some probability? Does this miss a <em>lot</em> of useful questions we might want to answer? Fortunately, there are a number of ways in which the simplicity of the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> model is useful. Given a probability and a number of nodes, we can easily describe the properties we would expect to see in a network if that network were ER. For instance, we know how many edges on average the nodes of an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random nework should have. We can reverse this idea, too: given a network we think might <em>not</em> be ER, we could check whether it’s different in some way from an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network. For instance, if we see that half the nodes have a ton of edges (meaning, they have a high degree), and half don’t, we might be able to determine that the network is poorly described by an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network. If this is the case, we might look for other models that could describe our network which are more complex.</p>
+<!-- Another utility of the $ER_n(p)$ model is that we might often want to benchmark network algorithms on simulated networks with a given *sparsity*. **Network sparsity** is a feature of a network which describes the degree to which the network possesses fewer edges than the maximum number of possible edges. As an example, when we know ahead of time that the network is going to be sparse (the network has a *small* number of edges which exist relative the number of possible edges), we can use network machine learning techniques which anticipate this sparsity to make the algorithm faster. In a simple network, for instance, the maximum number of possible edges is $\binom n 2$. In an $ER_n(p)$ network with probability $p$, we would expect the network to have on average about $p \binom n 2$ edges; that is, $p$ describes the fraction of total possible edges that we would expect to exist. $ER_n(p)$ networks are extremely cheap to simulate computationally, because "flipping weighted coins" (if you are curious, this is called a *Bernoulli sample* with probability $p$) is usually able to be performed with extremely optimized code in most standard programming languages such as python. Being able to generate networks very easily with a given number of nodes $n$ and a given sparsity allows us to test just how efficient our network machine learning technique is.
+-->
+<p>In the next code block, we are going to sample a single <span class="math notranslate nohighlight">\(ER_n(p)\)</span> network with <span class="math notranslate nohighlight">\(50\)</span> nodes and an edge probability <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(0.3\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># network with 50 nodes</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of an edge existing is .3</span>
+
+<span class="c1"># sample a single simple adjacency matrix from ER(50, .3)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># and plot it</span>
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$ER_</span><span class="si">{10}</span><span class="s2">(0.3)$ Simulation&quot;</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_4_0.png" src="../../_images/single-network-models_ER_4_0.png" />
+</div>
+</div>
+<p>Above, we visualize the network using a heatmap. The dark squares indicate that an edge exists between a pair of nodes, and white squares indicate that an edge does not exist between a pair of nodes.</p>
+<p>Next, let’s see what happens when we use a higher edge probability, like <span class="math notranslate nohighlight">\(p=0.7\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="mf">0.7</span>  <span class="c1"># network has an edge probability of 0.7</span>
+
+<span class="c1"># sample a single adjacency matrix from ER(50, 0.7)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># and plot it</span>
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$ER_</span><span class="si">{10}</span><span class="s2">(0.7)$ Simulation&quot;</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_7_0.png" src="../../_images/single-network-models_ER_7_0.png" />
+</div>
+</div>
+<p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
+</div>
+<div class="section" id="just-how-many-networks-are-possible-for-a-network-with-n-nodes">
+<h2><span class="section-number">2.2.4. </span>Just how many networks are possible for a network with <span class="math notranslate nohighlight">\(n\)</span> nodes?<a class="headerlink" href="#just-how-many-networks-are-possible-for-a-network-with-n-nodes" title="Permalink to this headline">¶</a></h2>
+<p>As you’re going to become accustomed to, we’re going to boil this down again to coin flips. If we had one coin, there are two possible outcomes: either heads or tails. If we had two coins, the first coin could be heads or tails, and the second coin could be heads or tails. Let’s break this down by fixing the outcome of the first coin. If the first coin were heads, there are two possible outcomes for the second coin. If the first coin were tails, there are two possible outcomes for the second coin. This means that the total number of possible outcomes is the sum of the number of possible outcomes if the first coin is heads with the number of possible outcomes if the first coin were tails. This gives us that with two coins, we have four possible outcomes. When we add a third coin, we repeat this process again. If the first coin were heads, the second two coins could take any of four possible outcomes as we just learned. if the first coin were tails, the second two coins could also taake any of four possible outcomes. Therefore, with three coins, we have eight possible outcomes. As we continue this procedure, we quickly will realize that with <span class="math notranslate nohighlight">\(x\)</span> coin flips, we have <span class="math notranslate nohighlight">\(2^x\)</span> possible outcomes.</p>
+<p>Remember in Chapter 4 when discussing the <a class="reference external" href="#link?">properties of networks</a>, we determined that there are <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span> possible edges in a simple network, which we could represent using the notation <span class="math notranslate nohighlight">\(\binom n 2\)</span>. In a realized network, each of these edges could exist or not exist, so there are again two possibilities just like the coin flips. Since edges existing or not existing boils down to a coin flip, the number of possible networks with <span class="math notranslate nohighlight">\(n\)</span> nodes is just <span class="math notranslate nohighlight">\(2\)</span> to the power of the number of coin flips that are performed in the network. Here, this is <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span>. This quantity gets <em>really</em> big <em>really</em> fast! Let’s see just how fast below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">comb</span>
+
+<span class="n">ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">51</span><span class="p">)</span>
+<span class="n">nposs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ns</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">ns</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">nposs</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of Nodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Possible Networks (log scale)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;$10^{{</span><span class="si">{pow:d}</span><span class="s2">}}$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">pow</span><span class="o">=</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">]])</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_10_0.png" src="../../_images/single-network-models_ER_10_0.png" />
+</div>
+</div>
+<p>This is an enormous quantity! When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(6\)</span>, the number of possible networks is <span class="math notranslate nohighlight">\(2^{\binom 6 2} = 2^{6}\)</span> which is over <span class="math notranslate nohighlight">\(32,000\)</span>. When <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(15\)</span>, the number of posssible networks balloons up to <span class="math notranslate nohighlight">\(2^{\binom{15}{2}} = 2^{105}\)</span> which is over <span class="math notranslate nohighlight">\(10^{30}\)</span>. As the number of nodes increases, the number of possible network balloons really, really fast!</p>
+</div>
+<div class="section" id="references">
+<h2><span class="section-number">2.2.5. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p>[1] Erdös P, Rényi A. 1959. “On random graphs, I.” Publ. Math. Debrecen 6:290–297.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./representations/ch5"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="why-use-models.html" title="previous page"><span class="section-number">2.1. </span>Why Use Statistical Models?</a>
+    <a class='right-next' id="next-link" href="single-network-models_SBM.html" title="next page"><span class="section-number">2.3. </span>Stochastic Block Models (SBM)</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Joshua Vogelstein, Alex Loftus, and Eric Bridgeford<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

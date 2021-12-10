@@ -1,0 +1,1532 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3.3. Spectral Embedding Methods &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="3.4. Estimating Parameters in Network Models via Spectral Methods" href="estimating-parameters_spectral.html" />
+    <link rel="prev" title="3.2. Why embed networks?" href="why-embed-networks.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../coverpage.html">
+   Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology and Math Refresher
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What Is A Network?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. Why Study Networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.3. Examples of applications
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-of-networks.html">
+     1.4. Types of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-of-learning-probs.html">
+     1.5. Types of Network Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/main-challenges.html">
+     1.6. Main Challenges of Network Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/exercises.html">
+     1.7. Exercises
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/transformation-techniques.html">
+     2.4. Transformation Techniques
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/select-and-train.html">
+     2.5. Select and Train a Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/fine-tune.html">
+     2.6. Fine-Tune your Model
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch3/ch3.html">
+   3. End-to-end Business Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/big-picture.html">
+     3.1. Look at the Big Picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/get-the-data.html">
+     3.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/discover-and-visualize.html">
+     3.3. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/prepare-the-data.html">
+     3.4. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch4/ch4.html">
+   1. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/matrix-representations.html">
+     1.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/network-representations.html">
+     1.2. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/properties-of-networks.html">
+     1.3. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/regularization.html">
+     1.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch5/ch5.html">
+   2. Why Use Statistical Models?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/why-use-models.html">
+     2.1. Why Use Statistical Models?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/single-network-models_ER.html">
+     2.2. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/single-network-models_SBM.html">
+     2.3. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/single-network-models_RDPG.html">
+     2.4. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/multi-network-models.html">
+     2.5. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/models-with-covariates.html">
+     2.6. Network Models with Covariates
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/single-network-models_theory.html">
+     2.7. Single network model theory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="ch6.html">
+   3. Learning Network Representations
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="estimating-parameters_mle.html">
+     3.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="why-embed-networks.html">
+     3.2. Why embed networks?
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     3.3. Spectral Embedding Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="estimating-parameters_spectral.html">
+     3.4. Estimating Parameters in Network Models via Spectral Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="random-walk-diffusion-methods.html">
+     3.5. Random-Walk and Diffusion-based Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="graph-neural-networks.html">
+     3.6. Graph Neural Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multigraph-representation-learning.html">
+     3.7. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="joint-representation-learning.html">
+     3.8. Joint Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="estimating-parameters_theory.html">
+     3.9. Model Estimation Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch7/ch7.html">
+   4. Theoretical Results
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/theory-single-network.html">
+     4.1. Theory for Single Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/theory-multigraph.html">
+     4.2. Theory for Multiple-Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/theory-matching.html">
+     4.3. Theory for Graph Matching
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch8/ch8.html">
+   1. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/community-detection.html">
+     1.1. Community Detection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/testing-differences.html">
+     1.2. Testing for Differences between Communities
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/model-selection.html">
+     1.3. Model Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/single-vertex-nomination.html">
+     1.4. Single-Network Vertex Nomination
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/out-of-sample.html">
+     1.5. Out-of-sample Embedding
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch9/ch9.html">
+   2. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/two-sample-hypothesis.html">
+     2.1. Two-Sample Hypothesis Testing
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/graph-matching-vertex.html">
+     2.2. Graph Matching
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/multiple-vertex-nomination.html">
+     2.3. Vertex Nomination For Multiple Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch10/ch10.html">
+   3. Applications for Many Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/anomaly-detection.html">
+     3.1. Anomaly Detection For Timeseries of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/significant-edges.html">
+     3.2. Testing for Significant Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/significant-vertices.html">
+     3.3. Testing for Significant Vertices
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch10/significant-communities.html">
+     3.4. Testing for Significant Communities
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/representations/ch6/spectral-embedding.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/neurodata/graph-stats-book"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Frepresentations/ch6/spectral-embedding.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        <a class="edit-button" href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/representations/ch6/spectral-embedding.ipynb"><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Edit this page"><i class="fas fa-pencil-alt"></i>suggest edit</button></a>
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch6/spectral-embedding.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-simple-network">
+   3.3.1. A Simple Network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-laplacian-matrix">
+   3.3.2. The Laplacian Matrix
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#finding-singular-vectors-with-singular-value-decomposition">
+   3.3.3. Finding Singular Vectors With Singular Value Decomposition
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#breaking-down-our-network-s-laplacian-matrix">
+   3.3.4. Breaking Down Our Network’s Laplacian matrix
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-we-care-about-taking-eigenvectors-matrix-rank">
+   3.3.5. Why We Care About Taking Eigenvectors: Matrix Rank
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#summing-rank-1-matrices-recreates-the-original-matrix">
+     3.3.5.1. Summing Rank 1 Matrices Recreates The Original Matrix
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#we-can-approximate-our-simple-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">
+     3.3.5.2. We can approximate our simple Laplacian by only summing a few of the low-rank matrices
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#approximating-becomes-extremely-useful-when-we-have-a-bigger-now-regularized-laplacian">
+     3.3.5.3. Approximating becomes extremely useful when we have a bigger (now regularized) Laplacian
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-this-matrix-rank-stuff-helps-us-understand-spectral-embedding">
+   3.3.6. How This Matrix Rank Stuff Helps Us Understand Spectral Embedding
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figuring-out-how-many-dimensions-to-embed-your-network-into">
+   3.3.7. Figuring Out How Many Dimensions To Embed Your Network Into
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-graspologic-to-embed-networks">
+   3.3.8. Using Graspologic to embed networks
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#adjacency-spectral-embedding">
+     3.3.8.1. Adjacency Spectral Embedding
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#laplacian-spectral-embedding">
+     3.3.8.2. Laplacian Spectral Embedding
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#when-should-you-use-ase-and-when-should-you-use-lse">
+   3.3.9. When should you use ASE and when should you use LSE?
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="spectral-embedding-methods">
+<h1><span class="section-number">3.3. </span>Spectral Embedding Methods<a class="headerlink" href="#spectral-embedding-methods" title="Permalink to this headline">¶</a></h1>
+<p>One of the primary embedding tools we’ll use in this book is a set of methods called <em>spectral embedding</em> <span id="id1"></span>. You’ll see spectral embedding and variations on it repeatedly, both throughout this section and when we get into applications, so it’s worth taking the time to understand spectral embedding deeply. If you’re familiar with Principal Component Analysis (PCA), this method has a lot of similarities. We’ll need to get into a bit of linear algebra to understand how it works.</p>
+<p>Remember that the basic idea behind any network embedding method is to take the network and put it into Euclidean space - meaning, a nice data table with rows as observations and columns as features (or dimensions), which you can then plot on an x-y axis. In this section, you’ll see the linear algebra-centric approach that spectral embedding uses to do this.</p>
+<p>Spectral methods are based on a bit of linear algebra, but hopefully a small enough amount to still be understandable. The overall idea has to do with eigenvectors, and more generally, something called “singular vectors” - a generalization of eigenvectors. It turns out that the biggest singular vectors of a network’s adjacency matrix contain the most information about that network - and as the singular vectors get smaller, they contain less information about the network (we’re glossing over what ‘information’ means a bit here, so just think about this as a general intuition). So if you represent a network in terms of its singular vectors, you can drop the smaller ones and still retain most of the information. This is the essence of what spectral embedding is about (here “biggest” means “the singular vector corresponding to the largest singular value”).</p>
+<div class="admonition-singular-values-and-singular-vectors admonition">
+<p class="admonition-title">Singular Values and Singular Vectors</p>
+<p>If you don’t know what singular values and singular vectors are, don’t worry about it. You can think of them as a generalization of eigenvalues/vectors (it’s also ok if you don’t know what those are): all matrices have singular values and singular vectors, but not all matrices have eigenvalues and eigenvectors. In the case of square, symmetric matrices with positive eigenvalues, the eigenvalues/vectors and singular values/vectors are the same thing.</p>
+<p>If you want some more background information on eigenstuff and singularstuff, there are some explanations in the Math Refresher section in the introduction. They’re an important set of vectors associated with matrices with a bunch of interesting properties. A lot of linear algebra is built around exploring those properties.</p>
+</div>
+<p>You can see visually how Spectral Embedding works below. We start with a 20-node Stochastic Block Model with two communities, and then found its singular values and vectors. It turns out that because there are only two communities, only the first two singular vectors contain information – the rest are just noise! (you can see this if you look carefully at the first two columns of the eigenvector matrix). So, we took these two columns and scaled them by the first two singular vectors of the singular value matrix <span class="math notranslate nohighlight">\(D\)</span>. The final embedding is that scaled matrix, and the plot you see takes the rows of that matrix and puts them into Euclidean space (an x-y axis) as points. This matrix is called the <em>latent position matrix</em>, and the embeddings for the nodes are called the <em>latent positions</em>. Underneath the figure is a list that explains how the algorithm works, step-by-step.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">cmaps</span><span class="p">,</span> <span class="n">plot_latents</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">patches</span>
+
+<span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Make network</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> 
+              <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+<span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">Ut</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">Uc</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n_components</span><span class="p">]</span>
+<span class="n">Ec</span> <span class="o">=</span> <span class="n">E</span><span class="p">[:</span><span class="n">n_components</span><span class="p">]</span>
+<span class="n">latents</span> <span class="o">=</span> <span class="n">Uc</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">Ec</span><span class="p">)</span>
+    
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">();</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="o">.</span><span class="mi">06</span><span class="p">,</span> <span class="o">-.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span> 
+<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network Representation&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+
+<span class="c1"># add arrow</span>
+<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
+
+<span class="c1"># add joint matrix</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-.</span><span class="mi">02</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Left Singular vector matrix $U$&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.55</span><span class="p">,</span> <span class="o">-.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">E</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Singular value matrix $S$&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-.</span><span class="mi">06</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">Ut</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Right singular vector matrix $V^T$&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+    
+<span class="c1"># add second arrow</span>
+<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;Simple, tail_width=10, head_width=40, head_length=20&quot;</span>
+<span class="n">kw</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">text_arrow</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">FancyArrowPatch</span><span class="p">((</span><span class="mf">0.33</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">),</span> <span class="n">connectionstyle</span><span class="o">=</span><span class="s2">&quot;arc3, rad=-.55&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+<span class="n">arrow_ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">text_arrow</span><span class="p">)</span>
+
+
+<span class="c1"># Embedding</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="o">.</span><span class="mi">185</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">]</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> 
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Positions </span><span class="se">\n</span><span class="s2">(matrix representation)&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First two scaled columns of $U$&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="o">.</span><span class="mi">185</span><span class="o">+.</span><span class="mi">45</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Positions (Euclidean representation)&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Plotting the rows of U as points in space&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;The Spectral Embedding Algorithm&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1.5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_2_0.png" src="../../_images/spectral-embedding_2_0.png" />
+</div>
+</div>
+<div class="admonition-the-spectral-embedding-algorithm admonition">
+<p class="admonition-title">The Spectral Embedding Algorithm</p>
+<ol class="simple">
+<li><p>Take a network’s adjacency matrix. Optionally take its Laplacian as a network representation.</p></li>
+<li><p>Decompose it into a a singular vector matrix, a singular value matrix, and the singular vector matrix’s transpose.</p></li>
+<li><p>Remove every column of the singular vector matrix except for the first <span class="math notranslate nohighlight">\(k\)</span> vectors, corresponding to the <span class="math notranslate nohighlight">\(k\)</span> largest singular values.</p></li>
+<li><p>Scale the <span class="math notranslate nohighlight">\(k\)</span> remaining columns by their corresponding singular values to create the embedding.</p></li>
+<li><p>The rows of this embedding matrix are the locations in Euclidean space for the nodes of the network (called the latent positions). The embedding matrix is an estimate of the latent position matrix (which we talked about in the ‘why embed networks’ section)</p></li>
+</ol>
+</div>
+<p>We need to dive into a few specifics to understand spectral embedding better. We need to figure out how to find our network’s singular vectors, for instance, and we also need to understand why those singular vectors can be used to form a representation of our network. To do this, we’ll explore a few concepts from linear algebra like matrix rank, and we’ll see how understanding these concepts connects to understanding spectral embedding.</p>
+<p>Let’s scale down and make a simple network, with only six nodes. We’ll take its Laplacian just to show what that optional step looks like, and then we’ll find its singular vectors with a technique we’ll explore called Singular Value Decomposition. Then, we’ll explore why we can use the first <span class="math notranslate nohighlight">\(k\)</span> singular values and vectors to find an embedding. Let’s start with creating the simple network.</p>
+<div class="section" id="a-simple-network">
+<h2><span class="section-number">3.3.1. </span>A Simple Network<a class="headerlink" href="#a-simple-network" title="Permalink to this headline">¶</a></h2>
+<p>Say we have the simple network below. There are six nodes total, numbered 0 through 5, and there are two distinct connected groups (called “connected components” in network theory land). Nodes 0 through 2 are all connected to each other, and nodes 3 through 5 are also all connected to each other.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">add_edge</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add an edge to an undirected graph.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">edge</span>
+    <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">A</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">add_edge</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
+    
+<span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">add_edge</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see the adjacency matrix and network below. Notice that there are two distrinct blocks in the adjacency matrix: in its upper-left, you can see the edges between the first three nodes, and in the bottom right, you can see the edges between the second three nodes.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">kamada_kawai_layout</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Our Simple Network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_9_0.png" src="../../_images/spectral-embedding_9_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="the-laplacian-matrix">
+<h2><span class="section-number">3.3.2. </span>The Laplacian Matrix<a class="headerlink" href="#the-laplacian-matrix" title="Permalink to this headline">¶</a></h2>
+<p>With spectral embedding, we’ll either find the singular vectors of the Laplacian or the singular vectors of the Adjacency Matrix itself (For undirected Laplacians, the singular vectors are the same thing as the eigenvectors). Since we already have the adjacency matrix, let’s take the Laplacian just to see what that looks like.</p>
+<p>Remember from chapter four that there are a few different types of Laplacian matrices. By default, for undirected networks, Graspologic uses the normalized Laplacian <span class="math notranslate nohighlight">\(L = D^{-1/2} A D^{-1/2}\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the degree matrix. Remember that the degree matrix has the degree, or number of edges, of each node along the diagonals. Variations on the normalized Laplacian are generally what we use in practice, but for simplicity and illustration, we’ll just use the basic, cookie-cutter version of the Laplacian <span class="math notranslate nohighlight">\(L = D - A\)</span>.</p>
+<p>Here’s the degree matrix <span class="math notranslate nohighlight">\(D\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build the degree matrix D</span>
+<span class="n">degrees</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">degrees</span><span class="p">)</span>
+<span class="n">D</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[2, 0, 0, 0, 0, 0],
+       [0, 2, 0, 0, 0, 0],
+       [0, 0, 2, 0, 0, 0],
+       [0, 0, 0, 2, 0, 0],
+       [0, 0, 0, 0, 2, 0],
+       [0, 0, 0, 0, 0, 2]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>And here’s the Laplacian matrix, written out in full.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build the Laplacian matrix L</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">D</span><span class="o">-</span><span class="n">A</span>
+<span class="n">L</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 2., -1., -1.,  0.,  0.,  0.],
+       [-1.,  2., -1.,  0.,  0.,  0.],
+       [-1., -1.,  2.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  2., -1., -1.],
+       [ 0.,  0.,  0., -1.,  2., -1.],
+       [ 0.,  0.,  0., -1., -1.,  2.]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below, you can see these matrices visually.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">Normalize</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">GraphColormap</span>
+<span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># First axis (Degree)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Degree Matrix $D$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Second axis (-)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> 
+            <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Third axis (Adjacency matrix)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjacency Matrix $A$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Third axis (=)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Fourth axis</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Laplacian Matrix $L$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Colorbar</span>
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">GraphColormap</span><span class="p">(</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;The Laplacian is just a function of the adjacency matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_17_0.png" src="../../_images/spectral-embedding_17_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="finding-singular-vectors-with-singular-value-decomposition">
+<h2><span class="section-number">3.3.3. </span>Finding Singular Vectors With Singular Value Decomposition<a class="headerlink" href="#finding-singular-vectors-with-singular-value-decomposition" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have a Laplacian matrix, we’ll want to find its singular vectors. To do this, we’ll need to use a technique called <em>Singular Value Decomposition</em>, or SVD.</p>
+<p>SVD is a way to break a single matrix apart (also known as factorizing) into three distinct new matrices – In our case, the matrix will be the Laplacian we just built. These three new matrices correspond to the singular vectors and singular values of the original matrix: the algorithm will collect all of the singular vectors as columns of one matrix, and the singular values as the diagonals of another matrix.</p>
+<p>In the case of the Laplacian (as with all symmetric matrices that have real, positive eigenvalues), remember that the singular vectors/values and the eigenvectors/values are the same thing. For more technical and generalized details on how SVD works, or for explicit proofs, we would recommend a Linear Algebra textbook [Trefethan, LADR]. Here, we’ll look at the SVD with a bit more detail here in the specific case where we start with a matrix which is square, symmetric, and has real eigenvalues.</p>
+<p><strong>Singular Value Decomposition</strong> Suppose you have a square, symmetrix matrix <span class="math notranslate nohighlight">\(X\)</span> with real eigenvalues. In our case, <span class="math notranslate nohighlight">\(X\)</span> corresponds to the Laplacian <span class="math notranslate nohighlight">\(L\)</span> (or the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>).</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\begin{bmatrix}
+    x_{11} &amp; &amp; &amp; &quot; \\
+    &amp; x_{22} &amp; &amp; \\
+    &amp; &amp; \ddots &amp; \\
+    &quot; &amp; &amp; &amp; x_{nn}
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>Then, you can find three matrices - one which rotates vectors in space, one which scales them along each coordinate axis, and another which rotates them back - which, when you multiply them all together, recreate the original matrix <span class="math notranslate nohighlight">\(X\)</span>. This is the essence of singular value decomposition: you can break down any linear transformation into a rotation, a scaling, and another rotation. Let’s call the matrix which rotates <span class="math notranslate nohighlight">\(U\)</span> (this type of matrix is called “orthogonal”), and the matrix that scales <span class="math notranslate nohighlight">\(S\)</span>.</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    X &amp;= U S V^T
+\end{align*}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(U\)</span> is a matrix that just rotates any vector, all of its column-vectors are orthogonal (all at right angles) from each other and they all have the unit length of 1. These columns are more generally called the <strong>singular vectors</strong> of X. In some specific cases, these are also called the eigenvectors. Since <span class="math notranslate nohighlight">\(S\)</span> just scales, it’s a diagonal matrix: there are values on the diagonals, but nothing (0) on the off-diagonals. The amount that each coordinate axis is scaled are the values on the diagonal entries of <span class="math notranslate nohighlight">\(S\)</span>, <span class="math notranslate nohighlight">\(\sigma_{i}\)</span>. These are <strong>singular values</strong> of the matrix <span class="math notranslate nohighlight">\(X\)</span>, and, also when some conditions are met, these are also the eigenvalues. Assuming our network is undirected, this will be the case with the Laplacian matrix, but not necessarily the adjacency matrix.</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    X &amp;= \begin{bmatrix}
+    \uparrow &amp; \uparrow &amp;  &amp; \uparrow \\
+    u_1 &amp; \vec u_2 &amp; ... &amp; \vec u_n \\
+    \downarrow &amp; \downarrow &amp;  &amp; \downarrow
+    \end{bmatrix}\begin{bmatrix}
+    \sigma_1 &amp; &amp;  &amp; \\
+    &amp; \sigma_2 &amp;  &amp; \\
+    &amp; &amp; \ddots &amp; \\
+    &amp; &amp; &amp; \sigma_n
+    \end{bmatrix}\begin{bmatrix}
+    \leftarrow &amp; \vec u_1^T &amp; \rightarrow \\
+    \leftarrow &amp; \vec u_2^T &amp; \rightarrow \\
+    &amp; \vdots &amp; \\
+    \leftarrow &amp; \vec u_n^T &amp; \rightarrow \\
+    \end{bmatrix}
+\end{align*}\]</div>
+</div>
+<div class="section" id="breaking-down-our-network-s-laplacian-matrix">
+<h2><span class="section-number">3.3.4. </span>Breaking Down Our Network’s Laplacian matrix<a class="headerlink" href="#breaking-down-our-network-s-laplacian-matrix" title="Permalink to this headline">¶</a></h2>
+<p>Now we know how to break down any random matrix into singular vectors and values with SVD, so let’s apply it to our toy network. We’ll break down our Laplacian matrix into <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(S\)</span>, and <span class="math notranslate nohighlight">\(V^\top\)</span>. The Laplacian is a special case where the singular values and singular vectors are the same as the eigenvalues and eigenvectors, so we’ll just refer to them as eigenvalues and eigenvectors from here on, since those terms are more common. For similar (actually the same) reasons, in this case <span class="math notranslate nohighlight">\(V^\top = U^\top\)</span>.</p>
+<p>Here, the leftmost column of <span class="math notranslate nohighlight">\(U\)</span> (and the leftmost eigenvalue in <span class="math notranslate nohighlight">\(S\)</span>) correspond to the eigenvector with the highest eigenvalue, and they’re organized in descending order (this is standard for Singular Value Decomposition).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svd</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># First axis (Laplacian)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$L$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Second axis (=)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> 
+            <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Third axis (U)</span>
+<span class="n">U_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$U$&quot;</span><span class="p">)</span>
+<span class="n">U_ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Columns of eigenvectors&quot;</span><span class="p">)</span>
+
+<span class="c1"># Third axis (S)</span>
+<span class="n">E_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$S$&quot;</span><span class="p">)</span>
+<span class="n">E_ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Eigenvalues on diagonal&quot;</span><span class="p">)</span>
+
+<span class="c1"># Fourth axis (V^T)</span>
+<span class="n">Ut_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">Vt</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$V^T$&quot;</span><span class="p">)</span>
+<span class="n">Ut_ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Rows of eigenvectors&quot;</span><span class="p">)</span>
+
+<span class="c1"># Colorbar</span>
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">GraphColormap</span><span class="p">(</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Decomposing our simple Laplacian into eigenvectors and eigenvalues with SVD&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_23_0.png" src="../../_images/spectral-embedding_23_0.png" />
+</div>
+</div>
+<p>So now we have a collection of eigenvectors organized into a matrix with <span class="math notranslate nohighlight">\(U\)</span>, and a collection of their corresponding eigenvalues organized into a matrix with <span class="math notranslate nohighlight">\(S\)</span>. Remember that with Spectral Embedding, we keep only the largest eigenvalues/vectors and “clip” columns off of <span class="math notranslate nohighlight">\(U\)</span>.</p>
+<p>Why exactly do these matrices reconstruct our Laplacian when multiplied together? Why does the clipped version of <span class="math notranslate nohighlight">\(U\)</span> give us a lower-dimensional representation of our network? To answer that question, we’ll need to start talking about a concept in linear algebra called the <em>rank</em> of a matrix.</p>
+<p>The essential idea is that you can turn each eigenvector/eigenvalue pair into a low-information matrix instead of a vector and number. Summing all of these matrices lets you reconstruct <span class="math notranslate nohighlight">\(L\)</span>. Summing only a few of these matrices lets you get <em>close</em> to <span class="math notranslate nohighlight">\(L\)</span>. In fact, if you were to unwrap the two matrices into single vectors, the vector you get from summing is as close in Euclidean space as you possibly can get to <span class="math notranslate nohighlight">\(L\)</span> given the information you deleted when you removed the smaller eigenvectors.</p>
+<p>Let’s dive into it!</p>
+</div>
+<div class="section" id="why-we-care-about-taking-eigenvectors-matrix-rank">
+<h2><span class="section-number">3.3.5. </span>Why We Care About Taking Eigenvectors: Matrix Rank<a class="headerlink" href="#why-we-care-about-taking-eigenvectors-matrix-rank" title="Permalink to this headline">¶</a></h2>
+<p>When we embed anything to create a new representation, we’re essentially trying to find a simpler version of that thing which preserves as much information as possible. This leads us to the concept of <strong>matrix rank</strong>.</p>
+<p><strong>Matrix Rank</strong>: The rank of a matrix <span class="math notranslate nohighlight">\(X\)</span>, defined <span class="math notranslate nohighlight">\(rank(X)\)</span>, is the number of linearly independent rows and columns of <span class="math notranslate nohighlight">\(X\)</span>.</p>
+<p>At a very high level, we can think of the matrix rank as telling us just how “simple” <span class="math notranslate nohighlight">\(X\)</span> is. A matrix which is rank <span class="math notranslate nohighlight">\(1\)</span> is very simple: all of its rows or columns can be expressed as a weighted sum of just a single vector. On the other hand, a matrix which has “full rank”, or a rank equal to the number of rows (or columns, whichever is smaller), is a bit more complex: no row nor column can be expressed as a weighted sum of other rows or columns.</p>
+<p>There are a couple ways that the rank of a matrix and the singular value decomposition interact which are critical to understand: First, you can make a matrix from your singular vectors and values (eigenvectors and values, in our Laplacian’s case), and summing all of them recreates your original, full-rank matrix. Each matrix that you add to the sum increases the rank of the result by one. Second, summing only a few of them gets you to the best estimation of the original matrix that you can get to, given the low-rank result. Let’s explore this with a bit more depth.</p>
+<p>We’ll be using the Laplacian as our examples, which has the distinctive quality of having its eigenvectors be the same as its singular vectors. For the adjacency matrix, this theory all still works, but you’d just have to replace <span class="math notranslate nohighlight">\(\vec u_i \vec u_i^\top\)</span> with <span class="math notranslate nohighlight">\(\vec u_i \vec v_i^\top\)</span> throughout (the adjacency matrices’ SVD is <span class="math notranslate nohighlight">\(A = U S V^\top\)</span>, since the right singular vectors might be different than the left singular vectors).</p>
+<div class="section" id="summing-rank-1-matrices-recreates-the-original-matrix">
+<h3><span class="section-number">3.3.5.1. </span>Summing Rank 1 Matrices Recreates The Original Matrix<a class="headerlink" href="#summing-rank-1-matrices-recreates-the-original-matrix" title="Permalink to this headline">¶</a></h3>
+<p>You can actually create an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix using any one of the original Laplacian’s eigenvectors <span class="math notranslate nohighlight">\(\vec u_i\)</span> by taking its outer product <span class="math notranslate nohighlight">\(\vec{u_i} \vec{u_i}^T\)</span>. This creates a rank one matrix which only contains the information stored in the first eigenvector. Scale it by its eigenvalue <span class="math notranslate nohighlight">\(\sigma_i\)</span> and you have something that feels suspiciously similar to how we take the first few singular vectors of <span class="math notranslate nohighlight">\(U\)</span> and scale them in the spectral embedding algorithm.</p>
+<p>It turns out that we can express any matrix <span class="math notranslate nohighlight">\(X\)</span> as the sum of all of these rank one matrices.
+Take the <span class="math notranslate nohighlight">\(i^{th}\)</span> column of <span class="math notranslate nohighlight">\(U\)</span>. Remember that we’ve been calling this <span class="math notranslate nohighlight">\(\vec u_i\)</span>: the <span class="math notranslate nohighlight">\(i^{th}\)</span> eigenvector of our Laplacian. Its corresponding eigenvalue is the <span class="math notranslate nohighlight">\(i^{th}\)</span> element of the diagonal eigenvalue matrix <span class="math notranslate nohighlight">\(E\)</span>. You can make a rank one matrix from this eigenvalue/eigenvector pair by taking the outer product and scaling the result by the eigenvalue: <span class="math notranslate nohighlight">\(\sigma_i \vec u_i \vec u_i^T\)</span>.</p>
+<p>It turns out that when we take the sum of all of these rank <span class="math notranslate nohighlight">\(1\)</span> matrices–each one corresponding to a particular eigenvalue/eigenvector pair–we’ll recreate the original matrix.</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec u_i^T = \sigma_1 \begin{bmatrix}\uparrow \\ \vec u_1 \\ \downarrow\end{bmatrix}\begin{bmatrix}\leftarrow &amp; \vec u_1^T &amp; \rightarrow \end{bmatrix} + 
+    \sigma_2 \begin{bmatrix}\uparrow \\ \vec u_2 \\ \downarrow\end{bmatrix}\begin{bmatrix}\leftarrow &amp; \vec u_2^T &amp; \rightarrow \end{bmatrix} + 
+    ... + 
+    \sigma_n \begin{bmatrix}\uparrow \\ \vec u_n \\ \downarrow\end{bmatrix}\begin{bmatrix}\leftarrow &amp; \vec u_n^T &amp; \rightarrow \end{bmatrix}
+\end{align*}\]</div>
+<p>Here are all of the <span class="math notranslate nohighlight">\(\sigma_i \vec u_i \vec u_i^T\)</span> for our Laplacian L. Since there were six nodes in the original network, there are six eigenvalue/vector pairs, and six rank 1 matrices.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_nodes</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># For each eigenvector/value,</span>
+<span class="c1"># find its outer product,</span>
+<span class="c1"># and append it to a list.</span>
+<span class="n">low_rank_matrices</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">):</span>
+    <span class="n">ui</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">U</span><span class="p">[:,</span> <span class="n">node</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">vi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">Vt</span><span class="o">.</span><span class="n">T</span><span class="p">[:,</span> <span class="n">node</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">low_rank_matrix</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">*</span> <span class="n">ui</span> <span class="o">@</span> <span class="n">vi</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">low_rank_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">low_rank_matrix</span><span class="p">)</span>
+    
+<span class="c1"># Take the elementwise sum of every matrix in the list.</span>
+<span class="n">laplacian_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">low_rank_matrices</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see the result of the sum below. On the left are all of the low-rank matrices - one corresponding to each eigenvector - and on the right is the sum of all of them. You can see that the sum is just our Laplacian!</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">import</span> <span class="n">GridSpec</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">GridSpec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">ax_laplacian</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:])</span>
+
+<span class="c1"># Plot low-rank matrices</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;$\sigma_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> u_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> v_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">^T$&quot;</span>
+        <span class="n">heatmap</span><span class="p">(</span><span class="n">low_rank_matrices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+<span class="c1"># Plot Laplacian</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">laplacian_sum</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_laplacian</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$L = \sum_{i = 1}^n \sigma_i u_i v_i^T$&quot;</span><span class="p">)</span>
+
+<span class="c1"># # Colorbar</span>
+<span class="n">cax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">04</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">laplacian_sum</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">laplacian_sum</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">GraphColormap</span><span class="p">(</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">,</span> <span class="n">use_gridspec</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+
+
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;We can recreate our simple Laplacian by summing all the low-rank matrices&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_31_0.png" src="../../_images/spectral-embedding_31_0.png" />
+</div>
+</div>
+<p>Next up, we’ll estimate the Laplacian by only taking a few of these matrices. You can already kind of see in the figure above that this’ll work - the last two matrices don’t even have anything in them (they’re just 0)!</p>
+</div>
+<div class="section" id="we-can-approximate-our-simple-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">
+<h3><span class="section-number">3.3.5.2. </span>We can approximate our simple Laplacian by only summing a few of the low-rank matrices<a class="headerlink" href="#we-can-approximate-our-simple-laplacian-by-only-summing-a-few-of-the-low-rank-matrices" title="Permalink to this headline">¶</a></h3>
+<p>When you sum the first few of these low-rank <span class="math notranslate nohighlight">\(\sigma_i u_i u_i^T\)</span>, you can <em>approximate</em> your original matrix.</p>
+<p>This tells us something interesting about Spectral Embedding: the information in the first few eigenvectors of a high rank matrix lets us find a more simple approximation to it. You can take a matrix that’s extremely complicated (high-rank) and project it down to something which is much less complicated (low-rank).</p>
+<p>Look below. In each plot, we’re summing more and more of these low-rank matrices. By the time we get to the fourth sum, we’ve totally recreated the original Laplacian.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">current</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axs</span><span class="o">.</span><span class="n">flat</span><span class="p">):</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="n">low_rank_matrices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">current</span> <span class="o">+=</span> <span class="n">new</span>
+    <span class="n">heatmap</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$\sum_</span><span class="se">{{</span><span class="s2">i = 1</span><span class="se">}}</span><span class="s2">^</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> \sigma_i u_i u_i^T$&quot;</span><span class="p">)</span>
+    
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Each of these is the sum of an </span><span class="se">\n</span><span class="s2">increasing number of low-rank matrices&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_35_0.png" src="../../_images/spectral-embedding_35_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="approximating-becomes-extremely-useful-when-we-have-a-bigger-now-regularized-laplacian">
+<h3><span class="section-number">3.3.5.3. </span>Approximating becomes extremely useful when we have a bigger (now regularized) Laplacian<a class="headerlink" href="#approximating-becomes-extremely-useful-when-we-have-a-bigger-now-regularized-laplacian" title="Permalink to this headline">¶</a></h3>
+<p>This becomes even more useful when we have huge networks with thousands of nodes, but only a few communities. It turns out, especially in this situation, we can usually sum a very small number of low-rank matrices and get to an excellent approximation for our network that uses much less information.</p>
+<p>Take the network below, for example. It’s generated from a Stochastic Block Model with 1000 nodes total (500 in one community, 500 in another). We took its normalized Laplacian (remember that this means <span class="math notranslate nohighlight">\(L = D^{-1/2} A D^{-1/2}\)</span>), decomposed it, and summed the first two low-rank matrices that we generated from the eigenvector columns.</p>
+<p>The result is not exact, but it looks pretty close. And we only needed the information from the first two singular vectors instead of all of the information in our full <span class="math notranslate nohighlight">\(n \times n\)</span> matrix!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
+
+<span class="c1"># Make network</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> 
+              <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+<span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+<span class="n">A2</span><span class="p">,</span> <span class="n">labels2</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Form new laplacian</span>
+<span class="n">L2</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A2</span><span class="p">)</span>
+
+<span class="c1"># decompose</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">U2</span><span class="p">,</span> <span class="n">E2</span><span class="p">,</span> <span class="n">Ut2</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">L2</span><span class="p">)</span>
+
+<span class="n">k_matrices</span> <span class="o">=</span> <span class="n">U2</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+<span class="n">low_rank_approximation</span> <span class="o">=</span> <span class="n">U2</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">@</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">E2</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">])</span> <span class="o">@</span> <span class="n">Ut2</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">k</span><span class="p">,</span> <span class="p">:])</span>
+
+
+<span class="c1"># Plotting</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">l2_hm</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$L$&quot;</span><span class="p">)</span>
+<span class="n">l2approx_hm</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">low_rank_approximation</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\sum_{{i = 1}}^</span><span class="si">{2}</span><span class="s2"> \sigma_i u_i u_i^T$&quot;</span><span class="p">)</span>
+
+<span class="n">l2_hm</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Full-rank Laplacian for a 50-node matrix&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">})</span>
+<span class="n">l2approx_hm</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Sum of only two low-rank matrices&quot;</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">});</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Summing only two low-rank matrices approximates the normalized Laplacian pretty well!&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_38_0.png" src="../../_images/spectral-embedding_38_0.png" />
+</div>
+</div>
+<p>This is where a lot of the power of an SVD comes from: you can approximate extremely complicated (high-rank) matrices with extremely simple (low-rank) matrices.</p>
+</div>
+</div>
+<div class="section" id="how-this-matrix-rank-stuff-helps-us-understand-spectral-embedding">
+<h2><span class="section-number">3.3.6. </span>How This Matrix Rank Stuff Helps Us Understand Spectral Embedding<a class="headerlink" href="#how-this-matrix-rank-stuff-helps-us-understand-spectral-embedding" title="Permalink to this headline">¶</a></h2>
+<p>Remember the actual spectral embedding algorithm: we take a network, decompose it with Singular Value Decomposition into its singular vectors and values, and then cut out everything but the top <span class="math notranslate nohighlight">\(k\)</span> singular vector/value pairs. Once we scale the columns of singular vectors by their corresponding values, we have our embedding. That embedding is called the latent position matrix, and the locations in space for each of our nodes are called the latent positions.</p>
+<p>Let’s go back to our original, small (six-node) network and make an estimate of the latent position matrix from it. We’ll embed down to three dimensions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">U_cut</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span>
+<span class="n">E_cut</span> <span class="o">=</span> <span class="n">E</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+
+<span class="n">latents_small</span> <span class="o">=</span> <span class="n">U_cut</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">E_cut</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">]</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">latents_small</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Eigenvector&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Position Matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_43_0.png" src="../../_images/spectral-embedding_43_0.png" />
+</div>
+</div>
+<p>How does what we just talked about help us understand spectral embedding?</p>
+<p>Well, each column of the latent position matrix is the <span class="math notranslate nohighlight">\(i^{th}\)</span> eigenvector scaled by the <span class="math notranslate nohighlight">\(i^{th}\)</span> eigenvalue: <span class="math notranslate nohighlight">\(\sigma_i \vec{u_i}\)</span>. If we right-multiplied one of those columns by its unscaled transpose <span class="math notranslate nohighlight">\(\vec{u_i}^\top\)</span>, we’d have one of our rank one matrices. This means that you can think of our rank-one matrices as essentially just fancy versions of the columns of a latent position matrix (our embedding). They contain all the same information - they’re just matrices instead of vectors!</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># First axis (Degree)</span>
+<span class="n">first_col</span> <span class="o">=</span> <span class="n">E</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">latents_small</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">first_mat</span> <span class="o">=</span> <span class="n">first_col</span> <span class="o">@</span> <span class="n">first_col</span><span class="o">.</span><span class="n">T</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">first_col</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First Eigenvector&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;First column of </span><span class="se">\n</span><span class="s2">latent position matrix $u_0$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+
+<span class="c1"># Third axis (Adjacency matrix)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">first_col</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;First column of latent position matrix $u_0^T$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+
+<span class="c1"># Third axis (=)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Fourth axis</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">first_mat</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;First low-rank </span><span class="se">\n</span><span class="s2">matrix $\sigma_0 u_0 u_0^T$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Colorbar</span>
+<span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">GraphColormap</span><span class="p">(</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Our low-rank matrices contain the same information</span><span class="se">\n</span><span class="s2"> as the columns of the latent position matrix&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_45_0.png" src="../../_images/spectral-embedding_45_0.png" />
+</div>
+</div>
+<p>In fact, you can express the sum we did earlier - our lower-rank estimation of L - with just our latent position matrix! Remember that <span class="math notranslate nohighlight">\(U_k\)</span> is the first <span class="math notranslate nohighlight">\(k\)</span> eigenvectors of our Laplacian, and <span class="math notranslate nohighlight">\(S_k\)</span> is the diagonal matrix with the first <span class="math notranslate nohighlight">\(k\)</span> eigenvalues (and that we named them <span class="math notranslate nohighlight">\(\sigma_1\)</span> through <span class="math notranslate nohighlight">\(\sigma_k\)</span>).</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">matplotlib.transforms</span> <span class="kn">import</span> <span class="n">Affine2D</span>
+<span class="kn">import</span> <span class="nn">mpl_toolkits.axisartist.floating_axes</span> <span class="k">as</span> <span class="nn">floating_axes</span>
+
+<span class="c1"># First axis (sum matrix)</span>
+<span class="n">current</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="n">low_rank_matrices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">current</span> <span class="o">+=</span> <span class="n">new</span>
+    
+<span class="n">heatmap</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$\sum_{i=1}^2 \sigma_i u_i u_i^T$&quot;</span><span class="p">)</span>
+
+<span class="c1"># Second axis (=)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;=&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+            <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Third axis (Uk)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">Uk</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span>
+<span class="n">Ek</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">E</span><span class="p">)[:</span><span class="n">k</span><span class="p">,</span> <span class="p">:</span><span class="n">k</span><span class="p">]</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Uk</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Eigenvector&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$U_k$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+
+
+<span class="c1"># Ek</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Ek</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$S_k$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="c1"># Uk^T</span>
+<span class="c1"># TODO: make this the same size as Uk, just rotated (currently too small)</span>
+<span class="c1"># Will probably involve revamping all this code to make subplots differently,</span>
+<span class="c1"># because the reason it&#39;s that size is that the dimensions are constrained by the `plt.subplots` call.</span>
+<span class="n">transform</span> <span class="o">=</span> <span class="n">Affine2D</span><span class="p">()</span><span class="o">.</span><span class="n">rotate_deg</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">set_transform</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Uk</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$U_k^T$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_47_0.png" src="../../_images/spectral-embedding_47_0.png" />
+</div>
+</div>
+<p>This helps gives an intuition for why our latent position matrix gives a representation of our network. You can take columns of it, turn those columns into matrices, and sum those matrices, and then estimate the Laplacian for the network. That means the columns of our embedding network contain all of the information necessary to estimate the network!</p>
+</div>
+<div class="section" id="figuring-out-how-many-dimensions-to-embed-your-network-into">
+<h2><span class="section-number">3.3.7. </span>Figuring Out How Many Dimensions To Embed Your Network Into<a class="headerlink" href="#figuring-out-how-many-dimensions-to-embed-your-network-into" title="Permalink to this headline">¶</a></h2>
+<p>One thing we haven’t addressed is how to figure out how many dimensions to embed down to. We’ve generally been embedding into two dimensions throughout this chapter (mainly because it’s easier to visualize), but you can embed into as many dimensions as you want.</p>
+<p>If you don’t have any prior information about the “true” dimensionality of your latent positions, by default you’d just be stuck guessing. Fortunately, there are some rules-of-thumb to make your guess better, and some methods people have developed to make fairly decent guesses automatically.</p>
+<p>The most common way to pick the number of embedding dimensions is with something called a scree plot. Essentially, the intuition is this: the top singular vectors of an adjacency matrix contain the most useful information about your network, and as the singular vectors have smaller and smaller singular values, they contain less important and so are less important (this is why we’re allowed to cut out the smallest <span class="math notranslate nohighlight">\(n-k\)</span> singular vectors in the spectral embedding algorithm).</p>
+<p>The scree plot just plots the singular values by their indices: the first (biggest) singular value is in the beginning, and the last (smallest) singular value is at the end.</p>
+<p>You can see the scree plot for the Laplacian we made earlier below. We’re only plotting the first ten singular values for demonstration purposes.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from graspologic.plot import screeplot</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Circle</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patheffects</span> <span class="kn">import</span> <span class="n">withStroke</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.anchored_artists</span> <span class="kn">import</span> <span class="n">AnchoredDrawingArea</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svdvals</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># eigval plot</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">svdvals</span><span class="p">(</span><span class="n">L2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">D</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Singular value index&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Singular value&quot;</span><span class="p">)</span>
+
+<span class="c1"># plot circle</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="o">.</span><span class="mi">15</span><span class="p">,</span> <span class="o">.</span><span class="mi">15</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="o">.</span><span class="mi">15</span>
+<span class="n">ada</span> <span class="o">=</span> <span class="n">AnchoredDrawingArea</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower left&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">((</span><span class="mi">105</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span> <span class="mi">20</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">.</span><span class="mi">0125</span><span class="p">),</span>
+                <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">withStroke</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">foreground</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)])</span>
+<span class="n">ada</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ada</span><span class="p">)</span>
+
+<span class="c1"># add text</span>
+<span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+    
+<span class="n">text</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">.</span><span class="mi">19</span><span class="p">,</span> <span class="s2">&quot;Elbow&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_51_0.png" src="../../_images/spectral-embedding_51_0.png" />
+</div>
+</div>
+<p>You’ll notice that there’s a marked area called the “elbow”. This is an area where singular values stop changing in magnitude as much when they get smaller: before the elbow, singular values change rapidly, and after the elbow, singular values barely change at all. (It’s called an elbow because the plot kind of looks like an arm, viewed from the side!)</p>
+<p>The location of this elbow gives you a rough indication for how many “true” dimensions your latent positions have. The singular values after the elbow are quite close to each other and have singular vectors which are largely noise, and don’t tell you very much about your data. It looks from the scree plot that we should be embedding down to two dimensions, and that adding more dimensions would probably just mean adding noise to our embedding.</p>
+<p>One drawback to this method is that a lot of the time, the elbow location is pretty subjective - real data will rarely have a nice, pretty elbow like the one you see above. The advantage is that it still generally works pretty well; embedding into a few more dimensions than you need isn’t too bad, since you’ll only have a few noies dimensions and there still may be <em>some</em> signal there.</p>
+<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2006 by Mu Zhu and Ali Ghodsi at the University of Waterloo. We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
+</div>
+<div class="section" id="using-graspologic-to-embed-networks">
+<h2><span class="section-number">3.3.8. </span>Using Graspologic to embed networks<a class="headerlink" href="#using-graspologic-to-embed-networks" title="Permalink to this headline">¶</a></h2>
+<p>It’s pretty straightforward to use graspologic’s API to embed a network. The setup works like an SKlearn class: you instantiate an AdjacencySpectralEmbed class, and then you use it to transform data. You set the number of dimensions to embed to (the number of eigenvector columns to keep!) with <code class="docutils literal notranslate"><span class="pre">n_components</span></code>.</p>
+<div class="section" id="adjacency-spectral-embedding">
+<h3><span class="section-number">3.3.8.1. </span>Adjacency Spectral Embedding<a class="headerlink" href="#adjacency-spectral-embedding" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
+
+<span class="c1"># Generate a network from an SBM</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> 
+              <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+<span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Instantiate an ASE model and find the embedding</span>
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjacency Spectral Embedding&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/spectral-embedding_57_0.png" src="../../_images/spectral-embedding_57_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="laplacian-spectral-embedding">
+<h3><span class="section-number">3.3.8.2. </span>Laplacian Spectral Embedding<a class="headerlink" href="#laplacian-spectral-embedding" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
+
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Laplacian Spectral Embedding&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;left&#39;:&#39;Laplacian Spectral Embedding&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/spectral-embedding_60_1.png" src="../../_images/spectral-embedding_60_1.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="when-should-you-use-ase-and-when-should-you-use-lse">
+<h2><span class="section-number">3.3.9. </span>When should you use ASE and when should you use LSE?<a class="headerlink" href="#when-should-you-use-ase-and-when-should-you-use-lse" title="Permalink to this headline">¶</a></h2>
+<p>Throughout this article, we’ve primarily used LSE, since Laplacians have some nice properties (such as having singular values being the same as eigenvalues) that make stuff like SVD easier to explain. However, you can embed the same network with either ASE or LSE, and you’ll get two different (but equally true) embeddings.</p>
+<p>Since both embeddings will give you a reasonable clustering, how are they different? When should you use one compared to the other?</p>
+<p>Well, it turns out that LSE and ASE capture different notions of “clustering”. Carey Priebe and collaborators at Johns Hopkins University investigated this recently - in 2018 - and discovered that LSE lets you capture “affinity” structure, whereas ASE lets you capture “core-periphery” structure (their paper is called “On a two-truths phenomenon in spectral graph clustering” - it’s an interesting read for the curious). The difference between the two types of structure is shown in the image below.</p>
+<div class="figure align-default" id="two-truths">
+<a class="reference internal image-reference" href="../../_images/two-truths.jpeg"><img alt="../../_images/two-truths.jpeg" src="../../_images/two-truths.jpeg" style="height: 400px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 3.1 </span><span class="caption-text">Affinity vs. Core-periphery Structure</span><a class="headerlink" href="#two-truths" title="Permalink to this image">¶</a></p>
+</div>
+<p>The “affinity” structure - the one that LSE is good at finding - means that you have two groups of nodes which are well-connected within the groups, and aren’t very connected with each other. Think of a friend network in two schools, where people within the same school are much more likely to be friends than people in different schools. This is a type of structure we’ve seen a lot in this book in our Stochastic Block Model examples. If you think the communities in your data look like this, you should apply LSE to your network.</p>
+<p>The name “core-periphery” is a good description for this type of structure (which ASE is good at finding). In this notion of clustering, you have a core group of well-connected nodes surrounded by a bunch of “outlier” nodes which just don’t have too many edges with anything in general. Think of a core of popular, well-liked, and charismatic kids at a high school, with a periphery of loners or people who prefer not to socialize as much.</p>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./representations/ch6"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="why-embed-networks.html" title="previous page"><span class="section-number">3.2. </span>Why embed networks?</a>
+    <a class='right-next' id="next-link" href="estimating-parameters_spectral.html" title="next page"><span class="section-number">3.4. </span>Estimating Parameters in Network Models via Spectral Methods</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Joshua Vogelstein, Alex Loftus, and Eric Bridgeford<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

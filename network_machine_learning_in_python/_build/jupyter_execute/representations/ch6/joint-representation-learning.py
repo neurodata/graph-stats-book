@@ -7,7 +7,7 @@
 # 
 # There are two primary reasons that we might want to explore using node covariates in addition to topological structure. First, they might improve our standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then we might be able to reduce noise when we embed, even if the communities in our network don't overlap perfectly with the communities in our covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in our network that we can explore. Covariate information in brain networks telling us where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.
 # 
-# In this section, we'll explore different ways to learn from our data when we have access to the covariates of a network in addition to its topological structure. We'll explore *Covariate-Assisted Spectral Embedding* (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or one of the many versions of its Laplacian, we'll combine the Laplacian and our covariates into a new matrix and embed that.
+# In this section, we'll explore different ways to learn from our data when we have access to the covariates of a network in addition to its topological structure. We'll explore *Covariate-Assisted Spectral Embedding* (CASE), a variation on Spectral Embedding. In CASE, instead of embedding just the adjacency matrix or its regularized Laplacian, we'll combine the Laplacian and our covariates into a new matrix and embed that.
 
 # A good way to illustrate how using covariates might help us is to use a model in which some of our community information is in the covariates and some is in our topology. Using the Stochastic Block Model, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in its covariates. By combining the topology and the covariates, we'll get a nice embedding that lets us find three distinct community clusters.
 
@@ -51,7 +51,7 @@ A, labels = sbm([n, n, n], B, return_labels = True)
 
 
 import matplotlib.pyplot as plt
-from graspologic.plot import heatmap
+from graphbook_code import heatmap
 import matplotlib
 
 # visualize
@@ -90,18 +90,7 @@ L_latents = LSE(n_components=2).fit_transform(L)
 
 
 import seaborn as sns
-
-def plot_latents(latent_positions, *, title, labels, ax=None):
-    if ax is None:
-        ax = plt.gca()
-    plot = sns.scatterplot(latent_positions[:, 0], latent_positions[:, 1], hue=labels, 
-                           linewidth=0, s=10, ax=ax, palette="Set1")
-    plot.set_title(title, wrap=True);
-    ax.axes.xaxis.set_visible(False)
-    ax.axes.yaxis.set_visible(False)
-    ax.legend(loc="upper right", title="Community")
-    
-    return plot
+from graphbook_code import plot_latents
 
 plot = plot_latents(L_latents, title="Latent positions when we\n only embed the Laplacian", 
                     labels=labels)
@@ -141,9 +130,12 @@ Y = gen_covariates()
 # In[7]:
 
 
+from graphbook_code import GraphColormap
+
 # Plot and make the axis look nice
+cmap = GraphColormap("sequential", discrete=False).palette
 fig, ax = plt.subplots(figsize=(5, 8))
-ax = sns.heatmap(Y, ax=ax, cmap="rocket_r", yticklabels=500)
+ax = sns.heatmap(Y, ax=ax, cmap=cmap, yticklabels=500)
 ax.set(title="Visualization of the covariates", xticks=[], 
        ylabel="Nodes (each row is a node)",
        xlabel="Covariates for each node (each column is a covariate)");
@@ -328,9 +320,108 @@ plt.tight_layout()
 from graspologic.embed import CovariateAssistedEmbed as CASE
 
 casc = CASE(assortative=True, n_components=2)
-latents = casc.fit_transform((A, Y))
+latents = casc.fit_transform(A, covariates=Y)
 plot_latents(latents, title="Embedding our model using graspologic", labels=labels);
 
+
+# ## Omnibus Joint Embedding
+
+# If you've read the Multiple-Network Representation Learning section, you've seen the Omnibus Embedding (if you haven't read that section, you should go read it before reading this one!). To recap, the way the omnibus embedding works is:
+# 
+# 1. Have a bunch of networks
+# 2. Combine the adjacency matrices from all of those networks into a single, huge network
+# 3. Embed that huge network
+# 
+# Remember that the Omnibus Embedding is a way to bring all of your networks into the same space (meaning, you don't run into any rotational nonidentifiability issues when you embed). Once you embed the Omnibus Matrix, it'll produce a huge latent position matrix, which you can break apart along the rows to recover latent positions for your individual networks.
+# 
+# You might be able to predict where this is going. What if we created an Omnibus embedding not with a set of networks, but with a network and covariates?
+
+# In[17]:
+
+
+from graspologic.embed import OmnibusEmbed
+
+# embed with Omni
+omni = OmnibusEmbed()
+
+# Normalize the covariates first
+YYt = Y@Y.T
+YYt /= np.max(YYt)
+
+# Create a joint embedding
+joint_embedding = omni.fit_transform([A, YYt])
+
+
+# In[18]:
+
+
+from graphbook_code import plot_latents
+
+fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+
+# network
+network_plot = plot_latents(joint_embedding[0], ax=axs[0], legend=None,
+                            labels=labels, title="Omni embedding for topology")
+
+# covariates
+covariates_plot = plot_latents(joint_embedding[1], ax=axs[1], 
+                               labels=labels, title="Omni embedding for covariates")
+sns.move_legend(covariates_plot, loc="center right", bbox_to_anchor=(1.4, .5))
+
+
+# There's a few things going on here. First, we had to normalize the covariates by dividing $YY^\top$ by its maximum. This is because if we didn't, the covariates and the adjacency matrix would contribute vastly different amounts of information to the omnibus matrix. You can see that by looking at the average value of $YY^\top$ compared to the average value of $A$:
+
+# In[19]:
+
+
+print(r"Mean of Y@Y.T:", f"{np.mean(Y@Y.T):.2f}")
+print(r"Mean of A:", f"{np.mean(A):.2f}")
+
+
+# In[20]:
+
+
+print(r"Mean of normalized Y@Y.T:", f"{np.mean(YYt):.2f}")
+print(r"Mean of A:", f"{np.mean(A):.2f}")
+
+
+# Remember the way this data is set up: you can separate the first community from the last two with the topology, you can separate the last community from the first two with the covariates, but you need both data sources to separate all three. 
+# 
+# Here, you can see that *both embeddings* are able to separate all three communities. This is because the Omnibus Embedding induces dependence on the latent positions it outputs. Remember that the off-diagonals of the Omnibus Matrix contain the averages of pairs of networks fed into it. These off-diagonal elements are responsible for some "information leakage": so the topology embedding contains information from the covariates, and the covariate embedding contains information from the topology.
+
+# ## MASE Joint Embedding
+
+# Just like you can use the OMNI to do a joint embedding, you can also use MASE to do a joint embedding. This fundamentally comes down to the fact that both embeddings fundamentally just eat matrices as their input - whether those matrices are the adjacency matrix or $YY^\top$ doesn't really matter.
+# 
+# Just like OMNI, we'll quickly recap how MASE works here:
+# 1. Have a bunch of networks
+# 2. Embed them all separately with ASE or LSE
+# 3. Concate those embeddings into a single latent position matrix with a lot more dimensions
+# 4. Embed that new matrix
+# 
+# The difference here is the same as with Omni -- we have the adjacency matrix (topology) and its covariates for a single network. So instead of embedding a bunch of adjacency matrices or Laplacians, we embed the adjacency matrix (or Laplacian) and the similarity matrix for the covariates $YY^\top$ separately, concatenate, and then embed again.
+
+# In[21]:
+
+
+from graspologic.embed import MultipleASE as MASE
+
+# Remmeber that YY^T is still normalized!
+mase = MASE(n_components=2)
+joint_embedding = mase.fit_transform([A, YYt])
+
+
+# In[22]:
+
+
+# network
+plot = plot_latents(joint_embedding, labels=labels,
+                            title="MASE embedding")
+
+sns.move_legend(plot, loc="center right", bbox_to_anchor=(1.3, .5))
+
+
+# As you can see, MASE lets us get fairly clear separation between communities. The covariates are still normalized, as with OMNI, so that they can contribute the same amount to the embedding as the adjacency matrix.
 
 # #### References
 # 
