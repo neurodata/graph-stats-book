@@ -17,41 +17,72 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-fig, axs = plt.subplots(1, 3, figsize=(18, 6))
+import seaborn as sns
+from pandas import DataFrame as df
 
-heatmap(Bhat,
-        vmin=0,
-        vmax=1,
-        font_scale=1.5,
-        title="$\hat B_{SBM}$",
-        ax=axs[0])
+nclusters = range(2, 11)  # graspologic nclusters goes from 2 to max_clusters
+bic = gm_clust.bic_  # obtain the respective silhouette scores
 
-heatmap(np.array(B),
-        vmin=0,
-        vmax=1,
-        font_scale=1.5,
-        title="$B_{SBM}$",
-        ax=axs[1])
+bic_df = df({"Number of Clusters": nclusters, "BIC": bic})  # place into pandas dataframe
 
-heatmap(np.abs(Bhat - np.array(B)),
-        vmin=0,
-        vmax=1,
-        font_scale=1.5,
-        title="$|\hat B_{SBM} - B_{SBM}|$",
-        ax=axs[2])
+fig, ax = plt.subplots(1,1,figsize=(12, 6))
 
+sns.lineplot(data=silhouette_df,ax=ax, x="Number of Clusters", y="Silhouette Score");
+ax.set_title("Silhouette Analysis of KMeans Clusterings")
 fig;
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-[0;32m/tmp/ipykernel_2201/474611689.py[0m in [0;36m<module>[0;34m[0m
-[0;32m----> 1[0;31m [0mfig[0m[0;34m,[0m [0maxs[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m3[0m[0;34m,[0m [0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m18[0m[0;34m,[0m [0;36m6[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-[0m[1;32m      2[0m [0;34m[0m[0m
-[1;32m      3[0m heatmap(Bhat,
-[1;32m      4[0m         [0mvmin[0m[0;34m=[0m[0;36m0[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
-[1;32m      5[0m         [0mvmax[0m[0;34m=[0m[0;36m1[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/tmp/ipykernel_2198/419099167.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      5[0m [0mbic[0m [0;34m=[0m [0mgm_clust[0m[0;34m.[0m[0mbic_[0m  [0;31m# obtain the respective silhouette scores[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      6[0m [0;34m[0m[0m
+[0;32m----> 7[0;31m [0mbic_df[0m [0;34m=[0m [0mdf[0m[0;34m([0m[0;34m{[0m[0;34m"Number of Clusters"[0m[0;34m:[0m [0mnclusters[0m[0;34m,[0m [0;34m"BIC"[0m[0;34m:[0m [0mbic[0m[0;34m}[0m[0;34m)[0m  [0;31m# place into pandas dataframe[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      8[0m [0;34m[0m[0m
+[1;32m      9[0m [0mfig[0m[0;34m,[0m [0max[0m [0;34m=[0m [0mplt[0m[0;34m.[0m[0msubplots[0m[0;34m([0m[0;36m1[0m[0;34m,[0m[0;36m1[0m[0;34m,[0m[0mfigsize[0m[0;34m=[0m[0;34m([0m[0;36m12[0m[0;34m,[0m [0;36m6[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
 
-[0;31mNameError[0m: name 'plt' is not defined
-NameError: name 'plt' is not defined
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/core/frame.py[0m in [0;36m__init__[0;34m(self, data, index, columns, dtype, copy)[0m
+[1;32m    612[0m         [0;32melif[0m [0misinstance[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0mdict[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    613[0m             [0;31m# GH#38939 de facto copy defaults to False only in non-dict cases[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 614[0;31m             [0mmgr[0m [0;34m=[0m [0mdict_to_mgr[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0mindex[0m[0;34m,[0m [0mcolumns[0m[0;34m,[0m [0mdtype[0m[0;34m=[0m[0mdtype[0m[0;34m,[0m [0mcopy[0m[0;34m=[0m[0mcopy[0m[0;34m,[0m [0mtyp[0m[0;34m=[0m[0mmanager[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    615[0m         [0;32melif[0m [0misinstance[0m[0;34m([0m[0mdata[0m[0;34m,[0m [0mma[0m[0;34m.[0m[0mMaskedArray[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    616[0m             [0;32mimport[0m [0mnumpy[0m[0;34m.[0m[0mma[0m[0;34m.[0m[0mmrecords[0m [0;32mas[0m [0mmrecords[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/core/internals/construction.py[0m in [0;36mdict_to_mgr[0;34m(data, index, columns, dtype, typ, copy)[0m
+[1;32m    462[0m         [0;31m# TODO: can we get rid of the dt64tz special case above?[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    463[0m [0;34m[0m[0m
+[0;32m--> 464[0;31m     return arrays_to_mgr(
+[0m[1;32m    465[0m         [0marrays[0m[0;34m,[0m [0mdata_names[0m[0;34m,[0m [0mindex[0m[0;34m,[0m [0mcolumns[0m[0;34m,[0m [0mdtype[0m[0;34m=[0m[0mdtype[0m[0;34m,[0m [0mtyp[0m[0;34m=[0m[0mtyp[0m[0;34m,[0m [0mconsolidate[0m[0;34m=[0m[0mcopy[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    466[0m     )
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/core/internals/construction.py[0m in [0;36marrays_to_mgr[0;34m(arrays, arr_names, index, columns, dtype, verify_integrity, typ, consolidate)[0m
+[1;32m    122[0m [0;34m[0m[0m
+[1;32m    123[0m         [0;31m# don't force copy because getting jammed in an ndarray anyway[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 124[0;31m         [0marrays[0m [0;34m=[0m [0m_homogenize[0m[0;34m([0m[0marrays[0m[0;34m,[0m [0mindex[0m[0;34m,[0m [0mdtype[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    125[0m [0;34m[0m[0m
+[1;32m    126[0m     [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/core/internals/construction.py[0m in [0;36m_homogenize[0;34m(data, index, dtype)[0m
+[1;32m    587[0m                 [0mval[0m [0;34m=[0m [0mlib[0m[0;34m.[0m[0mfast_multiget[0m[0;34m([0m[0mval[0m[0;34m,[0m [0moindex[0m[0;34m.[0m[0m_values[0m[0;34m,[0m [0mdefault[0m[0;34m=[0m[0mnp[0m[0;34m.[0m[0mnan[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    588[0m [0;34m[0m[0m
+[0;32m--> 589[0;31m             val = sanitize_array(
+[0m[1;32m    590[0m                 [0mval[0m[0;34m,[0m [0mindex[0m[0;34m,[0m [0mdtype[0m[0;34m=[0m[0mdtype[0m[0;34m,[0m [0mcopy[0m[0;34m=[0m[0;32mFalse[0m[0;34m,[0m [0mraise_cast_failure[0m[0;34m=[0m[0;32mFalse[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    591[0m             )
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/core/construction.py[0m in [0;36msanitize_array[0;34m(data, index, dtype, copy, raise_cast_failure, allow_2d)[0m
+[1;32m    574[0m                 [0msubarr[0m [0;34m=[0m [0mmaybe_infer_to_datetimelike[0m[0;34m([0m[0msubarr[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    575[0m [0;34m[0m[0m
+[0;32m--> 576[0;31m     [0msubarr[0m [0;34m=[0m [0m_sanitize_ndim[0m[0;34m([0m[0msubarr[0m[0;34m,[0m [0mdata[0m[0;34m,[0m [0mdtype[0m[0;34m,[0m [0mindex[0m[0;34m,[0m [0mallow_2d[0m[0;34m=[0m[0mallow_2d[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    577[0m [0;34m[0m[0m
+[1;32m    578[0m     [0;32mif[0m [0misinstance[0m[0;34m([0m[0msubarr[0m[0;34m,[0m [0mnp[0m[0;34m.[0m[0mndarray[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/core/construction.py[0m in [0;36m_sanitize_ndim[0;34m(result, data, dtype, index, allow_2d)[0m
+[1;32m    625[0m             [0;32mif[0m [0mallow_2d[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    626[0m                 [0;32mreturn[0m [0mresult[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 627[0;31m             [0;32mraise[0m [0mValueError[0m[0;34m([0m[0;34m"Data must be 1-dimensional"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    628[0m         [0;32mif[0m [0mis_object_dtype[0m[0;34m([0m[0mdtype[0m[0;34m)[0m [0;32mand[0m [0misinstance[0m[0;34m([0m[0mdtype[0m[0;34m,[0m [0mExtensionDtype[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    629[0m             [0;31m# i.e. PandasDtype("O")[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mValueError[0m: Data must be 1-dimensional
+ValueError: Data must be 1-dimensional
 
