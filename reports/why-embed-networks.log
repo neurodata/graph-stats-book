@@ -17,13 +17,66 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-%aimport graphbook_code
-%autoreload 2
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+import seaborn as sns
+from graphbook_code import GraphColormap, draw_cartesian
 
-from graphbook_code import draw_multiplot
-axs = draw_multiplot(A, labels=labels, title="A Network With Two Groups")
+# setup
+cmap = GraphColormap("divergent", k=2).color
+fig = plt.figure(figsize=(12, 8))
+gs = GridSpec(1, 3)
+axm = fig.add_subplot(gs[0])
+axs = fig.add_subplot(gs[1:])
+
+# plot left
+hm = sns.heatmap(data, ax=axm, yticklabels=False, 
+                 cmap=cmap, annot=True, cbar=True)
+hm.hlines(range(len(data)), *hm.get_xlim(), colors='k', alpha=.1)
+
+# plot right
+draw_cartesian(ax=axs)
+plot = sns.scatterplot(data=data, x='x', y='y', legend=False, ax=axs, color="k")
+
+# lines
+max_ = int(data.values.max()) + 1
+plot.vlines(0, -max_, max_, colors="black", lw=.9, linestyle="dashed", alpha=.2)
+plot.hlines(0, -max_, max_, colors="black", lw=.9, linestyle="dashed", alpha=.2)
+
+# ticks
+plot.xaxis.set_major_locator(plt.MaxNLocator(6))
+plot.yaxis.set_major_locator(plt.MaxNLocator(6))
+
+# set axis bounds
+lim = (-max_, max_)
+plot.set(xlim=lim, ylim=lim)
+
+# title, etc
+plt.suptitle("Euclidean data represented as a data matrix and represented in Euclidean space", fontsize=16)
+plt.tight_layout()
 ------------------
 
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mImportError[0m                               Traceback (most recent call last)
+[0;32m/tmp/ipykernel_2572/2299692857.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      2[0m [0;32mfrom[0m [0mmatplotlib[0m[0;34m.[0m[0mgridspec[0m [0;32mimport[0m [0mGridSpec[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0;32mimport[0m [0mseaborn[0m [0;32mas[0m [0msns[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 4[0;31m [0;32mfrom[0m [0mgraphbook_code[0m [0;32mimport[0m [0mGraphColormap[0m[0;34m,[0m [0mdraw_cartesian[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      5[0m [0;34m[0m[0m
+[1;32m      6[0m [0;31m# setup[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
 
-UsageError: Line magic function `%aimport` not found.
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     26[0m [0;32mfrom[0m [0;34m.[0m[0mutils[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     27[0m [0;32mfrom[0m [0;34m.[0m[0msiem[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 28[0;31m [0;32mfrom[0m [0;34m.[0m[0msbm[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/sbm.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      7[0m [0;32mfrom[0m [0msklearn[0m[0;34m.[0m[0mutils[0m [0;32mimport[0m [0mcheck_X_y[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      8[0m [0;34m[0m[0m
+[0;32m----> 9[0;31m [0;32mfrom[0m [0mgraspologic[0m[0;34m.[0m[0mtypes[0m [0;32mimport[0m [0mDict[0m[0;34m,[0m [0mList[0m[0;34m,[0m [0mTuple[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     10[0m [0;34m[0m[0m
+[1;32m     11[0m [0;32mfrom[0m [0mgraspologic[0m[0;34m.[0m[0mcluster[0m [0;32mimport[0m [0mGaussianCluster[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mImportError[0m: cannot import name 'Dict' from 'graspologic.types' (/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/types.py)
+ImportError: cannot import name 'Dict' from 'graspologic.types' (/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/types.py)
 

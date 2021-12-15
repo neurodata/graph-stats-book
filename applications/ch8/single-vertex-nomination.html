@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>8.3. Single-Network Vertex Nomination &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>8.4. Single-Network Vertex Nomination &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -54,8 +54,8 @@
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="8.4. Out-of-sample Embedding" href="out-of-sample.html" />
-    <link rel="prev" title="8.2. Model Selection" href="model-selection.html" />
+    <link rel="next" title="8.5. Out-of-sample Embedding" href="out-of-sample.html" />
+    <link rel="prev" title="8.3. Model Selection" href="model-selection.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -426,18 +426,23 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="testing-differences.html">
+     8.2. Testing for Differences between Groups of Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="model-selection.html">
-     8.2. Model Selection
+     8.3. Model Selection
     </a>
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     8.3. Single-Network Vertex Nomination
+     8.4. Single-Network Vertex Nomination
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="out-of-sample.html">
-     8.4. Out-of-sample Embedding
+     8.5. Out-of-sample Embedding
     </a>
    </li>
   </ul>
@@ -621,24 +626,24 @@
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#spectral-vertex-nomination">
-   8.3.1. Spectral Vertex Nomination
+   8.4.1. Spectral Vertex Nomination
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#finding-a-single-set-of-nominations">
-     8.3.1.1. Finding a single set of nominations
+     8.4.1.1. Finding a single set of nominations
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#finding-nominations-for-each-node">
-   8.3.2. Finding Nominations for Each Node
+   8.4.2. Finding Nominations for Each Node
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   8.3.3. References
+   8.4.3. References
   </a>
  </li>
 </ul>
@@ -653,12 +658,12 @@
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="single-network-vertex-nomination">
-<h1><span class="section-number">8.3. </span>Single-Network Vertex Nomination<a class="headerlink" href="#single-network-vertex-nomination" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">8.4. </span>Single-Network Vertex Nomination<a class="headerlink" href="#single-network-vertex-nomination" title="Permalink to this headline">¶</a></h1>
 <p>Say you’re a criminal investigator trying to uncover a human trafficking ring. You build a network of potential suspects: some of the nodes in the network represent human traffickers, and some represent innocent people. The edges of the network represent a working relationship between a given pair of individuals.</p>
 <p>Your team has limited resources, and so it’s difficult to scrutinize everybody in the network directly to see if they are human traffickers. Ideally, you’d like to use your network to nominate potential suspects, so that you can prioritize your investigative efforts. You’ve already done some work: you have a list of a few nodes of the network who are known to be traffickers, and you have a list of a few who you know are not. Your goal, then, is to build an ordered list of nodes in the network that are most similar to the nodes you already know belong to human traffickers. Ideally, the first nodes in the list would be more likely to be traffickers, and the nodes would get less and less likely the further down in the list you go.</p>
 <p>This is the idea behind <em>single-network vertex nomination</em>. You have a group of “seed nodes” that you know have the right community membership, and then you take the rest of the nodes in your network and order them by their relationship to the seed nodes in terms of that community membership. The nomination task here isn’t just classification: it’s prioritization. You’re prioritizing how important the rest of your nodes are with respect to the seed nodes, with the most important nodes at the top.</p>
 <div class="section" id="spectral-vertex-nomination">
-<h2><span class="section-number">8.3.1. </span>Spectral Vertex Nomination<a class="headerlink" href="#spectral-vertex-nomination" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">8.4.1. </span>Spectral Vertex Nomination<a class="headerlink" href="#spectral-vertex-nomination" title="Permalink to this headline">¶</a></h2>
 <p>There are a few approaches to vertex nomination. You can take a likelihood-maximization approach, or a bayes-optimal approach - but what we’ll focus on is <em>Spectral Vertex Nomination</em>. The general idea is that you embed your network, and then you just order the latent positions by how close they are to the seed node latent positions. There are a few ways of doing this: you could create a <em>separate</em> set of nominees for each node, for instance. This would correspond to finding the people closest to <em>each</em> human trafficker, rather than finding a single list of nominees. You could also just get a single list of nominees: you could first take the centroid of the latent positions of your seed nodes, and then find the closest nodes to that <em>centroid</em>. There are also a few different ways of defining what it means to be “close” to seed node latent positions. The obvious way is euclidean distance, which is what you’d traditionally think of as the distance between two points, but you could also use something like the Mahalanobis distance, which is essentially Euclidean distance but with a coordinate system and a rescaling defined by the covariance in your data.</p>
 <p>In any case, all forms of Spectral Vertex Nomination involve finding embeddings and then taking distances. In contrast to the other approaches, it scales well with very large networks (since you’re essentially just doing an embedding followed by a simple calculation) and doesn’t require any prior knowledge of community membership.</p>
 <p>Let’s see what spectral vertex nomination looks like. Below, we see the latent positions for a network with three communities, where two of the communities are more closely linked than the third community. We do a standard adjacency spectral embedding, and we end up with a set of latent positions. Our seed nodes - the ones whose community membership we know - are marked.</p>
@@ -714,15 +719,35 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 6.1&#39;)
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ImportError</span><span class="g g-Whitespace">                               </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_1928</span><span class="o">/</span><span class="mf">569668255.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> 
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">memberships</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions and seeds for an SBM </span><span class="se">\n</span><span class="s2">with three communities&quot;</span><span class="p">,</span> 
+<span class="g g-Whitespace">      </span><span class="mi">5</span>                     <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#ff0000&quot;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+
+<span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.8.12</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.8</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">graphbook_code</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">26</span> <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="kn">from</span> <span class="nn">.siem</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="ne">---&gt; </span><span class="mi">28</span> <span class="kn">from</span> <span class="nn">.sbm</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">hostedtoolcache</span><span class="o">/</span><span class="n">Python</span><span class="o">/</span><span class="mf">3.8.12</span><span class="o">/</span><span class="n">x64</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.8</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">graphbook_code</span><span class="o">/</span><span class="n">sbm</span><span class="o">.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_X_y</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> 
+<span class="ne">----&gt; </span><span class="mi">9</span> <span class="kn">from</span> <span class="nn">graspologic.types</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span> 
+<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="kn">from</span> <span class="nn">graspologic.cluster</span> <span class="kn">import</span> <span class="n">GaussianCluster</span>
+
+<span class="ne">ImportError</span>: cannot import name &#39;Dict&#39; from &#39;graspologic.types&#39; (/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/types.py)
 </pre></div>
 </div>
-<img alt="../../_images/single-vertex-nomination_5_1.png" src="../../_images/single-vertex-nomination_5_1.png" />
 </div>
 </div>
 <p>Now, we’d like to order the rest of the vertices in this network by their degree of similarity to the seed nodes. Remember that we talked about two ways of doing this: we could find a separate set of nominations for each seed node, or we could find a single set of nominations for all of the seed nodes. Let’s start by finding a single set, using the centroid.</p>
 <div class="section" id="finding-a-single-set-of-nominations">
-<h3><span class="section-number">8.3.1.1. </span>Finding a single set of nominations<a class="headerlink" href="#finding-a-single-set-of-nominations" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">8.4.1.1. </span>Finding a single set of nominations<a class="headerlink" href="#finding-a-single-set-of-nominations" title="Permalink to this headline">¶</a></h3>
 <p>Computing the centroid is as easy as just taking the mean value for the seed latent positions along each coordinate axis. Since our example is in 2 dimensions, we can just take our <span class="math notranslate nohighlight">\(m \times 2\)</span> matrix of seed latent positions and take the mean along the first axis to create a <span class="math notranslate nohighlight">\(1 \times 2\)</span> vector. That vector will be the centroid, and its location in Euclidean space will be right in the middle of the seeds. You can see the centroid (red star) along with the seed latent positions (red circles) below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -749,10 +774,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 6.2&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/single-vertex-nomination_10_1.png" src="../../_images/single-vertex-nomination_10_1.png" />
+<img alt="../../_images/single-vertex-nomination_10_0.png" src="../../_images/single-vertex-nomination_10_0.png" />
 </div>
 </div>
 <p>Now, all we do is order the rest of the latent positions (the blue dots in the figure above) by their distance to the centroid. The nodes corresponding to the closer latent positions will be higher up in our nomination list. Scikit-learn has a <code class="docutils literal notranslate"><span class="pre">NearestNeighbors</span></code> classifier, so we’ll just use that. Below, we fit the classifier to our latent positions matrix, then get our nominations using the <code class="docutils literal notranslate"><span class="pre">kneighbors</span></code> function. The latent positions closer to the centroid are more visible, and they get progressively less visible the further from the centroid they are.</p>
@@ -793,10 +815,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 6.3&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/single-vertex-nomination_13_1.png" src="../../_images/single-vertex-nomination_13_1.png" />
+<img alt="../../_images/single-vertex-nomination_13_0.png" src="../../_images/single-vertex-nomination_13_0.png" />
 </div>
 </div>
 <p>Let’s look at the layout plot for the network directly, and see where our nominations tend to be. Below is a network colored by nomination rank: nodes that are higher up in the nomination list are more purple, and nodes that are lower in the nomination list are more white. You can see that the higher up in the nomination list you get (more purple), the more well-connected nodes tend to be to the seed nodes.</p>
@@ -823,7 +842,7 @@
 </div>
 </div>
 <div class="section" id="finding-nominations-for-each-node">
-<h2><span class="section-number">8.3.2. </span>Finding Nominations for Each Node<a class="headerlink" href="#finding-nominations-for-each-node" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">8.4.2. </span>Finding Nominations for Each Node<a class="headerlink" href="#finding-nominations-for-each-node" title="Permalink to this headline">¶</a></h2>
 <p>Another approach, if we don’t want to combine the information from all of our seed nodes, is to create a different nomination list for each node. This would correspond to finding multiple sets of people close to <em>each</em> human trafficker, rather than finding a single set of people for the <em>group</em> of human traffickers. Graspologic does this natively; the only real difference between the two approaches is that we take the nearest neighbors of the centroid for the first method rather than for each individual. Because of this, we’ll just use graspologic directly, rather than showcasing the algorithm.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -848,10 +867,10 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 0,  1,  2,  3,  4],
-       [34, 78, 34, 85, 97],
-       [79, 36, 46,  7, 62],
-       [26, 65, 69, 52, 39],
-       [ 2, 44, 24, 74, 94]])
+       [97, 65, 62, 51, 57],
+       [ 2, 84,  0, 52, 58],
+       [51, 83,  8,  0, 45],
+       [98, 29, 94, 49, 32]])
 </pre></div>
 </div>
 </div>
@@ -877,16 +896,13 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 6.5&#39;)
-</pre></div>
-</div>
-<img alt="../../_images/single-vertex-nomination_21_1.png" src="../../_images/single-vertex-nomination_21_1.png" />
+<img alt="../../_images/single-vertex-nomination_21_0.png" src="../../_images/single-vertex-nomination_21_0.png" />
 </div>
 </div>
 <p>These approaches are each useful in different situations.</p>
 </div>
 <div class="section" id="references">
-<h2><span class="section-number">8.3.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">8.4.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p>theory papers:</p>
 <ul class="simple">
 <li><p>theory of consistency and Bayes optimality: On consistent vertex nomination schemes</p></li>
@@ -929,13 +945,13 @@
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">8.2. </span>Model Selection</p>
+            <p class="prev-next-title"><span class="section-number">8.3. </span>Model Selection</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="out-of-sample.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">8.4. </span>Out-of-sample Embedding</p>
+        <p class="prev-next-title"><span class="section-number">8.5. </span>Out-of-sample Embedding</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
