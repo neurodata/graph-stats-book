@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -607,6 +609,34 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#network-representations">
+   4.2.1. Network Representations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#community-wise-representations">
+   4.2.2. Community-Wise Representations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#node-wise-representations">
+   4.2.3. Node-Wise Representations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#edge-wise-representations">
+   4.2.4. Edge-Wise Representations
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -617,6 +647,57 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="representations-of-networks">
 <h1><span class="section-number">4.2. </span>Representations of Networks<a class="headerlink" href="#representations-of-networks" title="Permalink to this headline">¶</a></h1>
+<p>Now that we know how to represent networks with matrices, let’s take a step back and take a look at what network representation is in general, and the different ways you might think about representing networks to understand different aspects of the network.</p>
+<p>We already know that the topological structure of networks is just a collection of nodes, with pairs of nodes potentially linked together by edges. Mathematically, this means that a network is defined by two objects: the set of nodes, and the set of edges, with each edge just being defined as a pair of nodes for undirected networks. Networks can have additional structure: you might have extra information about each node (“features” or “covariates”), which we’ll talk about in the joint representation section in chapter 6. Edges might also have weights, which are usually measure the connection strength in some way. We learned in the previous section that network topology can be represented with matrices in a number of ways – with adjacency matrices, Laplacians, or (less commonly) with incidence matrices.</p>
+<p>One major challenge in working with networks is that a lot of standard mathematical operations and metrics remain undefined. What does it mean to add a network to another network, for instance? How would network multiplication work? How do you define a distance between one node and another node? Without these kinds of basic operations and metrics, we are left in the dark when we try to find analogies to non-network data analysis.</p>
+<p>Another major challenge is that the number of possible networks can get obscene fairly quickly. See the figure below, for instance. When you allow for only 50 nodes, there are already more than <span class="math notranslate nohighlight">\(10^{350}\)</span> possible networks. Just for reference, if you took all hundred-thousand quadrillion vigintillion atoms in the universe, and then made a new entire universe for each of those atoms… you’d still be nowhere near <span class="math notranslate nohighlight">\(10^{350}\)</span> atoms.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">comb</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+<span class="c1"># get number of graphs for a given n in log scale</span>
+<span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">51</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">OverflowError</span><span class="p">):</span>
+    <span class="n">n_graphs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">comb</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">n_graphs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">368</span>
+
+<span class="n">xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">vertices</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">vertices</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">300</span><span class="p">)</span>
+<span class="n">interpolated</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">n_graphs</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">)</span>
+<span class="n">ynew</span> <span class="o">=</span> <span class="n">interpolated</span><span class="p">(</span><span class="n">xnew</span><span class="p">)</span>
+
+<span class="c1"># plotting code</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">ynew</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of Nodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Networks</span><span class="se">\n</span><span class="s2"> (log scale)&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/network-representations_2_0.png" src="../../_images/network-representations_2_0.png" />
+</div>
+</div>
+<p>To address these challenges, network scientists generally group analysis into four approaches, each of which addresses these challenges in some way.</p>
+<p>The first approach is called the bag of features. You take networks and you compute statistics from them, either for each node or for the entire network. These statistics could be simple things like the edge count or average path length between two nodes, or more complicated metrics like the clustering coefficient, which indicates how much nodes tend to cluster together. Unfortunately, network statistics like this tend to not be independent from each other; the value of one network statistic will almost always influence the other. This means that it can be difficult to interpret analysis that works by comparing network statistics. It’s also hard to figure out which statistics to compute, since there are an infinite number of them. We’ll get into the bag of features a bit in this chapter, but it won’t pop up too much.</p>
+<p>The second approach is called the bag of edges. Here, you just take all of the edges in your network and treat them all as independent entities, and you study them all individually, ignoring interactions between edges. This can work in some situations, but you still run into dependence: if two people within a friend group are friends, that can change the dynamic of the friend group and so change the chance that two other people are friends.</p>
+<p>Similarly to the bag of edges, you can treat all of the nodes as their own entity and do analysis on a bag of nodes. Much of this book will focus on the bag of nodes approach, because you’ll often use edge count, covariate information, and other things when you work with bags of nodes – and, although there’s still dependence between nodes, it generally isn’t as big of an issue. Most of the single-network methods we’ll use in this book will take the bag of nodes approach. What you’ll see repeatedly is that we take the nodes of a network and <em>embed</em> them so each node is associated with a point on a plot (this is called the Euclidean representation of the node). Then, you can use other methods from mainstream machine learning to learn about your network. We’ll get into this heavily in future chapters.</p>
+<p>The last approach is the bag of communities, which you’d use when you have more than one network that you’re working with. Here, you’d study the networks as a whole and you’d want to test for differences across different networks or classify entire networks into one category or another. The last few chapters of this book will cover the bag of networks approach.</p>
+<div class="section" id="network-representations">
+<h2><span class="section-number">4.2.1. </span>Network Representations<a class="headerlink" href="#network-representations" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="community-wise-representations">
+<h2><span class="section-number">4.2.2. </span>Community-Wise Representations<a class="headerlink" href="#community-wise-representations" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="node-wise-representations">
+<h2><span class="section-number">4.2.3. </span>Node-Wise Representations<a class="headerlink" href="#node-wise-representations" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="edge-wise-representations">
+<h2><span class="section-number">4.2.4. </span>Edge-Wise Representations<a class="headerlink" href="#edge-wise-representations" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
