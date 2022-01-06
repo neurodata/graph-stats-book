@@ -42,7 +42,7 @@
     <script src="../../_static/copybutton.js"></script>
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
@@ -564,7 +564,7 @@
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
-            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+                onclick="printPdf(this)" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
 </div>
 
@@ -617,7 +617,7 @@
         </div>
 
         <!-- Table of contents -->
-        <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
@@ -628,6 +628,20 @@
   <a class="reference internal nav-link" href="#bag-of-features">
    4.2.1. Bag of Features
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#you-lose-a-lot-of-information-with-the-bag-of-features-approach">
+     4.2.1.1. You Lose A Lot of Information with the Bag of Features Approach
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#network-features-tend-to-be-correlated">
+       4.2.1.1.1. Network Features Tend to be Correlated
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#bag-of-edges">
@@ -652,7 +666,59 @@
 </div>
     <div id="main-content" class="row">
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
-        
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Representations of Networks</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bag-of-features">
+   4.2.1. Bag of Features
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#you-lose-a-lot-of-information-with-the-bag-of-features-approach">
+     4.2.1.1. You Lose A Lot of Information with the Bag of Features Approach
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#network-features-tend-to-be-correlated">
+       4.2.1.1.1. Network Features Tend to be Correlated
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bag-of-edges">
+   4.2.2. Bag of Edges
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bag-of-nodes">
+   4.2.3. Bag of Nodes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bag-of-networks">
+   4.2.4. Bag of Networks
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="representations-of-networks">
@@ -694,7 +760,17 @@
 <p>To address these challenges, we can generally group analysis into four approaches, each of which addresses these challenges in some way: the bag of features, the bag of edges, the bag of nodes, and the bag of networks, each so-called because you’re essentially throwing data into a bag and treating each thing in it as its own object. Let’s get into some details!</p>
 <div class="section" id="bag-of-features">
 <h2><span class="section-number">4.2.1. </span>Bag of Features<a class="headerlink" href="#bag-of-features" title="Permalink to this headline">¶</a></h2>
-<p>The first approach is called the bag of features. You take networks and you compute statistics from them, either for each node or for the entire network. These statistics could be simple things like the edge count or average path length between two nodes, or more complicated metrics like the clustering coefficient, which indicates how much nodes tend to cluster together. Unfortunately, network statistics like this tend to not be independent from each other; the value of one network statistic will almost always influence the other. This means that it can be difficult to interpret analysis that works by comparing network statistics. It’s also hard to figure out which statistics to compute, since there are an infinite number of them. We’ll get into the bag of features a bit in this chapter, but it won’t pop up too much.</p>
+<p>The first approach is called the bag of features. The idea is that you take networks and you compute statistics from them, either for each node or for the entire network. These statistics could be simple things like the edge count or average path length between two nodes, or more complicated metrics like the modularity, which measures how well a network can be separated into communities. Unfortunately, network statistics like this tend to be correlated; the value of one network statistic will almost always influence the other. This means that it can be difficult to interpret analysis that works by comparing network statistics. It’s also hard to figure out which statistics to compute, since there are an infinite number of them.</p>
+<div class="section" id="you-lose-a-lot-of-information-with-the-bag-of-features-approach">
+<h3><span class="section-number">4.2.1.1. </span>You Lose A Lot of Information with the Bag of Features Approach<a class="headerlink" href="#you-lose-a-lot-of-information-with-the-bag-of-features-approach" title="Permalink to this headline">¶</a></h3>
+<p><img alt="anascombe" src="representations/Images/anascombe.png" /></p>
+<p>This figure contains for networks, all of whom have the exact same network statistics. They each have ten nodes and 15 edges. They also all contain the same number of triangles (sets of three nodes which are all connected), and the same global clustering coefficient. Global clustering cloefficient, for reference, gives an indication of how clustered the network is, and works by counting the proportion of triangles out of all edges that share a node.</p>
+<p>Each of these networks, however, are completely different from each other. The first network, for instance, has two connected components, while the others are all connected. The second network has a community of nodes that are only connected along a path, and a different community which are tightly connected – and so on. Modeling these networks through computing features from them would lose a great deal of information.</p>
+<div class="section" id="network-features-tend-to-be-correlated">
+<h4><span class="section-number">4.2.1.1.1. </span>Network Features Tend to be Correlated<a class="headerlink" href="#network-features-tend-to-be-correlated" title="Permalink to this headline">¶</a></h4>
+<p>The other issue with the bag of features approach is that network features tend to be correlated with each other.</p>
+</div>
+</div>
 </div>
 <div class="section" id="bag-of-edges">
 <h2><span class="section-number">4.2.2. </span>Bag of Edges<a class="headerlink" href="#bag-of-edges" title="Permalink to this headline">¶</a></h2>
@@ -733,8 +809,8 @@
 
               </div>
               
-        
-            <!-- Previous / next buttons -->
+            
+                <!-- Previous / next buttons -->
 <div class='prev-next-area'> 
     <a class='left-prev' id="prev-link" href="matrix-representations.html" title="previous page">
         <i class="fas fa-angle-left"></i>
@@ -751,19 +827,17 @@
     <i class="fas fa-angle-right"></i>
     </a>
 </div>
-        
+            
         </div>
     </div>
     <footer class="footer">
-    <div class="container">
-      <p>
-        
-          By Joshua Vogelstein, Alex Loftus, and Eric Bridgeford<br/>
-        
-            &copy; Copyright 2021.<br/>
-      </p>
-    </div>
-  </footer>
+  <p>
+    
+      By Joshua Vogelstein, Alex Loftus, and Eric Bridgeford<br/>
+    
+        &copy; Copyright 2021.<br/>
+  </p>
+</footer>
 </main>
 
 
