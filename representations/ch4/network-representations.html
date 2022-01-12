@@ -639,6 +639,11 @@
        4.2.1.1.1. Network Features Tend to be Correlated
       </a>
      </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#why-network-feature-correlatedness-can-lead-to-problems">
+       4.2.1.1.2. Why Network Feature Correlatedness Can Lead To Problems
+      </a>
+     </li>
     </ul>
    </li>
   </ul>
@@ -647,6 +652,20 @@
   <a class="reference internal nav-link" href="#bag-of-edges">
    4.2.2. Bag of Edges
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#figuring-out-which-edge-is-the-outlier">
+     4.2.2.1. Figuring out which edge is the outlier
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#correcting-for-multiple-comparisons">
+       4.2.2.1.1. Correcting for Multiple Comparisons
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#bag-of-nodes">
@@ -693,6 +712,11 @@
        4.2.1.1.1. Network Features Tend to be Correlated
       </a>
      </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#why-network-feature-correlatedness-can-lead-to-problems">
+       4.2.1.1.2. Why Network Feature Correlatedness Can Lead To Problems
+      </a>
+     </li>
     </ul>
    </li>
   </ul>
@@ -701,6 +725,20 @@
   <a class="reference internal nav-link" href="#bag-of-edges">
    4.2.2. Bag of Edges
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#figuring-out-which-edge-is-the-outlier">
+     4.2.2.1. Figuring out which edge is the outlier
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#correcting-for-multiple-comparisons">
+       4.2.2.1.1. Correcting for Multiple Comparisons
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#bag-of-nodes">
@@ -733,6 +771,7 @@
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">comb</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># get number of graphs for a given n in log scale</span>
 <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">51</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -754,7 +793,11 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/network-representations_2_0.png" src="../../_images/network-representations_2_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2433/3329702103.py:11: RuntimeWarning: overflow encountered in power
+  n_graphs = np.log10(2**comb(vertices, 2))
+</pre></div>
+</div>
+<img alt="../../_images/network-representations_2_1.png" src="../../_images/network-representations_2_1.png" />
 </div>
 </div>
 <p>To address these challenges, we can generally group analysis into four approaches, each of which addresses these challenges in some way: the bag of features, the bag of edges, the bag of nodes, and the bag of networks, each so-called because you’re essentially throwing data into a bag and treating each thing in it as its own object. Let’s get into some details!</p>
@@ -768,13 +811,224 @@
 <p>Each of these networks, however, are completely different from each other. The first network, for instance, has two connected components, while the others are all connected. The second network has a community of nodes that are only connected along a path, and a different community which are tightly connected – and so on. Modeling these networks through computing features from them would lose a great deal of information.</p>
 <div class="section" id="network-features-tend-to-be-correlated">
 <h4><span class="section-number">4.2.1.1.1. </span>Network Features Tend to be Correlated<a class="headerlink" href="#network-features-tend-to-be-correlated" title="Permalink to this headline">¶</a></h4>
-<p>The other issue with the bag of features approach is that network features tend to be correlated with each other.</p>
+<p>The other issue with the bag of features approach is that network features tend to be correlated with each other: if you consider all possible networks, knowing the value of any of the network features gives you information about what the value of other network features might be.</p>
+<p>Let’s play around with this. We’ll make 100 random networks, each with 50 nodes, and then we’ll compute some of the most common network features that people use on them (we’ll explain what each network feature is along the way). Then, we’ll look at how correlated these features are. For now, just think of a random network as being a network with each node being connected to each other node with some set probability. Each network will have a different connection probability. These networks will also have communities – groups of nodes which are more connected with each other than other nodes – the strength of which will also be determined randomly. When we generate data later on in this book, we’ll get into different types of random network models you can use.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">uniform</span>
+
+<span class="n">n_nodes</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">n_networks</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">networks</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_networks</span><span class="p">):</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                  <span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]]])</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="n">n_nodes</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_nodes</span><span class="o">//</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">P</span><span class="p">)</span>
+    <span class="n">networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, for each of these networks, we’ll calculate a set of network features. These will just be a collection of some of the most common metrics you can use to define graphs. We’ll use the network density, the clustering coefficient, the path length, and the modularity. We’ll go over these features with more depth later, but here are some brief explanations for now just to get a sense for what we’re actually calculating.</p>
+<p>The <strong>Modularity</strong> measures the fraction of edges in your network that belong to the same community, subtracting out the probability of an edge existing at random. It effectively measures how much better a particular assignment of community labels is at defining communities than a completely random assignment.</p>
+<p>The <strong>Network Density</strong> is the fraction of all possible edges that a network can have which actually exist. If every node were connected to every other node, the network density would be 1; and if no node is connected to anything, the network density would be 0.</p>
+<p>The <strong>Clustering Coefficient</strong> indicates how much nodes tend to cluster together. If you pick out three nodes, and two of them are connected, a high clustering coefficient would mean that the third is probably connected as well.</p>
+<p>The <strong>Path Length</strong> indicates how far apart two nodes in your network are on average. If two nodes are directly connected, their path length is one. If two nodes are connected through an intermediate node, their path length is two.</p>
+<p>The code below defines functions to calculate each of these network features, and then calculates them for each of the networks we created above. Since most of these metrics already exist in <code class="docutils literal notranslate"><span class="pre">networkx</span></code>, we’ll just pull from there. You can check the <code class="docutils literal notranslate"><span class="pre">networkx</span></code> documentation for details.</p>
+<p>We’ll also define a preprocessing decorator, which just converts the network from a numpy array into the format networkx uses.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
+<span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">network</span><span class="p">):</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+<span class="nd">@preprocess</span>
+<span class="k">def</span> <span class="nf">modularity</span><span class="p">(</span><span class="n">network</span><span class="p">):</span>
+    <span class="n">communities</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">community</span><span class="o">.</span><span class="n">greedy_modularity_communities</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">community</span><span class="o">.</span><span class="n">quality</span><span class="o">.</span><span class="n">modularity</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">communities</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Q</span>
+
+<span class="nd">@preprocess</span>
+<span class="k">def</span> <span class="nf">network_density</span><span class="p">(</span><span class="n">network</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+
+<span class="nd">@preprocess</span>
+<span class="k">def</span> <span class="nf">clustering_coefficient</span><span class="p">(</span><span class="n">network</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">transitivity</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+
+<span class="nd">@preprocess</span>
+<span class="k">def</span> <span class="nf">path_length</span><span class="p">(</span><span class="n">network</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">network</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># You want to make sure this still works if your network isn&#39;t fully connected!</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">network</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">network</span><span class="p">)),</span> 
+                      <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_shortest_path_length</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we’ll calculate all of these features for each network, and finally we’ll create a heatmap of their correlation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">network_features</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+    <span class="n">modularity_</span> <span class="o">=</span> <span class="n">modularity</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    <span class="n">network_density_</span> <span class="o">=</span> <span class="n">network_density</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    <span class="n">clustering_coefficient_</span> <span class="o">=</span> <span class="n">clustering_coefficient</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    <span class="n">path_length_</span> <span class="o">=</span> <span class="n">path_length</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Modularity&quot;</span><span class="p">:</span> <span class="n">modularity_</span><span class="p">,</span> <span class="s2">&quot;Network Density&quot;</span><span class="p">:</span> <span class="n">network_density_</span><span class="p">,</span> 
+                <span class="s2">&quot;Clustering Coefficient&quot;</span><span class="p">:</span> <span class="n">clustering_coefficient_</span><span class="p">,</span> <span class="s2">&quot;Average Path Length&quot;</span><span class="p">:</span> <span class="n">path_length_</span><span class="p">}</span>
+    <span class="n">network_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+    
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">network_features</span><span class="p">)</span>
+<span class="n">feature_correlation</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below is the heatmap. Numbers close to 1 mean that when the first feature is large, the second tends to be large, numbers close to 0 mean that the features are not very correlated, and numbers close to -1 mean that when the first feature is large, the second feature tends to be small.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">cmaps</span>
+
+<span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">feature_correlation</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                   <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;divergent&quot;</span><span class="p">],</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]})</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Average Correlation </span><span class="se">\n</span><span class="s2">For Our Network Features&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/network-representations_12_0.png" src="../../_images/network-representations_12_0.png" />
+</div>
+</div>
+<p>If you’re familiar with correlation, you’ll notice that these correlation numbers generally have a pretty high magnitude: each feature generally tells you a lot about each other feature. Let’s explore why this can lead to some issues in practice.</p>
+</div>
+<div class="section" id="why-network-feature-correlatedness-can-lead-to-problems">
+<h4><span class="section-number">4.2.1.1.2. </span>Why Network Feature Correlatedness Can Lead To Problems<a class="headerlink" href="#why-network-feature-correlatedness-can-lead-to-problems" title="Permalink to this headline">¶</a></h4>
+<p>Let’s take a step back to the implications of using the bag of features approach to analyze networks, now that we can see how correlated they usually are. Say you have a bunch of brain networks of mice, where the nodes are neurons and the edges are connections between neurons. You have a group of mice who were raised total darkness, and another group who were raised normally: let’s call the ones who were raised in the darkness the batman mice. You’re interested in how the visual parts of the brain are affected in the batman mice. You find the networks for only the visual parts of their brain, and then you calculate some network feature; maybe the density. It turns out that the network density is much lower for batman mice than it is for normal mice, so you conclude that raising mice in the darkness causes lower network density. Seems reasonable.</p>
+<p>The problem is that network density is correlated with pretty much every other network feature you could have used. For example, just looking at the heatmap above, we can see that it’s lower for more modularity; higher with a greater clustering coefficient; and much lower for smaller average path lengths. So, for instance, if you measured modularity instead of density, then you could have just as easily concluded that raising mice in total darkness causes their brains to have more well-defined clusters of neurons, and you’d then write an entire paper on the implications of that.</p>
 </div>
 </div>
 </div>
 <div class="section" id="bag-of-edges">
 <h2><span class="section-number">4.2.2. </span>Bag of Edges<a class="headerlink" href="#bag-of-edges" title="Permalink to this headline">¶</a></h2>
-<p>The second approach is called the bag of edges. Here, you just take all of the edges in your network and treat them all as independent entities, and you study them all individually, ignoring interactions between edges. This can work in some situations, but you still run into dependence: if two people within a friend group are friends, that can change the dynamic of the friend group and so change the chance that two other people are friends.</p>
+<p>The second approach is called the bag of edges. Here, you just take all of the edges in your network and treat them all as independent entities. You study each edge individually, ignoring any interactions between edges. This can work in some situations, but you still run into dependence: if two people within a friend group are friends, that can change the dynamic of the friend group and so change the chance that a different set of two people within the group are friends.</p>
+<p>More specifically, in the bag of edges approach, you generally assume that every edge in your network will exist with some particular <em>probability</em>, which can be different depending on the edge that you’re looking at. For example, there might be a 60% chance that the first and second nodes in your network are connected, but only a 20% chance that the third and fourth nodes are. What often will happen here is that you have multiple networks describing the same (or similar) systems. For example, let’s use the mouse example again from above. You have your batman mice (who were raised in the dark) and your normal mice. You’ll have a network for each batman mouse and a network for each normal mouse, and you assume that, even though there’s a bit of variation in what you actually see, the <em>probability</em> of an edge existing between the same two nodes is the same for all batman mice. Your goal would be to figure out which edges have a different <em>probability</em> of existing with the batman mice compared to the normal mice.</p>
+<p>Let’s make some example networks to explore this. We’ll have two groups of networks, and all of the networks will have only three nodes for simplicity’s sake. Each group will contain 20 networks, for a total of 40 networks. In the first group, every edge between every pair of nodes simply has a 50% chance of existing. In the second group, the edge between nodes 0 and 1 will instead have a 90% chance of existing, but every other edge will still just be 50%. We’ll generate ten networks from the first group, and ten networks from the second group.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sample_edges</span>
+
+<span class="n">P1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">]])</span>
+
+<span class="n">P2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">.5</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">.9</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">]])</span>
+
+<span class="c1"># First group</span>
+<span class="n">n_networks</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">first_group</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_networks</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_networks</span><span class="p">):</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">sample_edges</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
+    <span class="n">first_group</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">network</span>
+    
+<span class="c1"># Second group</span>
+<span class="n">second_group</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_networks</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_networks</span><span class="p">):</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">sample_edges</span><span class="p">(</span><span class="n">P2</span><span class="p">)</span>
+    <span class="n">second_group</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">network</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="figuring-out-which-edge-is-the-outlier">
+<h3><span class="section-number">4.2.2.1. </span>Figuring out which edge is the outlier<a class="headerlink" href="#figuring-out-which-edge-is-the-outlier" title="Permalink to this headline">¶</a></h3>
+<p>By design, we know that the edge between nodes 0 and 1 is an outlier - the probability that it’s there changes depending on whether your network is in the first or the second group. One common goal when using the bag of edges approach is finding signal edges: an edge whose probability of existing changes depending on which type of network you’re looking at. In our case, we’re trying to figure out (without using our prior knowledge) that the edge between nodes 0 and 1 is a signal edge.</p>
+<p>To find the outlier edge, we’ll first get the set of all edges, along with their indices. Since all of our networks are undirected, we’ll get the edges and their indices by finding all of the values in the the upper-triangular portion of the adjacency matrices.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we’ll use a hypothesis test called <em>dcorr</em> to find the outlier edge. You don’t need to worry too much about what dcorr is; it’s essentially a hypothesis that is useful with networks, which doesn’t make any assumptions about the relationships between edges or the way your networks were randomly generated.</p>
+<p>In the code below, we:</p>
+<ol class="simple">
+<li><p>Loop through the edge indices</p></li>
+<li><p>Get a list of all instances of that edge in the first group, and all instances of that edge in the second group</p></li>
+<li><p>Feed that list into the dcorr test to obtain p-values for each edge</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hyppo.ksample</span> <span class="kn">import</span> <span class="n">KSample</span>
+
+<span class="n">edge_pvals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">edge_indices</span><span class="p">):</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">group</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="p">[</span><span class="n">first_group</span><span class="p">,</span> <span class="n">second_group</span><span class="p">]]</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">pvalue</span> <span class="o">=</span> <span class="n">KSample</span><span class="p">(</span><span class="s2">&quot;Dcorr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="o">*</span><span class="n">samples</span><span class="p">)</span>
+    <span class="n">edge_pvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pvalue</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see below that the p-value for the first edge, the one that connects nodes 0 and 1, is extremely small, whereas the p-values for the other two edges are relatively large.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">edge_pvals</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.001, 0.541, 0.541])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="correcting-for-multiple-comparisons">
+<h4><span class="section-number">4.2.2.1.1. </span>Correcting for Multiple Comparisons<a class="headerlink" href="#correcting-for-multiple-comparisons" title="Permalink to this headline">¶</a></h4>
+<p>Because we are doing multiple tests, we’re running into a multiple comparisons problem here. If you’re not familiar with the idea of multiple comparisons in statistics, it is as follows. Suppose you have a test that estimates the probability of making a discovery (or, to be more rigorous, tells you whether you should reject the idea that you didn’t make a discovery). You run that test multiple times. If you run this test enough times, even if there’s no discovery to be made, eventually random chance will make it <em>seem</em> like you’ve made a discovery. So, the chance that you make a false discovery increases with the number of tests that you run. For example, say your test has a 5% false-positive rate, and you run this test 100 times. On average, there will be 5 false positives. If there was only one true positive in all of your data, and your test finds it, then you’ll end up with 6 positives total, 5 of which were false.</p>
+<p>We need to correct for this here because we’re doing a new test for each edge. There are a few standard ways to do this, but we’ll use something called the <em>Holm-Bonferroni correction</em>. Don’t worry about the details of this; all you need to know for now is that it corrects for the multiple comparisons problem by being a bit more conservative with what we classify as a positive result. This correction is implemented in the <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> library, a popular library for statistical tests and data exploration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+
+<span class="n">reject</span><span class="p">,</span> <span class="n">corrected_pvals</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span><span class="n">edge_pvals</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;holm&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see below that the corrected p-value for the edge connecting nodes 0 and 1 is still extremely small. We somewhat arbitrarily chose a value of .05 as the cutoff for determining an outlier, so we can say that any edge with a corrected p-value below .05 is an outlier edge. We’ve used the bag-of-edges approach to find an edge whose probability of existing changed depending on which group a network belongs to!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_pvals</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.004, 1.   , 1.   ])
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="bag-of-nodes">
 <h2><span class="section-number">4.2.3. </span>Bag of Nodes<a class="headerlink" href="#bag-of-nodes" title="Permalink to this headline">¶</a></h2>
