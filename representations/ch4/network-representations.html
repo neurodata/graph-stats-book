@@ -793,7 +793,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2433/3329702103.py:11: RuntimeWarning: overflow encountered in power
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2480/3329702103.py:11: RuntimeWarning: overflow encountered in power
   n_graphs = np.log10(2**comb(vertices, 2))
 </pre></div>
 </div>
@@ -806,7 +806,7 @@
 <p>The first approach is called the bag of features. The idea is that you take networks and you compute statistics from them, either for each node or for the entire network. These statistics could be simple things like the edge count or average path length between two nodes, or more complicated metrics like the modularity, which measures how well a network can be separated into communities. Unfortunately, network statistics like this tend to be correlated; the value of one network statistic will almost always influence the other. This means that it can be difficult to interpret analysis that works by comparing network statistics. It’s also hard to figure out which statistics to compute, since there are an infinite number of them.</p>
 <div class="section" id="you-lose-a-lot-of-information-with-the-bag-of-features-approach">
 <h3><span class="section-number">4.2.1.1. </span>You Lose A Lot of Information with the Bag of Features Approach<a class="headerlink" href="#you-lose-a-lot-of-information-with-the-bag-of-features-approach" title="Permalink to this headline">¶</a></h3>
-<p><img alt="anascombe" src="representations/Images/anascombe.png" /></p>
+<p><img alt="anascombe" src="representations/Images/anascombe.jpeg" /></p>
 <p>This figure contains for networks, all of whom have the exact same network statistics. They each have ten nodes and 15 edges. They also all contain the same number of triangles (sets of three nodes which are all connected), and the same global clustering coefficient. Global clustering cloefficient, for reference, gives an indication of how clustered the network is, and works by counting the proportion of triangles out of all edges that share a node.</p>
 <p>Each of these networks, however, are completely different from each other. The first network, for instance, has two connected components, while the others are all connected. The second network has a community of nodes that are only connected along a path, and a different community which are tightly connected – and so on. Modeling these networks through computing features from them would lose a great deal of information.</p>
 <div class="section" id="network-features-tend-to-be-correlated">
@@ -996,7 +996,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.001, 0.541, 0.541])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.001, 0.185, 0.026])
 </pre></div>
 </div>
 </div>
@@ -1022,7 +1022,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.004, 1.   , 1.   ])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.002, 0.185, 0.051])
 </pre></div>
 </div>
 </div>
@@ -1034,6 +1034,48 @@
 <h2><span class="section-number">4.2.3. </span>Bag of Nodes<a class="headerlink" href="#bag-of-nodes" title="Permalink to this headline">¶</a></h2>
 <p>Similarly to the bag of edges, you can treat all of the nodes as their own entity and do analysis on a bag of nodes. Much of this book will focus on the bag of nodes approach, because you’ll often use edge count, covariate information, and other things when you work with bags of nodes – and, although there’s still dependence between nodes, it generally isn’t as big of an issue. Most of the single-network methods we’ll use in this book will take the bag of nodes approach. What you’ll see repeatedly is that we take the nodes of a network and <em>embed</em> them so each node is associated with a point on a plot (this is called the Euclidean representation of the node). Then, you can use other methods from mainstream machine learning to learn about your network. We’ll get into this heavily in future chapters.</p>
 <p>We’ll also often associate node representation with community investigation. The idea is that sometimes you have groups of nodes which behave similarly – maybe they have a higher chance of being connected to each other, or maybe they’re all connected to certain other groups of nodes. Regardless of how you define communities, a community investigation motif will pop up: you get your node representation, then you associate nearby nodes to the same community. We can then look at the properties of the node belonging to a particular community, or look at relationships between communities of nodes.</p>
+<p>Since we’ll use the bag of nodes approach heavily throughout this book, you’ll be getting a much better sense for what you can do with it later. As a sneak preview right now, let’s generate a few networks and embed their nodes to get a feel for what bag-of-nodes type analysis might look like.</p>
+<p>Don’t worry about the specifics, but below we generate a simple network with two communities. Nodes in the same community have an 80% chance of being connected, whereas nodes in separate communities have a 20% chance of being connected. There are 20 nodes per community.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+
+<span class="c1"># generate network</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">,],</span>
+              <span class="p">[</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.8</span><span class="p">]])</span>
+<span class="n">network</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">P</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we’ll use graspologic to find the points in 2D space that each node is associated with. Again, don’t worry about the specifics: this will be heavily explained later in the book. All you have to know right now is that we’re moving the nodes of our network from network space, where each node is associated with a set of edges with other nodes, to 2D Euclidean space, where each node is associated with an x-coordinate and a y-coordinate.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
+
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below you can see the result, colored by community. Each of the dots in this plot is one of the nodes of our network. You can see that the nodes cluster into two groups: one group for the first community, and another group for the second community. Using this representation for the nodes of our network, we can open the door to later downstream machine learning tasks.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Bag of Nodes on a coordinate axis&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/network-representations_37_0.png" src="../../_images/network-representations_37_0.png" />
+</div>
+</div>
 </div>
 <div class="section" id="bag-of-networks">
 <h2><span class="section-number">4.2.4. </span>Bag of Networks<a class="headerlink" href="#bag-of-networks" title="Permalink to this headline">¶</a></h2>
