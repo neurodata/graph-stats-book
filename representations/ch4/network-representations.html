@@ -798,7 +798,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2541/3329702103.py:11: RuntimeWarning: overflow encountered in power
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_2480/3329702103.py:11: RuntimeWarning: overflow encountered in power
   n_graphs = np.log10(2**comb(vertices, 2))
 </pre></div>
 </div>
@@ -811,7 +811,7 @@
 <p>The first approach is called the bag of features. The idea is that you take networks and you compute statistics from them, either for each node or for the entire network. These statistics could be simple things like the edge count or average path length between two nodes, or more complicated metrics like the modularity, which measures how well a network can be separated into communities. Unfortunately, network statistics like this tend to be correlated; the value of one network statistic will almost always influence the other. This means that it can be difficult to interpret analysis that works by comparing network statistics. It’s also hard to figure out which statistics to compute, since there are an infinite number of them.</p>
 <div class="section" id="you-lose-a-lot-of-information-with-the-bag-of-features-approach">
 <h3><span class="section-number">4.2.1.1. </span>You Lose A Lot of Information with the Bag of Features Approach<a class="headerlink" href="#you-lose-a-lot-of-information-with-the-bag-of-features-approach" title="Permalink to this headline">¶</a></h3>
-<p><img alt="anascombe" src="representations/Images/anascombe.jpeg" /></p>
+<p><img alt="anascombe" src="../../_images/anascombe.jpeg" /></p>
 <p>This figure contains for networks, all of whom have the exact same network statistics. They each have ten nodes and 15 edges. They also all contain the same number of triangles (sets of three nodes which are all connected), and the same global clustering coefficient. Global clustering cloefficient, for reference, gives an indication of how clustered the network is, and works by counting the proportion of triangles out of all edges that share a node.</p>
 <p>Each of these networks, however, are completely different from each other. The first network, for instance, has two connected components, while the others are all connected. The second network has a community of nodes that are only connected along a path, and a different community which are tightly connected – and so on. Modeling these networks through computing features from them would lose a great deal of information.</p>
 <div class="section" id="network-features-tend-to-be-correlated">
@@ -1001,7 +1001,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.001, 0.817, 0.823])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.005, 0.823, 0.823])
 </pre></div>
 </div>
 </div>
@@ -1027,7 +1027,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.004, 1.   , 1.   ])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.015, 1.   , 1.   ])
 </pre></div>
 </div>
 </div>
@@ -1067,13 +1067,17 @@
 <p>Below you can see the result, colored by community. Each of the dots in this plot is one of the nodes of our network. You can see that the nodes cluster into two groups: one group for the first community, and another group for the second community. Using this representation for the nodes of our network, we can open the door to later downstream machine learning tasks.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span><span class="p">,</span> <span class="n">draw_cartesian</span><span class="p">,</span> <span class="n">add_circle</span><span class="p">,</span> <span class="n">text</span>
 
-<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-<span class="n">plot</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">plot</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">draw_cartesian</span><span class="p">(</span><span class="n">xrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Bag of Nodes on a coordinate axis&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">);</span>
 
-<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Bag of Nodes on a coordinate axis&quot;</span><span class="p">);</span>
+<span class="c1"># plot circle</span>
+<span class="n">x_centroid</span><span class="p">,</span> <span class="n">y_centroid</span> <span class="o">=</span> <span class="n">embedding</span><span class="p">[</span><span class="n">labels</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">add_circle</span><span class="p">(</span><span class="n">x_centroid</span><span class="p">,</span> <span class="n">y_centroid</span><span class="o">+</span><span class="mf">.2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Nodes plotted </span><span class="se">\n</span><span class="s2">as 2d points&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x_centroid</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="n">y_centroid</span><span class="o">+</span><span class="mf">.2</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">x_centroid</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">y_centroid</span><span class="p">),</span> 
+            <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">});</span>
 </pre></div>
 </div>
 </div>
@@ -1084,7 +1088,126 @@
 </div>
 <div class="section" id="bag-of-networks">
 <h2><span class="section-number">4.2.4. </span>Bag of Networks<a class="headerlink" href="#bag-of-networks" title="Permalink to this headline">¶</a></h2>
-<p>The last approach is the bag of networks, which you’d use when you have more than one network that you’re working with. Here, you’d study the networks as a whole and you’d want to test for differences across different networks or classify entire networks into one category or another. You might want to figure out if two networks were drawn from the same probability distribution, or whether you can find a smaller group of nodes that could represent the whole network. The end of this book will cover the bag of networks approach.</p>
+<p>The last approach is the bag of networks, which you’d use when you have more than one network that you’re working with. Here, you’d study the networks as a whole and you’d want to test for differences across different networks or classify entire networks into one category or another. You might want to figure out if two networks were drawn from the same probability distribution, or whether you can find a smaller group of nodes that can represent the whole network, preserving its important properties. This is can be useful if you have extremely large networks, with millions of nodes.</p>
+<p>To showcase the bag of networks approach, let’s create a few networks. We’ll have one group of networks distributed the same way, and another group distributed differently. What we want to do is plot each network as a point in space, so that we can see the communities of networks directly.</p>
+<p>Both sets of networks will have two communities of nodes, but the first set will have slightly stronger within-community connections than the second. Each network will have 200 nodes in it, 100 for each community.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_network</span><span class="p">(</span><span class="o">*</span><span class="n">probs</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">pa</span><span class="p">,</span> <span class="n">pb</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">pd</span> <span class="o">=</span> <span class="n">probs</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">pa</span><span class="p">,</span> <span class="n">pb</span><span class="p">],</span> 
+                  <span class="p">[</span><span class="n">pc</span><span class="p">,</span> <span class="n">pd</span><span class="p">]])</span>
+    
+    <span class="k">return</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">P</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="n">return_labels</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="mf">.12</span><span class="p">,</span> <span class="mf">.06</span><span class="p">,</span> <span class="mf">.03</span>
+
+<span class="n">first_group</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span>
+    <span class="n">first_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    
+<span class="n">second_group</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">make_network</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="n">second_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Again, don’t worry too much yet about the process with which these networks were generated - that will all be explained in the next few chapters. All you need to get out of this code is that we have six networks from the first group, and another twelve networks from the second. You can see these networks in heatmap form below.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">();</span>
+
+<span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># add stack of heatmaps</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span> 
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">first_group</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;First Group of Networks&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+    
+<span class="c1"># add stack of heatmaps</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mf">.75</span><span class="p">,</span> <span class="o">-</span><span class="mf">.02</span><span class="o">*</span><span class="n">i</span><span class="p">,</span> <span class="mf">.8</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span> 
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">second_group</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Second Group of Networks&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">.9</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/network-representations_42_0.png" src="../../_images/network-representations_42_0.png" />
+</div>
+</div>
+<p>Now, we have to figure out some way of plotting each network as a point in space. Here’s a rough overview for how we’ll do it.</p>
+<p>First, we’ll take all of our networks and get a Euclidean location for each of their nodes. The nodes for all of the networks will exist in the same space, meaning their locations can be compared with each other. We’ll have a bunch of matrices, one for each network. Since each network has 200 nodes, and we’re embedding into 2-dimensional space, we’ll have six 200 by 2 matrices for the first group of networks, and another twelve 200 by 2 matrices for the second group.</p>
+<p>Now, we’ll look at pairwise dissimilarity for each matrix. The dissimilarity between the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> network is defined as the norm of the difference between the <span class="math notranslate nohighlight">\(i_{th}\)</span> matrix and the <span class="math notranslate nohighlight">\(j_{th}\)</span> matrix that we’ve created this way. You can think of this pairwise dissimilarity as just a number that tells you how different the representations for the nodes are between the two networks: a low number means the networks have very similar nodes, and a high number means the networks have very different nodes.</p>
+<p>Then, we’ll organize all of these pairwise dissimilarities into a dissimilarity <em>matrix</em>, where the <span class="math notranslate nohighlight">\(i, j_{th}\)</span> entry is the dissimilarity between the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> network. Embedding this <em>new</em> matrix will give us a point in space for each network.</p>
+<p>Again, don’t worry if you don’t understand the details: embedding and how it works will be explained in future chapters.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">ClassicalMDS</span>
+
+<span class="c1"># Find a euclidean location for the nodes of all of our networks</span>
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">omni_embedding</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">first_group</span> <span class="o">+</span> <span class="n">second_group</span><span class="p">)</span>
+
+<span class="c1"># embed each network representation into a 2-dimensional space</span>
+<span class="n">cmds</span> <span class="o">=</span> <span class="n">ClassicalMDS</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">cmds_embedding</span> <span class="o">=</span> <span class="n">cmds</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">omni_embedding</span><span class="p">)</span>
+
+<span class="c1"># Find and normalize the dissimilarity matrix</span>
+<span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">cmds</span><span class="o">.</span><span class="n">dissimilarity_matrix_</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cmds</span><span class="o">.</span><span class="n">dissimilarity_matrix_</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see the dissimilarity matrix below, with values between 0 and 1 since we normalized it. As you can see, there are two groups, with the values for two networks in different groups having high dissimilarity, and the values for two networks in the same group having low dissimilarity. The diagonals of the matrix are all 0, because the dissimilarity between a network and itself is 0.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Pairwise Dissimilarity Matrix&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/network-representations_46_0.png" src="../../_images/network-representations_46_0.png" />
+</div>
+</div>
+<p>Once we find the embedding for this dissimilarity matrix, we can plot each of the networks in space. In the plot below, each network represents a single point in space. We can easily see the two clusters, which represent the two types of networks we created. Since there are six networks of the first type and twelve of the second type, one of the clusters has six dots, and the other has twelve dots.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">12</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">draw_cartesian</span><span class="p">(</span><span class="n">xrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">cmds_embedding</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Different groups of networks&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.1, &#39;Different groups of networks&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/network-representations_48_1.png" src="../../_images/network-representations_48_1.png" />
+</div>
+</div>
 </div>
 </div>
 
