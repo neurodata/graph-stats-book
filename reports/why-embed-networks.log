@@ -17,13 +17,76 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-%aimport graphbook_code
-%autoreload 2
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+import seaborn as sns
+from graphbook_code import GraphColormap, draw_cartesian
 
-from graphbook_code import draw_multiplot
-axs = draw_multiplot(A, labels=labels, title="A Network With Two Groups")
+# setup
+cmap = GraphColormap("divergent", k=2).color
+fig = plt.figure(figsize=(12, 8))
+gs = GridSpec(1, 3)
+axm = fig.add_subplot(gs[0])
+axs = fig.add_subplot(gs[1:])
+
+# plot left
+hm = sns.heatmap(data, ax=axm, yticklabels=False, 
+                 cmap=cmap, annot=True, cbar=True)
+hm.hlines(range(len(data)), *hm.get_xlim(), colors='k', alpha=.1)
+
+# plot right
+draw_cartesian(ax=axs)
+plot = sns.scatterplot(data=data, x='x', y='y', legend=False, ax=axs, color="k")
+
+# lines
+max_ = int(data.values.max()) + 1
+plot.vlines(0, -max_, max_, colors="black", lw=.9, linestyle="dashed", alpha=.2)
+plot.hlines(0, -max_, max_, colors="black", lw=.9, linestyle="dashed", alpha=.2)
+
+# ticks
+plot.xaxis.set_major_locator(plt.MaxNLocator(6))
+plot.yaxis.set_major_locator(plt.MaxNLocator(6))
+
+# set axis bounds
+lim = (-max_, max_)
+plot.set(xlim=lim, ylim=lim)
+
+# title, etc
+plt.suptitle("Euclidean data represented as a data matrix and represented in Euclidean space", fontsize=16)
+plt.tight_layout()
 ------------------
 
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mImportError[0m                               Traceback (most recent call last)
+Input [0;32mIn [2][0m, in [0;36m<module>[0;34m[0m
+[1;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mmatplotlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01mgridspec[39;00m [38;5;28;01mimport[39;00m GridSpec
+[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mseaborn[39;00m [38;5;28;01mas[39;00m [38;5;21;01msns[39;00m
+[0;32m----> 4[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraphbook_code[39;00m [38;5;28;01mimport[39;00m GraphColormap, draw_cartesian
+[1;32m      6[0m [38;5;66;03m# setup[39;00m
+[1;32m      7[0m cmap [38;5;241m=[39m GraphColormap([38;5;124m"[39m[38;5;124mdivergent[39m[38;5;124m"[39m, k[38;5;241m=[39m[38;5;241m2[39m)[38;5;241m.[39mcolor
 
-UsageError: Line magic function `%aimport` not found.
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/__init__.py:31[0m, in [0;36m<module>[0;34m[0m
+[1;32m     29[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01msiem[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[1;32m     30[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01msbm[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[0;32m---> 31[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mier[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/ier.py:15[0m, in [0;36m<module>[0;34m[0m
+[1;32m     13[0m [38;5;28;01mfrom[39;00m [38;5;21;01mscipy[39;00m[38;5;21;01m.[39;00m[38;5;21;01mstats[39;00m [38;5;28;01mimport[39;00m bernoulli
+[1;32m     14[0m [38;5;28;01mfrom[39;00m [38;5;21;01mtyping[39;00m [38;5;28;01mimport[39;00m Any, Callable, Optional, Union
+[0;32m---> 15[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mtypes[39;00m [38;5;28;01mimport[39;00m Dict, List, Tuple
+[1;32m     17[0m [38;5;28;01mdef[39;00m [38;5;21mier[39m(
+[1;32m     18[0m     P: np[38;5;241m.[39mndarray,
+[1;32m     19[0m     rescale: [38;5;28mbool[39m [38;5;241m=[39m [38;5;28;01mFalse[39;00m,
+[0;32m   (...)[0m
+[1;32m     23[0m     wtargs: Optional[Dict[[38;5;28mstr[39m, Any]] [38;5;241m=[39m [38;5;28;01mNone[39;00m,
+[1;32m     24[0m ) [38;5;241m-[39m[38;5;241m>[39m np[38;5;241m.[39mndarray:
+[1;32m     25[0m     [38;5;124mr[39m[38;5;124;03m"""[39;00m
+[1;32m     26[0m [38;5;124;03m    Samples a random graph, given a probability matrix.[39;00m
+[1;32m     27[0m [38;5;124;03m    :math:`P = (p_{ij})_{i,j = 1}^n` is the probability matrix, where each entry :math:`p_{ij} \in [0, 1]`[39;00m
+[0;32m   (...)[0m
+[1;32m     68[0m [38;5;124;03m           [1., 1., 1., 0., 0.]])[39;00m
+[1;32m     69[0m [38;5;124;03m    """[39;00m
+
+[0;31mImportError[0m: cannot import name 'Dict' from 'graspologic.types' (/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/types.py)
+ImportError: cannot import name 'Dict' from 'graspologic.types' (/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/types.py)
 
