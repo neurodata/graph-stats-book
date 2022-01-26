@@ -650,8 +650,13 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#naive-bayes-classifier-statistical-intuition">
-     10.2.3.1. Naive Bayes Classifier (Statistical Intuition)
+    <a class="reference internal nav-link" href="#bayes-plugin-classifier-statistical-intuition">
+     10.2.3.1. Bayes Plugin Classifier (Statistical Intuition)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#classification-with-bayes-plugin-classifier">
+     10.2.3.2. Classification with Bayes Plugin Classifier
     </a>
    </li>
   </ul>
@@ -692,8 +697,13 @@
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#naive-bayes-classifier-statistical-intuition">
-     10.2.3.1. Naive Bayes Classifier (Statistical Intuition)
+    <a class="reference internal nav-link" href="#bayes-plugin-classifier-statistical-intuition">
+     10.2.3.1. Bayes Plugin Classifier (Statistical Intuition)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#classification-with-bayes-plugin-classifier">
+     10.2.3.2. Classification with Bayes Plugin Classifier
     </a>
    </li>
   </ul>
@@ -921,12 +931,12 @@ Number of individuals who are humans: 61
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">fisher_exact</span>
 
 <span class="n">test_statistic</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">edge_tab</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Statistic: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;p-value: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pval</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Statistic: 3.5000
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value: 0.0071
 </pre></div>
 </div>
 </div>
@@ -945,12 +955,12 @@ Number of individuals who are humans: 61
 <span class="n">edge_tab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ast_edge</span><span class="p">,</span> <span class="n">hum_edge</span><span class="p">],</span> <span class="p">[</span><span class="n">ast_noedge</span><span class="p">,</span> <span class="n">hum_noedge</span><span class="p">]])</span>  <span class="c1"># arrange as in table shown above</span>
 
 <span class="n">test_statistic</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">edge_tab</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Statistic: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;p-value: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pval</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Statistic: 0.8077
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value: 0.8000
 </pre></div>
 </div>
 </div>
@@ -976,7 +986,7 @@ Number of individuals who are humans: 61
         <span class="n">hum_edgeij</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">hum_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ast_edgeij</span><span class="p">,</span> <span class="n">hum_edgeij</span><span class="p">],</span>
                           <span class="p">[</span><span class="n">class_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">ast_edgeij</span><span class="p">,</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">hum_edgeij</span><span class="p">]])</span>
-        <span class="n">sig_mtx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">table</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sig_mtx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">table</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">sig_mtx</span> <span class="o">=</span> <span class="n">sig_mtx</span> <span class="o">+</span> <span class="n">sig_mtx</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># symmetrize</span>
 </pre></div>
 </div>
@@ -1055,81 +1065,175 @@ Number of individuals who are humans: 61
 <h2><span class="section-number">10.2.3. </span>Building a classifier using the estimated signal subnetwork<a class="headerlink" href="#building-a-classifier-using-the-estimated-signal-subnetwork" title="Permalink to this headline">¶</a></h2>
 <p>Finally, we can use the estimated signal subnetwork that we have constructed to devise a classifier. The objective of a classifier is to take new pieces of data (in this case, new networks), and assign them to the class which they are most likely from. How do we determine which class a network is most likely from?</p>
 <p>At the moment, we have our estimate of the signal subnetwork, <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>, and have a bunch of networks from one of two classes: astronaut (class 1) or alien (class 2). The edges of the network are binary, and we want to use the edges which are in the signal subnetwork to classify points as either astronaut or alien. A natural classifier choice for this situation is known as the Naive Bayes classifier. We have all the ingredients we need to construct the Naive Bayes classifier, so we’ll try to put this together. Feel free to skip past this next section if you want to jump right into the implementation of the classifier. In this next section, we will explain some of the intuition of the Naive Bayes classifer, which might require a bit of a probability and statistics background.</p>
-<div class="section" id="naive-bayes-classifier-statistical-intuition">
-<h3><span class="section-number">10.2.3.1. </span>Naive Bayes Classifier (Statistical Intuition)<a class="headerlink" href="#naive-bayes-classifier-statistical-intuition" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="bayes-plugin-classifier-statistical-intuition">
+<h3><span class="section-number">10.2.3.1. </span>Bayes Plugin Classifier (Statistical Intuition)<a class="headerlink" href="#bayes-plugin-classifier-statistical-intuition" title="Permalink to this headline">¶</a></h3>
 <p>The core idea of the Naive Bayes classifier is, if our data have features which are zeros and ones, we can use the <em>class-conditional probabilities</em> to determine whether a point is from class <span class="math notranslate nohighlight">\(1\)</span> or class <span class="math notranslate nohighlight">\(2\)</span>. The idea is as follows. First, we assume that all of the individual features of our data (the features, in our case, are the edges of the network that are in the signal subnetwork) are independent, then the likelihood of observing a particular sequence of edges in the signal subnetwork of the <span class="math notranslate nohighlight">\(m^{th}\)</span> network if that network is in class <span class="math notranslate nohighlight">\(y\)</span> is as follows. First, we will just write down some simpler notation for the quantity we want:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(\text{observing }A^{(m)}\text{ given we assume }\text{$m$ is in class $y$} \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(A^{(m)} | y_i = y; \mathcal S)
+    \mathbb P(\text{observing }A^{(m)}\text{ given we assume }\text{$m$ is in class $y$} \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(A^{(m)} | y_m = y; \mathcal S)
 \end{align*}\]</div>
 <p>Nothing happened in this step just yet; we just made a smaller notation for the quantity on the left that we will use later on. In this next step, we use the fact that, if edges existing and not existing are independent, then the probability of observing a sequence of edges is the product of the probabilities of observing each individual edge. This is called an <em>independent edge assumption</em>. We proceed as follows:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(A^{(m)}| y_i = y; \mathcal S) &amp;= \prod_{(i,j) \in \mathcal S} \mathbb P(a_{ij}^{(m)} | y_i = y; \mathcal S)
+    \mathbb P(A^{(m)}| y_m = y; \mathcal S) &amp;= \prod_{(i,j) \in \mathcal S} \mathbb P(a_{ij}^{(m)} | y_m = y; \mathcal S)
 \end{align*}\]</div>
-<p>Note that we are taking the product of each pair of edges, <span class="math notranslate nohighlight">\((i,j)\)</span>, which are in the signal sub-network. Next, if we remember back to the Independent-Edge Random Network (IER), we assumed that if <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> was an <span class="math notranslate nohighlight">\(IER_n(P^y)\)</span> network, that every edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}^{(m)}\)</span> had a probability of <span class="math notranslate nohighlight">\(p^y_{ij}\)</span> of taking a value of <span class="math notranslate nohighlight">\(1\)</span> (the edge exists), and a probability of <span class="math notranslate nohighlight">\(1 - p_{ij}^y\)</span> of taking a value of <span class="math notranslate nohighlight">\(0\)</span> (the edge does not exist). What this means is that <span class="math notranslate nohighlight">\(\mathbf a_{ij}^{(m)}\)</span> is something called a <strong>Bernoulli distributed random variable</strong>. The probability of seeing a particular realization <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> of a Bernoulli distributed random variable is relatively straightforward to see. We want the quantity <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | y_i = y; \mathcal S)\)</span> to reflect the following two facts we’ve already discussed:</p>
+<p>Note that we are taking the product of each pair of edges, <span class="math notranslate nohighlight">\((i,j)\)</span>, which are in the signal sub-network. Next, if we remember back to the Independent-Edge Random Network (IER), we assumed that if <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> was an <span class="math notranslate nohighlight">\(IER_n(P^y)\)</span> network, that every edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}^{(m)}\)</span> had a probability of <span class="math notranslate nohighlight">\(p^y_{ij}\)</span> of taking a value of <span class="math notranslate nohighlight">\(1\)</span> (the edge exists), and a probability of <span class="math notranslate nohighlight">\(1 - p_{ij}^y\)</span> of taking a value of <span class="math notranslate nohighlight">\(0\)</span> (the edge does not exist). What this means is that <span class="math notranslate nohighlight">\(\mathbf a_{ij}^{(m)}\)</span> is something called a <strong>Bernoulli distributed random variable</strong>. The probability of seeing a particular realization <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> of a Bernoulli distributed random variable is relatively straightforward to see. We want the quantity <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | y_m = y; \mathcal S)\)</span> to reflect the following two facts we’ve already discussed:</p>
 <ol class="simple">
-<li><p>If <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | \mathbf y_i = y; \mathcal S)\)</span> is <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>, then <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | \mathbf y_i = y; \mathcal S)\)</span> is <span class="math notranslate nohighlight">\(1 - p_{ij}^y\)</span>.
+<li><p>If <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | \mathbf y_m = y; \mathcal S)\)</span> is <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>, then <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | \mathbf y_m = y; \mathcal S)\)</span> is <span class="math notranslate nohighlight">\(1 - p_{ij}^y\)</span>.
 Is there a succinct expression that we can express this with? Yes! Try the following equation:</p></li>
 </ol>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(A^{(m)} | \mathbf y_i = y; \mathcal S) &amp;= (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+    \mathbb P(A^{(m)} | \mathbf y_m = y; \mathcal S) &amp;= (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
 \end{align*}\]</div>
 <p>Notice that if <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then <span class="math notranslate nohighlight">\(1 - a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>. Therefore, <span class="math notranslate nohighlight">\((1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}\)</span> is just <span class="math notranslate nohighlight">\(1\)</span>, since any number raised to the <span class="math notranslate nohighlight">\(0\)</span> power is <span class="math notranslate nohighlight">\(1\)</span>. On the other hand, <span class="math notranslate nohighlight">\((p_{ij}^y)^{a_{ij}^{(m)}}\)</span> is <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>, since any number raised to the <span class="math notranslate nohighlight">\(1\)</span> power is itself. Therefore, this expression fits the bill for us. So, we can simplify our expression as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\mathbb P(A^{(m)} | y_i = y; \mathcal S) &amp;= \prod_{(i,j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\mathbb P(A^{(m)} | y_m = y; \mathcal S) &amp;= \prod_{(i,j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
 \end{align*}\]</div>
-<p>And we’re almost there! The next thing we’re going to do is a little tricky, but fortunately we can turn to Bayes’ Theorem for help. What we want to do is compute the probability of observing <em>both</em> <span class="math notranslate nohighlight">\(A^{(m)}\)</span> <em>and</em> <span class="math notranslate nohighlight">\(y_i\)</span> having the value <span class="math notranslate nohighlight">\(y\)</span>, not the probability of observing <span class="math notranslate nohighlight">\(A^{(m)}\)</span> given that we assume that <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(y\)</span>. In statistical notation, what this amounts to is:</p>
+<p>And we’re almost there! The next thing we’re going to do is a little tricky, but fortunately we can turn to Bayes’ Theorem for help. What we want to do is compute the probability of observing <em>both</em> <span class="math notranslate nohighlight">\(A^{(m)}\)</span> <em>and</em> <span class="math notranslate nohighlight">\(y_m\)</span> having the value <span class="math notranslate nohighlight">\(y\)</span>, not the probability of observing <span class="math notranslate nohighlight">\(A^{(m)}\)</span> given that we assume that <span class="math notranslate nohighlight">\(y_m\)</span> is <span class="math notranslate nohighlight">\(y\)</span>. In statistical notation, what this amounts to is:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P(\text{observing }A^{(m)}\text{ and }\text{$m$ is in class $y$} \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(A^{(m)}, y_i = y; \mathcal S)
+    \mathbb P(\text{observing }A^{(m)}\text{ and }\text{$m$ is in class $y$} \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(A^{(m)}, y_m = y; \mathcal S)
 \end{align*}\]</div>
-<p>This expression is a little confusing, but its interpretation is relatively straightforward: it is the probability that we see both things happening at the same time (the random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> takes the value <span class="math notranslate nohighlight">\(A^{(m)}\)</span> and the random class <span class="math notranslate nohighlight">\(\mathbf y_i\)</span> has the value <span class="math notranslate nohighlight">\(y\)</span>) rather than just assume that the random class <span class="math notranslate nohighlight">\(\mathbf y_i\)</span> already is <span class="math notranslate nohighlight">\(y\)</span>. We can compute this quantity by remembering Bayes’ Theorem:</p>
+<p>This expression is a little confusing, but its interpretation is relatively straightforward: it is the probability that we see both things happening at the same time (the random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> takes the value <span class="math notranslate nohighlight">\(A^{(m)}\)</span> and the random class <span class="math notranslate nohighlight">\(\mathbf y_m\)</span> has the value <span class="math notranslate nohighlight">\(y\)</span>) rather than just assume that the random class <span class="math notranslate nohighlight">\(\mathbf y_m\)</span> already is <span class="math notranslate nohighlight">\(y\)</span>. We can compute this quantity by remembering <a class="reference external" href="#link?">Bayes’ Theorem</a>:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-     \mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S) &amp;= \frac{\mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S)}{\mathbb P(\mathbb y_i = y}
+     \mathbb P(A^{(m)} |  \mathbb y_m = y; \mathcal S) &amp;= \frac{\mathbb P(A^{(m)}, \mathbb y_m = y; \mathcal S)}{\mathbb P(\mathbb y_m = y)}
 \end{align*}\]</div>
 <p>Note that this implies the following:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S) &amp;= \mathbb P(A^{(m)} | \mathbb y_i = y; \mathcal S)\mathbb P(\mathbb y_i = y)
+\mathbb P(A^{(m)}, \mathbb y_m = y; \mathcal S) &amp;= \mathbb P(A^{(m)} | \mathbb y_m = y; \mathcal S)\mathbb P(\mathbb y_m = y)
 \end{align*}\]</div>
 <p>Plugging in the value we obtained above:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S) &amp;= \mathbb P(\mathbb y_i = y)\prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\mathbb P(A^{(m)}, \mathbb y_m = y; \mathcal S) &amp;= \mathbb P(\mathbb y_m = y)\prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
 \end{align*}\]</div>
-<p>Remember that the parameter of the signal subnetwork model, <span class="math notranslate nohighlight">\(\pi_y\)</span>, represented the probability of our <span class="math notranslate nohighlight">\(Y\)</span>-sided die landing on class <span class="math notranslate nohighlight">\(y\)</span>, and therefore was the probability that the random class <span class="math notranslate nohighlight">\(\mathbf y_i\)</span> took the value <span class="math notranslate nohighlight">\(y\)</span>. Therefore, <span class="math notranslate nohighlight">\(\mathbb P(\mathbb y_i = y) = \pi_y\)</span>, since these two quantites represent the same thing! Finally:</p>
+<p>Remember that the parameter of the signal subnetwork model, <span class="math notranslate nohighlight">\(\pi_y\)</span>, represented the probability of our <span class="math notranslate nohighlight">\(Y\)</span>-sided die landing on class <span class="math notranslate nohighlight">\(y\)</span>, and therefore was the probability that the random class <span class="math notranslate nohighlight">\(\mathbf y_m\)</span> took the value <span class="math notranslate nohighlight">\(y\)</span>. Therefore, <span class="math notranslate nohighlight">\(\mathbb P(\mathbb y_m = y) = \pi_y\)</span>, since these two quantites represent the same thing! So:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\mathbb P(A^{(m)}, \mathbb y_i = y; P_y, \mathcal S) &amp;= \pi_y\prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\mathbb P(A^{(m)}, \mathbb y_m = y; \mathcal S) &amp;= \pi_y \prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
 \end{align*}\]</div>
-<p>So, what relevance does this have to the Naive bayes classifier? As it turns out, this is the <em>objective function</em> for the Naive Bayes classifier. We will simply “plug in” estimates of the quantities that we don’t have given to us, which are the signal subnetwork <span class="math notranslate nohighlight">\(\mathcal S\)</span>, the class probabilities <span class="math notranslate nohighlight">\(\pi_y\)</span>, and the class-conditional edge probabilities <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>:</p>
+<p>Finally, we introduce a new quantity. This quantity is very similar to the above quantity we came across, but with some terms reversed:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\mathbb P(A^{(m)}, \mathbb y_i = y; \hat P_y, \hat{\mathcal S}) &amp;= \hat \pi_y\prod_{(i, j) \in \mathcal S} (\hat p_{ij}^y)^{a_{ij}^{(m)}} (1 - \hat p_{ij}^y)^{1 - a_{ij}^{(m)}}
+    \mathbb P(\text{$m$ is in class $y$}\text{ given we observe }$A^{(m)}$ \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(\mathbb y_m = y | A^{(m)}; \mathcal S)
 \end{align*}\]</div>
-<p>And we classify a point based on which of the possible values that <span class="math notranslate nohighlight">\(y\)</span> could take which maximizes this quantity. That is, we are choosing the class for which <span class="math notranslate nohighlight">\(A^{(m)}\)</span> is “most probable” to be in! In symbols, we classify our points using:</p>
+<p>Remember that we saw that using Bayes Theorem, we can just rewrite this expression as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \hat y_m &amp;= \text{argmax}_{y \in \left\{1,...,Y\right\}} \hat \pi_y\prod_{(i, j) \in \mathcal S} (\hat p_{ij}^y)^{a_{ij}^{(m)}} (1 - \hat p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\mathbb P(\mathbb y_m = y | A^{(m)}; \mathcal S) &amp;= \frac{\mathbb P(A^{(m)}, \mathbb y_m = y; \mathcal S)}{\mathbb P(A^{(m)}; \mathcal S)}
 \end{align*}\]</div>
-<p>Or that our estimated class <span class="math notranslate nohighlight">\(\hat y_m\)</span> for individual <span class="math notranslate nohighlight">\(m\)</span> is the class <span class="math notranslate nohighlight">\(y\)</span> in which <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)}, \mathbb y_i = y; \hat P_y, \hat{\mathcal S})\)</span> is as large as possible.</p>
+<p>But using the expression we just obtained for <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)}, \mathbb y_m = y; \mathcal S)\)</span>, we can write this down as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(\mathbb y_m = y | A^{(m)}; \mathcal S) &amp;= \frac{\pi_y \prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}}{\mathbb P(A^{(m)}; \mathcal S)}
+\end{align*}\]</div>
+<p>So, what this quantity tells us is the probability that item <span class="math notranslate nohighlight">\(m\)</span> is in class <span class="math notranslate nohighlight">\(y\)</span>, given that we observe that item <span class="math notranslate nohighlight">\(m\)</span> has the network <span class="math notranslate nohighlight">\(A^{(m)}\)</span> with signal subnetwork <span class="math notranslate nohighlight">\(\mathcal S\)</span>! When we have a new piece of data, this is an excellent quantity to compute! The reason for this is that, if we see a new network and want to assign it to a class, we want to choose the class that we think is most reasonable, or most probable. Therefore, given a new network to classify, it is reasonable to just estimate the class of this new network to be the class which is most probable, which is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat y_m &amp;= \text{argmax}_{y \in \left\{1, ..., Y\right\}}\mathbb P(\mathbb y_m = y | A^{(m)}; \mathcal S) \\
+    &amp;= \text{argmax}_{y \in \left\{1,..., Y\right\}}\frac{\pi_y \prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}}{\mathbb P(A^{(m)}; \mathcal S)}
+\end{align*}\]</div>
+<p>What this states in words is, we check all possible values that <span class="math notranslate nohighlight">\(y\)</span> could take (1, 2, 3, … all the way to <span class="math notranslate nohighlight">\(Y\)</span>), and compute the probability that the class is <span class="math notranslate nohighlight">\(y\)</span> given the network we observed. Then, we just choose which of the values was most plausible, and return it for our prediction <span class="math notranslate nohighlight">\(\hat y_m\)</span>. But wait! We can simplify this expression even further. Note that the quantity <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)}; \mathcal S)\)</span> has <em>no</em> dependence on the particular class we are checking for a given value of <span class="math notranslate nohighlight">\(y\)</span>. This means that the denominator will be the same for all of the possible values of <span class="math notranslate nohighlight">\(y\)</span>, and therefore won’t impact which of the <span class="math notranslate nohighlight">\(y\)</span>s is the actual maximum. Therefore, we can just drop this term entirely, giving us the quantity that will become the objective function for our classification task:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\hat y_m &amp;= \text{argmax}_{y \in \left\{1,..., Y\right\}}\pi_y \prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>Now what you might be wondering is, we don’t know <span class="math notranslate nohighlight">\(\mathcal S\)</span>, the vector <span class="math notranslate nohighlight">\(\vec \pi\)</span>, nor the probability matrices <span class="math notranslate nohighlight">\(P_1,..., P_Y\)</span>. This is why this is called a “Bayes Plugin” classifier. What we do is we estimate the signal subnetwork <span class="math notranslate nohighlight">\(\mathcal S\)</span> using the approach we outlined above to produce <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>, and then we use the class vector <span class="math notranslate nohighlight">\(\vec y\)</span> that we observed to produce estimates of <span class="math notranslate nohighlight">\(\vec \pi\)</span>, where:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat{\pi_y} &amp;= \frac{M_y}{M}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(M\)</span> is the total number of networks, and <span class="math notranslate nohighlight">\(M_y\)</span> is the number of networks where <span class="math notranslate nohighlight">\(y_m = y\)</span>. Finally, we compute the estimated probability entries, using:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat p_{ij}^y &amp;= \frac{1}{M_y} \sum_{m : y_m = y} a_{ij}^{(m)}
+\end{align*}\]</div>
+<p>What this means is that, for each edge <span class="math notranslate nohighlight">\((i,j)\)</span> which is in the estimated signal subnetwork <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>, we look at the <span class="math notranslate nohighlight">\(m\)</span>s where the class <span class="math notranslate nohighlight">\(y_m\)</span> is <span class="math notranslate nohighlight">\(y\)</span>, and then we just compute the fraction of the edges which exist across all of the <span class="math notranslate nohighlight">\(M_y\)</span> networks where <span class="math notranslate nohighlight">\(y_m = y\)</span>. Finally, we estimate the class for our new network <span class="math notranslate nohighlight">\(A^{(m)}\)</span> by just “plugging in” these values to the objective function:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat y_m &amp;= \text{argmax}_{y \in \left\{1,..., Y\right\}}\hat \pi_y \prod_{(i, j) \in \hat{\mathcal S}} (\hat p_{ij}^y)^{a_{ij}^{(m)}} (1 - \hat p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>which is the objective function for the Bayes Plugin classifier.</p>
+</div>
+<div class="section" id="classification-with-bayes-plugin-classifier">
+<h3><span class="section-number">10.2.3.2. </span>Classification with Bayes Plugin Classifier<a class="headerlink" href="#classification-with-bayes-plugin-classifier" title="Permalink to this headline">¶</a></h3>
+<p>So, how do we actually use the estimated signal subnetwork <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span> to classify new points? Quite simply, we can just use sklearn’s <code class="docutils literal notranslate"><span class="pre">BernoulliNB</span></code> from <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>, which is the Naive Bayes classifier for data where the features take values of <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> (such as our network). We need to reorganize our data a little bit to get it into the format we want. Our estimated signal subnetwork <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span> is returned to us by <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> in the format of a <code class="docutils literal notranslate"><span class="pre">[2</span> <span class="pre">x</span> <span class="pre">K]</span></code> matrix, where <span class="math notranslate nohighlight">\(K\)</span> is the number of edges in the signal subnetwork. The first row is the row index of the entry of the signal subnetwork, and the second row is the column index of the entry in the signal subnetwork. We need to coerce this into an <code class="docutils literal notranslate"><span class="pre">[M</span> <span class="pre">x</span> <span class="pre">K]</span></code> matrix which we will call <span class="math notranslate nohighlight">\(D\)</span>, where <span class="math notranslate nohighlight">\(M\)</span> is the total number of networks, and <span class="math notranslate nohighlight">\(K\)</span> is the number of edges in the signal subnetwork. Each entry of this matrix <span class="math notranslate nohighlight">\(d_{mk}\)</span> represents the adjacency value of the <span class="math notranslate nohighlight">\(m^{th}\)</span> individual for the <span class="math notranslate nohighlight">\(k^{th}\)</span> element of the signal subnetwork:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yvec</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">sgest</span><span class="o">.</span><span class="n">sigsub_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sgest</span><span class="o">.</span><span class="n">sigsub_</span><span class="p">[</span><span class="mi">1</span><span class="p">],:]</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we create a Naive Bayes classifier, and fit the classifier using the class vector <span class="math notranslate nohighlight">\(\vec y\)</span> for all of our samples:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">BernoulliNB</span>
+
+<span class="n">classifier</span> <span class="o">=</span> <span class="n">BernoulliNB</span><span class="p">()</span>
+<span class="c1"># fit the classifier using the vector of classes for each sample</span>
+<span class="n">classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">yvec</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(100,)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>BernoulliNB()
 </pre></div>
 </div>
 </div>
 </div>
+<p>Let’s see how it does! We create <span class="math notranslate nohighlight">\(50\)</span> new networks, which are astronauts or earthlings, and assess the performance using the classification accuracy:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Mtest</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># roll a 2-sided die 100 times, with probability 0.4 of landing on side 1 (astronaut) </span>
+<span class="c1"># and 0.6 of landing on side 2 (earthling)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345678</span><span class="p">)</span>
+<span class="n">class_countstest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">Mtest</span><span class="p">,</span> <span class="n">pvals</span><span class="o">=</span><span class="p">[</span><span class="n">pi_ast</span><span class="p">,</span> <span class="n">pi_hum</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of individuals who are astronauts: </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of individuals who are humans: </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1"># create class assignment vector, and randomly reshuffle class labels for each individual</span>
+<span class="n">yvectest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">class_countstest</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">class_countstest</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345678</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">yvectest</span><span class="p">)</span>
+
+<span class="n">Astest</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">yvectest</span><span class="p">:</span>
+    <span class="c1"># sample adjacency matrix for an individual of class y using the probability</span>
+    <span class="c1"># matrix for that class</span>
+    <span class="n">Astest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ier</span><span class="p">(</span><span class="n">prob_mtxs</span><span class="p">[</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="c1"># stack the adjacency matrices for each individual such that node i is first dimension,</span>
+<span class="c1"># node j is second dimension, and the individual index m is the third dimension</span>
+<span class="n">Astest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">Astest</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">datatest</span> <span class="o">=</span> <span class="n">Astest</span><span class="p">[</span><span class="n">sgest</span><span class="o">.</span><span class="n">sigsub_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">sgest</span><span class="o">.</span><span class="n">sigsub_</span><span class="p">[</span><span class="mi">1</span><span class="p">],:]</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">datatest</span><span class="p">)</span>
+
+<span class="c1"># classifier accuracy is the fraction of predictions that are correct</span>
+<span class="n">acc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">predictions</span> <span class="o">==</span> <span class="n">yvectest</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Classifier Accuracy: </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of individuals who are astronauts: 39
+Number of individuals who are humans: 61
+Classifier Accuracy: 0.770
+</pre></div>
+</div>
+</div>
+</div>
+<p>Which means our classifier is right about <span class="math notranslate nohighlight">\(77\%\)</span> of the time. Not bad!</p>
 </div>
 </div>
 </div>
