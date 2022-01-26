@@ -43,6 +43,8 @@
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../../_static/sphinx-book-theme.d59cb220de22ca1c485ebbdc042f0030.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -627,6 +629,36 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fisher-s-exact-test-for-edge-importance">
+   10.2.1. Fisher’s Exact Test for Edge Importance
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-edge-importances-to-estimate-the-signal-subnetwork">
+   10.2.2. Using edge importances to estimate the signal subnetwork
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#building-a-classifier-using-the-estimated-signal-subnetwork">
+   10.2.3. Building a classifier using the estimated signal subnetwork
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#naive-bayes-classifier-statistical-intuition">
+     10.2.3.1. Naive Bayes Classifier (Statistical Intuition)
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -639,6 +671,36 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fisher-s-exact-test-for-edge-importance">
+   10.2.1. Fisher’s Exact Test for Edge Importance
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-edge-importances-to-estimate-the-signal-subnetwork">
+   10.2.2. Using edge importances to estimate the signal subnetwork
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#building-a-classifier-using-the-estimated-signal-subnetwork">
+   10.2.3. Building a classifier using the estimated signal subnetwork
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#naive-bayes-classifier-statistical-intuition">
+     10.2.3.1. Naive Bayes Classifier (Statistical Intuition)
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -647,6 +709,429 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="testing-for-significant-edges">
 <h1><span class="section-number">10.2. </span>Testing for Significant Edges<a class="headerlink" href="#testing-for-significant-edges" title="Permalink to this headline">¶</a></h1>
+<p>For the next two sections, we will turn back to an example we came across back when we discussed the <a class="reference external" href="#link?">Signal Subnetwork model</a>. If you recall, we had <span class="math notranslate nohighlight">\(100\)</span> networks, which were either earthlings or astronauts. The networks each had <span class="math notranslate nohighlight">\(5\)</span> nodes, which represented different lobes of the brain. The occipital lobe is responsible for sight, the temporal lobe with emotions and language, the parietal with hearing, the frontal with thinking and movement, and the insula with basic survivability skills. The astronauts were forced to live for several hundred thousand years on a planet in which their eyesight was challenged, and over time, evolution selected the astronauts who had a higher probability of connections between the occipital lobe and other areas of the brain. Our question of interest was as follows: if we are shown a network, how do we decide whether that network is from an earthling or an astronaut? Can we come up with a signal subnetwork classifier?</p>
+<p>To begin to address this question, we came up with the signal subnetwork model. What we established wit hthe signal subnetwork model was that all of the edges in each network could be broken up into one of two groups: either the signal edges or the non-signal edges. We collected these signal edges into a set called the “signal subnetwork”, which was a parameter for the signal subnetwork model. For these signal edges, the probability of an edge existing (or not) was different for two (or more) classes in our problem. What this means is that, in our problem above, the edges which had a node in the occipital lobe had a different connection probability for the astronauts than the humans. On the other hand, the non-signal edges did not have a different connection probability for the astronauts than the humans.</p>
+<p>To start this section off, let’s first sample some example networks from the signal subnetwork model. Let’s assume that we have a total of <span class="math notranslate nohighlight">\(100\)</span> people, each of whom are either astronauts (with probability <span class="math notranslate nohighlight">\(\pi_{ast} = 0.4\)</span>) or humans (with probability <span class="math notranslate nohighlight">\(\pi_{earth} = 0.6\)</span>). First, we’ll roll our 2-sided die <span class="math notranslate nohighlight">\(100\)</span> times, where side 1 (class 1) corresponds to astronauts, and side 2 (class 2) corresponds to humans. We will then create the class assignment vector <span class="math notranslate nohighlight">\(\vec y\)</span> using the number of times the die lands on each class:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">pi_ast</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">pi_hum</span> <span class="o">=</span> <span class="mf">0.6</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># roll a 2-sided die 100 times, with probability 0.4 of landing on side 1 (astronaut) </span>
+<span class="c1"># and 0.6 of landing on side 2 (earthling)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="n">classnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Astronaut&quot;</span><span class="p">,</span> <span class="s2">&quot;Earthling&quot;</span><span class="p">]</span>
+<span class="n">class_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">pvals</span><span class="o">=</span><span class="p">[</span><span class="n">pi_ast</span><span class="p">,</span> <span class="n">pi_hum</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of individuals who are astronauts: </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of individuals who are humans: </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1"># create class assignment vector, and randomly reshuffle class labels for each individual</span>
+<span class="n">yvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">yvec</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of individuals who are astronauts: 39
+Number of individuals who are humans: 61
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we construct the probability matrices for each class. The probabilities for edges in which a node is in the occipital lobe are higher for the astronauts than the humans:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># the number of nodes</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># edge probabilities for humans are random</span>
+<span class="n">P_hum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="o">*</span><span class="n">n</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="c1"># networks are undirected, so make the probability matrix symmetric</span>
+<span class="n">P_hum</span> <span class="o">=</span> <span class="p">(</span><span class="n">P_hum</span> <span class="o">+</span> <span class="n">P_hum</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="c1"># networks are loopless, so remove the diagonal</span>
+<span class="n">P_hum</span> <span class="o">=</span> <span class="n">P_hum</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">P_hum</span><span class="p">))</span>
+
+<span class="c1"># the names of each of the five nodes</span>
+<span class="n">nodenames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Occipital&quot;</span><span class="p">,</span> <span class="s2">&quot;Frontal&quot;</span><span class="p">,</span> <span class="s2">&quot;Temporal&quot;</span><span class="p">,</span> <span class="s2">&quot;Frontal&quot;</span><span class="p">,</span> <span class="s2">&quot;Insula&quot;</span><span class="p">]</span>
+<span class="c1"># the signal edges</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="n">P_ast</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">P_hum</span><span class="p">)</span>
+
+<span class="c1"># probabilities for signal edges are higher in astronauts than humans</span>
+<span class="c1"># square root function biases them towards 1, which is higher than</span>
+<span class="c1"># whatever they are right now since they are between 0 and 1</span>
+<span class="n">P_ast</span><span class="p">[</span><span class="n">E</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">P_ast</span><span class="p">[</span><span class="n">E</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="k">def</span> <span class="nf">plot_prob</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">nodename</span><span class="o">=</span><span class="s2">&quot;Brain Area&quot;</span><span class="p">,</span> <span class="n">nodetix</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">],</span>
+             <span class="n">nodelabs</span><span class="o">=</span><span class="n">nodenames</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    
+    <span class="k">with</span> <span class="n">sns</span><span class="o">.</span><span class="n">plotting_context</span><span class="p">(</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">shrink</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">colorbar</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="n">nodename</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="n">nodename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">nodetix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">nodelabs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">nodetix</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">nodelabs</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">nodetix</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">nodelabs</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_frame_on</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">P_hum</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Earthling Probability Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">P_ast</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Astronaut Probability Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Signal Edges&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">P_ast</span> <span class="o">-</span> <span class="n">P_hum</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_</span><span class="si">{ast}</span><span class="s2"> - P_</span><span class="si">{earth}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/significant-edges_4_0.png" src="../../_images/significant-edges_4_0.png" />
+</div>
+</div>
+<p>Finally, we use the class assignment vector <span class="math notranslate nohighlight">\(\vec y\)</span> to sample individual networks for each of the individuals. We plot an adjacency matrix for the first individual:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">ier</span>
+
+<span class="c1"># arrange the probability matrices in a list</span>
+<span class="n">prob_mtxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">P_ast</span><span class="p">,</span> <span class="n">P_hum</span><span class="p">]</span>
+<span class="c1"># initialize empty list for adjacency matrices</span>
+<span class="n">As</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">yvec</span><span class="p">:</span>
+    <span class="c1"># sample adjacency matrix for an individual of class y using the probability</span>
+    <span class="c1"># matrix for that class</span>
+    <span class="n">As</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ier</span><span class="p">(</span><span class="n">prob_mtxs</span><span class="p">[</span><span class="n">y</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="c1"># stack the adjacency matrices for each individual such that node i is first dimension,</span>
+<span class="c1"># node j is second dimension, and the individual index m is the third dimension</span>
+<span class="n">As</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/statsmodels/compat/pandas.py:65: FutureWarning: pandas.Int64Index is deprecated and will be removed from pandas in a future version. Use pandas.Index with the appropriate dtype instead.
+  from pandas import Int64Index as NumericIndex
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">));</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">As</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;First individual, an </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">classnames</span><span class="p">[</span><span class="n">yvec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/significant-edges_7_0.png" src="../../_images/significant-edges_7_0.png" />
+</div>
+</div>
+<p>The key ideas we want to capture in our classifier are as follows:</p>
+<ol class="simple">
+<li><p>We want to <em>only</em> look at the edges which have a differing connection probability amongst our classes. This means that we only want to look at <em>signal edges</em> which are in the <em>signal subnetwork</em>, and we want to ignore edges which are not in the signal subnetwork. Edges which are not in the signal subnetwork are simply noise, since they have the same connection probability between the classes, and therefore are not useful for differentiating between the different classes.</p></li>
+<li><p>We want to incorporate the structure of the network into the classifier. This means we want to use the fact that nodes are nodes, and that edges are connections between nodes, to determine how to classify networks as earthling or astronaut.</p></li>
+</ol>
+<p>To begin, we will start by addressing aim 1. We need to find which edges are in the signal subnetework. Stated another way, we need to <em>estimate</em> the signal subnetwork. What this requires is a way to identify which edges will best capture the difference between the classes in our network. Do we know anything which can do this? As it turns out, we can use Fisher’s exact test, something we learned about in the section on <a class="reference external" href="http://docs.neurodata.io/graph-stats-book/applications/ch8/testing-differences.html#two-sample-hypothesis-testing-with-coins">testing for differences between groups of edges</a>, to identify the signal subnetwork. In the next section on <a class="reference external" href="#link?">identifying significant vertices</a>, we will address the second point on using the structure of the network to further refine these potential signal edges.</p>
+<div class="section" id="fisher-s-exact-test-for-edge-importance">
+<h2><span class="section-number">10.2.1. </span>Fisher’s Exact Test for Edge Importance<a class="headerlink" href="#fisher-s-exact-test-for-edge-importance" title="Permalink to this headline">¶</a></h2>
+<p>If you remember back to the coin flip example, our setting was as follows. We had two coins, coin <span class="math notranslate nohighlight">\(1\)</span> and coin <span class="math notranslate nohighlight">\(2\)</span>, and we wanted to test whether their probabilities of landing on heads were different. Our hypotheses were <span class="math notranslate nohighlight">\(H_A: p_1 \neq p_2\)</span>, against the null hypothesis that <span class="math notranslate nohighlight">\(H_0: p_1 = p_2\)</span>. We therefore had two random samples, the outcomes of ten coin flips from coin one and the outcomes of ten coin flips from coin two, meaning that our test of <span class="math notranslate nohighlight">\(H_A\)</span> against <span class="math notranslate nohighlight">\(H_0\)</span> fell into the <em>two-sample testing</em> regime. To address this, what we used was Fisher’s exact test, where we counted the number of times each coin landed on heads and tails, which we aggregated in a table:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>First coin</p></th>
+<th class="head"><p>Second coin</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Landed on heads</p></td>
+<td><p>7</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>Landed on tails</p></td>
+<td><p>3</p></td>
+<td><p>9</p></td>
+</tr>
+</tbody>
+</table>
+<p>As it turns out, we can adapt this test for our situation here too! For a single edge, what we want to do is test whether <span class="math notranslate nohighlight">\(H_A: p_{ij}^{(ast)} \neq p_{ij}^{(earth)}\)</span>, against the null hypothesis that <span class="math notranslate nohighlight">\(H_0: p_{ij}^{(ast)} = p_{ij}^{(earth)}\)</span>. The key property of Fisher’s exact test that makes this desirable for us is that, when <span class="math notranslate nohighlight">\(H_0\)</span> is true (and the probabilities are equal), the Fisher’s exact test statistic is smaller, whereas when <span class="math notranslate nohighlight">\(H_A\)</span> is true (and the probabilities are not equal), the Fisher’s exact test statistic is bigger. We will exploit this feature in our design of a classifier for astronauts versus earthlings. Note that we are using the Fisher’s exact test statistic, and <em>not</em> the <span class="math notranslate nohighlight">\(p\)</span>-value of the test, for this step like we did previously when testing for differences between groups of edges. For each edge <span class="math notranslate nohighlight">\((i, j)\)</span>, we will construct the following table:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>Astronauts</p></th>
+<th class="head"><p>Earthlings</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Edge <span class="math notranslate nohighlight">\((i,j)\)</span> exists</p></td>
+<td><p>Number of astronauts with <span class="math notranslate nohighlight">\((i,j)\)</span></p></td>
+<td><p>Number of earthlings with edge <span class="math notranslate nohighlight">\((i,j)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Edge <span class="math notranslate nohighlight">\((i,j)\)</span> does not exist</p></td>
+<td><p>Number of astronauts with edge <span class="math notranslate nohighlight">\((i,j)\)</span></p></td>
+<td><p>Number of earthlings without edge <span class="math notranslate nohighlight">\((i,j)\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>Which we can do in python as follows, for the edge from the occipital lobe to the temporal lobe:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># (1,2) corresponds to the edge from occipital to temporal lobe</span>
+
+<span class="n">ast_edge</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">yvec</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># count the number of astronauts with edge i,j</span>
+<span class="n">hum_edge</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">yvec</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># count the number of earthlings with edge i,j</span>
+<span class="n">ast_noedge</span> <span class="o">=</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ast_edge</span>  <span class="c1"># count the number of astronauts without edge i,j</span>
+<span class="n">hum_noedge</span> <span class="o">=</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">hum_edge</span>  <span class="c1"># count the number of earthlings without edge i,j</span>
+
+<span class="n">edge_tab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ast_edge</span><span class="p">,</span> <span class="n">hum_edge</span><span class="p">],</span> <span class="p">[</span><span class="n">ast_noedge</span><span class="p">,</span> <span class="n">hum_noedge</span><span class="p">]])</span>  <span class="c1"># arrange as in table shown above</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">edge_tab</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[18. 12.]
+ [21. 49.]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we compute the Fisher’s exact test statistic on the data, using scipy:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">fisher_exact</span>
+
+<span class="n">test_statistic</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">edge_tab</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Statistic: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Statistic: 3.5000
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that since the edge <span class="math notranslate nohighlight">\((i,j)\)</span> that we chose above corresponded to the edge between the occipital and temporal lobe, we expect this edge to indicate a disparity between the astronauts and the earthlings. Why is this? Well, quite simply, by construction, this edge is a <em>signal</em> edge, which means that it carries real <em>signal</em> in differentiating a network from a human from a network of an alien. Why is this a big deal?</p>
+<p>Well, let’s see what happens if we were to compute this for a non-signal edge. Let’s arbitrarily choose the edge between the temporal and frontal lobes, which corresponds to <span class="math notranslate nohighlight">\(i=3\)</span> (the temporal lobe) and <span class="math notranslate nohighlight">\(j = 2\)</span> (the frontal lobe):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># (3,2) corresponds to the edge from temporal to frontal lobe</span>
+
+<span class="n">ast_edge</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">yvec</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># count the number of astronauts with edge i,j</span>
+<span class="n">hum_edge</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">yvec</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># count the number of earthlings with edge i,j</span>
+<span class="n">ast_noedge</span> <span class="o">=</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ast_edge</span>  <span class="c1"># count the number of astronauts without edge i,j</span>
+<span class="n">hum_noedge</span> <span class="o">=</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">hum_edge</span>  <span class="c1"># count the number of earthlings without edge i,j</span>
+
+<span class="n">edge_tab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ast_edge</span><span class="p">,</span> <span class="n">hum_edge</span><span class="p">],</span> <span class="p">[</span><span class="n">ast_noedge</span><span class="p">,</span> <span class="n">hum_noedge</span><span class="p">]])</span>  <span class="c1"># arrange as in table shown above</span>
+
+<span class="n">test_statistic</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">edge_tab</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Statistic: </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test Statistic: 0.8077
+</pre></div>
+</div>
+</div>
+</div>
+<p>Well, now this test statistic happens to be a <em>lot</em> smaller than the previous one we saw, now doesn’t it? Is this just by chance? The answer is: no! For signal edges, the test statistic will, by construction, <em>generally</em> be smaller than the test statistic in a non-signal edge. By <em>generally</em>, we mean that it will <em>tend</em> to be smaller (but not always!). We could certainly get samples of data where this is not the case, analogous to the idea that we could flip a fair coin (with equal probability of seeing heads and tails) 10 times and obtain all 10 flips being heads. For this reason, we will use the Fisher’s exact test statistic to quantify how “important” an edge is for differentiating the two classes, or as an edge importance statistic. We will exploit this edge importance statistic as we build up our classifier further.</p>
+</div>
+<div class="section" id="using-edge-importances-to-estimate-the-signal-subnetwork">
+<h2><span class="section-number">10.2.2. </span>Using edge importances to estimate the signal subnetwork<a class="headerlink" href="#using-edge-importances-to-estimate-the-signal-subnetwork" title="Permalink to this headline">¶</a></h2>
+<p>We will use the Fisher’s exact test statistic to develop an approach which allows us to properly estimate a signal subnetwork model. The key idea is this: if we were to use any one edge of the network, we would not really be able to predict whether someone is an earthling or an alien. The reason for this is that edges either exist, or not, so unless one of the class edge probabilities for a particular edge happens to be really low (near zero) and the other happens to be really high (near one), the only informative decision boundary we could construct would be to assign one class to the networks where that particular edge exists, or the other class to the networks where that particular edge does not exist. Even less interestingly, we could abitrarily say that every network is in a particular class, which is also not going to be a particularly interesting classifier.</p>
+<p>Another thing we could do would be to use <em>every</em> edge in the network to develop a classifier, which also isn’t the best we could do. This is because if we use every edge in the classifier, w would have a lot of <em>noise</em> from the non-signal edges. This means that even though we might learn <em>something</em> from the signal edges, anything we learn is going to end up being diluted down by noise because we are including a lot of uninformative information in our classifier (the non-signal edges).</p>
+<p>Rather, what we want to do is investigate to find the edges which are carrying all of the signal, and then isolate our downstream learning from information captured by those edges. This is because the signal edges carry all of the informative information about differentiating networks from one class to the other. This begs the question, how do we find the signal edges, and isolate them from the non-signal edges?</p>
+<p>As we mentioned in the preceding subsection, as it happens, the Fisher’s exact test statistic is going to tend to be larger for edges in which there is actual signal (the edge probability is different for astronauts and humans), and smaller when there is no signal (the edge probability is the same for astronauts and humans). That is, if an edge is in the signal subnetwork, the Fisher’s exact test statistic is big, and if it is not in the signal subnetwork, the Fisher’s exact test statistic is small. For this reason, what we end up doing is <em>rank transforming</em> the Fisher’s exact test statistics, and then pick an arbitrary number of the highest ranking test statistics to retain for classification.</p>
+<p>We start by constructing a <strong>significance matrix</strong>, which is a collection of all of the Fisher’s exact test statistics for each edge:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sig_mtx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+<span class="n">ast_idxs</span> <span class="o">=</span> <span class="n">yvec</span> <span class="o">==</span> <span class="mi">1</span>  <span class="c1"># the individuals who are astronauts</span>
+<span class="n">hum_idxs</span> <span class="o">=</span> <span class="n">yvec</span> <span class="o">==</span> <span class="mi">2</span>  <span class="c1"># the individuals who are earthlings</span>
+<span class="c1"># since the networks are undirected, only need to compute for upper triangle</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">ast_edgeij</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">ast_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">hum_edgeij</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">hum_idxs</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">ast_edgeij</span><span class="p">,</span> <span class="n">hum_edgeij</span><span class="p">],</span>
+                          <span class="p">[</span><span class="n">class_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">ast_edgeij</span><span class="p">,</span> <span class="n">class_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">hum_edgeij</span><span class="p">]])</span>
+        <span class="n">sig_mtx</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">fisher_exact</span><span class="p">(</span><span class="n">table</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sig_mtx</span> <span class="o">=</span> <span class="n">sig_mtx</span> <span class="o">+</span> <span class="n">sig_mtx</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># symmetrize</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">));</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">sig_mtx</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Significance matrix&quot;</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">sig_mtx</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/significant-edges_17_0.png" src="../../_images/significant-edges_17_0.png" />
+</div>
+</div>
+<p>Notice that the edges with the highest Fisher’s exact test statistics in the significance matrix tend to be the edges with a node in the occipital lobe, which are our signal edges. This is great news! Next, we rank the test statistics in the significance matrix, from smallest to largest:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">rankdata</span>
+
+<span class="n">rank_sig_mtx</span> <span class="o">=</span> <span class="n">rankdata</span><span class="p">(</span><span class="n">sig_mtx</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">));</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">rank_sig_mtx</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ranked significance matrix&quot;</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">rank_sig_mtx</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/significant-edges_20_0.png" src="../../_images/significant-edges_20_0.png" />
+</div>
+</div>
+<p>And the ranks are biggest for the Fisher’s exact test statistics with a node in the occipital lobe. Then, we select a number of edges (the size of the signal subnetwork) <span class="math notranslate nohighlight">\(K\)</span>, and retain the top <span class="math notranslate nohighlight">\(K\)</span> edges, by their test statistic significances. The top <span class="math notranslate nohighlight">\(K\)</span> edges by significance are an estimate of the signal subnetwork, <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>.</p>
+<p>We can implement everything we’ve learned so far in graspologic relatively easily, using the <code class="docutils literal notranslate"><span class="pre">SignalSubgraph</span></code> class:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.subgraph</span> <span class="kn">import</span> <span class="n">SignalSubgraph</span>
+
+<span class="n">K</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># the number of edges in the subgraph</span>
+<span class="n">sgest</span> <span class="o">=</span> <span class="n">SignalSubgraph</span><span class="p">()</span>
+<span class="n">sgest</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">As</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">yvec</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">K</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we arrange this into a matrix so that we can look at the signal subnetwork we identified, and compare it to the true signal subnetwork:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigsub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>  <span class="c1"># initialize empty matrix</span>
+<span class="n">sigsub</span><span class="p">[</span><span class="n">sgest</span><span class="o">.</span><span class="n">sigsub_</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">));</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;True Signal Subnetwork&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_prob</span><span class="p">(</span><span class="n">sigsub</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated Signal Subnetwork&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/significant-edges_25_0.png" src="../../_images/significant-edges_25_0.png" />
+</div>
+</div>
+<p>So our estimated signal subnetwork looks pretty close to the true signal subnetwork.</p>
+<p>A question you might be wondering concerns how exactly we chose the number of signal edges to include in our estimate of the signal subnetwork, <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>. If we knew the number of edges in the signal subnetwork ahead of time, the choice would be easy: just choose <span class="math notranslate nohighlight">\(K\)</span> to be the number of edges in the signal subnetwork! In real data, however, this isn’t really going to be the case. For this reason, we will have to estimate <span class="math notranslate nohighlight">\(K\)</span> using <span class="math notranslate nohighlight">\(\hat K\)</span>. To learn how to estimate <span class="math notranslate nohighlight">\(K\)</span>, we first need to learn how to put what we’ve covered so far into a classifier, so read on!</p>
+</div>
+<div class="section" id="building-a-classifier-using-the-estimated-signal-subnetwork">
+<h2><span class="section-number">10.2.3. </span>Building a classifier using the estimated signal subnetwork<a class="headerlink" href="#building-a-classifier-using-the-estimated-signal-subnetwork" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can use the estimated signal subnetwork that we have constructed to devise a classifier. The objective of a classifier is to take new pieces of data (in this case, new networks), and assign them to the class which they are most likely from. How do we determine which class a network is most likely from?</p>
+<p>At the moment, we have our estimate of the signal subnetwork, <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>, and have a bunch of networks from one of two classes: astronaut (class 1) or alien (class 2). The edges of the network are binary, and we want to use the edges which are in the signal subnetwork to classify points as either astronaut or alien. A natural classifier choice for this situation is known as the Naive Bayes classifier. We have all the ingredients we need to construct the Naive Bayes classifier, so we’ll try to put this together. Feel free to skip past this next section if you want to jump right into the implementation of the classifier. In this next section, we will explain some of the intuition of the Naive Bayes classifer, which might require a bit of a probability and statistics background.</p>
+<div class="section" id="naive-bayes-classifier-statistical-intuition">
+<h3><span class="section-number">10.2.3.1. </span>Naive Bayes Classifier (Statistical Intuition)<a class="headerlink" href="#naive-bayes-classifier-statistical-intuition" title="Permalink to this headline">¶</a></h3>
+<p>The core idea of the Naive Bayes classifier is, if our data have features which are zeros and ones, we can use the <em>class-conditional probabilities</em> to determine whether a point is from class <span class="math notranslate nohighlight">\(1\)</span> or class <span class="math notranslate nohighlight">\(2\)</span>. The idea is as follows. First, we assume that all of the individual features of our data (the features, in our case, are the edges of the network that are in the signal subnetwork) are independent, then the likelihood of observing a particular sequence of edges in the signal subnetwork of the <span class="math notranslate nohighlight">\(m^{th}\)</span> network if that network is in class <span class="math notranslate nohighlight">\(y\)</span> is as follows. First, we will just write down some simpler notation for the quantity we want:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P(\text{observing }A^{(m)}\text{ given we assume }\text{$m$ is in class $y$} \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(A^{(m)} | y_i = y; \mathcal S)
+\end{align*}\]</div>
+<p>Nothing happened in this step just yet; we just made a smaller notation for the quantity on the left that we will use later on. In this next step, we use the fact that, if edges existing and not existing are independent, then the probability of observing a sequence of edges is the product of the probabilities of observing each individual edge. This is called an <em>independent edge assumption</em>. We proceed as follows:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P(A^{(m)}| y_i = y; \mathcal S) &amp;= \prod_{(i,j) \in \mathcal S} \mathbb P(a_{ij}^{(m)} | y_i = y; \mathcal S)
+\end{align*}\]</div>
+<p>Note that we are taking the product of each pair of edges, <span class="math notranslate nohighlight">\((i,j)\)</span>, which are in the signal sub-network. Next, if we remember back to the Independent-Edge Random Network (IER), we assumed that if <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> was an <span class="math notranslate nohighlight">\(IER_n(P^y)\)</span> network, that every edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}^{(m)}\)</span> had a probability of <span class="math notranslate nohighlight">\(p^y_{ij}\)</span> of taking a value of <span class="math notranslate nohighlight">\(1\)</span> (the edge exists), and a probability of <span class="math notranslate nohighlight">\(1 - p_{ij}^y\)</span> of taking a value of <span class="math notranslate nohighlight">\(0\)</span> (the edge does not exist). What this means is that <span class="math notranslate nohighlight">\(\mathbf a_{ij}^{(m)}\)</span> is something called a <strong>Bernoulli distributed random variable</strong>. The probability of seeing a particular realization <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> of a Bernoulli distributed random variable is relatively straightforward to see. We want the quantity <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | y_i = y; \mathcal S)\)</span> to reflect the following two facts we’ve already discussed:</p>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | \mathbf y_i = y; \mathcal S)\)</span> is <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>, then <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)} | \mathbf y_i = y; \mathcal S)\)</span> is <span class="math notranslate nohighlight">\(1 - p_{ij}^y\)</span>.
+Is there a succinct expression that we can express this with? Yes! Try the following equation:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P(A^{(m)} | \mathbf y_i = y; \mathcal S) &amp;= (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>Notice that if <span class="math notranslate nohighlight">\(a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, then <span class="math notranslate nohighlight">\(1 - a_{ij}^{(m)}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>. Therefore, <span class="math notranslate nohighlight">\((1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}\)</span> is just <span class="math notranslate nohighlight">\(1\)</span>, since any number raised to the <span class="math notranslate nohighlight">\(0\)</span> power is <span class="math notranslate nohighlight">\(1\)</span>. On the other hand, <span class="math notranslate nohighlight">\((p_{ij}^y)^{a_{ij}^{(m)}}\)</span> is <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>, since any number raised to the <span class="math notranslate nohighlight">\(1\)</span> power is itself. Therefore, this expression fits the bill for us. So, we can simplify our expression as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(A^{(m)} | y_i = y; \mathcal S) &amp;= \prod_{(i,j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>And we’re almost there! The next thing we’re going to do is a little tricky, but fortunately we can turn to Bayes’ Theorem for help. What we want to do is compute the probability of observing <em>both</em> <span class="math notranslate nohighlight">\(A^{(m)}\)</span> <em>and</em> <span class="math notranslate nohighlight">\(y_i\)</span> having the value <span class="math notranslate nohighlight">\(y\)</span>, not the probability of observing <span class="math notranslate nohighlight">\(A^{(m)}\)</span> given that we assume that <span class="math notranslate nohighlight">\(y_i\)</span> is <span class="math notranslate nohighlight">\(y\)</span>. In statistical notation, what this amounts to is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P(\text{observing }A^{(m)}\text{ and }\text{$m$ is in class $y$} \text{ where the signal subnetwork is $\mathcal S$}) = \mathbb P(A^{(m)}, y_i = y; \mathcal S)
+\end{align*}\]</div>
+<p>This expression is a little confusing, but its interpretation is relatively straightforward: it is the probability that we see both things happening at the same time (the random network <span class="math notranslate nohighlight">\(\mathbf A^{(m)}\)</span> takes the value <span class="math notranslate nohighlight">\(A^{(m)}\)</span> and the random class <span class="math notranslate nohighlight">\(\mathbf y_i\)</span> has the value <span class="math notranslate nohighlight">\(y\)</span>) rather than just assume that the random class <span class="math notranslate nohighlight">\(\mathbf y_i\)</span> already is <span class="math notranslate nohighlight">\(y\)</span>. We can compute this quantity by remembering Bayes’ Theorem:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+     \mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S) &amp;= \frac{\mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S)}{\mathbb P(\mathbb y_i = y}
+\end{align*}\]</div>
+<p>Note that this implies the following:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S) &amp;= \mathbb P(A^{(m)} | \mathbb y_i = y; \mathcal S)\mathbb P(\mathbb y_i = y)
+\end{align*}\]</div>
+<p>Plugging in the value we obtained above:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(A^{(m)}, \mathbb y_i = y; \mathcal S) &amp;= \mathbb P(\mathbb y_i = y)\prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>Remember that the parameter of the signal subnetwork model, <span class="math notranslate nohighlight">\(\pi_y\)</span>, represented the probability of our <span class="math notranslate nohighlight">\(Y\)</span>-sided die landing on class <span class="math notranslate nohighlight">\(y\)</span>, and therefore was the probability that the random class <span class="math notranslate nohighlight">\(\mathbf y_i\)</span> took the value <span class="math notranslate nohighlight">\(y\)</span>. Therefore, <span class="math notranslate nohighlight">\(\mathbb P(\mathbb y_i = y) = \pi_y\)</span>, since these two quantites represent the same thing! Finally:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(A^{(m)}, \mathbb y_i = y; P_y, \mathcal S) &amp;= \pi_y\prod_{(i, j) \in \mathcal S} (p_{ij}^y)^{a_{ij}^{(m)}} (1 - p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>So, what relevance does this have to the Naive bayes classifier? As it turns out, this is the <em>objective function</em> for the Naive Bayes classifier. We will simply “plug in” estimates of the quantities that we don’t have given to us, which are the signal subnetwork <span class="math notranslate nohighlight">\(\mathcal S\)</span>, the class probabilities <span class="math notranslate nohighlight">\(\pi_y\)</span>, and the class-conditional edge probabilities <span class="math notranslate nohighlight">\(p_{ij}^y\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(A^{(m)}, \mathbb y_i = y; \hat P_y, \hat{\mathcal S}) &amp;= \hat \pi_y\prod_{(i, j) \in \mathcal S} (\hat p_{ij}^y)^{a_{ij}^{(m)}} (1 - \hat p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>And we classify a point based on which of the possible values that <span class="math notranslate nohighlight">\(y\)</span> could take which maximizes this quantity. That is, we are choosing the class for which <span class="math notranslate nohighlight">\(A^{(m)}\)</span> is “most probable” to be in! In symbols, we classify our points using:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat y_m &amp;= \text{argmax}_{y \in \left\{1,...,Y\right\}} \hat \pi_y\prod_{(i, j) \in \mathcal S} (\hat p_{ij}^y)^{a_{ij}^{(m)}} (1 - \hat p_{ij}^y)^{1 - a_{ij}^{(m)}}
+\end{align*}\]</div>
+<p>Or that our estimated class <span class="math notranslate nohighlight">\(\hat y_m\)</span> for individual <span class="math notranslate nohighlight">\(m\)</span> is the class <span class="math notranslate nohighlight">\(y\)</span> in which <span class="math notranslate nohighlight">\(\mathbb P(A^{(m)}, \mathbb y_i = y; \hat P_y, \hat{\mathcal S})\)</span> is as large as possible.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yvec</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(100,)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
