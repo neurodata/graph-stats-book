@@ -1,0 +1,107 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 1085, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 551, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 846, in async_execute_cell
+    self._check_raise_for_error(cell, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 748, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from graphbook_code import heatmap
+from graspologic.simulations import sbm
+import numpy as np
+import matplotlib.pyplot as plt
+
+K = 3
+
+B1 = np.zeros((K,K))
+
+B1[0,0] = 0.3
+B1[0,1] = .05
+B1[1,0] = .05
+B1[0,2] = .05
+B1[2,0] = .05
+B1[1,1] = 0.3
+B1[1,2] = .05
+B1[2,1] = .05
+B1[2,2] = 0.3
+
+B2 = B1
+
+B3 = np.copy(B1)
+B3[1,1] = 0.9
+
+ns = [25, 10, 10]
+A1 = sbm(n=ns, p=B1, directed=False, loops=False)
+ys = ["ML" for i in range(0, ns[0])] + ["Adm." for i in range(ns[0],ns[0] + ns[1])] + ["Mar." for i in range(ns[0] + ns[1],ns[0] + ns[1] + ns[2])]
+
+A2 = sbm(n=ns, p=B2, directed=False, loops=False)
+
+A3 = sbm(n=ns, p=B3, directed=False, loops=False)
+
+fig, axs = plt.subplots(1,3, figsize=(30, 6))
+
+heatmap(A1, ax=axs[0], title="$A^{(1)}$ Monday Emails", color="sequential", xticklabels=False, yticklabels=False, inner_hier_labels=ys);
+
+heatmap(A2, ax=axs[1], title="$A^{(2)}$ Tuesday Emails", color="sequential", xticklabels=False, yticklabels=False, inner_hier_labels=ys);
+
+heatmap(A3, ax=axs[2], title="$A^{(3)}$ Wednesday Emails", color="sequential", xticklabels=False, yticklabels=False, inner_hier_labels=ys);
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[0;32m/tmp/ipykernel_2390/2849815637.py[0m in [0;36m<module>[0;34m[0m
+[0;32m----> 1[0;31m [0;32mfrom[0m [0mgraphbook_code[0m [0;32mimport[0m [0mheatmap[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      2[0m [0;32mfrom[0m [0mgraspologic[0m[0;34m.[0m[0msimulations[0m [0;32mimport[0m [0msbm[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0;32mimport[0m [0mnumpy[0m [0;32mas[0m [0mnp[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m [0;32mimport[0m [0mmatplotlib[0m[0;34m.[0m[0mpyplot[0m [0;32mas[0m [0mplt[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      5[0m [0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     25[0m [0;34m[0m[0m
+[1;32m     26[0m [0;31m# star imports work only because we have __all__ defined[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 27[0;31m [0;32mfrom[0m [0;34m.[0m[0mplotting[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     28[0m [0;32mfrom[0m [0;34m.[0m[0mutils[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     29[0m [0;32mfrom[0m [0;34m.[0m[0msiem[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/plotting.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      6[0m [0;34m[0m[0m
+[1;32m      7[0m [0;31m# from graspologic.plot.plot import _check_common_inputs, _process_graphs, _plot_groups[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 8[0;31m from graspologic.plot.plot import (
+[0m[1;32m      9[0m     [0m_check_common_inputs[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     10[0m     [0m_process_graphs[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      3[0m [0;34m[0m[0m
+[1;32m      4[0m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0malign[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 5[0;31m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0mcluster[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      6[0m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0mdatasets[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      7[0m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0membed[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/cluster/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      2[0m [0;31m# Licensed under the MIT License.[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0;34m[0m[0m
+[0;32m----> 4[0;31m [0;32mfrom[0m [0;34m.[0m[0mautogmm[0m [0;32mimport[0m [0mAutoGMMCluster[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      5[0m [0;32mfrom[0m [0;34m.[0m[0mdivisive_cluster[0m [0;32mimport[0m [0mDivisiveCluster[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      6[0m [0;32mfrom[0m [0;34m.[0m[0mgclust[0m [0;32mimport[0m [0mGaussianCluster[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/cluster/autogmm.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     18[0m [0;32mfrom[0m [0msklearn[0m[0;34m.[0m[0mmodel_selection[0m [0;32mimport[0m [0mParameterGrid[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     19[0m [0;32mfrom[0m [0msklearn[0m[0;34m.[0m[0mutils[0m [0;32mimport[0m [0mcheck_scalar[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 20[0;31m [0;32mfrom[0m [0mtyping_extensions[0m [0;32mimport[0m [0mLiteral[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     21[0m [0;34m[0m[0m
+[1;32m     22[0m [0;32mfrom[0m [0;34m.[0m[0mbase[0m [0;32mimport[0m [0mBaseCluster[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mModuleNotFoundError[0m: No module named 'typing_extensions'
+ModuleNotFoundError: No module named 'typing_extensions'
+

@@ -17,17 +17,70 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-p = (bootstraps > y).sum() / N
+import numpy as np
+from graspologic.simulations import rdpg
 
-print(p)
+
+def gen_timepoint(X, perturbed=False, n_perturbed=20):
+    if perturbed:
+        X = np.squeeze(X)
+        baseline = np.array([1, -1, 0])
+        delta = np.repeat(baseline, (n_perturbed//2, 
+                                     n_perturbed//2, 
+                                     nodes-n_perturbed))
+        X += (delta * .15)
+    if X.ndim == 1:
+        X = X[:, np.newaxis]
+    A = rdpg(X)
+    return A
+    
+
+time_points = 12
+nodes = 100
+X = np.random.uniform(.2, .8, size=nodes)
+networks = []
+
+for time in range(time_points - 2):
+    A = gen_timepoint(X)
+    networks.append(A)
+
+for perturbed_time in range(5, 7):
+    A = gen_timepoint(X, perturbed=True)
+    networks.insert(perturbed_time, A)
+    
+networks = np.array(networks)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-Input [0;32mIn [8][0m, in [0;36m<module>[0;34m[0m
-[0;32m----> 1[0m p [38;5;241m=[39m (bootstraps [38;5;241m>[39m [43my[49m)[38;5;241m.[39msum() [38;5;241m/[39m N
-[1;32m      3[0m [38;5;28mprint[39m(p)
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[0;32m/tmp/ipykernel_1977/3553010378.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [0;32mimport[0m [0mnumpy[0m [0;32mas[0m [0mnp[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 2[0;31m [0;32mfrom[0m [0mgraspologic[0m[0;34m.[0m[0msimulations[0m [0;32mimport[0m [0mrdpg[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      3[0m [0;34m[0m[0m
+[1;32m      4[0m [0;34m[0m[0m
+[1;32m      5[0m [0;32mdef[0m [0mgen_timepoint[0m[0;34m([0m[0mX[0m[0;34m,[0m [0mperturbed[0m[0;34m=[0m[0;32mFalse[0m[0;34m,[0m [0mn_perturbed[0m[0;34m=[0m[0;36m20[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
 
-[0;31mNameError[0m: name 'y' is not defined
-NameError: name 'y' is not defined
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      3[0m [0;34m[0m[0m
+[1;32m      4[0m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0malign[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 5[0;31m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0mcluster[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      6[0m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0mdatasets[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      7[0m [0;32mimport[0m [0mgraspologic[0m[0;34m.[0m[0membed[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/cluster/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m      2[0m [0;31m# Licensed under the MIT License.[0m[0;34m[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0;34m[0m[0m
+[0;32m----> 4[0;31m [0;32mfrom[0m [0;34m.[0m[0mautogmm[0m [0;32mimport[0m [0mAutoGMMCluster[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      5[0m [0;32mfrom[0m [0;34m.[0m[0mdivisive_cluster[0m [0;32mimport[0m [0mDivisiveCluster[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      6[0m [0;32mfrom[0m [0;34m.[0m[0mgclust[0m [0;32mimport[0m [0mGaussianCluster[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/cluster/autogmm.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     18[0m [0;32mfrom[0m [0msklearn[0m[0;34m.[0m[0mmodel_selection[0m [0;32mimport[0m [0mParameterGrid[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     19[0m [0;32mfrom[0m [0msklearn[0m[0;34m.[0m[0mutils[0m [0;32mimport[0m [0mcheck_scalar[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 20[0;31m [0;32mfrom[0m [0mtyping_extensions[0m [0;32mimport[0m [0mLiteral[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     21[0m [0;34m[0m[0m
+[1;32m     22[0m [0;32mfrom[0m [0;34m.[0m[0mbase[0m [0;32mimport[0m [0mBaseCluster[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mModuleNotFoundError[0m: No module named 'typing_extensions'
+ModuleNotFoundError: No module named 'typing_extensions'
 
