@@ -638,6 +638,13 @@
   <a class="reference internal nav-link" href="#testing-whether-the-block-matrices-in-an-sbm-are-different">
    9.2.1. Testing whether the block matrices in an SBM are different
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#adjusting-for-multiple-comparisons">
+     9.2.1.1. Adjusting for multiple comparisons
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#testing-whether-the-block-matrices-in-an-sbm-are-multiples-of-one-another">
@@ -668,6 +675,13 @@
   <a class="reference internal nav-link" href="#testing-whether-the-block-matrices-in-an-sbm-are-different">
    9.2.1. Testing whether the block matrices in an SBM are different
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#adjusting-for-multiple-comparisons">
+     9.2.1.1. Adjusting for multiple comparisons
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#testing-whether-the-block-matrices-in-an-sbm-are-multiples-of-one-another">
@@ -685,7 +699,7 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="differences-in-block-matrices">
 <h1><span class="section-number">9.2. </span>Differences in Block Matrices<a class="headerlink" href="#differences-in-block-matrices" title="Permalink to this headline">¶</a></h1>
-<p>In the previous section, we saw a situation where we had two networks which we thought could be effectively characterized with RDPG. Further, we knew that the nodes were the same across both networks: that is, we knew that node <span class="math notranslate nohighlight">\(1\)</span> in the first network was the same as node <span class="math notranslate nohighlight">\(1\)</span> in the second network, so on and so forth all the way up to node <span class="math notranslate nohighlight">\(n\)</span>. In this situation, we found that we could test whether the latent positions for the underlying RDPGs are the same; that is, whether <span class="math notranslate nohighlight">\(H_0: X_1 = X_2R\)</span> against <span class="math notranslate nohighlight">\(H_A: H_1 \neq X_2R\)</span>. We called this the two-sample hypothesis test for RDPGs.</p>
+<p>In the previous section, we saw a situation where we had two networks which we thought could be effectively characterized with RDPG. Further, we knew that the communities were the same across both networks: that is, we knew that community <span class="math notranslate nohighlight">\(1\)</span> in the first network was the same as community <span class="math notranslate nohighlight">\(1\)</span> in the second network, so on and so forth all the way up to community <span class="math notranslate nohighlight">\(K\)</span>. In this situation, we found that we could test whether the latent positions for the underlying RDPGs are the same; that is, whether <span class="math notranslate nohighlight">\(H_0: X_1 = X_2R\)</span> against <span class="math notranslate nohighlight">\(H_A: H_1 \neq X_2R\)</span>. We called this the two-sample hypothesis test for RDPGs.</p>
 <p>What if we can take this a step further, however, and we can say that the networks are realizations of SBMs? How can we check whether the block matrices are the same? If you remember from <a class="reference external" href="#link?">Chapter 5.4</a>, we learned that SBMs are just a “special case” of the RDPG. What this means is that, since the SBM is an RDPG, the SBM also has a latent position matrix. Therefore, we could test whether the networks are the same by just using the two-sample hypothesis test for the RDPG. The interpretation of rejecting/accepting the alternative hypothesis here was that the latent positions were the same/different across the two networks, and therefore, they share the same probability matrix. This is excellent news, so are we done?</p>
 <p>Not quite yet; as it turns out, when we think that the networks are realizations of SBMs, there are a lot more interesting questions we can ask about the probabilities that might arise. Specifically, we can deduce many useful ways in which two probability matrices for SBMs might be different, but <em>still</em> share similar characteristics.</p>
 <p>For this example, we will introduce a new scenario. We have two networks which summarize the traffic patterns between <span class="math notranslate nohighlight">\(n=100\)</span> towns (represented by the nodes in our network) across <span class="math notranslate nohighlight">\(K=3\)</span> states (represented by the communities in our network). The first 45 towns are in New York (the first community), the second 30 towns are in New Jersey (the second community), and the third 25 towns are in Pennsylvania (the third community). The community assignment vector <span class="math notranslate nohighlight">\(\vec z\)</span> looks like this:</p>
@@ -736,7 +750,7 @@
 <img alt="../../_images/significant-communities_2_0.png" src="../../_images/significant-communities_2_0.png" />
 </div>
 </div>
-<p>For a month, we measure the number of drivers who commute from one town to the other in a specified time window, and if more than <span class="math notranslate nohighlight">\(1,000\)</span> drivers regularly make this commute, we add an edge between the pair of towns. In general, we know that people tend to commute more frequently within their state, so the probabilities that an edge exists between a pair of towns in the same state exceeds the probabilities that an edge exists between a pair of towns which are not in the same state. Now, here’s the twist: we have measured the first network between 8 AM and 8 PM (covering the bulk of the work day), and the second network between 8 PM and 8 AM (covering the bulk of night time). We know that a lot of people in New Jersey tend to commute to new York for the work day, so we the probability of an edge existing between a New Jersey town and a New York town are higher during the day than the night. We don’t think that driving patterns themselves really change, but we do think that the probability of an edge existing is about <span class="math notranslate nohighlight">\(50\%\)</span> higher during the daytime. Further, since New York is a large hub for workers, This applies to towns for all pairs of communities in the network. The block matrices look like this:</p>
+<p>For a month, we measure the number of drivers who commute from one town to the other in a specified time window, and if more than <span class="math notranslate nohighlight">\(1,000\)</span> drivers regularly make this commute, we add an edge between the pair of towns. In general, we know that people tend to commute more frequently within their state, so the probabilities that an edge exists between a pair of towns in the same state exceeds the probabilities that an edge exists between a pair of towns which are not in the same state. Now, here’s the twist: we have measured the first network between 8 AM and 8 PM (covering the bulk of the work day), and the second network between 8 PM and 8 AM (covering the bulk of night time). We know that a lot of people in New Jersey tend to commute to new York for the work day, so we the probability of an edge existing between a New Jersey town and a New York town are higher during the day than the night. We don’t think that driving patterns themselves really change <em>too</em> much otherwise, but we do think that the probability of an edge existing is about <span class="math notranslate nohighlight">\(50\%\)</span> higher during the daytime. for all pairs of communities in the network. The block matrices look like this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Bnight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.3</span><span class="p">,</span> <span class="mf">.15</span><span class="p">,</span> <span class="mf">.15</span><span class="p">],</span> <span class="p">[</span><span class="mf">.15</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.15</span><span class="p">],</span> <span class="p">[</span><span class="mf">.15</span><span class="p">,</span> <span class="mf">.15</span><span class="p">,</span> <span class="mf">.3</span><span class="p">]])</span>
@@ -801,12 +815,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/statsmodels/compat/pandas.py:65: FutureWarning: pandas.Int64Index is deprecated and will be removed from pandas in a future version. Use pandas.Index with the appropriate dtype instead.
-  from pandas import Int64Index as NumericIndex
-</pre></div>
-</div>
-<img alt="../../_images/significant-communities_8_1.png" src="../../_images/significant-communities_8_1.png" />
-<img alt="../../_images/significant-communities_8_2.png" src="../../_images/significant-communities_8_2.png" />
+<img alt="../../_images/significant-communities_9_0.png" src="../../_images/significant-communities_9_0.png" />
+<img alt="../../_images/significant-communities_9_1.png" src="../../_images/significant-communities_9_1.png" />
 </div>
 </div>
 <p>How can we ask whether the block matrices have similarities?</p>
@@ -857,7 +867,7 @@
 <span class="c1"># fill matrix with NaNs</span>
 <span class="n">Pvals</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-<span class="c1"># get the indices of the upper triangle of Asrt</span>
+<span class="c1"># get the indices of the upper triangle of Aday</span>
 <span class="n">upper_tri_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="n">Aday</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="c1"># create a boolean array that is nxn</span>
 <span class="n">upper_tri_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Aday</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
@@ -874,6 +884,8 @@
 </div>
 </div>
 </div>
+<div class="section" id="adjusting-for-multiple-comparisons">
+<h3><span class="section-number">9.2.1.1. </span>Adjusting for multiple comparisons<a class="headerlink" href="#adjusting-for-multiple-comparisons" title="Permalink to this headline">¶</a></h3>
 <p>Before we visualize these <span class="math notranslate nohighlight">\(p\)</span>-values, we need to learn a little bit about a fundamental problem in statistics. Basically it goes something like this. If you remember, when we chose whether to accept or reject the alternative hypothesis for a statistical test, we used a value called the <span class="math notranslate nohighlight">\(\alpha\)</span> of the test. The <span class="math notranslate nohighlight">\(\alpha\)</span> of the test, usually <span class="math notranslate nohighlight">\(0.05\)</span>, indicated what fraction of the time we thought it was acceptable that we would incorrectly accept the alternative hypothesis. This corresponds to saying that we are okay with being wrong about <span class="math notranslate nohighlight">\(5\%\)</span> of the time. Let’s say that we have a set of <span class="math notranslate nohighlight">\(100,000\)</span> coins, each of which have a probability of landing on heads of <span class="math notranslate nohighlight">\(0.5\)</span>, and we flip each 30 times. For each coin, we test whether the coin has a probability of landing on heads of <span class="math notranslate nohighlight">\(0.5\)</span> against the null hypothesis that the probability of the coin landing on heads is not <span class="math notranslate nohighlight">\(0.5\)</span>. For 99,999 of the 100,000 coins, the <span class="math notranslate nohighlight">\(p\)</span>-values exceed <span class="math notranslate nohighlight">\(\alpha\)</span>, and therefore we accept the null hypothesis that the coin lands on heads with probability <span class="math notranslate nohighlight">\(0.5\)</span>. However, one of the coin flip experiments has a <span class="math notranslate nohighlight">\(p\)</span>-value of <span class="math notranslate nohighlight">\(0.01\)</span>, so we think that we should accept the alternative hypothesis that this particular coin does not have a probability of landing on heads of <span class="math notranslate nohighlight">\(0.5\)</span>. Or should we?</p>
 <p>As it turns out, when you run more than one hypothesis test, the <em>familywise error rate</em> itself changes. The <strong>familywise error rate</strong> is the probability that we made an error and incorrectly accepted the alternative hypothesis for <em>any</em> of the hypothesis tests we ran. Without getting into too much detail, the problem is that if you were to flip enough fair coins, there is always a chance that you might see a sequence of heads and tails that would suggest to you that the coin might not be fair and have a probabaility of landing on heads of <span class="math notranslate nohighlight">\(0.5\)</span>. The more coins you flip, the higher the chance that this occurs. For this reason, we use something called <em>multiple hypothesis correction</em>, which basically says that instead of using the <span class="math notranslate nohighlight">\(p\)</span>-values themselves in our evaluation of a bunch of hypothesis tests, we inflate th <span class="math notranslate nohighlight">\(p\)</span>-values to reflect the fact that we tested a bunch of things at once. One such approach which is extremely popular is called Bonferroni correction, which says that all <span class="math notranslate nohighlight">\(p\)</span>-values should be multiplied by the total number of hypothesis tests that are performed. We can easily do this using <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>’s <code class="docutils literal notranslate"><span class="pre">multipletests</span></code> function:</p>
 <div class="cell docutils container">
@@ -887,6 +899,7 @@
 <span class="n">Pvals</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Pvals</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="c1"># symmetrize since the network is undirected</span>
 <span class="n">Pvals</span> <span class="o">=</span> <span class="n">Pvals</span> <span class="o">+</span> <span class="n">Pvals</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">Pvals</span><span class="p">))</span>
+<span class="n">pval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">Pvals</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -894,17 +907,88 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">Pvals</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$p$-value matrix after Bonferrroni correction&quot;</span><span class="p">)</span>
+<span class="n">plot_block</span><span class="p">(</span><span class="n">Pvals</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$p$-value matrix after Bonferrroni correction, p-value=</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pval</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/significant-communities_13_0.png" src="../../_images/significant-communities_13_0.png" />
+<img alt="../../_images/significant-communities_14_0.png" src="../../_images/significant-communities_14_0.png" />
+</div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(p\)</span>-values are all <em>still</em> below <span class="math notranslate nohighlight">\(\alpha=0.05\)</span> after multiple hypothesis correction, so therefore, we accept the alternative hypothesis for every pair of communities that the probabilities differ. Since the alternative hypothesis <span class="math notranslate nohighlight">\(H_A: B^{(day)} = B^{(night)}\)</span> only requires this to occur for at least one pair of communities, we accept the alternative hypothesis that the blocks are different. The This can be implemented using the <a class="reference external" href="#link?">bilateral connectome package</a> <code class="docutils literal notranslate"><span class="pre">stochastic_block_test</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pkg.stats</span> <span class="kn">import</span> <span class="n">stochastic_block_test</span>
+
+<span class="n">stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">misc</span> <span class="o">=</span> <span class="n">stochastic_block_test</span><span class="p">(</span>
+    <span class="n">Aday</span><span class="p">,</span> <span class="n">Anight</span><span class="p">,</span> <span class="n">labels1</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">labels2</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;fisher&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2954</span><span class="o">/</span><span class="mf">223404527.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">pkg.stats</span> <span class="kn">import</span> <span class="n">stochastic_block_test</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> 
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">misc</span> <span class="o">=</span> <span class="n">stochastic_block_test</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">Aday</span><span class="p">,</span> <span class="n">Anight</span><span class="p">,</span> <span class="n">labels1</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">labels2</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;fisher&quot;</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="p">)</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;pkg&#39;
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="section" id="testing-whether-the-block-matrices-in-an-sbm-are-multiples-of-one-another">
 <h2><span class="section-number">9.2.2. </span>Testing whether the block matrices in an SBM are multiples of one another<a class="headerlink" href="#testing-whether-the-block-matrices-in-an-sbm-are-multiples-of-one-another" title="Permalink to this headline">¶</a></h2>
+<p>Back in <a class="reference external" href="#link?">Chapter 4</a> we learned about a useful summary statistic, known as the <em>network density</em>. If you remember, the network density was the quantity:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+density(A) &amp;= \frac{2\sum_{j &gt; i}a_{ij}}{n(n - 1)}
+\end{align*}\]</div>
+<p>Which could be thought of as the “fraction” of edges which actually exist in a network, divided by the fraction of edges which could exist in a network. As it turns out, the network density plays an extremely large role ion virtually every property of networks which we estimate in machine learning, including the block matrices. However, when we talk about two block matrices being different, we might be trying to describe something more than just that their network densities are different.</p>
+<p>For instance, in our example, we know that the probability of an edge existing between two cities is, in general, about <span class="math notranslate nohighlight">\(50\%\)</span> higher during the daytime compared to the night time. We don’t want to have our answer just be a product of the fact that there were just more edges in the daytime network. Rather, we want to find the <em>topological</em> difference between the two networks; that is, that the day time driving patterns between New Jersey and New York towns went <em>above and beyond</em> the <span class="math notranslate nohighlight">\(50\%\)</span> increase we otherwise had. For this reason, we revamp our hypothesis a little bit.</p>
+<p>If you remember, our hypothesis that we ran above was the null hypothesis <span class="math notranslate nohighlight">\(H_0: B^{(day)} = B^{(night)}\)</span> that the two block matrices are the same against the alternative <span class="math notranslate nohighlight">\(H_A: B^{(day)} \neq B^{(night)}\)</span> that the block matrices differ. We will change this up a little bit. Now, our null hypothesis becomes <span class="math notranslate nohighlight">\(H_0: B^{(day)} = a\cdot B^{(night)}\)</span> that the two block matrices are the same <em>up to a rescaling</em> against <span class="math notranslate nohighlight">\(H_A: B^{(day)} \neq a\cdot B^{(night)}\)</span>. How do we interpret this?</p>
+<p>In this case, the value <span class="math notranslate nohighlight">\(a\)</span> is chosen to be the difference in the expected network densities between the day time and night time networks, the quantity <span class="math notranslate nohighlight">\(a = \frac{p^{(day)}}{p^{(night)}}\)</span>. In practice, what we use is an estimate of this quantity, <span class="math notranslate nohighlight">\(\hat a = \frac{\hat p^{(day)}}{\hat p^{(night)}}\)</span>, where <span class="math notranslate nohighlight">\(\hat p^{(day)}\)</span> is the network density of the day time network and <span class="math notranslate nohighlight">\(\hat p^{(night)}\)</span> is the network density of the night time network.</p>
+<p>We address this problem very similarly to above, instead using <a class="reference external" href="#https://en.wikipedia.org/wiki/Fisher%27s_noncentral_hypergeometric_distribution">Fisher’s exact test for non-unity odds ratios</a>. We implement this using the <a class="reference external" href="#link?">bilateral connectome</a> package, again showing the p-value matrix to visualize wiuch combinations of communities are substantially different:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span>
+
+<span class="n">density_day</span> <span class="o">=</span> <span class="n">Aday</span><span class="p">[</span><span class="n">upper_tri_mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">density_night</span> <span class="o">=</span> <span class="n">Anight</span><span class="p">[</span><span class="n">upper_tri_mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">null_odds</span> <span class="o">=</span> <span class="n">density_day</span><span class="o">/</span><span class="n">density_night</span>
+<span class="n">stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">misc</span> <span class="o">=</span> <span class="n">stochastic_block_test</span><span class="p">(</span>
+    <span class="n">Aday</span><span class="p">,</span> <span class="n">Anight</span><span class="p">,</span> <span class="n">labels1</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">labels2</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;fisher&quot;</span><span class="p">,</span>
+    <span class="n">null_odds</span><span class="o">=</span><span class="n">null_odds</span>
+<span class="p">)</span>
+<span class="n">Pval_mtx</span> <span class="o">=</span> <span class="n">misc</span><span class="p">[</span><span class="s2">&quot;uncorrected_pvalues&quot;</span><span class="p">]</span>
+
+<span class="n">Bnight_adj</span> <span class="o">=</span> <span class="n">Bnight</span><span class="o">*</span><span class="n">null_odds</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plot_block</span><span class="p">(</span><span class="n">Bnight</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Night Block Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_block</span><span class="p">(</span><span class="n">Bday</span><span class="o">/</span><span class="n">null_odds</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjusted Day Block Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_block</span><span class="p">(</span><span class="n">Pval_mtx</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;unadjusted P-value matrix, p-value=</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pvalue</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/significant-communities_20_0.png" src="../../_images/significant-communities_20_0.png" />
+</div>
+</div>
+<p>This shows that after we adjust the block matrix for changes in network density, the difference in the block probability between New York and New Jersey is still significant. This means that the density-adjusted block matrices are different, since the <span class="math notranslate nohighlight">\(p\)</span>-value is less than <span class="math notranslate nohighlight">\(\alpha = 0.05\)</span>.</p>
 </div>
 </div>
 
