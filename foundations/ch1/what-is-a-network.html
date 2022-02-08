@@ -627,6 +627,24 @@
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#types-of-networks">
+   1.1.1. Types of Networks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-see-a-network-statistically">
+   1.1.2. How to See a Network Statistically
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -639,6 +657,24 @@
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#types-of-networks">
+   1.1.1. Types of Networks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-see-a-network-statistically">
+   1.1.2. How to See a Network Statistically
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -647,8 +683,10 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="what-is-a-network">
 <h1><span class="section-number">1.1. </span>What Is A Network?<a class="headerlink" href="#what-is-a-network" title="Permalink to this headline">¶</a></h1>
-<p>When most people think of a “network”, they have some vague image in their head of the internet, or of cell phone towers transmitting data, or of some other technical thing. But networks have a specific definition in the world of machine learning.</p>
-<p>In the most simple terms, a network is a set of objects in which pairs of objects have a simple, clearly defined relationship to each other, and so can be thought of as connected to each other. When you start thinking about it, you start seeing networks everywhere. The objects could be people, and their relationship could be friendships. Or they could be computers, and the relationship could be the information they send to each other. You’d have warehouse networks if you’re working in logistics, where the relationships are products traveling between warehouses; or if you’re an epidemiologist studying disease, you could create an infection network. Neuroscientists can explore brain networks, which tell them about neurons and their relationships with each other, and computer scientists often use neural networks, which have become pillars in machine learning. Networks can even be used to visualize ideas: in a Bayesian network, your nodes represent a set of variables and the relationship between them is their conditional dependencies. You can have ecological networks, electrical networks, gene networks, and you could visualize your team’s workflow with a network.</p>
+<p>When most people think of a “network”, they often have some vague image in their head of the internet, or of cell phone towers transmitting data, or of some other technical thing. But networks have a specific definition in the world of machine learning.</p>
+<p>In the most simple terms, a network is a set of objects in which pairs of objects have a simple, clearly defined relationship to each other, and can be thought of as connected.</p>
+<p>In other places, you might hear networks referred to as “graphs”, and the field studying them as “graph theory”. We don’t really like that word, since it’s too easy to confuse a graph and a plot with an x/y coordinate axis. We’ll stick to the term “network” throughout this book when possible. There might be times when we have to use the word “graph”, since the name of some algorithm or tool we’re showing you uses it, but just remember that they mean the same thing.</p>
+<p>Let’s get a little bit more specific about what we mean. Each object in your network is called a node, or a vertex (we’ll stick to node in this book, just for consistency’s sake). A connection between two nodes is called an edge. Below you can see a visualization of a simple network with 8 nodes. As you can see, some nodes are well-connected with other nodes – for example, the node in the center, with connections to five other nodes – and you can also have nodes which aren’t connected to anything, like the lonely extra node without any edges.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
@@ -656,13 +694,18 @@
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
 <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-<span class="n">g</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">n_nodes</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">g</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">))</span>
 <span class="n">g</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> 
                   <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> 
                   <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)])</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">relabel_nodes</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">},</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">nx</span><span class="o">.</span><span class="n">draw_kamada_kawai</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;A simple 8-node network&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;A simple 8-node network&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">);</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;A well-connected node&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.75</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;A disconnected node&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">.65</span><span class="p">,</span> <span class="mf">.1</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">));</span>
 </pre></div>
 </div>
 </div>
@@ -670,12 +713,91 @@
 <img alt="../../_images/what-is-a-network_2_0.png" src="../../_images/what-is-a-network_2_0.png" />
 </div>
 </div>
-<p>Even the way we think is organized as a network. Visualize a concept or object in your head. Maybe you could think about the food you had for breakfast this morning, or the city you live in. Now, think about the connections between those concepts and others. Maybe you had eggs and toast for breakfast. Eggs and toast are connected with a multitude of other concepts in your head: forks and silverware, kitchens, hunger, protein, carbohydrates, your morning routine, chickens, wheat, other breakfast foods, and an innumerable amount of other things. What you’re doing right now is exploring a small part of the massive semantic network that lives in your head.</p>
-<p>In other places, you might hear networks referred to as “graphs”, and the field studying them as “graph theory”. We don’t really like that word, since it’s too easy to confuse a graph and a plot with an x/y coordinate axis. We’ll stick to the term “network” throughout this book when possible. There might be times when we have to use the word “graph”, since the name of some algorithm or tool we’re showing you uses it, but just remember that they mean the same thing.</p>
-<p>Networks have been thought about in one form or another since the 1700’s, when Leonhard Euler kickstarted the field with a famous problem about bridges in a city called called Königsberg. One crucially influential use of networks was in 1996, when a graduate student at Stanford named Larry Page made the PageRank algorithm. The idea was that websites on the internet (which, in 1996, had barely formed) could be ordered into a hierarchy by “link popularity”: a web page would rank higher the more links there were to it. Larry Page and his friend Sergey Brin realized that PageRank could be used to create a search engine – and so they used the PageRank algorithm to found a small web searching company they called Google.</p>
-<p>How do networks fit into the world of machine learning, and why are they important? What does it mean to learn from a network, and what kinds of things would you be trying to learn? How can we use network-valued data to understand the world better?</p>
-<p>In this book, we’ll explore the universe of network machine learning, with a particular emphasis on spectral methods and the types of probabilistic models that we can use to make inferences about networks. This chapter is intended to give you the fundamentals you’ll need to understand the rest of the book: you’ll learn some basic facts about what networks are and how they work, and you’ll see some examples of potential applications and use-cases. Then, in chapter two, we’ll start out by diving right into the meat and look at the workflow of a typical network machine learning project. You’ll get a high-level, big-picture overview, and we won’t get into the weeds too much here. Unlike the rest of the book, there won’t be very much code in this chapter. The goal is to just get you familiar with some basic concepts and ideas. Later in the book, we’ll get a lot deeper into the mathematics, and we’ll implement a number of algorithms from scratch to get our heads around how they work.</p>
+<p>Networks might also come attached with extra information. For instance, each node might have a set of features attached to it: extra information that comes in the form of a table. For instance, say the network we just made is of business transactions. Assume that there are eight companies, one for each node, and there is an edge if one company has sold something to another.</p>
+<p>Then, we might also have information about the company size. For instance, if the company is larger, you might assume that it’ll tend to have had more business transactions with the other companies. The network, in this case, includes the company size information.</p>
+<div class="section" id="types-of-networks">
+<h2><span class="section-number">1.1.1. </span>Types of Networks<a class="headerlink" href="#types-of-networks" title="Permalink to this headline">¶</a></h2>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">cmaps</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_kamada_kawai</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">kamada_kawai_layout</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">.08</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.05</span><span class="p">,</span> <span class="mf">.06</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">.1</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.07</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.08</span><span class="p">,</span> <span class="o">-</span><span class="mf">.03</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">.13</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.07</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="o">-</span><span class="mf">.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;An 8-node business transaction network&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">);</span>
+
+<span class="c1"># Generate a covariate matrix</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Company Size (# Workers)&quot;</span><span class="p">]</span>
+<span class="n">covariates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+
+
+
+<span class="c1"># Plot and make the axis look nice</span>
+<span class="n">cov_plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">covariates</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">],</span> 
+                       <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">cov_plot</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Company Size&quot;</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> 
+       <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Node label&quot;</span><span class="p">,)</span>
+<span class="n">cov_plot</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/what-is-a-network_5_0.png" src="../../_images/what-is-a-network_5_0.png" />
+</div>
+</div>
+<p>Your network might also have directions on the edges. For instance, instead of the edges of our business transaction network representing whether either of the companies have sold a product to each other, we might keep information about which company sells to who. If company 5 is a mining company, for instance, and sells raw materials to all of the other companies but doesn’t buy anything in return, you could have edges <em>from</em> company 5 <em>to</em> the other companies, but not the other way around.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]:</span>
+    <span class="n">H</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="o">*</span><span class="n">edge</span><span class="p">)</span>
+    
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_kamada_kawai</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">kamada_kawai_layout</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">.2</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.05</span><span class="p">,</span> <span class="mf">.06</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">.1</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">.07</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.08</span><span class="p">,</span> <span class="o">-</span><span class="mf">.03</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">.13</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="mf">.03</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">pos</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="o">-</span><span class="mf">.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;A directed 8-node business transaction network&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/what-is-a-network_7_0.png" src="../../_images/what-is-a-network_7_0.png" />
+</div>
+</div>
+<p>There are a few other fundamentally different types of networks you might see. You might have weights on the edges, for instance. You might even have more than one network, different noisy observations of the same network, or you might track a network’s changes over time. We’ll explore all of these a little bit, although for simplicity’s sake we’ll be focusing on networks whose edges don’t have a direction and aren’t weighted.</p>
+</div>
+<div class="section" id="how-to-see-a-network-statistically">
+<h2><span class="section-number">1.1.2. </span>How to See a Network Statistically<a class="headerlink" href="#how-to-see-a-network-statistically" title="Permalink to this headline">¶</a></h2>
+<p>Another major focus of this book will be viewing networks statistically: chapter 5 does this in depth. When you view a network from a statistic or probabilistic perspective, you’re viewing it fundamentally as an <em>observation</em> of a random variable (or in this case, a random network): a noisy real-thing thing that is the output of a probabilistic model. Your probabilistic model might contain communities, for instance: the first ten nodes might have a higher probability of connection than the second ten. When you observe concrete networks from this model, the details of which node is connected to which might change, but you can find general trends. This idea is at the core of modern statistics, so being able to apply it to networks will be an important change in perspective.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: make figure showing this. Picture of model on the left,</span>
+<span class="c1"># then a bunch of observations of it on the right.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This chapter is intended to give you the fundamentals you’ll need to understand the rest of the book: you’ll learn some basic facts about what networks are and how they work, and you’ll see some examples of potential applications and use-cases. Then, in chapter two, we’ll start out by diving right into the meat and look at the workflow of a typical network machine learning project. You’ll get a high-level, big-picture overview, and we won’t get into the weeds too much here. Unlike the rest of the book, there won’t be very much code in this chapter. The goal is to just get you familiar with some basic concepts and ideas. Later in the book, we’ll get a lot deeper into the mathematics, and we’ll implement a number of algorithms from scratch to get our heads around how they work.</p>
 <p>Let’s get started!</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
