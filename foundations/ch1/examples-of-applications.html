@@ -643,19 +643,364 @@
 <p>Let’s look at some concrete examples of Network Machine Learning tasks, along with the techniques that can tackle them which we’ll explore in this book.</p>
 <p><em>Finding working groups in your company</em><br />
 Community detection is a major focus in network science, and many techniques have been proposed to accomplish this. We’ll primarily use Adjacency Spectral Embedding or Laplacian Spectral Embedding (6.3, Spectral Embedding Methods, and throughout the book) combined with K-Means Clustering or a Gaussian Mixture Model to reconstruct labels.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot_with_gmm</span>
+<span class="kn">from</span> <span class="nn">sklearn.mixture</span> <span class="kn">import</span> <span class="n">GaussianMixture</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">cmaps</span>
+
+<span class="c1"># Make network and embed</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">.1</span><span class="p">],</span> 
+              <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">.1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">.8</span><span class="p">]])</span>
+<span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># plot</span>
+<span class="n">gmm</span> <span class="o">=</span> <span class="n">GaussianMixture</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">covariance_type</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">pairplot_with_gmm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">gmm</span><span class="p">,</span> <span class="n">cluster_palette</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;qualitative&quot;</span><span class="p">],</span>  <span class="n">label_palette</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;qualitative&quot;</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Working groups in a company, found from a network (simulated)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/examples-of-applications_3_0.png" src="../../_images/examples-of-applications_3_0.png" />
+</div>
+</div>
 <p><em>Finding the hemisphere a new neuron you haven’t seen before belongs to</em><br />
 This is called out-of-sample embedding, and is typically done by using the results from a previous embedding along with a trick involving the moore-penrose pseudoinverse (8.5, Out-of-Sample Embedding)</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">remove_vertices</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Generate parameters</span>
+<span class="n">nodes_per_community</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+
+<span class="c1"># Generate an undirected Stochastic Block Model (SBM)</span>
+<span class="n">undirected</span><span class="p">,</span> <span class="n">labels_</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">[</span><span class="n">nodes_per_community</span><span class="p">],</span> <span class="n">P</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels_</span><span class="p">)</span>
+
+<span class="c1"># Grab out-of-sample vertices</span>
+<span class="n">oos_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">oos_labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">oos_idx</span><span class="p">)</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">remove_vertices</span><span class="p">(</span><span class="n">undirected</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">oos_idx</span><span class="p">,</span> <span class="n">return_removed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Generate an embedding with ASE</span>
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X_hat_ase</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># predicted latent positions</span>
+<span class="n">w_ase</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">plot_oos</span><span class="p">(</span><span class="n">X_hat</span><span class="p">,</span> <span class="n">oos_vertices</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">oos_labels</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="c1"># Plot the in-sample latent positions</span>
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">X_hat</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="c1"># generate an out-of-sample dataframe</span>
+    <span class="n">oos_vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">oos_vertices</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Type&#39;</span><span class="p">:</span> <span class="n">oos_labels</span><span class="p">,</span>
+          <span class="s1">&#39;Dimension 1&#39;</span><span class="p">:</span> <span class="n">oos_vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+          <span class="s1">&#39;Dimension 2&#39;</span><span class="p">:</span> <span class="n">oos_vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]}</span>
+    <span class="n">oos_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># update plot with out-of-sample latent positions,</span>
+    <span class="c1"># plotting out-of-sample latent positions as stars</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">oos_df</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">hue_vals</span> <span class="o">=</span> <span class="n">oos_df</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">map_offdiag</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">plot</span>
+
+<span class="c1"># Plot all latent positions</span>
+<span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Star represents previously-unseen neuron (simulated data)&quot;</span>
+<span class="n">plot_oos</span><span class="p">(</span><span class="n">X_hat_ase</span><span class="p">,</span> <span class="n">w_ase</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">oos_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ipykernel_2695</span><span class="o">/</span><span class="mf">3368397942.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">     </span><span class="mi">46</span> <span class="c1"># Plot all latent positions</span>
+<span class="g g-Whitespace">     </span><span class="mi">47</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Star represents previously-unseen neuron (simulated data)&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">48</span> <span class="n">plot_oos</span><span class="p">(</span><span class="n">X_hat_ase</span><span class="p">,</span> <span class="n">w_ase</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">oos_labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">);</span>
+
+<span class="nn">/tmp/ipykernel_2695/3368397942.py</span> in <span class="ni">plot_oos</span><span class="nt">(X_hat, oos_vertices, labels, oos_labels, title)</span>
+<span class="g g-Whitespace">     </span><span class="mi">39</span>     <span class="n">plot</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">oos_df</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span>     <span class="n">plot</span><span class="o">.</span><span class="n">hue_vals</span> <span class="o">=</span> <span class="n">oos_df</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span>
+<span class="ne">---&gt; </span><span class="mi">41</span>     <span class="n">plot</span><span class="o">.</span><span class="n">map_offdiag</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span>                      <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span>     <span class="n">plot</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="ne">NameError</span>: name &#39;sns&#39; is not defined
+</pre></div>
+</div>
+<img alt="../../_images/examples-of-applications_5_1.png" src="../../_images/examples-of-applications_5_1.png" />
+</div>
+</div>
 <p><em>Using a subset of connecting flights to find the rest of them</em><br />
 This a problem called vertex nomination, where you have a network along with a few nodes that are interesting to you, and want to find the rest of the interesting nodes (8.4, Single-Network Vertex Nomination)</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.nominate</span> <span class="kn">import</span> <span class="n">SpectralVertexNomination</span>
+
+<span class="c1"># construct network</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.65</span><span class="p">]])</span>
+
+<span class="c1"># Create a network from and SBM, then embed</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s say we know that the first five nodes belong to the first community.</span>
+<span class="c1"># We&#39;ll say that those are our seed nodes.</span>
+<span class="n">seeds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># grab a set of seed nodes</span>
+<span class="n">memberships</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">memberships</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">seed_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="p">))</span>
+<span class="n">mask</span><span class="p">[</span><span class="n">seed_idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">memberships</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># find the latent positions for the seed nodes</span>
+<span class="n">seed_latents</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">memberships</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span>
+
+<span class="c1"># Choose the number of nominations we want for each seed node</span>
+<span class="n">svn</span> <span class="o">=</span> <span class="n">SpectralVertexNomination</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">svn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># get nominations and distances for each seed index</span>
+<span class="n">nominations</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="n">svn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">seed_idx</span><span class="p">)</span>
+
+<span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;cyan&#39;</span><span class="p">,</span> <span class="s1">&#39;pink&#39;</span><span class="p">]</span>
+<span class="n">seed_color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;firebrick&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;tan&#39;</span><span class="p">,</span> <span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="s1">&#39;purple&#39;</span><span class="p">]</span>
+
+
+<span class="n">fix</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seed_group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nominations</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">neighbors</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">seed_group</span><span class="p">]</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">neighbors</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">neighbors</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">seed_color</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original flights (stars) and similar flights&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">24</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Figure 6.5&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/examples-of-applications_7_1.png" src="../../_images/examples-of-applications_7_1.png" />
+</div>
+</div>
 <p><em>Finding a small subset of people in your social network that are representative of the whole network</em><br />
 This is a problem called signal subgraph estimation, which we renamed to signal subnetwork estimation. The general idea is that you have two different networks, and you want to find the subset of nodes which carry all the information about the differences between your networks. We talk about this in 5.6, Network Models with Covariates, and then again in 10.2, Testing for Significant Edges, and 10.3, Testing for Significant Nodes.</p>
 <p>*TODO: thing for 8.2, testing for differences between groups of edges</p>
 <p><em>Using extra data like house size and price to find more precise groups of houses in a house buying/selling network</em><br />
 This is called joint representation learning, and is talked about extensively in 6.8.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">beta</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">CovariateAssistedEmbed</span> <span class="k">as</span> <span class="n">CASC</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">randomized_svd</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+
+<span class="c1"># Start with some simple parameters</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1500</span>  <span class="c1"># Total number of nodes</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">3</span>  <span class="c1"># Nodes per community</span>
+<span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.15</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.15</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">.3</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.15</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">.15</span><span class="p">,</span> <span class="mf">.15</span><span class="p">,</span> <span class="mf">.3</span><span class="p">]])</span>  <span class="c1"># Our block probability matrix</span>
+
+<span class="c1"># Make our Stochastic Block Model</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">make_community</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">beta</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">gen_covariates</span><span class="p">():</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">c3</span> <span class="o">=</span> <span class="n">make_community</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">covariates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">covariates</span>
+    
+
+<span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dimension</span><span class="p">):</span>
+    <span class="n">latents</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">randomized_svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">dimension</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">latents</span>
+
+<span class="c1"># Generate a covariate matrix</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">gen_covariates</span><span class="p">()</span>
+<span class="n">casc</span> <span class="o">=</span> <span class="n">CASC</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">casc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">X_A</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">X_Y</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X_A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;House groups when we only use the network&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X_Y</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;House groups when we only use extra data&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;House groups when we use both&quot;</span><span class="p">,</span> 
+             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/examples-of-applications_12_0.png" src="../../_images/examples-of-applications_12_0.png" />
+</div>
+</div>
 <p><em>Representing sets of mouse brain networks as a single point in space to compare their overall similarities and differences</em><br />
-To do this, you’d jointly embed all of your brain networks at once using an Omnibus Embedding, then you’d create a pairwise difference matrix for each embedding. You’d then embed the pairwise distance matrix using Classic Multidimensional Scaling. This isn’t discussed at length in this book, but you can look up Multiscale Comparative Connectomics by Gopalakrishnan et al., 2021 to see how to do this in more depth.</p>
+To do this, you’d jointly embed all of your brain networks at once using an Omnibus Embedding, then you’d create a pairwise difference matrix for each embedding. You’d then embed the pairwise distance matrix using Classic Multidimensional Scaling. This isn’t discussed at length in this book, but is mentioned in 4.2.4, Bag of Networks. You can look up Multiscale Comparative Connectomics by Gopalakrishnan et al., 2021 to see how to do this in more depth.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">ClassicalMDS</span>
+
+<span class="k">def</span> <span class="nf">make_network</span><span class="p">(</span><span class="o">*</span><span class="n">probs</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">pa</span><span class="p">,</span> <span class="n">pb</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">pd</span> <span class="o">=</span> <span class="n">probs</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">pa</span><span class="p">,</span> <span class="n">pb</span><span class="p">],</span> 
+                  <span class="p">[</span><span class="n">pc</span><span class="p">,</span> <span class="n">pd</span><span class="p">]])</span>
+    
+    <span class="k">return</span> <span class="n">sbm</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">P</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="n">return_labels</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="mf">.12</span><span class="p">,</span> <span class="mf">.06</span><span class="p">,</span> <span class="mf">.03</span>
+
+<span class="n">first_group</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">make_network</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span>
+    <span class="n">first_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+    
+<span class="n">second_group</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">make_network</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="n">second_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+
+<span class="c1"># Find a euclidean location for the nodes of all of our networks</span>
+<span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">omni_embedding</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">first_group</span> <span class="o">+</span> <span class="n">second_group</span><span class="p">)</span>
+
+<span class="c1"># embed each network representation into a 2-dimensional space</span>
+<span class="n">cmds</span> <span class="o">=</span> <span class="n">ClassicalMDS</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">cmds_embedding</span> <span class="o">=</span> <span class="n">cmds</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">omni_embedding</span><span class="p">)</span>
+
+<span class="c1"># Find and normalize the dissimilarity matrix</span>
+<span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">cmds</span><span class="o">.</span><span class="n">dissimilarity_matrix_</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cmds</span><span class="o">.</span><span class="n">dissimilarity_matrix_</span><span class="p">)</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">12</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">draw_cartesian</span><span class="p">(</span><span class="n">xrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">cmds_embedding</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Simulated sets of mouse brain networks as single points in space&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/examples-of-applications_14_0.png" src="../../_images/examples-of-applications_14_0.png" />
+</div>
+</div>
 <p><em>Figuring out which users match between the facebook social network and the twitter social network, without knowing their names</em><br />
 This problem has been studied extensively, and is called graph matching. You can find an in-depth discussion of it in 9.3, Graph Matching.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
+<span class="kn">from</span> <span class="nn">graspologic.match</span> <span class="kn">import</span> <span class="n">GraphMatch</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">cmaps</span>
+
+<span class="k">def</span> <span class="nf">rm_ticks</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="c1"># draw a network, then shuffle</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+<span class="n">node_shuffle_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">node_shuffle_input</span><span class="p">][:,</span> <span class="n">node_shuffle_input</span><span class="p">]</span>
+
+<span class="n">gmp</span> <span class="o">=</span> <span class="n">GraphMatch</span><span class="p">()</span>
+<span class="n">gmp</span> <span class="o">=</span> <span class="n">gmp</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+<span class="n">B_</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">][:,</span> <span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">]</span>
+
+<span class="n">A_nx</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">B_nx</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="c1"># explicitly set positions</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">),</span> <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.255</span><span class="p">),</span> <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">)}</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;font_size&quot;</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+    <span class="s2">&quot;node_size&quot;</span><span class="p">:</span> <span class="mi">3000</span><span class="p">,</span>
+    <span class="s2">&quot;node_color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;edgecolors&quot;</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">A_nx</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="c1"># Set margins for the axes so that nodes aren&#39;t clipped</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.20</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Facebook Network&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<span class="n">pos_b</span> <span class="o">=</span> <span class="p">{</span><span class="n">node_shuffle_input</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">loc</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">pos</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="c1"># pos_b = {2: (0, 0), 1: (-1, 0.3), 4: (2, 0.17), 3: (4, 0.255), 0: (5, 0.03)}</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">B_nx</span><span class="p">,</span> <span class="n">pos_b</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.20</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Twitter Network&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+
+<span class="c1"># add second arrow</span>
+<span class="n">arrow_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.3</span><span class="p">,</span> <span class="mf">.1</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">arrow_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span> 
+
+<span class="c1"># add second arrow</span>
+<span class="n">match_ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
+<span class="n">rm_ticks</span><span class="p">(</span><span class="n">match_ax</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">match_ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">gmp</span><span class="o">.</span><span class="n">perm_inds_</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">match_ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">xticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">match_ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">match_ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Node correspondence between </span><span class="se">\n</span><span class="s2">twitter and facebook network&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.1, &#39;Node correspondence between \ntwitter and facebook network&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/examples-of-applications_16_1.png" src="../../_images/examples-of-applications_16_1.png" />
+</div>
+</div>
 <p><em>Estimating the day that the Federal Reserve tightened rates using a timeseries of stock market networks</em><br />
 This is called timeseries anomaly detection, and is used when you have a timeseries of the same network, and you’re trying to figure out when the probability distribution it was drawn from changed (10.1, Anomaly Detection for Timeseries of Networks)</p>
 <p><em>Figuring out if two estimated brain networks come from the same person</em><br />
