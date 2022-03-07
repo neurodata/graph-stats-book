@@ -658,6 +658,23 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
   </ul>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-you-re-going-to-represent-your-network">
+   1.4.5. How you’re going to represent your network
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#when-you-have-one-network-and-distinct-groups">
+     1.4.5.1. When You have One Network and Distinct Groups
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-you-re-going-to-do-when-you-have-a-good-representation">
+   1.4.6. What you’re going to do when you have a good representation
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -725,6 +742,23 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
   </ul>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-you-re-going-to-represent-your-network">
+   1.4.5. How you’re going to represent your network
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#when-you-have-one-network-and-distinct-groups">
+     1.4.5.1. When You have One Network and Distinct Groups
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-you-re-going-to-do-when-you-have-a-good-representation">
+   1.4.6. What you’re going to do when you have a good representation
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -748,7 +782,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>Let’s look at each of these criteria more closely.</p>
 <div class="section" id="what-type-of-network-you-re-working-with">
 <h2><span class="section-number">1.4.1. </span>What type of network you’re working with<a class="headerlink" href="#what-type-of-network-you-re-working-with" title="Permalink to this headline">¶</a></h2>
-<p>We talked earlier about the different types of networks out there. Most of this book will use simple networks as examples: networks whose edges don’t have a direction or weight. Sometimes we’ll have multiple networks. We’ll also run into situations where you have additional information, called covariates, to add to node-and-edge valued data you already have.</p>
+<p>We talked earlier about the different types of networks out there. Most of this book will use <strong>simple networks</strong> as examples: networks whose edges don’t have a direction or weight. Sometimes we’ll have multiple networks. We’ll also run into situations where you have additional information, called covariates, to add to node-and-edge valued data you already have.</p>
 <p>There are other types of networks out there which we won’t discuss in this book, since techniques that use these types of networks to learn from data are underdeveloped. Just so that you know they’re out there, here are some of them. Most of the time, you can find a way to turn your complicated type of network into a simple network.</p>
 <ul class="simple">
 <li><p><strong>Bipartite networks</strong> come into play when your nodes belong to two completely distinct classes, and connections can only be established between two members of different classes. For instance, let’s say you’re a stock trader and you’re creating a big stock network, where the nodes are stocks and the edges are the degree of covariance in stock value between them. Now, let’s say that on top of that simple (albeit weighted) network, you want to cluster stocks into groups: you have your energy sector group, your entertainment sector group, and so on. The kicker is that you want your groups to be nodes <em>themselves</em>, which have edges with all of the stocks you’re interested in. If you just added these groups as nodes in the original network, you lose the fact that these group nodes are qualitatively different than the other types of nodes.</p></li>
@@ -771,42 +805,6 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
-<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-
-<span class="c1"># explicitly set positions</span>
-<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">),</span> <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.255</span><span class="p">),</span> <span class="mi">5</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">)}</span>
-
-<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;font_size&quot;</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
-    <span class="s2">&quot;node_size&quot;</span><span class="p">:</span> <span class="mi">3000</span><span class="p">,</span>
-    <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="s2">&quot;node_color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>  <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
-<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
-
-<span class="c1"># Set margins for the axes so that nodes aren&#39;t clipped</span>
-<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axs</span><span class="p">[:</span><span class="mi">2</span><span class="p">]:</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
-
-<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Nodes as Primary Object&quot;</span><span class="p">)</span>
-<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Edges as Primary Object&quot;</span><span class="p">)</span>
-<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network itself as Primary Object&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">);</span>
-
-<span class="c1"># arrow</span>
-<span class="n">draw_cartesian</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
-<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="s2">&quot;network as a </span><span class="se">\n</span><span class="s2">single point&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.3</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">modularity</span><span class="p">(</span><span class="n">network</span><span class="p">):</span>
     <span class="n">communities</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">community</span><span class="o">.</span><span class="n">greedy_modularity_communities</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
@@ -826,7 +824,16 @@ const thebe_selector_output = ".output, .cell_output"
                       <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_shortest_path_length</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
 
+<span class="c1"># Create network</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
+<span class="c1"># Calculate network features</span>
 <span class="n">network_features</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">network</span> <span class="o">=</span> <span class="n">G</span>
 <span class="n">modularity_</span> <span class="o">=</span> <span class="n">modularity</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
@@ -836,8 +843,38 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">features</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Modularity&quot;</span><span class="p">:</span> <span class="n">modularity_</span><span class="p">,</span> <span class="s2">&quot;Network Density&quot;</span><span class="p">:</span> <span class="n">network_density_</span><span class="p">,</span> 
             <span class="s2">&quot;Clustering Coefficient&quot;</span><span class="p">:</span> <span class="n">clustering_coefficient_</span><span class="p">,</span> <span class="s2">&quot;Average Path Length&quot;</span><span class="p">:</span> <span class="n">path_length_</span><span class="p">}</span>
 <span class="n">network_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
-    
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">network_features</span><span class="p">)</span>
+
+<span class="c1"># explicitly set positions</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">),</span> <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.255</span><span class="p">),</span> <span class="mi">5</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">)}</span>
+
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;font_size&quot;</span><span class="p">:</span> <span class="mi">36</span><span class="p">,</span>
+    <span class="s2">&quot;node_size&quot;</span><span class="p">:</span> <span class="mi">3000</span><span class="p">,</span>
+    <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;node_color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Plotting</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>  <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+
+<span class="c1"># Set margins for the axes so that nodes aren&#39;t clipped</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axs</span><span class="p">[:</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Nodes as Primary Object&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Edges as Primary Object&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network itself as Primary Object&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">);</span>
+
+<span class="c1"># arrow</span>
+<span class="n">draw_cartesian</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">markerfacecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="s2">&quot;network as a </span><span class="se">\n</span><span class="s2">single point&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.3</span><span class="p">)</span>
+
 <span class="n">hmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;qualitative&quot;</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">hmap</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">hmap</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Network statistics as primary object&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">);</span>
@@ -851,24 +888,114 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="what-kind-of-preprocessing-you-need-to-do">
 <h2><span class="section-number">1.4.3. </span>What kind of preprocessing you need to do<a class="headerlink" href="#what-kind-of-preprocessing-you-need-to-do" title="Permalink to this headline">¶</a></h2>
-<p>Although the majority of this book is about what to do after you have a fully formed network, it’s important to think critically about what you need to do to a network to get it into a good form. For instance, how was the network data originally stored on your computer, and what format was it in? How noisy is your network, and is there anything you can do to clean up that noise? Are there isolated nodes which don’t add any information?</p>
-<p>You’ll get your first exposure to this in the end-to-end network machine learning project in chapter two, where you’ll investigate a larval fly brain network, pulling the data from raw sources.</p>
+<p>Although the majority of this book is about what to do after you have a fully formed network, it’s important to think critically about what you need to do to a network to get it into a good form. For instance, how was the network data originally stored on your computer, and what format was it in? How noisy is your network, and is there anything you can do to clean up that noise? Are there isolated nodes which don’t add any information? Do you have categorical node labels in the form of text? Do your edges have weights, and are you doing subsequent analysis that doesn’t work well with edge weights?</p>
+<p>You’ll get your first exposure to this in the end-to-end network machine learning project in chapter two, where you’ll investigate a larval fly brain network, pulling the data from raw sources. Generally, isolated nodes cause problems when you’re trying to do analysis, so unless you have a good reason not to, it’s often best to remove them. It’s also best practice to use numerical labels for your nodes, especially if you will be using the labels during your analysis process.</p>
+<p>Your networks might also be directed, or have edges. This is sometimes fine, but there are cases where you’d like to just have a simple, binary network. In these cases, you’d want to either binarize your network by removing the weight information and only keeping information about whether there’s an edge or not. There are also situations where you’d keep information about the <em>order</em> of weights – meaning, which edges are higher-weighted than which other edges – while discarding the weights themselves.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">GraphColormap</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">5.1</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">5.2</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">5.3</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">5.4</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">5.5</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">5.6</span><span class="p">)</span>
+
+<span class="c1"># explicitly set positions</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">relabel_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="p">{</span><span class="mi">5</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">},</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.17</span><span class="p">),</span> <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.255</span><span class="p">),</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">),</span> <span class="mi">6</span><span class="p">:</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">)}</span>
+<span class="n">edge_cmap</span> <span class="o">=</span> <span class="n">GraphColormap</span><span class="p">(</span><span class="s2">&quot;sequential&quot;</span><span class="p">,</span> <span class="n">discrete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">palette</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>  <span class="n">edge_color</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">edge_cmap</span><span class="o">=</span><span class="n">edge_cmap</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Isolated Node&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mf">.25</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">.3</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="n">connectionstyle</span><span class="o">=</span><span class="s2">&quot;arc3,rad=-0.2&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Labeled Node&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">6.3</span><span class="p">,</span> <span class="mf">.03</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mf">.07</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="n">connectionstyle</span><span class="o">=</span><span class="s2">&quot;arc3,rad=-0.2&quot;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;Weighted edges&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">.09</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mf">.15</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="n">connectionstyle</span><span class="o">=</span><span class="s2">&quot;arc3,rad=0.2&quot;</span><span class="p">));</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Some preprocessing issues that need to be dealt with&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/types-of-learning-probs_9_0.png" src="../../_images/types-of-learning-probs_9_0.png" />
+</div>
+</div>
 </div>
 <div class="section" id="understanding-the-statistical-process-that-generated-your-network">
 <h2><span class="section-number">1.4.4. </span>Understanding the statistical process that generated your network<a class="headerlink" href="#understanding-the-statistical-process-that-generated-your-network" title="Permalink to this headline">¶</a></h2>
-<p>A key concept that you’ll see throughout this book, especially if you are uninitiated in statistics, is viewing every network as simply an observation which resulted from a data-generating process, and what you’re fundamentally doing is trying to reconstruct the properties of that data-generating process using your observation.</p>
-<p>We’ll get into the different types of ways you can model a data-generating process heavily in chapter five. For now, here’s a brief summary of the types of models you might consider, given the network data that you observe.</p>
+<p>A key concept that you’ll see throughout this book, especially if you are uninitiated in statistics, is viewing every network as simply an observation which resulted from a data-generating process. What you’re essentially doing is trying to reconstruct the properties of that data-generating process using the observation and data you have. This idea is ubiquitous and fundamental throughout statistics.</p>
+<p>We’ll get into the different types of ways you can model a data-generating process, and the types of processes out there, heavily in chapter five. For now, here’s a brief summary of the types of models you might consider, given the network data that you observe.</p>
 <div class="section" id="the-erdos-renyi-model">
 <h3><span class="section-number">1.4.4.1. </span>The Erdös-Rényi Model<a class="headerlink" href="#the-erdos-renyi-model" title="Permalink to this headline">¶</a></h3>
-<p>The ER random network model is the simplest around, and is probably the most straightforward to understand. Under this model, for any two nodes in our network, there is some probability that they’ll have an edge (say, <span class="math notranslate nohighlight">\(p = 0.3\)</span>). That means that when you observe a network whose generating process was Erdös-Rényi, it would be unlikely to find groups or communities, or even any structure at all, really. Erdös-Rényi networks have well-defined mathematical properties: we know how many edges on average the nodes should be expected to have, for instance.</p>
+<p>The ER random network model is the simplest around, and is probably the most straightforward to understand. Under this model, for any two nodes in our network, there is some probability that they’ll have an edge (say, <span class="math notranslate nohighlight">\(p = 0.3\)</span>). That means that when you observe a network whose generating process was Erdös-Rényi, each edge has the same 30% chance of existing, regardless of which nodes you’re looking at. It would be unlikely to find groups or communities, or even any structure at all, in an ER model. Erdös-Rényi networks have well-defined mathematical properties: we know how many edges on average the nodes should be expected to have, for instance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mf">.5</span><span class="p">)</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;font_size&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+    <span class="s2">&quot;node_size&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s2">&quot;node_color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/types-of-learning-probs_14_1.png" src="../../_images/types-of-learning-probs_14_1.png" />
+</div>
+</div>
 </div>
 <div class="section" id="the-stochastic-block-model">
 <h3><span class="section-number">1.4.4.2. </span>The Stochastic Block Model<a class="headerlink" href="#the-stochastic-block-model" title="Permalink to this headline">¶</a></h3>
 <p>An SBM is a step up in complexity from the ER model, and we’ll be using it heavily throughout this book. It builds on top of the ER model in complexity: The basic idea is that, in addition to each edge being associated with a probability, each node is also associated with a community, and edge probabilities can change depending on the community your node belongs to. When we’re trying to reconstruct community membership, we’ll usually assume that our data-generating process happened as the result of some kind of SBM.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.1</span><span class="p">,],</span> <span class="p">[</span> <span class="mf">.1</span><span class="p">,</span> <span class="mf">.8</span><span class="p">]]))</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_array</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;node_size&quot;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="s2">&quot;linewidths&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;edgecolors&quot;</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">nodelist</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)),</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:red&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">.2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Stochastic Block Model with two communities&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/types-of-learning-probs_17_0.png" src="../../_images/types-of-learning-probs_17_0.png" />
+</div>
+</div>
 </div>
 <div class="section" id="random-dot-product-graphs">
 <h3><span class="section-number">1.4.4.3. </span>Random Dot Product Graphs<a class="headerlink" href="#random-dot-product-graphs" title="Permalink to this headline">¶</a></h3>
-<p>The ER model and the SBM can both be thought of as particular cases of an Random Dot Product Graph. The RDPG is a little bit harder-to-understand, since it uses a few concepts from linear algebra at its core, with the advantage of being much more dynamic. The basic idea is that, rather than being associated with a probability, each node is associated with a <em>latent position</em>: a vector with however many entries you want. The edge probability for a given pair of nodes is given by the dot product between their latent positions. In an ER model, every node has the same latent position; in an SBM, every node belonging to the same community has the same latent position.</p>
+<p>The ER model and the SBM can both be thought of as particular cases of a Random Dot Product Graph. The RDPG is a little bit harder-to-understand, since it uses a few concepts from linear algebra at its core, with the advantage of being much more dynamic. The basic idea is that, rather than being associated with a probability, each node is associated with a <em>latent position</em>: a vector with however many entries you want. The edge probability for a given pair of nodes is given by the dot product between their latent positions. In an ER model, every node has the same latent position; in an SBM, every node belonging to the same community has the same latent position.</p>
 <p>When we find representations for networks throughout this book, an overarching theme will be assuming that the networks were drawn from an RDPG under the hood, and estimating these latent positions will be central to a large portion of its content.</p>
 </div>
 <div class="section" id="multiple-network-models">
@@ -883,6 +1010,18 @@ const thebe_selector_output = ".output, .cell_output"
 <h3><span class="section-number">1.4.4.5. </span>Network Models with Covariates<a class="headerlink" href="#network-models-with-covariates" title="Permalink to this headline">¶</a></h3>
 <p>The last type of network model that you’ll see in this book come into play when you have covariates, which we’ve already talked about a bit: an extra set of features for each node.</p>
 </div>
+</div>
+<div class="section" id="how-you-re-going-to-represent-your-network">
+<h2><span class="section-number">1.4.5. </span>How you’re going to represent your network<a class="headerlink" href="#how-you-re-going-to-represent-your-network" title="Permalink to this headline">¶</a></h2>
+<p>Once you’ve figured out which statistical process best represents the network you have, you’re going to want to represent your network in some way that makes whatever subsequent inference task that you’re planning on doing easier. This means taking your network or networks, which exist as sets of nodes and edges, and representing it or them a different way, usually as a set of points embedded into coordinate space. What these points represent changes depending on what part of the network you’re investigating: points could represent individual nodes, groups of nodes, entire networks, or even edges in some rare cases. You can sometimes keep your network as a set of nodes and edges, and do your analysis that way – but we’ll usually do our work using these embedding methods.</p>
+<p>We’ll go into more depth about the different types of embedding methods that you should use for different types of models in chapter six. Here is a brief summary of what you should do in different types of situations.</p>
+<div class="section" id="when-you-have-one-network-and-distinct-groups">
+<h3><span class="section-number">1.4.5.1. </span>When You have One Network and Distinct Groups<a class="headerlink" href="#when-you-have-one-network-and-distinct-groups" title="Permalink to this headline">¶</a></h3>
+<p>When you have groups of nodes which are well-connected within groups, and not very well-connected in between groups, you’d generally want to use <em>Laplacian Spectral Embedding (LSE)</em>. The Laplacian of</p>
+</div>
+</div>
+<div class="section" id="what-you-re-going-to-do-when-you-have-a-good-representation">
+<h2><span class="section-number">1.4.6. </span>What you’re going to do when you have a good representation<a class="headerlink" href="#what-you-re-going-to-do-when-you-have-a-good-representation" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
