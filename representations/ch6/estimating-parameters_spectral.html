@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6.4. Estimating Parameters with Spectral Methods &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>6.4. A Simple Network &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -56,7 +56,7 @@ const thebe_selector_output = ".output, .cell_output"
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.5. Random-Walk and Diffusion-based Methods" href="random-walk-diffusion-methods.html" />
+    <link rel="next" title="6.8. Random-Walk and Diffusion-based Methods" href="random-walk-diffusion-methods.html" />
     <link rel="prev" title="6.3. Spectral Embedding Methods" href="spectral-embedding.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -333,32 +333,32 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     6.4. Estimating Parameters with Spectral Methods
+     6.4. A Simple Network
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="random-walk-diffusion-methods.html">
-     6.5. Random-Walk and Diffusion-based Methods
+     6.8. Random-Walk and Diffusion-based Methods
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="graph-neural-networks.html">
-     6.6. Graph Neural Networks
+     6.9. Graph Neural Networks
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="multigraph-representation-learning.html">
-     6.7. Multiple-Network Representation Learning
+     6.10. Multiple-Network Representation Learning
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="joint-representation-learning.html">
-     6.8. Joint Representation Learning
+     6.11. Joint Representation Learning
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="estimating-parameters_theory.html">
-     6.9. Model Estimation Theory
+     6.12. Model Estimation Theory
     </a>
    </li>
   </ul>
@@ -611,10 +611,66 @@ const thebe_selector_output = ".output, .cell_output"
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#random-dot-product-graph">
-   6.4.1. Random Dot Product Graph
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   6.4. A Simple Network
   </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-are-nodes-from-the-same-community-similar">
+   6.5. How are nodes from the same community similar?
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#low-rank-structure-what-it-is-how-we-find-it-and-why-it-matters">
+   6.6. Low-rank structure: what it is, how we find it, and why it matters
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#matrix-rank">
+     6.6.1. Matrix Rank
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-we-find-this-low-rank-structure">
+     6.6.2. How do we find this low-rank structure?
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-singular-value-decomposition">
+       6.6.2.1. The Singular Value Decomposition
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-relationship-between-the-singular-value-decomposition-and-best-representations-of-a-matrix">
+       6.6.2.2. The relationship between the singular value decomposition and “best” representations of a matrix
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#equivalence-of-top-left-and-right-singular-vectors">
+       6.6.2.3. Equivalence of top left and right singular vectors
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-square-root-matrix">
+       6.6.2.4. The Square Root Matrix
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#but-wait-we-don-t-have-the-probability-matrix-what-do-we-do">
+   6.7. But wait: we don’t have the probability matrix! What do we do?
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#figuring-out-how-many-dimensions-to-embed-your-network-into">
+     6.7.1. Figuring Out How Many Dimensions To Embed Your Network Into
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -626,7 +682,7 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Estimating Parameters with Spectral Methods</h1>
+                <h1>A Simple Network</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -636,10 +692,66 @@ const thebe_selector_output = ".output, .cell_output"
                         </div>
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#random-dot-product-graph">
-   6.4.1. Random Dot Product Graph
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   6.4. A Simple Network
   </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-are-nodes-from-the-same-community-similar">
+   6.5. How are nodes from the same community similar?
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#low-rank-structure-what-it-is-how-we-find-it-and-why-it-matters">
+   6.6. Low-rank structure: what it is, how we find it, and why it matters
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#matrix-rank">
+     6.6.1. Matrix Rank
+    </a>
+   </li>
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-we-find-this-low-rank-structure">
+     6.6.2. How do we find this low-rank structure?
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-singular-value-decomposition">
+       6.6.2.1. The Singular Value Decomposition
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-relationship-between-the-singular-value-decomposition-and-best-representations-of-a-matrix">
+       6.6.2.2. The relationship between the singular value decomposition and “best” representations of a matrix
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#equivalence-of-top-left-and-right-singular-vectors">
+       6.6.2.3. Equivalence of top left and right singular vectors
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-square-root-matrix">
+       6.6.2.4. The Square Root Matrix
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#but-wait-we-don-t-have-the-probability-matrix-what-do-we-do">
+   6.7. But wait: we don’t have the probability matrix! What do we do?
+  </a>
+  <ul class="visible nav section-nav flex-column">
+   <li class="toc-h2 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#figuring-out-how-many-dimensions-to-embed-your-network-into">
+     6.7.1. Figuring Out How Many Dimensions To Embed Your Network Into
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 
@@ -650,145 +762,576 @@ const thebe_selector_output = ".output, .cell_output"
             
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="estimating-parameters-with-spectral-methods">
-<h1><span class="section-number">6.4. </span>Estimating Parameters with Spectral Methods<a class="headerlink" href="#estimating-parameters-with-spectral-methods" title="Permalink to this headline">¶</a></h1>
-<p>Now that we have some intuition for spectral methods, we will show how to use them to estimate parameters a little bit more rigorously. We will begin with the Random Dot Product Graph (RDPG), and in <a class="reference external" href="#link?">Chapter 8</a>, we will explore how to use the strategies we develop for the RDPG on a Stochastic Block Model where we do not know the node communities aheaad of time.</p>
-<div class="section" id="random-dot-product-graph">
-<h2><span class="section-number">6.4.1. </span>Random Dot Product Graph<a class="headerlink" href="#random-dot-product-graph" title="Permalink to this headline">¶</a></h2>
-<p>The Random Dot Product Graph has a single parameter, the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Remember that the latent position matrix has <span class="math notranslate nohighlight">\(n\)</span> rows, one for each node in the network, and <span class="math notranslate nohighlight">\(d\)</span> columns, one for each latent dimension in the network.</p>
-<p>Remember that when we see a network which we think might be a realization of an RDPG random network, we do not actually have the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> ahead of time. For this reason, we must <em>estimate</em> <span class="math notranslate nohighlight">\(X\)</span>. Unfortunately, we cannot just use MLE like we did for the ER and SBM networks. Instead, we will use spectral methods.</p>
-<p>In order to produce an estimate of <span class="math notranslate nohighlight">\(X\)</span>, we also need to know the number of latent dimensions of <span class="math notranslate nohighlight">\(\pmb A\)</span>, <span class="math notranslate nohighlight">\(d\)</span>. We might have a reasonable ability to “guess” what <span class="math notranslate nohighlight">\(d\)</span> is ahead of time, but this will often not be the case. For this reason, we can instead estimate <span class="math notranslate nohighlight">\(d\)</span> using the strategy described in <span class="xref myst">6.3.7</span>. Once we have an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> and a number of latent dimensions <span class="math notranslate nohighlight">\(d\)</span> (or an estimate of the number of latent dimensions, which we will call <span class="math notranslate nohighlight">\(\hat d\)</span>), producing an estimate of the latent position matrix is very straightforward. We simply use the adjacency spectral embedding to embed the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(d\)</span> (or, <span class="math notranslate nohighlight">\(\hat d\)</span>) dimensions. The resulting embedded adjacency matrix <em>is</em> the estimate of the latent position matrix. We will call the estimate of the latent position matrix <span class="math notranslate nohighlight">\(\hat X\)</span>.</p>
-<p>Let’s try an example of an <em>a priori</em> RDPG. We will use the same example that we used in the <a class="reference external" href="#link?">section on RDPGs</a>, where we had <span class="math notranslate nohighlight">\(100\)</span> people living along a <span class="math notranslate nohighlight">\(100\)</span> mile road, with each person one mile apart. The nodes represented people, and two people were connected if they were friends. The people at the ends of the street hosted parties, and invite everyone along the street to their parties. If a person was closer to one party host, they would tend to go to that host’s parties more than the other party host. The latent positions for each person <span class="math notranslate nohighlight">\(i\)</span> were the vectors:</p>
+  <div class="section" id="a-simple-network">
+<h1><span class="section-number">6.4. </span>A Simple Network<a class="headerlink" href="#a-simple-network" title="Permalink to this headline">¶</a></h1>
+<p>For this example, we’ll work with the school example we’ve seen previously. The nodes are 100 students in total, from one of two schools. Here, the first 50 students are from the first school, and the second 50 students are from the second school. The probability of two students who both go to the first school being friends is <span class="math notranslate nohighlight">\(0.5\)</span>, and the probability of two students who both go to school two being friends will also be <span class="math notranslate nohighlight">\(0.5\)</span>. If two students go to different schools, their probability of being friends will be <span class="math notranslate nohighlight">\(0.2\)</span>. The statistical model has parameters which look like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graspologic</span> <span class="k">as</span> <span class="nn">gp</span>
+
+<span class="n">ns1</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> <span class="n">ns2</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">ns</span> <span class="o">=</span> <span class="p">[</span><span class="n">ns1</span><span class="p">,</span> <span class="n">ns2</span><span class="p">]</span>
+
+<span class="c1"># zvec is a column vector of 50 1s followed by 50 2s</span>
+<span class="c1"># this vector gives the school each of the 100 students are from</span>
+<span class="n">zvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;S1&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns1</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;S2&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns2</span><span class="p">)])</span>
+
+<span class="c1"># the block matrix</span>
+<span class="n">B</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]</span>
+
+<span class="c1"># the probability matrix</span>
+<span class="n">zvec_ohe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns1</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns2</span><span class="p">)])</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">zvec_ohe</span> <span class="o">@</span> <span class="n">B</span> <span class="o">@</span> <span class="n">zvec_ohe</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [1],</span> in <span class="ni">&lt;cell line: 8&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">ns</span> <span class="o">=</span> <span class="p">[</span><span class="n">ns1</span><span class="p">,</span> <span class="n">ns2</span><span class="p">]</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1"># zvec is a column vector of 50 1s followed by 50 2s</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="c1"># this vector gives the school each of the 100 students are from</span>
+<span class="nn">----&gt; 8 zvec = np.array([&quot;S1&quot; for i in range(0, ns1)] + [&quot;S2&quot; for i</span> in <span class="ni">range</span><span class="nt">(0, ns2)])</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="c1"># the block matrix</span>
+<span class="g g-Whitespace">     </span><span class="mi">11</span> <span class="n">B</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]</span>
+
+<span class="ne">NameError</span>: name &#39;np&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">B</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Block Matrix $B$&quot;</span><span class="p">,</span> 
+                <span class="n">xticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">],</span> <span class="n">yticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;S1&quot;</span><span class="p">,</span> <span class="s2">&quot;S2&quot;</span><span class="p">],</span>
+                <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">zvec</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Probability Matrix $P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_3_0.png" src="../../_images/estimating-parameters_spectral_3_0.png" />
+</div>
+</div>
+<p>The procedure for generating the probability matrix from the block probability matrix that we used above is a linear algebra “cheat”, but in reality, all that’s happening is that we are comparing whether two nodes are in the first or the second school, and then taking the appropriate entry from the block matrix accordingly. The operation is exactly the same as we had in the section on RDPG. For two nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, the probability they are connected is:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \vec x_i &amp;= \begin{bmatrix}
-        \frac{100 - i}{100} \\ \frac{i}{100}
+    p_{ji} = p_{ij}, p_{ij} = \begin{cases}
+        b_{11} &amp; z_i = 1, z_j = 1 \\
+        b_{12} &amp; z_i = 1, z_j = 2 \\
+        b_{22} &amp; z_i = 2, z_j = 2
+    \end{cases}
+\end{align*}\]</div>
+<p>Next, we will use this probability matrix and the corresponding community assignment vector to generate a realization of the stochastic block model we saw above. This is our “real network”:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">simulations</span><span class="o">.</span><span class="n">sbm</span><span class="p">(</span><span class="n">ns</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can see the adjacency matrix and the probability matrix below. Notice that there are two distrinct blocks in the adjacency matrix, which are shared with the probability matrix: in its upper-left, you can see the edges between the first 50 nodes (the individuals in the first school), and in the bottom right, you can see the edges between the second 50 nodes (the individuals in the second school).</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">zvec</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Probability Matrix $P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">zvec</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Realization of SBM Random Network, $A$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_7_0.png" src="../../_images/estimating-parameters_spectral_7_0.png" />
+</div>
+</div>
+<p>As we can see, both the probability matrix <span class="math notranslate nohighlight">\(P\)</span> and the realization of the random network <span class="math notranslate nohighlight">\(A\)</span> both have a notable “structure”, in that it’s clear that there are more nodes when both individuals are in the first school (the top left and bottom right “squares” of the adjacency matrix and probability matrix have more entries and are darker, respectively) and fewer nodes when both individuals are in different schools (the top right and bottom left “squares” of the adjacency matrix have fewer entries and are lighter, respectively).</p>
+</div>
+<div class="section" id="how-are-nodes-from-the-same-community-similar">
+<h1><span class="section-number">6.5. </span>How are nodes from the same community similar?<a class="headerlink" href="#how-are-nodes-from-the-same-community-similar" title="Permalink to this headline">¶</a></h1>
+<p>As it turns out, there’s a really important property that is shared by nodes in an SBM random network. Remember that the probability matrix <span class="math notranslate nohighlight">\(P\)</span> gives the probabilities <span class="math notranslate nohighlight">\(p_{ji}\)</span> of each pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of being connected. We’re going to introduce a new piece of notation here, called the <em>vector of probabilities</em> for a single node. The <strong>vector of probabilities</strong> for a node <span class="math notranslate nohighlight">\(i\)</span> is the quantity:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec p_i &amp;= \begin{bmatrix}
+        p_{i1} \\
+        \vdots \\
+        p_{in}
     \end{bmatrix}
 \end{align*}\]</div>
-<p>In this case, since each <span class="math notranslate nohighlight">\(\vec x_i\)</span> is <span class="math notranslate nohighlight">\(2\)</span>-dimensional, the number of latent dimensions in <span class="math notranslate nohighlight">\(X\)</span> is <span class="math notranslate nohighlight">\(d=2\)</span>. Let’s simulate an example network:</p>
+<p>In words, it is basically just the <span class="math notranslate nohighlight">\(i^{th}\)</span> row of the probability matrix <span class="math notranslate nohighlight">\(P\)</span>. Now, what happens when we look at the probability vectors for nodes which are in the same, versus different communities? Here, what we will do is take the probability vectors for students <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, who both attend school one, and compare them to the probability vectors for students <span class="math notranslate nohighlight">\(51\)</span> and <span class="math notranslate nohighlight">\(52\)</span>, who both attend school two:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">rdpg</span>
-
-<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># the number of nodes in our network</span>
-
-<span class="c1"># design the latent position matrix X according to </span>
-<span class="c1"># the rules we laid out previously</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-    <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="p">[((</span><span class="n">n</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span><span class="o">/</span><span class="n">n</span><span class="p">),</span> <span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="n">n</span><span class="p">)]</span>
-
-<span class="n">P</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># grab the probability vectors for the students we outlined above</span>
+<span class="n">Psubset</span> <span class="o">=</span> <span class="n">P</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">],:]</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
-<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Simulated RDPG(X)&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_spectral_2_0.png" src="../../_images/estimating-parameters_spectral_2_0.png" />
-</div>
-</div>
-<p>What happens when we fit a <code class="docutils literal notranslate"><span class="pre">rdpg</span></code> model to <span class="math notranslate nohighlight">\(A\)</span>? We will evaluate the performance of the RDPG estimator by comparing the estimated probability matrix, <span class="math notranslate nohighlight">\(\hat P = \hat X \hat X^\top\)</span>, to the true probability matrix, <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. We can do this using the <code class="docutils literal notranslate"><span class="pre">RDPGEstimator</span></code> object, provided directly by graspologic:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">RDPGEstimator</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">RDPGEstimator</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># number of latent dimensions is 2</span>
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="n">Xhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">latent_</span>
-<span class="n">Phat</span> <span class="o">=</span> <span class="n">Xhat</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Xhat</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Phat</span><span class="p">,</span>
-        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated probability matrix&quot;</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-
-<span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span>
-        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;True probability matrix&quot;</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
-<span class="n">fig</span><span class="p">;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Psubset</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdBu_r&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+           <span class="n">yticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Student 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Student 2&quot;</span><span class="p">,</span> <span class="s2">&quot;Student 51&quot;</span><span class="p">,</span> <span class="s2">&quot;Student 52&quot;</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Probability that student $i$ is friends with student $j$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Student $i$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Student $j$&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_spectral_5_0.png" src="../../_images/estimating-parameters_spectral_5_0.png" />
+<img alt="../../_images/estimating-parameters_spectral_11_0.png" src="../../_images/estimating-parameters_spectral_11_0.png" />
 </div>
 </div>
-<p>Note that our estimated probability matrix tends to preserve the pattern in the true probability matrix, where the probabilities are highest for pairs of nodes which are closer together, but lower for pairs of nodes which are farther apart.</p>
-<p>What if we did not know that there were two latent dimensions ahead of time? The RDPG Estimator handles this situation just as well, and we can estimate the number of latent dimensions with <span class="math notranslate nohighlight">\(\hat d\)</span> instead:</p>
+<p>The probability vectors for students <span class="math notranslate nohighlight">\(1\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, <span class="math notranslate nohighlight">\(51\)</span>, and <span class="math notranslate nohighlight">\(52\)</span> are shown as the rows of the above heatmap. What do we notice about the probability vectors for students <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> in comparison to students <span class="math notranslate nohighlight">\(51\)</span> and <span class="math notranslate nohighlight">\(52\)</span>? As it turns out, they are exactly the same, and the probability vectors are identical! In general, what this means is that, for an SBM, <em>all</em> of the nodes in a single community have the <em>exact same</em> probability vector! If you are interested in some more details as to why this is the case for an SBM, the reason is that the probability vector for a given node is <em>fully specified</em> by just knowing the block matrix and the community assignment vector for the nodes in the network. What this means is that there is nothing special about one node versus another node in the same community, in the probability sense.</p>
+<p>Now, what does this mean for <em>us</em>? What this means is that the probability matrix has a special property, called the <em>low-rank</em> property. Now, we’ll learn about matrix rank, and some important consequences of this fact.</p>
+</div>
+<div class="section" id="low-rank-structure-what-it-is-how-we-find-it-and-why-it-matters">
+<h1><span class="section-number">6.6. </span>Low-rank structure: what it is, how we find it, and why it matters<a class="headerlink" href="#low-rank-structure-what-it-is-how-we-find-it-and-why-it-matters" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="matrix-rank">
+<h2><span class="section-number">6.6.1. </span>Matrix Rank<a class="headerlink" href="#matrix-rank" title="Permalink to this headline">¶</a></h2>
+<p>In the technical sense, the <em>rank</em> of a matrix is a description of just how complicated the matrix is. A matrix is <strong>low rank</strong> if any of its rows (or equivalently, its columns) are linear combinations of other rows (or columns). What this means is that if we can take rows or columns from the matrix, and add or multiply them together to get other rows or columns from the matrix, the matrix is low rank. This means that information contained in the matrix is redundant, in that we could obtain it by just adding or subtracting other information already contained in the matrix!</p>
+<p>In our case, what this means is that the probability matrix for an SBM with <span class="math notranslate nohighlight">\(K\)</span> total communities will be of rank-<span class="math notranslate nohighlight">\(K\)</span>: there is a single unique probability vector for each community. This means that we could express all of the rows of the probability matrix by taking one probability vector from each community, and then “instructions” as to how we combine these probability vectors to obtain the probability vectors for other nodes in the community. In the case of the simple SBM, these “instructions” are just to duplicate the same vector over and over again, for every node in the community. Nothing too complicated, right?</p>
+</div>
+<div class="section" id="how-do-we-find-this-low-rank-structure">
+<h2><span class="section-number">6.6.2. </span>How do we find this low-rank structure?<a class="headerlink" href="#how-do-we-find-this-low-rank-structure" title="Permalink to this headline">¶</a></h2>
+<p>When we have data which we think is low-rank, one way we can identify this pattern is by using something called a <em>spectral embedding</em>. This embedding is called <em>spectral</em> because it will have to do with the eigenvalues/eigenvectors of the probability matrix (often called a matrix’s <em>spectrum</em>). It is called an <em>embedding</em> which, informally, means that there is a high level structure that we get to see (the probability matrix) which can be more succinctly described by a lower-level structure that we don’t immediately get to see (the two unique probability vectors). What we want to do here is identify this low-level structure given the probability matrix and <em>nothing else</em>, which means we might not get to see the communities each node is part of when we perform this analysis. The spectral embedding will let us do this.</p>
+<div class="section" id="the-singular-value-decomposition">
+<h3><span class="section-number">6.6.2.1. </span>The Singular Value Decomposition<a class="headerlink" href="#the-singular-value-decomposition" title="Permalink to this headline">¶</a></h3>
+<p>The spectral embedding algorithm begins by finding the <em>singular-value decomposition</em> of the data.</p>
+<div class="admonition-singular-value-decomposition admonition">
+<p class="admonition-title">Singular-Value Decomposition</p>
+<p>The singular value decomposition of a matrix <span class="math notranslate nohighlight">\(P\)</span> is the set of matrices <span class="math notranslate nohighlight">\(U, \Sigma\)</span>, and <span class="math notranslate nohighlight">\(V\)</span>, where:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P &amp;= U\SigmaV^\Top
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma\)</span>, and <span class="math notranslate nohighlight">\(V\)</span> have some special properties:</p>
+<ol class="simple">
+<li><p>The left singular vectors: the columns <span class="math notranslate nohighlight">\(\vec u_i\)</span> of <span class="math notranslate nohighlight">\(U\)</span> are called the left singular vectors of <span class="math notranslate nohighlight">\(P\)</span>. If <span class="math notranslate nohighlight">\(P\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns, there will be <span class="math notranslate nohighlight">\(n\)</span> left singular vectors. This matrix looks like this:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    U &amp;= \begin{bmatrix}
+        \vec u_1 &amp; ... &amp; \vec u_n
+    \end{bmatrix}
+\end{align*}\]</div>
+<ol class="simple">
+<li><p>The singular values: the matrix <span class="math notranslate nohighlight">\(\Sigma\)</span> is a diagonal matrix, which means that it has entries along the diagonal and all the other entries are just <em>zero</em>. There will be <span class="math notranslate nohighlight">\(n\)</span> total of these. This matrix looks something like this:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \Sigma &amp;= \begin{bmatrix}
+        \sigma_1 &amp; 0 &amp; ... &amp; 0 \\
+        0 &amp; \sigma_2 &amp; \ddots &amp; \vdots \\
+        \vdots &amp; \ddots &amp; \ddots &amp; 0 \\
+        0 &amp; ... &amp; 0 &amp; \sigma_n
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>The special property is that by definition, the singular values are <em>descending</em>, in that <span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2\)</span>, <span class="math notranslate nohighlight">\(\sigma_2 \geq \sigma_3\)</span>, so on and so forth to <span class="math notranslate nohighlight">\(\sigma_n\)</span>.
+3. The right singular vectors: the columns <span class="math notranslate nohighlight">\(\vec v_i\)</span> of <span class="math notranslate nohighlight">\(V\)</span> are called the right singular vectors of <span class="math notranslate nohighlight">\(P\)</span>. If <span class="math notranslate nohighlight">\(P\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns, there will be <span class="math notranslate nohighlight">\(n\)</span> right singular vectors. This matrix looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+V &amp;= \begin{bmatrix}
+    \vec v_1 &amp; ... &amp; \vec v_n
+\end{bmatrix}
+\end{align*}\]</div>
+</div>
+<p>As it turns out, because <span class="math notranslate nohighlight">\(\Sigma\)</span> is a diagonal matrix, the multiplication <span class="math notranslate nohighlight">\(P = U\Sigma V^\top\)</span>, which to the author anyways is somewhat opaque, can actually be written a lot more easily. We can write this equation down like this, which is much more understandable:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sum_{i = 1}^n \sigma_i\begin{bmatrix}
+        \uparrow \\ \vec u_i \\ \downarrow
+    \end{bmatrix}\begin{bmatrix}
+        \leftarrow &amp; \vec v_i^\top &amp; \rightarrow
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>In a sense, what this means is that <span class="math notranslate nohighlight">\(P\)</span> is a sum of the products of <span class="math notranslate nohighlight">\(\vec u_i\)</span> with <span class="math notranslate nohighlight">\(\vec v_i^\top\)</span>, and then “scaled” or “multiplied” by <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
+<p>To show this computationally, we’re going to decompose <span class="math notranslate nohighlight">\(P\)</span> into its singular value decomposition using <code class="docutils literal notranslate"><span class="pre">numpy</span></code>. We’ll first show something called a scree plot, which is a plot of the singular values of the matrix <span class="math notranslate nohighlight">\(P\)</span>. This plot is typically shown by having the magnitude of each singular value on the <span class="math notranslate nohighlight">\(y\)</span>-axis, and the <span class="math notranslate nohighlight">\(x\)</span>-axis is just the index of the singular value. Remember, the singular values are <em>descending</em>, which means that this plot is always going to show the singular values <em>decreasing</em> as the index increases.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">RDPGEstimator</span><span class="p">(</span><span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># number of latent dimensions is not known</span>
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="n">Xhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">latent_</span>
-<span class="n">Phat</span> <span class="o">=</span> <span class="n">Xhat</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">Xhat</span><span class="p">)</span>
-<span class="n">dhat</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">latent_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Estimated number of latent dimensions: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dhat</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># take the singular value decomposition</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+<span class="c1"># U is the matrix whose columns are the left singular vectors</span>
+<span class="c1"># s is the vector whose entries are the singular values</span>
+<span class="c1"># Vt is the matrix whose rows are the right singular vectors</span>
+<span class="c1"># and whose tranpose has columns which are the right singular vectors</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="k">def</span> <span class="nf">plot_scree</span><span class="p">(</span><span class="n">svs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">sv_dat</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;Singular Value&quot;</span><span class="p">:</span> <span class="n">svs</span><span class="p">,</span> <span class="s2">&quot;Dimension&quot;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">svs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)})</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">sv_dat</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Dimension&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Singular Value&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Dimension&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Singular Value&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;Dimension 2&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="n">plot_scree</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Scree plot of $P$&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Estimated number of latent dimensions: 2
+<img alt="../../_images/estimating-parameters_spectral_14_0.png" src="../../_images/estimating-parameters_spectral_14_0.png" />
+</div>
+</div>
+<p>Next, we’ll show <span class="math notranslate nohighlight">\(P\)</span> itself, the matrix product of <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma\)</span>, and <span class="math notranslate nohighlight">\(V^\top\)</span>, followed by the sum expression to show you we aren’t just making up that all of these expressions are exactly equal!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># matrix product form of expression for P</span>
+<span class="n">Psvd</span> <span class="o">=</span> <span class="n">U</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">@</span> <span class="n">Vt</span>
+
+<span class="c1"># sum expression for P</span>
+<span class="c1"># remember that U[:,i] is the ith column of U (the ith left singular vector)</span>
+<span class="c1"># and Vt[i,:] is the ith column of V (the ith right singular vector)</span>
+<span class="c1"># and the ith row of Vt (transpose)</span>
+<span class="n">Psum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">U</span><span class="p">[:,[</span><span class="n">i</span><span class="p">]])</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Vt</span><span class="p">[[</span><span class="n">i</span><span class="p">],:])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ns1</span> <span class="o">+</span> <span class="n">ns2</span><span class="p">)],</span> <span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>So we can see that choosing the best-fit elbow instead yielded <span class="math notranslate nohighlight">\(\hat d = 3\)</span>; that is, the number of latent dimensions are estimated to be <span class="math notranslate nohighlight">\(3\)</span>. Again, looking at the estimated and true probability matrices:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+ 
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Psvd</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$U</span><span class="se">\\</span><span class="s2">Sigma V^</span><span class="se">\\</span><span class="s2">top$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Psum</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">sum_{i = 1}^n \sigma_i u_i v_i^</span><span class="se">\\</span><span class="s2">top$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_17_0.png" src="../../_images/estimating-parameters_spectral_17_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="the-relationship-between-the-singular-value-decomposition-and-best-representations-of-a-matrix">
+<h3><span class="section-number">6.6.2.2. </span>The relationship between the singular value decomposition and “best” representations of a matrix<a class="headerlink" href="#the-relationship-between-the-singular-value-decomposition-and-best-representations-of-a-matrix" title="Permalink to this headline">¶</a></h3>
+<p>What if we only looked at the first <span class="math notranslate nohighlight">\(d\)</span> entries of the singular value decomposition? When we say “look at”, what we mean is that we will retain the first <span class="math notranslate nohighlight">\(d\)</span> left and right singular values/vectors, and the first (the <em>biggest</em>) <span class="math notranslate nohighlight">\(d\)</span> singular values. We will call this new matrix <span class="math notranslate nohighlight">\(P_d\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P_d &amp;= \sum_{i = 1}^d \sigma_i \vec u_i \vec v_i^\top
+\end{align*}\]</div>
+<p>Again, we can write this up in full matrix form, as <span class="math notranslate nohighlight">\(P_d = U_d\Sigma_d V_d^\top\)</span>, where <span class="math notranslate nohighlight">\(U_d\)</span> is now just the first <span class="math notranslate nohighlight">\(d\)</span> columns of <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma_d\)</span> is just the diagonal matrix from the first <span class="math notranslate nohighlight">\(d\)</span> singular values, and <span class="math notranslate nohighlight">\(V_d\)</span> is the first <span class="math notranslate nohighlight">\(d\)</span> columns of <span class="math notranslate nohighlight">\(V\)</span>. Another special property of the singular value decomposition that we will need is that, as it turns out, the <span class="math notranslate nohighlight">\(U_d\)</span>, <span class="math notranslate nohighlight">\(\Sigma_d\)</span>, and <span class="math notranslate nohighlight">\(V_d\)</span> that we constructed in this way are the <em>best</em> possible choices we could have made to represent <span class="math notranslate nohighlight">\(P\)</span> using <span class="math notranslate nohighlight">\(d\)</span> singular values and vectors. By best, we mean that if we were to any other scalar multiples <span class="math notranslate nohighlight">\(\sigma_i\)</span>, and singular values/vectors <span class="math notranslate nohighlight">\(\vec u_i\)</span> and <span class="math notranslate nohighlight">\(\vec v_i\)</span>, the matrix we would make using the sum shown above is not going to be as similar to <span class="math notranslate nohighlight">\(P\)</span> as <span class="math notranslate nohighlight">\(P_d\)</span> is (more specifically, the Frobenius difference between <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(P_d\)</span> will be <em>minimal</em>). This is just a definition of the singular value decomposition, and is not anything super technical beyond that, so you shouldn’t worry too much about this fact and just take our word on it for now.</p>
+<p>What does <span class="math notranslate nohighlight">\(\sigma_i\)</span> mean for us? Well, if we were to look at <span class="math notranslate nohighlight">\(P_1\)</span>, <span class="math notranslate nohighlight">\(P_1\)</span> would just be <span class="math notranslate nohighlight">\(\sigma_1 \vec u_1 \vec v_1^\top\)</span>, so it’s pretty clear that <span class="math notranslate nohighlight">\(\vec u_1\)</span> and <span class="math notranslate nohighlight">\(\vec v_1\)</span> are the best singular vectors to describe <span class="math notranslate nohighlight">\(P\)</span>. <span class="math notranslate nohighlight">\(\sigma_1\)</span> basically just tells us how much we should multiply them to describe <span class="math notranslate nohighlight">\(P\)</span> just right. Let’s take a look at <span class="math notranslate nohighlight">\(P_1\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">P1</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">U</span><span class="p">[:,[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Vt</span><span class="p">[[</span><span class="mi">0</span><span class="p">],:])</span>
+<span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">P1</span><span class="p">)</span>  <span class="c1"># compute the frobenius difference</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_1$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">P1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P - P_1$, Frobenius difference = </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">diff</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_20_0.png" src="../../_images/estimating-parameters_spectral_20_0.png" />
+</div>
+</div>
+<p>How about <span class="math notranslate nohighlight">\(P_2\)</span>? Well we knew that <span class="math notranslate nohighlight">\(P_1\)</span> was the best representation with <span class="math notranslate nohighlight">\(1\)</span> singular values and vectors, and now we just add in <span class="math notranslate nohighlight">\(\sigma_2 \vec u_2 \vec v_2^\top\)</span> to get <span class="math notranslate nohighlight">\(P_2\)</span>. That is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P_2 &amp;= \sum_{i = 1}^2 \sigma_i \vec u_i \vec v_i^\top + \sigma_2 \vec u_2 \vec v_2^\top = P_1 + \sigma_2 \vec u_2 \vec v_2^\top
+\end{align*}\]</div>
+<p>So now <span class="math notranslate nohighlight">\(\sigma_2\)</span> is the multiplicative factor telling us how much to multiply <span class="math notranslate nohighlight">\(\vec u_2\)</span> and <span class="math notranslate nohighlight">\(\vec v_2\)</span> by. If we repeat this over and over, we will see that the singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span> will just describe how much we need to multiply <span class="math notranslate nohighlight">\(\vec u_i\)</span> and <span class="math notranslate nohighlight">\(\vec v_i\)</span> by to offset the preceding “best” matrix with <span class="math notranslate nohighlight">\(i-1\)</span> singular values and vectors to get the best representation with <span class="math notranslate nohighlight">\(i\)</span> singular values and vectors. If <span class="math notranslate nohighlight">\(\sigma_i\)</span> were big, then <span class="math notranslate nohighlight">\(\vec u_i\)</span> and <span class="math notranslate nohighlight">\(\vec v_i^\top\)</span>’s product will be a big component of <span class="math notranslate nohighlight">\(P_i\)</span>. If <span class="math notranslate nohighlight">\(\sigma_i\)</span> were small, then <span class="math notranslate nohighlight">\(\vec u_i\)</span> and <span class="math notranslate nohighlight">\(\vec v_i^\top\)</span>’s product will not be a very big compouent of the sum we have here. So the entry <span class="math notranslate nohighlight">\(\sigma_i\)</span>, in effect, tells us <em>just how important</em> the <span class="math notranslate nohighlight">\(i^{th}\)</span> singular vectors are to <span class="math notranslate nohighlight">\(P\)</span>. This fact will be crucial later on.</p>
+</div>
+<div class="section" id="equivalence-of-top-left-and-right-singular-vectors">
+<h3><span class="section-number">6.6.2.3. </span>Equivalence of top left and right singular vectors<a class="headerlink" href="#equivalence-of-top-left-and-right-singular-vectors" title="Permalink to this headline">¶</a></h3>
+<p>You might be thinking this expression looks complicated, which we agree, so far it does. But there are some nice facts that will make this expression way simpler for us. As a rule of thumb, if a matrix is rank <span class="math notranslate nohighlight">\(d\)</span>, then <em>all</em> but the first <span class="math notranslate nohighlight">\(d\)</span> singular values are just going to be zero. Since our probability matrix was rank-<span class="math notranslate nohighlight">\(K\)</span>, this means that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P &amp;= \sum_{i = 1}^d \sigma_i \vec u_i \vec v_i^\top \\
+    &amp;= \sum_{i = 1}^K \sigma_i \vec u_i \vec v_i^\top + \sum_{i = K+1}^{n}\sigma_i \vec u_i \vec v_i^\top \\
+    &amp;= \sum_{i = 1}^K \sigma_i \vec u_i \vec v_i^\top \\
+    &amp;^= P_K
+\end{align*}\]</div>
+<p>in the second line, we just split the sum from <span class="math notranslate nohighlight">\(n\)</span> terms apart into the first <span class="math notranslate nohighlight">\(K\)</span> terms and the second <span class="math notranslate nohighlight">\(n - K\)</span> terms as separate expressions. Then, we used the fact that the last <span class="math notranslate nohighlight">\(n-K\)</span> singular values are all just <span class="math notranslate nohighlight">\(0\)</span>, so the <span class="math notranslate nohighlight">\(\vec u_i\)</span>s and <span class="math notranslate nohighlight">\(\vec v_i\)</span>s don’t matter at <em>all</em>. So we can describe <span class="math notranslate nohighlight">\(P\)</span> fully using <em>only</em> the first <span class="math notranslate nohighlight">\(K\)</span> singular values and vectors. Again, we’ll show this with <code class="docutils literal notranslate"><span class="pre">numpy</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">UK</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">K</span><span class="p">];</span> <span class="n">SK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">K</span><span class="p">]);</span> <span class="n">VtK</span> <span class="o">=</span> <span class="n">Vt</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">K</span><span class="p">,:]</span>
+<span class="n">PK</span> <span class="o">=</span> <span class="n">UK</span> <span class="o">@</span> <span class="n">SK</span> <span class="o">@</span> <span class="n">VtK</span>
+<span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">PK</span><span class="p">)</span>  <span class="c1"># compute the frobenius difference</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P_2$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">PK</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P - P_2$, Frobenius difference = </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">diff</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_23_0.png" src="../../_images/estimating-parameters_spectral_23_0.png" />
+</div>
+</div>
+<p>Next comes the really cool part. The matrix <span class="math notranslate nohighlight">\(P\)</span> is square because it has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns. The matrix is positive, because every entry is a probability between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Finally, the matrix is symmetric, because the underlying random network is undirected, which means that the probability of node <span class="math notranslate nohighlight">\(i\)</span> being connected to node <span class="math notranslate nohighlight">\(j\)</span> is equal to the probability that node <span class="math notranslate nohighlight">\(j\)</span> is connected to node <span class="math notranslate nohighlight">\(i\)</span>. When a matrix is square, symmetric, and positive, for any singular vector associated with a non-zero singular value, the left and right singular vectors will be <em>identical</em>! This means that for <em>all</em> of the first <span class="math notranslate nohighlight">\(K\)</span> singular vectors <span class="math notranslate nohighlight">\(\vec u_i\)</span> and <span class="math notranslate nohighlight">\(\vec v_i\)</span>, that <span class="math notranslate nohighlight">\(\vec u_i = \vec v_i\)</span>! Using what we learned above, our expression for <span class="math notranslate nohighlight">\(P\)</span> now looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}    
+    P = P_K = \sum_{i = 1}^K \sigma_i \vec u_i \vec u_i^\top
+\end{align*}\]</div>
+<p>and putting this back in our matrix form with <span class="math notranslate nohighlight">\(U_K\)</span> the matrix whose <span class="math notranslate nohighlight">\(K\)</span> columns are the vectors <span class="math notranslate nohighlight">\(\vec u_i\)</span>, and <span class="math notranslate nohighlight">\(\Sigma_K\)</span> the first <span class="math notranslate nohighlight">\(K\)</span> singular values, we have that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P &amp;= U_K \Sigma_K U_K^\top
+\end{align*}\]</div>
+<p>Now, we are really starting to get somewhere! Again, we’ll show this using <code class="docutils literal notranslate"><span class="pre">numpy</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Psymm is UK * SigmaK * UK^transpose</span>
+<span class="n">Psymm</span> <span class="o">=</span> <span class="n">UK</span> <span class="o">@</span> <span class="n">SK</span> <span class="o">@</span> <span class="n">UK</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">Psymm</span><span class="p">)</span>  <span class="c1"># compute the frobenius difference</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">PK</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$U_K </span><span class="se">\\</span><span class="s2">Sigma_K U_K^</span><span class="se">\\</span><span class="s2">top$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">PK</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P - U_K </span><span class="se">\\</span><span class="s2">Sigma_K U_K^</span><span class="se">\\</span><span class="s2">top$, Frobenius difference = </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">diff</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_26_0.png" src="../../_images/estimating-parameters_spectral_26_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="the-square-root-matrix">
+<h3><span class="section-number">6.6.2.4. </span>The Square Root Matrix<a class="headerlink" href="#the-square-root-matrix" title="Permalink to this headline">¶</a></h3>
+<p>It’s been quite a ride; don’t fall off just yet! Now we are really in the home stretch! We’ve saved the easiest part for last. Remember that <span class="math notranslate nohighlight">\(\Sigma_K\)</span> is just a diagonal matrix, whose entries are the singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span> for the first <span class="math notranslate nohighlight">\(K\)</span> singular values. As it turns out, since <span class="math notranslate nohighlight">\(P\)</span> is positive, these singular values are going to be positive too. This means that <span class="math notranslate nohighlight">\(\sigma_i\)</span> has a real square root, since all positive numbers have a square root. This means we could just express <span class="math notranslate nohighlight">\(\sigma_i\)</span> as the product of <span class="math notranslate nohighlight">\(\sqrt{\sigma_i}\sqrt{\sigma_i}\)</span> with itself!</p>
+<p>Finally, remember that if we were to multiply two diagonal matrices, the resulting matrix would just be the element-wise product of each diagonal entry. This means we could just write <span class="math notranslate nohighlight">\(\Sigma_K\)</span> like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \Sigma_K &amp;= \begin{bmatrix}
+        \sqrt{\sigma_1} &amp; 0 &amp; ... &amp; 0 \\
+        0 &amp; \sqrt{\sigma_2} &amp; \ddots &amp; \vdots \\
+        \vdots &amp; \ddots &amp; \ddots &amp; 0 \\
+        0 &amp; ... &amp; 0 &amp; \sqrt{\sigma_n}
+    \end{bmatrix}\begin{bmatrix}
+        \sqrt{\sigma_1} &amp; 0 &amp; ... &amp; 0 \\
+        0 &amp; \sqrt{\sigma_2} &amp; \ddots &amp; \vdots \\
+        \vdots &amp; \ddots &amp; \ddots &amp; 0 \\
+        0 &amp; ... &amp; 0 &amp; \sqrt{\sigma_n}
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>We will call the resulting matrix the “square root” matrix of <span class="math notranslate nohighlight">\(\Sigma_K\)</span>, abbreviated <span class="math notranslate nohighlight">\(\sqrt{\Sigma_K}\)</span> which hopefully is named for pretty obvious reasons. So, <span class="math notranslate nohighlight">\(\Sigma_K = \sqrt{\Sigma_K}\sqrt{\Sigma_K}\)</span>. This matrix has <span class="math notranslate nohighlight">\(K \times K\)</span> entries, and is therefore square. Also, notice that all the off-diagonal entries are just <span class="math notranslate nohighlight">\(0\)</span>, which means it’s symmetric too, because of the convenient fact that <span class="math notranslate nohighlight">\(0 = 0\)</span> (and hence, the off-diagonal entries are all equal). Putting this fact together means that <span class="math notranslate nohighlight">\(\sqrt{\Sigma_K} = \sqrt{\Sigma_K}^\top\)</span>, which is the definition of matrix symmetry. So finally, <span class="math notranslate nohighlight">\(\Sigma_K = \sqrt{\Sigma_K}\sqrt{\Sigma_K}^\top\)</span>. Putting this fact together gives us that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    P &amp;= U_K \sqrt{\Sigma_K}\sqrt{\Sigma_K}^\top U_K^\top
+\end{align*}\]</div>
+<p>If we let <span class="math notranslate nohighlight">\(X = U_K \sqrt{\Sigma_K}\)</span>, then <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. This means that <span class="math notranslate nohighlight">\(X\)</span> is a latent position matrix for <span class="math notranslate nohighlight">\(P\)</span>! If you remember back to the <a class="reference external" href="#link?">Section on RDPGs</a>, this means that we have found the latent position parameter for the corresponding RDPG for our SBM random network!</p>
+<p>Let’s see this using numpy again:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">SKsqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">SK</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">UK</span> <span class="o">@</span> <span class="n">SKsqrt</span>
+<span class="n">Prdpg</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">X</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">Prdpg</span><span class="p">)</span>  <span class="c1"># compute the frobenius difference</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Prdpg</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$XX^</span><span class="se">\\</span><span class="s2">top$&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">Prdpg</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$P - XX^</span><span class="se">\\</span><span class="s2">top$, Frobenius difference = </span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">diff</span><span class="p">),</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_29_0.png" src="../../_images/estimating-parameters_spectral_29_0.png" />
+</div>
+</div>
+<p>This matrix <span class="math notranslate nohighlight">\(X\)</span>, the latent position matrix, for an SBM will look like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_lpm</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">xticklabs</span><span class="o">=</span><span class="p">[],</span>
+            <span class="n">yticks</span><span class="o">=</span><span class="p">[],</span> <span class="n">yticklabs</span><span class="o">=</span><span class="p">[],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="n">cbar</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Latent Dimension&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">xticks</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">xticklabs</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">yticks</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">yticklabs</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">);</span>
+
+<span class="n">plot_lpm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="n">xticklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Dimension 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Dimension 2&quot;</span><span class="p">],</span>
+        <span class="n">yticks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Heatmap of Latent Position Matrix $X$&quot;</span><span class="p">,</span>
+        <span class="n">yticklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;51&quot;</span><span class="p">,</span> <span class="s2">&quot;100&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_31_0.png" src="../../_images/estimating-parameters_spectral_31_0.png" />
+</div>
+</div>
+<p>and is the “low-rank structure” which describes the probability matrix.</p>
+<div class="admonition-putting-it-all-together admonition">
+<p class="admonition-title">Putting it all together</p>
+<p>What have we learned so far? What we’ve learned so far is that, if we have a probability matrix that is symmetric and rank-<span class="math notranslate nohighlight">\(K\)</span>:</p>
+<ol class="simple">
+<li><p>We can decompose this probability matrix using the singular value decomposition.</p></li>
+<li><p>We can ignore singular values/vectors other than the first <span class="math notranslate nohighlight">\(K\)</span> of them.</p></li>
+<li><p>For the first <span class="math notranslate nohighlight">\(K\)</span> singular vectors, the left and right vectors are identical.</p></li>
+<li><p>We can decompose the singular value matrix into the product of the square root matrix with its transpose.</p></li>
+<li><p>We can express the matrix <span class="math notranslate nohighlight">\(P\)</span> using the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, which is the product of the first <span class="math notranslate nohighlight">\(K\)</span> singular vectors with the first <span class="math notranslate nohighlight">\(K\)</span> singular values.
+This means that we have found a latent position matrix <span class="math notranslate nohighlight">\(X\)</span> for the probability matrix using the singular values and singular vectors of <span class="math notranslate nohighlight">\(P\)</span>, by effectively just discarding the ones that don’t matter (and have singular values of <span class="math notranslate nohighlight">\(0\)</span>). We have succeeded in our goal of finding a much lower rank structure, the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, to describe the probability matrix <span class="math notranslate nohighlight">\(P\)</span>.</p></li>
+</ol>
+</div>
+<p>If you remember from the section on RDPGs, this probability matrix has the property that each entry <span class="math notranslate nohighlight">\(p_{ij} = \vec x_i \vec x_j^\top\)</span>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="but-wait-we-don-t-have-the-probability-matrix-what-do-we-do">
+<h1><span class="section-number">6.7. </span>But wait: we don’t have the probability matrix! What do we do?<a class="headerlink" href="#but-wait-we-don-t-have-the-probability-matrix-what-do-we-do" title="Permalink to this headline">¶</a></h1>
+<p>All of the logic we developed above was with respect to the probability matrix, <span class="math notranslate nohighlight">\(P\)</span>, for a SBM. More generally, this logic extends to the probability matrix <span class="math notranslate nohighlight">\(P\)</span> for any RDPG, which is because an RDPG with <span class="math notranslate nohighlight">\(d\)</span> latent dimensions will <em>always</em> have a probability matrix that is <em>exactly</em> rank <span class="math notranslate nohighlight">\(d\)</span>. But, we have a slight issue: when we perform machine learning, we don’t know the probability matrix! All we have is the adjacency matrix itself, <span class="math notranslate nohighlight">\(A\)</span>, which is our data! We don’t actually know what the underlying probability matrix is! How the heck can we find this low rank structure we want to be able to estimate?</p>
+<p>As it turns out, if we kept obtaining more and more networks <span class="math notranslate nohighlight">\(A\)</span> from the underlying RDPG random network <span class="math notranslate nohighlight">\(\mathbf A\)</span>, we would <em>expect</em> that the network <span class="math notranslate nohighlight">\(A\)</span> we saw would be the probability matrix <span class="math notranslate nohighlight">\(P\)</span>. We’ll explain what we mean by expect here by turning back to our coin flip example. As you remember, we perform a coin flip at each pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of an RDPG, where the coin lands on heads with probability <span class="math notranslate nohighlight">\(\vec x_i\vec x_j^\top\)</span>, and lands on tails with probability <span class="math notranslate nohighlight">\(1 - \vec x_i\vec x_j^\top\)</span>. This means we can <em>expect</em> the coin to land on heads with probability <span class="math notranslate nohighlight">\(\vec x_i\vec x_j^\top\)</span>. In the same sense, we can expect the <span class="math notranslate nohighlight">\((i,j)\)</span> entry of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> to exist with probability <span class="math notranslate nohighlight">\(\vec x_i \vec x_j^\top\)</span>. In this sense, the expected value of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> <em>is</em> the probability matrix <span class="math notranslate nohighlight">\(P = XX^\top\)</span>.</p>
+<p>So, since the expected value of the adjacency matrix <em>is</em> the probability matrix, what if we were to just embed the adjacency matrix instead? Let’s see how this might work. Again, we’ll use the singular value decomposition on <span class="math notranslate nohighlight">\(A\)</span>, and take a look at the scree plot for <span class="math notranslate nohighlight">\(A\)</span>, and compare it to the scree plot of <span class="math notranslate nohighlight">\(P\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">UA</span><span class="p">,</span> <span class="n">sA</span><span class="p">,</span> <span class="n">VAt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plot_scree</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Scree plot of $P$&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plot_scree</span><span class="p">(</span><span class="n">sA</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Scree plot of $A$&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_34_0.png" src="../../_images/estimating-parameters_spectral_34_0.png" />
+</div>
+</div>
+<p>Now that’s really funky! The singular values of both <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(A\)</span> tend to fall off around <em>roughly</em> the same spot, right around dimension <span class="math notranslate nohighlight">\(2\)</span>! The singular value of <span class="math notranslate nohighlight">\(P\)</span> go directly to <span class="math notranslate nohighlight">\(0\)</span>, but the singular values for <span class="math notranslate nohighlight">\(A\)</span> tend to “round off” in the direction of <span class="math notranslate nohighlight">\(0\)</span>, but it isn’t <em>too</em> far off!</p>
+<p>As it turns out, this is no coincidence: the singular values for an RDPG will tend to “elbow” off right around the number of true latent dimensions for the probability matrix. If the RDPG has <span class="math notranslate nohighlight">\(d\)</span> latent dimensions, this will occur right around <span class="math notranslate nohighlight">\(d\)</span>. This is called an elbow because it kind of looks like the elbow of an arm, where the upper shoulder is dimensions <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, and the forearm are the remaining dimensions (and therefore, the spot where they meet is the “elbow”!</p>
+<p>For now, let’s assume we know that the proper dimensionality to embed into is two. What does it look like when we use the spectral embedding on <span class="math notranslate nohighlight">\(A\)</span>? We’ll compare the embedding of the adjacency matrix to the latent positions of the probability matrix:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">UAK</span> <span class="o">=</span> <span class="n">UA</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">K</span><span class="p">];</span> <span class="n">USK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sA</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">K</span><span class="p">]))</span>
+<span class="n">Aembedded</span> <span class="o">=</span> <span class="n">UAK</span> <span class="o">@</span> <span class="n">USK</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="n">plot_lpm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="n">xticklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Dimension 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Dimension 2&quot;</span><span class="p">],</span>
+        <span class="n">yticks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Heatmap of Latent Position Matrix $X$&quot;</span><span class="p">,</span>
+        <span class="n">yticklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;51&quot;</span><span class="p">,</span> <span class="s2">&quot;100&quot;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">plot_lpm</span><span class="p">(</span><span class="n">Aembedded</span><span class="p">,</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="n">xticklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Dimension 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Dimension 2&quot;</span><span class="p">],</span>
+        <span class="n">yticks</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedded Adjacency Matrix&quot;</span><span class="p">,</span>
+        <span class="n">yticklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;51&quot;</span><span class="p">,</span> <span class="s2">&quot;100&quot;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/estimating-parameters_spectral_37_0.png" src="../../_images/estimating-parameters_spectral_37_0.png" />
+</div>
+</div>
+<p>Wow! When we take the adjacency matrix and embed it into <span class="math notranslate nohighlight">\(2\)</span> dimensions, it doesn’t look <em>identical</em> to the latent position matrix, but it shares some major patterns with it! In particular, it looks like the second latent dimension for the embedded adjacency matrix tends to capture that the second latent dimension of <span class="math notranslate nohighlight">\(X\)</span> has higher values for the first <span class="math notranslate nohighlight">\(50\)</span> nodes, and lower values for the second <span class="math notranslate nohighlight">\(50\)</span> nodes. For a variety of reasons, we will call this “embedding of <span class="math notranslate nohighlight">\(A\)</span>” an <em>estimate</em> of the latent position matrix for the underlying RDPG, which we will denote by <span class="math notranslate nohighlight">\(\hat X\)</span>.</p>
+<div class="section" id="figuring-out-how-many-dimensions-to-embed-your-network-into">
+<h2><span class="section-number">6.7.1. </span>Figuring Out How Many Dimensions To Embed Your Network Into<a class="headerlink" href="#figuring-out-how-many-dimensions-to-embed-your-network-into" title="Permalink to this headline">¶</a></h2>
+<p>One thing we haven’t addressed is how to figure out how many dimensions to embed down to. We’ve generally been embedding into two dimensions throughout this chapter (mainly because it’s easier to visualize), but you can embed into as many dimensions as you want.</p>
+<p>If you don’t have any prior information about the “true” dimensionality of your latent positions, by default you’d just be stuck guessing. Fortunately, there are some rules-of-thumb to make your guess better, and some methods people have developed to make fairly decent guesses automatically.</p>
+<p>The most common way to pick the number of embedding dimensions uses the scree plot which we learned about above. Let’s take a look at the scree plot for <span class="math notranslate nohighlight">\(A\)</span> again:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from graspologic.plot import screeplot</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Circle</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patheffects</span> <span class="kn">import</span> <span class="n">withStroke</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.anchored_artists</span> <span class="kn">import</span> <span class="n">AnchoredDrawingArea</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svdvals</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">Phat</span><span class="p">,</span>
-        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Estimated probability matrix&quot;</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
-<span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span>
-        <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;True probability matrix&quot;</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sA</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Singular value index&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Singular value&quot;</span><span class="p">)</span>
 
-<span class="n">fig</span><span class="p">;</span>
+<span class="c1"># plot circle</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mf">.2</span><span class="p">,</span> <span class="mf">.2</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="mf">.15</span>
+<span class="n">ada</span> <span class="o">=</span> <span class="n">AnchoredDrawingArea</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower left&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">circle</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="mi">20</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.0125</span><span class="p">),</span>
+                <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">withStroke</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">foreground</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)])</span>
+<span class="n">ada</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ada</span><span class="p">)</span>
+
+<span class="c1"># add text</span>
+<span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+    
+<span class="n">text</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;Elbow&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/estimating-parameters_spectral_9_0.png" src="../../_images/estimating-parameters_spectral_9_0.png" />
+<img alt="../../_images/estimating-parameters_spectral_40_0.png" src="../../_images/estimating-parameters_spectral_40_0.png" />
 </div>
 </div>
-<p>Which also is a decent estimate of the true probability matrix <span class="math notranslate nohighlight">\(P\)</span>.</p>
+<p>You’ll notice that there’s a marked area called the “elbow”. This is an area where singular values stop changing in magnitude as much when they get smaller: before the elbow, singular values change rapidly, and after the elbow, singular values barely change at all. (It’s called an elbow because the plot kind of looks like an arm, viewed from the side!)</p>
+<p>The location of this elbow gives you a rough indication for how many “true” dimensions your latent positions have. The singular values after the elbow are quite close to each other and have singular vectors which are largely noise, and don’t tell you very much about your data. It looks from the scree plot that we should be embedding down to two dimensions, and that adding more dimensions would probably just mean adding noise to our embedding.</p>
+<p>One drawback to this method is that a lot of the time, the elbow location is pretty subjective - real data will rarely have a nice, pretty elbow like the one you see above. The advantage is that it still generally works pretty well; embedding into a few more dimensions than you need isn’t too bad, since you’ll only have a few noies dimensions and there still may be <em>some</em> signal there.</p>
+<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2006 by Mu Zhu and Ali Ghodsi at the University of Waterloo. We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
 </div>
 </div>
 
@@ -827,7 +1370,7 @@ const thebe_selector_output = ".output, .cell_output"
     <a class='right-next' id="next-link" href="random-walk-diffusion-methods.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6.5. </span>Random-Walk and Diffusion-based Methods</p>
+        <p class="prev-next-title"><span class="section-number">6.8. </span>Random-Walk and Diffusion-based Methods</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
