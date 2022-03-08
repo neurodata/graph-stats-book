@@ -740,6 +740,7 @@ const thebe_selector_output = ".output, .cell_output"
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="estimating-parameters-for-the-rdpg">
 <h1><span class="section-number">6.4. </span>Estimating Parameters for the RDPG<a class="headerlink" href="#estimating-parameters-for-the-rdpg" title="Permalink to this headline">¶</a></h1>
+<p>In this section, we’ll cover a special case of the spectral embedding, which is when we think that the network might be well described by an underlying RDPG. We’ll double back on some concepts, such as the singular value decomposition and matrix rank, so that we can explain the importance of these concepts as they relate directly to the probability matrix of an RDPG.</p>
 <p>For this example, we’ll work with the school example we’ve seen previously. The nodes are 100 students in total, from one of two schools. Here, the first 50 students are from the first school, and the second 50 students are from the second school. The probability of two students who both go to the first school being friends is <span class="math notranslate nohighlight">\(0.5\)</span>, and the probability of two students who both go to school two being friends will also be <span class="math notranslate nohighlight">\(0.5\)</span>. If two students go to different schools, their probability of being friends will be <span class="math notranslate nohighlight">\(0.2\)</span>. The statistical model has parameters which look like this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -815,6 +816,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <p>As we can see, both the probability matrix <span class="math notranslate nohighlight">\(P\)</span> and the realization of the random network <span class="math notranslate nohighlight">\(A\)</span> both have a notable “structure”, in that it’s clear that there are more nodes when both individuals are in the first school (the top left and bottom right “squares” of the adjacency matrix and probability matrix have more entries and are darker, respectively) and fewer nodes when both individuals are in different schools (the top right and bottom left “squares” of the adjacency matrix have fewer entries and are lighter, respectively).</p>
+<p>Next, we have the key conceptual leap we need to take: remember that if a network is an SBM, there is also an underlying RDPG that <em>also</em> describes that network. When we learned about this in <a class="reference external" href="#link?">Chapter 5</a>, we learned that this was because the RDPG is a more broad statistical model that was more general than the SBM. So, to learn about the SBM which underlies <span class="math notranslate nohighlight">\(A\)</span>, we could also learn about an RDPG which underlies <span class="math notranslate nohighlight">\(A\)</span>, too. This will prove critical in later applications sections, such as <a class="reference external" href="#link?">Chapter 8</a>, when we try to decipher which nodes are in which communities of the network, without having them handed to us in this nice organized way.</p>
 <div class="section" id="how-are-nodes-from-the-same-community-similar">
 <h2><span class="section-number">6.4.1. </span>How are nodes from the same community similar?<a class="headerlink" href="#how-are-nodes-from-the-same-community-similar" title="Permalink to this headline">¶</a></h2>
 <p>As it turns out, there’s a really important property that is shared by nodes in an SBM random network. Remember that the probability matrix <span class="math notranslate nohighlight">\(P\)</span> gives the probabilities <span class="math notranslate nohighlight">\(p_{ji}\)</span> of each pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of being connected. We’re going to introduce a new piece of notation here, called the <em>vector of probabilities</em> for a single node. The <strong>vector of probabilities</strong> for a node <span class="math notranslate nohighlight">\(i\)</span> is the quantity:</p>
@@ -857,7 +859,7 @@ const thebe_selector_output = ".output, .cell_output"
 <h2><span class="section-number">6.4.2. </span>Low-rank structure: what it is, how we find it, and why it matters<a class="headerlink" href="#low-rank-structure-what-it-is-how-we-find-it-and-why-it-matters" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="matrix-rank">
 <h3><span class="section-number">6.4.2.1. </span>Matrix Rank<a class="headerlink" href="#matrix-rank" title="Permalink to this headline">¶</a></h3>
-<p>In the technical sense, the <em>rank</em> of a matrix is a description of just how complicated the matrix is. A matrix is <strong>low rank</strong> if any of its rows (or equivalently, its columns) are linear combinations of other rows (or columns). What this means is that if we can take rows or columns from the matrix, and add or multiply them together to get other rows or columns from the matrix, the matrix is low rank. This means that information contained in the matrix is redundant, in that we could obtain it by just adding or subtracting other information already contained in the matrix!</p>
+<p>As we saw in the previous section, t</p>
 <p>In our case, what this means is that the probability matrix for an SBM with <span class="math notranslate nohighlight">\(K\)</span> total communities will be of rank-<span class="math notranslate nohighlight">\(K\)</span>: there is a single unique probability vector for each community. This means that we could express all of the rows of the probability matrix by taking one probability vector from each community, and then “instructions” as to how we combine these probability vectors to obtain the probability vectors for other nodes in the community. In the case of the simple SBM, these “instructions” are just to duplicate the same vector over and over again, for every node in the community. Nothing too complicated, right?</p>
 </div>
 <div class="section" id="how-do-we-find-this-low-rank-structure">
@@ -865,57 +867,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p>When we have data which we think is low-rank, one way we can identify this pattern is by using something called a <em>spectral embedding</em>. This embedding is called <em>spectral</em> because it will have to do with the eigenvalues/eigenvectors of the probability matrix (often called a matrix’s <em>spectrum</em>). It is called an <em>embedding</em> which, informally, means that there is a high level structure that we get to see (the probability matrix) which can be more succinctly described by a lower-level structure that we don’t immediately get to see (the two unique probability vectors). What we want to do here is identify this low-level structure given the probability matrix and <em>nothing else</em>, which means we might not get to see the communities each node is part of when we perform this analysis. The spectral embedding will let us do this.</p>
 <div class="section" id="the-singular-value-decomposition">
 <h4><span class="section-number">6.4.2.2.1. </span>The Singular Value Decomposition<a class="headerlink" href="#the-singular-value-decomposition" title="Permalink to this headline">¶</a></h4>
-<p>The spectral embedding algorithm begins by finding the <em>singular-value decomposition</em> of the data.</p>
-<div class="admonition-singular-value-decomposition admonition">
-<p class="admonition-title">Singular-Value Decomposition</p>
-<p>The singular value decomposition of a matrix <span class="math notranslate nohighlight">\(P\)</span> is the set of matrices <span class="math notranslate nohighlight">\(U, \Sigma\)</span>, and <span class="math notranslate nohighlight">\(V\)</span>, where:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    P &amp;= U\Sigma V^\top
-\end{align*}\]</div>
-<p>where <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma\)</span>, and <span class="math notranslate nohighlight">\(V\)</span> have some special properties:</p>
-<ol class="simple">
-<li><p>The left singular vectors: the columns <span class="math notranslate nohighlight">\(\vec u_i\)</span> of <span class="math notranslate nohighlight">\(U\)</span> are called the left singular vectors of <span class="math notranslate nohighlight">\(P\)</span>. If <span class="math notranslate nohighlight">\(P\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns, there will be <span class="math notranslate nohighlight">\(n\)</span> left singular vectors. This matrix looks like this:</p></li>
-</ol>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    U &amp;= \begin{bmatrix}
-        \vec u_1 &amp; ... &amp; \vec u_n
-    \end{bmatrix}
-\end{align*}\]</div>
-<ol class="simple">
-<li><p>The singular values: the matrix <span class="math notranslate nohighlight">\(\Sigma\)</span> is a diagonal matrix, which means that it has entries along the diagonal and all the other entries are just <em>zero</em>. There will be <span class="math notranslate nohighlight">\(n\)</span> total of these. This matrix looks something like this:</p></li>
-</ol>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \Sigma &amp;= \begin{bmatrix}
-        \sigma_1 &amp; 0 &amp; ... &amp; 0 \\
-        0 &amp; \sigma_2 &amp; \ddots &amp; \vdots \\
-        \vdots &amp; \ddots &amp; \ddots &amp; 0 \\
-        0 &amp; ... &amp; 0 &amp; \sigma_n
-    \end{bmatrix}
-\end{align*}\]</div>
-<p>The special property is that by definition, the singular values are <em>descending</em>, in that <span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2\)</span>, <span class="math notranslate nohighlight">\(\sigma_2 \geq \sigma_3\)</span>, so on and so forth to <span class="math notranslate nohighlight">\(\sigma_n\)</span>.</p>
-<ol class="simple">
-<li><p>The right singular vectors: the columns <span class="math notranslate nohighlight">\(\vec v_i\)</span> of <span class="math notranslate nohighlight">\(V\)</span> are called the right singular vectors of <span class="math notranslate nohighlight">\(P\)</span>. If <span class="math notranslate nohighlight">\(P\)</span> has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(n\)</span> columns, there will be <span class="math notranslate nohighlight">\(n\)</span> right singular vectors. This matrix looks like this:</p></li>
-</ol>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-V &amp;= \begin{bmatrix}
-    \vec v_1 &amp; ... &amp; \vec v_n
-\end{bmatrix}
-\end{align*}\]</div>
-</div>
-<p>As it turns out, because <span class="math notranslate nohighlight">\(\Sigma\)</span> is a diagonal matrix, the multiplication <span class="math notranslate nohighlight">\(P = U\Sigma V^\top\)</span>, which to the author anyways is somewhat opaque, can actually be written a lot more easily. We can write this equation down like this, which is much more understandable:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    P &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sum_{i = 1}^n \sigma_i\begin{bmatrix}
-        \uparrow \\ \vec u_i \\ \downarrow
-    \end{bmatrix}\begin{bmatrix}
-        \leftarrow &amp; \vec v_i^\top &amp; \rightarrow
-    \end{bmatrix}
-\end{align*}\]</div>
-<p>In a sense, what this means is that <span class="math notranslate nohighlight">\(P\)</span> is a sum of the products of <span class="math notranslate nohighlight">\(\vec u_i\)</span> with <span class="math notranslate nohighlight">\(\vec v_i^\top\)</span>, and then “scaled” or “multiplied” by <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
+<p>The spectral embedding algorithm begins by finding the <em>singular-value decomposition</em> of the data. This is the same singular value decomposition that we found previously, where we learned that a matrix <span class="math notranslate nohighlight">\(X\)</span> could be broken into a matrix <span class="math notranslate nohighlight">\(U\)</span> whose columns were the left singular vectors of <span class="math notranslate nohighlight">\(X\)</span>, a matrix <span class="math notranslate nohighlight">\(\Sigma\)</span> whose diagonal entries were the singular values of <span class="math notranslate nohighlight">\(X\)</span>, and a matrix <span class="math notranslate nohighlight">\(V\)</span> whose columns were the right singular vectors of <span class="math notranslate nohighlight">\(X\)</span>.</p>
 <p>To show this computationally, we’re going to decompose <span class="math notranslate nohighlight">\(P\)</span> into its singular value decomposition using <code class="docutils literal notranslate"><span class="pre">numpy</span></code>. We’ll first show something called a scree plot, which is a plot of the singular values of the matrix <span class="math notranslate nohighlight">\(P\)</span>. This plot is typically shown by having the magnitude of each singular value on the <span class="math notranslate nohighlight">\(y\)</span>-axis, and the <span class="math notranslate nohighlight">\(x\)</span>-axis is just the index of the singular value. Remember, the singular values are <em>descending</em>, which means that this plot is always going to show the singular values <em>decreasing</em> as the index increases.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1104,28 +1056,8 @@ V &amp;= \begin{bmatrix}
 </div>
 <div class="section" id="the-square-root-matrix">
 <h4><span class="section-number">6.4.2.2.4. </span>The Square Root Matrix<a class="headerlink" href="#the-square-root-matrix" title="Permalink to this headline">¶</a></h4>
-<p>It’s been quite a ride; don’t fall off just yet! Now we are really in the home stretch! We’ve saved the easiest part for last. Remember that <span class="math notranslate nohighlight">\(\Sigma_K\)</span> is just a diagonal matrix, whose entries are the singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span> for the first <span class="math notranslate nohighlight">\(K\)</span> singular values. As it turns out, since <span class="math notranslate nohighlight">\(P\)</span> is positive, these singular values are going to be positive too. This means that <span class="math notranslate nohighlight">\(\sigma_i\)</span> has a real square root, since all positive numbers have a square root. This means we could just express <span class="math notranslate nohighlight">\(\sigma_i\)</span> as the product of <span class="math notranslate nohighlight">\(\sqrt{\sigma_i}\sqrt{\sigma_i}\)</span> with itself!</p>
-<p>Finally, remember that if we were to multiply two diagonal matrices, the resulting matrix would just be the element-wise product of each diagonal entry. This means we could just write <span class="math notranslate nohighlight">\(\Sigma_K\)</span> like this:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    \Sigma_K &amp;= \begin{bmatrix}
-        \sqrt{\sigma_1} &amp; 0 &amp; ... &amp; 0 \\
-        0 &amp; \sqrt{\sigma_2} &amp; \ddots &amp; \vdots \\
-        \vdots &amp; \ddots &amp; \ddots &amp; 0 \\
-        0 &amp; ... &amp; 0 &amp; \sqrt{\sigma_n}
-    \end{bmatrix}\begin{bmatrix}
-        \sqrt{\sigma_1} &amp; 0 &amp; ... &amp; 0 \\
-        0 &amp; \sqrt{\sigma_2} &amp; \ddots &amp; \vdots \\
-        \vdots &amp; \ddots &amp; \ddots &amp; 0 \\
-        0 &amp; ... &amp; 0 &amp; \sqrt{\sigma_n}
-    \end{bmatrix}
-\end{align*}\]</div>
-<p>We will call the resulting matrix the “square root” matrix of <span class="math notranslate nohighlight">\(\Sigma_K\)</span>, abbreviated <span class="math notranslate nohighlight">\(\sqrt{\Sigma_K}\)</span> which hopefully is named for pretty obvious reasons. So, <span class="math notranslate nohighlight">\(\Sigma_K = \sqrt{\Sigma_K}\sqrt{\Sigma_K}\)</span>. This matrix has <span class="math notranslate nohighlight">\(K \times K\)</span> entries, and is therefore square. Also, notice that all the off-diagonal entries are just <span class="math notranslate nohighlight">\(0\)</span>, which means it’s symmetric too, because of the convenient fact that <span class="math notranslate nohighlight">\(0 = 0\)</span> (and hence, the off-diagonal entries are all equal). Putting this fact together means that <span class="math notranslate nohighlight">\(\sqrt{\Sigma_K} = \sqrt{\Sigma_K}^\top\)</span>, which is the definition of matrix symmetry. So finally, <span class="math notranslate nohighlight">\(\Sigma_K = \sqrt{\Sigma_K}\sqrt{\Sigma_K}^\top\)</span>. Putting this fact together gives us that:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    P &amp;= U_K \sqrt{\Sigma_K}\sqrt{\Sigma_K}^\top U_K^\top
-\end{align*}\]</div>
-<p>If we let <span class="math notranslate nohighlight">\(X = U_K \sqrt{\Sigma_K}\)</span>, then <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. This means that <span class="math notranslate nohighlight">\(X\)</span> is a latent position matrix for <span class="math notranslate nohighlight">\(P\)</span>! If you remember back to the <a class="reference external" href="#link?">Section on RDPGs</a>, this means that we have found the latent position parameter for the corresponding RDPG for our SBM random network!</p>
+<p>It’s been quite a ride; don’t fall off just yet! Now we are really in the home stretch! We’ve saved the easiest part for last. Remember that <span class="math notranslate nohighlight">\(\Sigma_K\)</span> is just a diagonal matrix, whose entries are the singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span> for the first <span class="math notranslate nohighlight">\(K\)</span> singular values. As it turns out, since <span class="math notranslate nohighlight">\(P\)</span> is positive, these singular values are going to be positive too. This means that <span class="math notranslate nohighlight">\(\sigma_i\)</span> has a real square root, since all positive numbers have a square root.
+If we let <span class="math notranslate nohighlight">\(X = U_K \sqrt{\Sigma_K}\)</span>, then <span class="math notranslate nohighlight">\(P = XX^\top\)</span>. This means that <span class="math notranslate nohighlight">\(X\)</span> is a latent position matrix for <span class="math notranslate nohighlight">\(P\)</span>! If you remember back to the <a class="reference external" href="#link?">Section on RDPGs</a>, this means that we have found the latent position parameter for the corresponding RDPG for our SBM random network!</p>
 <p>Let’s see this using numpy again:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1222,7 +1154,7 @@ This means that we have found a latent position matrix <span class="math notrans
 </div>
 </div>
 <p>Now that’s really funky! The singular values of both <span class="math notranslate nohighlight">\(P\)</span> and <span class="math notranslate nohighlight">\(A\)</span> tend to fall off around <em>roughly</em> the same spot, right around dimension <span class="math notranslate nohighlight">\(2\)</span>! The singular value of <span class="math notranslate nohighlight">\(P\)</span> go directly to <span class="math notranslate nohighlight">\(0\)</span>, but the singular values for <span class="math notranslate nohighlight">\(A\)</span> tend to “round off” in the direction of <span class="math notranslate nohighlight">\(0\)</span>, but it isn’t <em>too</em> far off!</p>
-<p>As it turns out, this is no coincidence: the singular values for a network which can be described by an RDPG will tend to “elbow” off right around the number of true latent dimensions for the probability matrix of the underlying random network. If the RDPG has <span class="math notranslate nohighlight">\(d\)</span> latent dimensions, this will occur right around <span class="math notranslate nohighlight">\(d\)</span>. For this reason, it is usually a good idea when we think a network might be well described by an RDPG to let the elbow selection algorithm do the work for us, and then take a good look at the scree plot to make sure the number of latent dimensions chosen seems reasonable to us.</p>
+<p>As it turns out, this is no coincidence: the singular values for a network which can be described by an RDPG will tend to “elbow” off right around the number of true latent dimensions for the probability matrix of the underlying random network. If the RDPG has <span class="math notranslate nohighlight">\(d\)</span> latent dimensions, this will occur right around <span class="math notranslate nohighlight">\(d\)</span>. For this reason, it is usually a good idea when we think a network might be well described by an RDPG to let the elbow selection algorithm do the work for us, and then take a good look at the scree plot to make sure the number of latent dimensions chosen seems reasonable to us. If we don’t know how many latent dimensions to retain, we’ll call the number of embedding dimensions <span class="math notranslate nohighlight">\(\hat d\)</span>, which just means, “estimate of the number of latent dimensions”.</p>
 <p>What does it look like when we use the spectral embedding on <span class="math notranslate nohighlight">\(A\)</span>? We’ll compare the embedding of the adjacency matrix to the latent positions of the probability matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
