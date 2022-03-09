@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.1. Theory for Single Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>7.1. Theory for Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -52,6 +52,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="7.2. Theory for Multiple-Network Models" href="theory-multigraph.html" />
@@ -297,11 +299,6 @@ const thebe_selector_output = ".output, .cell_output"
      5.6. Network Models with Covariates
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch5/single-network-models_theory.html">
-     5.7. Single network model theory
-    </a>
-   </li>
   </ul>
  </li>
  <li class="toctree-l1 has-children">
@@ -373,7 +370,7 @@ const thebe_selector_output = ".output, .cell_output"
   <ul class="current">
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     7.1. Theory for Single Network Models
+     7.1. Theory for Network Models
     </a>
    </li>
    <li class="toctree-l2">
@@ -582,11 +579,227 @@ const thebe_selector_output = ".output, .cell_output"
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch7/theory-single-network.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#foundation">
+   7.1.1. Foundation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#equivalence-classes">
+     7.1.1.1. Equivalence Classes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#independent-edge-random-networks">
+     7.1.1.2. Independent-Edge Random Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#erdos-renyi-er-random-networks">
+   7.1.2. Erdös-Rényi (ER) Random Networks
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#probability">
+     7.1.2.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#network-models-for-networks-which-aren-t-simple">
+   7.1.3. Network Models for networks which aren’t simple
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-has-loops-but-is-undirected">
+     7.1.3.1. Binary network model which has loops, but is undirected
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-loopless-but-directed">
+     7.1.3.2. Binary network model which is loopless, but directed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-has-loops-and-is-directed">
+     7.1.3.3. Binary network model which is has loops and is directed
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
+   7.1.4.
+   <em>
+    A Priori
+   </em>
+   Stochastic Block Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id1">
+     7.1.4.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-posteriori-stochastic-block-model">
+   7.1.5.
+   <em>
+    A Posteriori
+   </em>
+   Stochastic Block Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     7.1.5.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#degree-corrected-stochastic-block-model-dcsbm">
+   7.1.6. Degree-Corrected Stochastic Block Model (DCSBM)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-dcsbm">
+     7.1.6.1.
+     <em>
+      A Priori
+     </em>
+     DCSBM
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id3">
+       7.1.6.1.1. Probability
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-posteriori-dcsbm">
+     7.1.6.2.
+     <em>
+      A Posteriori
+     </em>
+     DCSBM
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#random-dot-product-graph-rdpg">
+   7.1.7. Random Dot Product Graph (RDPG)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-rdpg">
+     7.1.7.1.
+     <em>
+      A Priori
+     </em>
+     RDPG
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id4">
+       7.1.7.1.1. Probability
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-posteriori-rdpg">
+     7.1.7.2.
+     <em>
+      A Posteriori
+     </em>
+     RDPG
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id5">
+       7.1.7.2.1. Probability
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#generalized-random-dot-product-graph-grdpg">
+   7.1.8. Generalized Random Dot Product Graph (GRDPG)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-grdpg">
+     7.1.8.1.
+     <em>
+      A Priori
+     </em>
+     GRDPG
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-posteriori-grdpg">
+     7.1.8.2.
+     <em>
+      A Posteriori
+     </em>
+     GRDPG
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#inhomogeneous-erdos-renyi-ier">
+   7.1.9. Inhomogeneous Erdös-Rényi (IER)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     7.1.9.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -594,19 +807,1005 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Theory for Single Network Models</h1>
+                <h1>Theory for Network Models</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#foundation">
+   7.1.1. Foundation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#equivalence-classes">
+     7.1.1.1. Equivalence Classes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#independent-edge-random-networks">
+     7.1.1.2. Independent-Edge Random Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#erdos-renyi-er-random-networks">
+   7.1.2. Erdös-Rényi (ER) Random Networks
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#probability">
+     7.1.2.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#network-models-for-networks-which-aren-t-simple">
+   7.1.3. Network Models for networks which aren’t simple
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-has-loops-but-is-undirected">
+     7.1.3.1. Binary network model which has loops, but is undirected
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-loopless-but-directed">
+     7.1.3.2. Binary network model which is loopless, but directed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-has-loops-and-is-directed">
+     7.1.3.3. Binary network model which is has loops and is directed
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-priori-stochastic-block-model">
+   7.1.4.
+   <em>
+    A Priori
+   </em>
+   Stochastic Block Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id1">
+     7.1.4.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-posteriori-stochastic-block-model">
+   7.1.5.
+   <em>
+    A Posteriori
+   </em>
+   Stochastic Block Model
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     7.1.5.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#degree-corrected-stochastic-block-model-dcsbm">
+   7.1.6. Degree-Corrected Stochastic Block Model (DCSBM)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-dcsbm">
+     7.1.6.1.
+     <em>
+      A Priori
+     </em>
+     DCSBM
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id3">
+       7.1.6.1.1. Probability
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-posteriori-dcsbm">
+     7.1.6.2.
+     <em>
+      A Posteriori
+     </em>
+     DCSBM
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#random-dot-product-graph-rdpg">
+   7.1.7. Random Dot Product Graph (RDPG)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-rdpg">
+     7.1.7.1.
+     <em>
+      A Priori
+     </em>
+     RDPG
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id4">
+       7.1.7.1.1. Probability
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-posteriori-rdpg">
+     7.1.7.2.
+     <em>
+      A Posteriori
+     </em>
+     RDPG
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#id5">
+       7.1.7.2.1. Probability
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#generalized-random-dot-product-graph-grdpg">
+   7.1.8. Generalized Random Dot Product Graph (GRDPG)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-priori-grdpg">
+     7.1.8.1.
+     <em>
+      A Priori
+     </em>
+     GRDPG
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#a-posteriori-grdpg">
+     7.1.8.2.
+     <em>
+      A Posteriori
+     </em>
+     GRDPG
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#inhomogeneous-erdos-renyi-ier">
+   7.1.9. Inhomogeneous Erdös-Rényi (IER)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id6">
+     7.1.9.1. Probability
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="theory-for-single-network-models">
-<h1><span class="section-number">7.1. </span>Theory for Single Network Models<a class="headerlink" href="#theory-for-single-network-models" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="theory-for-network-models">
+<h1><span class="section-number">7.1. </span>Theory for Network Models<a class="headerlink" href="#theory-for-network-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="foundation">
+<h2><span class="section-number">7.1.1. </span>Foundation<a class="headerlink" href="#foundation" title="Permalink to this headline">¶</a></h2>
+<p>To understand network models, it is crucial to understand the concept of a network as a random quantity, taking a probability distribution. We have a realization <span class="math notranslate nohighlight">\(A\)</span>, and we think that this realization is random in some way. Stated another way, we think that there exists a network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> that governs the realizations we get to see. Since <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random variable, we can describe it using a probability distribution. The distribution of the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the function <span class="math notranslate nohighlight">\(\mathbb P\)</span> which assigns probabilities to every possible configuration that <span class="math notranslate nohighlight">\(\mathbf A\)</span> could take. Notationally, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim \mathbb P\)</span>, which is read in words as “the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is distributed according to <span class="math notranslate nohighlight">\(\mathbb P\)</span>.”</p>
+<p>In the preceding description, we made a fairly substantial claim: <span class="math notranslate nohighlight">\(\mathbb P\)</span> assigns probabilities to every possible configuration that realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, denoted by <span class="math notranslate nohighlight">\(A\)</span>, could take. How many possibilities are there for a network with <span class="math notranslate nohighlight">\(n\)</span> nodes? Let’s limit ourselves to simple networks: that is, <span class="math notranslate nohighlight">\(A\)</span> takes values that are unweighted (<span class="math notranslate nohighlight">\(A\)</span> is <em>binary</em>), undirected (<span class="math notranslate nohighlight">\(A\)</span> is <em>symmetric</em>), and loopless (<span class="math notranslate nohighlight">\(A\)</span> is <em>hollow</em>). In words, <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> is the set of all possible adjacency matrices <span class="math notranslate nohighlight">\(A\)</span> that correspond to simple networks with <span class="math notranslate nohighlight">\(n\)</span> nodes. Stated another way: every <span class="math notranslate nohighlight">\(A\)</span> that is found in <span class="math notranslate nohighlight">\(\mathcal A\)</span> is a <em>binary</em> <span class="math notranslate nohighlight">\(n \times n\)</span> matrix (<span class="math notranslate nohighlight">\(A \in \{0, 1\}^{n \times n}\)</span>), <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A = A^\top\)</span>), and <span class="math notranslate nohighlight">\(A\)</span> is <em>hollow</em> (<span class="math notranslate nohighlight">\(diag(A) = 0\)</span>, or <span class="math notranslate nohighlight">\(A_{ii} = 0\)</span> for all <span class="math notranslate nohighlight">\(i = 1,...,n\)</span>). We describe <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal A_n = \left\{A : A \textrm{ is an $n \times n$ matrix with $0$s and $1$s}, A\textrm{ is symmetric}, A\textrm{ is hollow}\right\}
+\end{align*}\]</div>
+<p>To summarize the statement that <span class="math notranslate nohighlight">\(\mathbb P\)</span> assigns probabilities to every possible configuration that realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span> can take, we write that <span class="math notranslate nohighlight">\(\mathbb P : \mathcal A_n \rightarrow [0, 1]\)</span>. This means that for any <span class="math notranslate nohighlight">\(A \in \mathcal A_n\)</span> which is a possible realization of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span>, that <span class="math notranslate nohighlight">\(\mathbb P(\mathbf A = A)\)</span> is a probability (it takes a value between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>). If it is completely unambiguous what the random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> refers to, we might abbreviate <span class="math notranslate nohighlight">\(\mathbb P(\mathbf A = A)\)</span> with <span class="math notranslate nohighlight">\(\mathbb P(A)\)</span>. This statement can alternatively be read that the probability that the random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> takes the value <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(\mathbb P(A)\)</span>. Finally, let’s address that question we had in the previous paragraph. How many possible adjacency matrices are in <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>?</p>
+<p>Let’s imagine what just one <span class="math notranslate nohighlight">\(A \in \mathcal A_n\)</span> can look like. Note that each matrix <span class="math notranslate nohighlight">\(A\)</span> has <span class="math notranslate nohighlight">\(n \times n = n^2\)</span> possible entries, in total, since <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix. There are <span class="math notranslate nohighlight">\(n\)</span> possible self-loops for a network, but since <span class="math notranslate nohighlight">\(\mathbf A\)</span> is simple, it is loopless. This means that we can subtract <span class="math notranslate nohighlight">\(n\)</span> possible edges from <span class="math notranslate nohighlight">\(n^2\)</span>, leaving us with <span class="math notranslate nohighlight">\(n^2 - n = n(n-1)\)</span> possible edges that might not be unconnected. If we think in terms of a realization <span class="math notranslate nohighlight">\(A\)</span>, this means that we are ignoring the diagonal entries <span class="math notranslate nohighlight">\(a_{ii}\)</span>, for all <span class="math notranslate nohighlight">\(i \in [n]\)</span>.  Remember that a simple network is also undirected. In terms of the realization <span class="math notranslate nohighlight">\(A\)</span>, this means that for every pair <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, that <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>. If we were to learn about an entry in the upper triangle of <span class="math notranslate nohighlight">\(A\)</span> where <span class="math notranslate nohighlight">\(a_{ij}\)</span> is such that <span class="math notranslate nohighlight">\(j &gt; i\)</span>, note that we have also learned what <span class="math notranslate nohighlight">\(a_{ji}\)</span> is, too. This symmetry of <span class="math notranslate nohighlight">\(A\)</span> means that of the <span class="math notranslate nohighlight">\(n(n-1)\)</span> entries that are not on the diagonal of <span class="math notranslate nohighlight">\(A\)</span>, we would, in fact, “double count” the possible number of unique values that <span class="math notranslate nohighlight">\(A\)</span> could have. This means that <span class="math notranslate nohighlight">\(A\)</span> has a total of <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span> possible entries which are <em>free</em>, which is equal to the expression <span class="math notranslate nohighlight">\(\binom{n}{2}\)</span>. Finally, note that for each entry of <span class="math notranslate nohighlight">\(A\)</span>, that the adjacency can take one of two possible values: <span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>. To write this down formally, for every possible edge which is randomly determined, we have <em>two</em> possible values that edge could take. Let’s think about building some intuition here:</p>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(2 \times 2\)</span>, there are <span class="math notranslate nohighlight">\(\binom{2}{2} = 1\)</span> unique entry of <span class="math notranslate nohighlight">\(A\)</span>, which takes one of <span class="math notranslate nohighlight">\(2\)</span> values. There are <span class="math notranslate nohighlight">\(2\)</span> possible ways that <span class="math notranslate nohighlight">\(A\)</span> could look:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \begin{bmatrix}
+        0 &amp; 1 \\
+        1 &amp; 0
+    \end{bmatrix}\textrm{ or }
+    \begin{bmatrix}
+        0 &amp; 0 \\
+        0 &amp; 0
+    \end{bmatrix}
+\end{align*}\]</div>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(3 \times 3\)</span>, there are <span class="math notranslate nohighlight">\(\binom{3}{2} = \frac{3 \times 2}{2} = 3\)</span> unique entries of <span class="math notranslate nohighlight">\(A\)</span>, each of which takes one of <span class="math notranslate nohighlight">\(2\)</span> values. There are <span class="math notranslate nohighlight">\(8\)</span> possible ways that <span class="math notranslate nohighlight">\(A\)</span> could look:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+&amp;\begin{bmatrix}
+    0 &amp; 1 &amp; 1 \\
+    1 &amp; 0 &amp; 1 \\
+    1 &amp; 1 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 1 &amp; 0 \\
+    1 &amp; 0 &amp; 1 \\
+    0 &amp; 1 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 1 \\
+    0 &amp; 0 &amp; 1 \\
+    1 &amp; 1 &amp; 0
+    \end{bmatrix}
+    \textrm{ or }\\
+&amp;\begin{bmatrix}
+    0 &amp; 1 &amp; 1 \\
+    1 &amp; 0 &amp; 0 \\
+    1 &amp; 0 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 1 \\
+    0 &amp; 0 &amp; 0 \\
+    1 &amp; 0 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 1 \\
+    0 &amp; 1 &amp; 0
+    \end{bmatrix}\textrm{ or }\\
+&amp;\begin{bmatrix}
+    0 &amp; 1 &amp; 0 \\
+    1 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 0
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>How do we generalize this to an arbitrary choice of <span class="math notranslate nohighlight">\(n\)</span>? The answer is to use <em>combinatorics</em>. Basically, the approach is to look at each entry of <span class="math notranslate nohighlight">\(A\)</span> which can take different values, and multiply the total number of possibilities by <span class="math notranslate nohighlight">\(2\)</span> for every element which can take different values. Stated another way, if there are <span class="math notranslate nohighlight">\(2\)</span> choices for each one of <span class="math notranslate nohighlight">\(x\)</span> possible items, we have <span class="math notranslate nohighlight">\(2^x\)</span> possible ways in which we could select those <span class="math notranslate nohighlight">\(x\)</span> items. But we already know how many different elements there are in <span class="math notranslate nohighlight">\(A\)</span>, so we are ready to come up with an expression for the number. In total, there are <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span> unique adjacency matrices in <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>. Stated another way, the <em>cardinality</em> of <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>, described by the expression <span class="math notranslate nohighlight">\(|\mathcal A_n|\)</span>, is <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span>. The <strong>cardinality</strong> here just means the number of elements that the set <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> contains. When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(15\)</span>, note that <span class="math notranslate nohighlight">\(\left|\mathcal A_{15}\right| = 2^{\binom{15}{2}} = 2^{105}\)</span>, which when expressed as a power of <span class="math notranslate nohighlight">\(10\)</span>, is more than <span class="math notranslate nohighlight">\(10^{30}\)</span> possible networks that can be realized with just <span class="math notranslate nohighlight">\(15\)</span> nodes! As <span class="math notranslate nohighlight">\(n\)</span> increases, how many unique possible networks are there? In the below figure, look at the value of <span class="math notranslate nohighlight">\(|\mathcal A_n| = 2^{\binom n 2}\)</span> as a function of <span class="math notranslate nohighlight">\(n\)</span>. As we can see, as <span class="math notranslate nohighlight">\(n\)</span> gets big, <span class="math notranslate nohighlight">\(|\mathcal A_n|\)</span> grows really really fast!</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">comb</span>
+
+
+<span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">51</span><span class="p">)</span>
+<span class="n">logAn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">comb</span><span class="p">(</span><span class="n">ni</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">ni</span> <span class="ow">in</span> <span class="n">n</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">logAn</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of Nodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Possible Graphs $|A_n|$ (log scale)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;$10^{{</span><span class="si">{pow:d}</span><span class="s2">}}$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">pow</span><span class="o">=</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">]])</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-single-network_2_0.png" src="../../_images/theory-single-network_2_0.png" />
+</div>
+</div>
+<p>So, now we know that we have probability distributions on networks, and a set <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> which defines all of the adjacency matrices that every probability distribution must assign a probability to. Now, just what is a network model? A <strong>network model</strong> is a set <span class="math notranslate nohighlight">\(\mathcal P\)</span> of probability distributions on <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>. Stated another way, we can describe <span class="math notranslate nohighlight">\(\mathcal P\)</span> to be:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal P &amp;\subseteq \{\mathbb P: \mathbb P\textrm{ is a probability distribution on }\mathcal A_n\}
+\end{align*}\]</div>
+<p>In general, we will simplify <span class="math notranslate nohighlight">\(\mathcal P\)</span> through something called <em>parametrization</em>. We define <span class="math notranslate nohighlight">\(\Theta\)</span> to be the set of all possible parameters of the random network model, and <span class="math notranslate nohighlight">\(\theta \in \Theta\)</span> is a particular parameter choice that governs the parameters of a specific network-valued random variaable <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In this case, we will write <span class="math notranslate nohighlight">\(\mathcal P\)</span> as the set:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal P(\Theta) &amp;= \left\{\mathbb P_\theta : \theta \in \Theta\right\}
+\end{align*}\]</div>
+<p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network that follows a network model, we will write that <span class="math notranslate nohighlight">\(\mathbf A \sim \mathbb P_\theta\)</span>, for some choice <span class="math notranslate nohighlight">\(\theta\)</span>. We will often use the shorthand <span class="math notranslate nohighlight">\(\mathbf A \sim \mathbb P\)</span>.</p>
+<p>If you are used to traditional univariate or multivariate statistical modelling, an extremely natural choice for when you have a discrete sample space (like <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>, which is discrete because we can count it) would be to use a categorical model. In the categorical model, we would have a single parameter for all possible configurations of an <span class="math notranslate nohighlight">\(n\)</span>-node network; that is, <span class="math notranslate nohighlight">\(|\theta| = \left|\mathcal A_n\right| = 2^{\binom n 2}\)</span>. What is wrong with this model? The limitations are two-fold:</p>
+<ol class="simple">
+<li><p>As we explained previously, when <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(15\)</span>, we would need over <span class="math notranslate nohighlight">\(10^{30}\)</span> bits of storage just to define <span class="math notranslate nohighlight">\(\theta\)</span>. This amounts to more than <span class="math notranslate nohighlight">\(10^{8}\)</span> zetabytes, which exceeds the storage capacity of <em>the entire world</em>.</p></li>
+<li><p>With a single network observed (or really, any number of networks we could collect in the real world) we would never be able to get a reasonable estimate of <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span> parameters for any reasonably non-trivial number of nodes <span class="math notranslate nohighlight">\(n\)</span>. For the case of one observed network <span class="math notranslate nohighlight">\(A\)</span>, an estimate of <span class="math notranslate nohighlight">\(\theta\)</span> (referred to as <span class="math notranslate nohighlight">\(\hat\theta\)</span>) would simply be for <span class="math notranslate nohighlight">\(\hat\theta\)</span> to have a <span class="math notranslate nohighlight">\(1\)</span> in the entry corresponding to our observed network, and a <span class="math notranslate nohighlight">\(0\)</span> everywhere else. Inferentially, this would imply that the network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> which governs realizations <span class="math notranslate nohighlight">\(A\)</span> is deterministic, even if this is not the case. Even if we collected potentially <em>many</em> observed networks, we would still (with very high probability) just get <span class="math notranslate nohighlight">\(\hat \theta\)</span> as a series of point masses on the observed networks we see, and <span class="math notranslate nohighlight">\(0\)</span>s everywhere else. This would mean our parameter estimates <span class="math notranslate nohighlight">\(\hat\theta\)</span> would not generalize to new observations at <em>all</em>, with high probability.</p></li>
+</ol>
+<p>So, what are some more reasonable descriptions of <span class="math notranslate nohighlight">\(\mathcal P\)</span>? We explore some choices below. Particularly, we will be most interested in the <em>independent-edge</em> networks. These are the families of networks in which the generative procedure which governs the random networks assume that the edges of the network are generated <em>independently</em>. <strong>Statistical Independence</strong> is a property which greatly simplifies many of the modelling assumptions which are crucial for proper estimation and rigorous statistical inference, which we will learn more about in the later chapters.</p>
+<div class="section" id="equivalence-classes">
+<h3><span class="section-number">7.1.1.1. </span>Equivalence Classes<a class="headerlink" href="#equivalence-classes" title="Permalink to this headline">¶</a></h3>
+<p>In all of the below models, we will explore the concept of the <strong>probability equivalence class</strong>, or an <em>equivalence class</em>, for short. The probability is a function which in general, describes how effective a particular observation can be described by a random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> with parameters <span class="math notranslate nohighlight">\(\theta\)</span>, written <span class="math notranslate nohighlight">\(\mathbf A \sim F(\theta)\)</span>. The probability will be used to describe the probability <span class="math notranslate nohighlight">\(\mathbb P_\theta(\mathbf A)\)</span> of observing the realization <span class="math notranslate nohighlight">\(A\)</span> if the underlying random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> has parameters <span class="math notranslate nohighlight">\(\theta\)</span>.  Why does this matter when it comes to equivalence classes? An equivalence class is a subset of the sample space <span class="math notranslate nohighlight">\(E \subseteq \mathcal A_n\)</span>, which has the following properties. Holding the parameters <span class="math notranslate nohighlight">\(\theta\)</span> fixed:</p>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> are members of the same equivalence class <span class="math notranslate nohighlight">\(E\)</span> (written <span class="math notranslate nohighlight">\(A, A' \in E\)</span>), then <span class="math notranslate nohighlight">\(\mathbb P_\theta(A) = \mathbb P_\theta(A')\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A''\)</span> are members of different equivalence classes; that is, <span class="math notranslate nohighlight">\(A \in E\)</span> and <span class="math notranslate nohighlight">\(A'' \in E'\)</span> where <span class="math notranslate nohighlight">\(E, E'\)</span> are equivalence classes, then <span class="math notranslate nohighlight">\(\mathbb P_\theta(A) \neq \mathbb P_\theta(A'')\)</span>.</p></li>
+<li><p>Using points 1 and 2, we can establish that if <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(E'\)</span> are two different equivalence classes, then <span class="math notranslate nohighlight">\(E \cap E' = \varnothing\)</span>. That is, the equivalence classes are <strong>mutually disjoint</strong>.</p></li>
+<li><p>We can use the preceding properties to deduce that given the sample space <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> and a probability function <span class="math notranslate nohighlight">\(\mathbb P_\theta\)</span>, we can define a partition of the sample space into equivalence classes <span class="math notranslate nohighlight">\(E_i\)</span>, where <span class="math notranslate nohighlight">\(i \in \mathcal I\)</span> is an arbitrary indexing set. A <strong>partition</strong> of <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> is a sequence of sets which are mutually disjoint, and whose union is the whole space. That is, <span class="math notranslate nohighlight">\(\bigcup_{i \in \mathcal I} E_i = \mathcal A_n\)</span>.</p></li>
+</ol>
+<p>We will see more below about how the equivalence classes come into play with network models, and in a later section, we will see their relevance to the estimation of the parameters <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
+</div>
+<div class="section" id="independent-edge-random-networks">
+<span id="representations-whyuse-networkmodels-iern"></span><h3><span class="section-number">7.1.1.2. </span>Independent-Edge Random Networks<a class="headerlink" href="#independent-edge-random-networks" title="Permalink to this headline">¶</a></h3>
+<p>The below models are all special families of something called <strong>independent-edge random networks</strong>. An independent-edge random network is a network-valued random variable, in which the collection of edges are all independent. In words, this means that for every adjacency <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> of the network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is independent of <span class="math notranslate nohighlight">\(\mathbf a_{i'j'}\)</span>, any time that <span class="math notranslate nohighlight">\((i,j) \neq (i',j')\)</span>. When the networks are simple, the easiest thing to do is to assume that each edge <span class="math notranslate nohighlight">\((i,j)\)</span> is connected with some probability (which might be different for each edge) <span class="math notranslate nohighlight">\(p_{ij}\)</span>. We use the <span class="math notranslate nohighlight">\(ij\)</span> subscript to denote that this probability is not necessarily the same for each edge. This simple model can be described as <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> has the distribution <span class="math notranslate nohighlight">\(Bern(p_{ij})\)</span>, for every <span class="math notranslate nohighlight">\(j &gt; i\)</span>, and is independent of every other edge in <span class="math notranslate nohighlight">\(\mathbf A\)</span>. We only look at the entries <span class="math notranslate nohighlight">\(j &gt; i\)</span>, since our networks are simple. This means that knowing a realization of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> also gives us the realizaaion of <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> (and thus <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> is a <em>deterministic</em> function of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>). Further, we know that the random network is loopless, which means that every <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>. We will call the matrix <span class="math notranslate nohighlight">\(P = (p_{ij})\)</span> the <strong>probability matrix</strong> of the network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In general, we will see a common theme for the probabilities of a realization <span class="math notranslate nohighlight">\(A\)</span> of a network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>, which is that it will greatly simplify our computation. Remember that if <span class="math notranslate nohighlight">\(\mathbf x\)</span> and <span class="math notranslate nohighlight">\(\mathbf y\)</span> are binary variables which are independent, that <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x = x, \mathbf y = y) = \mathbb P(\mathbf x = x) \mathbb P(\mathbf y = y)\)</span>. Using this fact:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}) \\
+    &amp;= \mathbb P(\mathbf a_{ij} = a_{ij} \text{ for all }j &gt; i) \\
+    &amp;= \prod_{j &gt; i}\mathbb P(\mathbf a_{ij} = a_{ij}), \;\;\;\;\textrm{Independence Assumption}
+\end{align*}\]</div>
+<p>Next, we will use the fact that if a random variable <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> has the Bernoulli distribution with probability <span class="math notranslate nohighlight">\(p_{ij}\)</span>, that <span class="math notranslate nohighlight">\(\mathbb P(\mathbf a_{ij} = a_{ij}) = p_{ij}^{a_{ij}}(1 - p_{ij})^{1 - p_{ij}}\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \prod_{j &gt; i}p_{ij}^{a_{ij}}(1 - p_{ij})^{1 - p_{ij}}
+\end{align*}\]</div>
+<p>Now that we’ve specified a probability and a very generalizable model, we’ve learned the full story behind network models and are ready to skip to estimating parameters, right? <em>Wrong!</em> Unfortunately, if we tried too estimate anything about each <span class="math notranslate nohighlight">\(p_{ij}\)</span> individually, we would obtain that <span class="math notranslate nohighlight">\(p_{ij} = a_{ij}\)</span> if we only have one realization <span class="math notranslate nohighlight">\(A\)</span>. Even if we had many realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, this still would not be very interesting, since we have a <em>lot</em> of <span class="math notranslate nohighlight">\(p_{ij}\)</span>s to estimate, and we’ve ignored any sort of structural model that might give us deeper insight into <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In the below sections, we will learn successively less restrictive (and hence, <em>more expressive</em>) assumptions about <span class="math notranslate nohighlight">\(p_{ij}\)</span>s, which will allow us to convey fairly complex random networks, but <em>still</em> enable us with plenty of intteresting things to learn about later on.</p>
+</div>
+</div>
+<div class="section" id="erdos-renyi-er-random-networks">
+<h2><span class="section-number">7.1.2. </span>Erdös-Rényi (ER) Random Networks<a class="headerlink" href="#erdos-renyi-er-random-networks" title="Permalink to this headline">¶</a></h2>
+<p>The Erdös Rényi model formalizes this relatively simple situation with a single parameter and an <span class="math notranslate nohighlight">\(iid\)</span> assumption:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(p\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p>Probability that an edge exists between a pair of nodes, which is identical for all pairs of nodes</p></td>
+</tr>
+</tbody>
+</table>
+<p>From here on out, when we talk about an Erdös Rényi random variable, we will simply call it an ER network. In an ER network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(j &gt; i\)</span> (in terms of the adjacency matrix, this means all of the edges in the <em>upper right</em> triangle), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>. The word “independent” means that edges in the network occurring or not occurring do not affect one another. For instance, this means that if we knew a student named Alice was friends with Bob, and Alice was also friends with Chadwick, that we do not learn any information about whether Bob is friends with Chadwick. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If Alice and Bob are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, then Alice and Chadwick are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, too. We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim ER_n(p)\)</span>.</p>
+<p>Next, let’s formalize an example of one of the limitations of an ER random network. Remember that we said that ER random networks are often too simple. Well, one way in which they are simple is called <strong>degree homogeneity</strong>, which is a property in which <em>all</em> of the nodes in an ER network have the <em>exact</em> same expected node degree! What this means is that if we were to take an ER random network <span class="math notranslate nohighlight">\(\mathbf A\)</span>, we would expect that <em>all</em> of the nodes in the network had the same degree. Let’s see how this works:</p>
+<div class="admonition-working-out-the-expected-degree-in-an-erd-ouml-s-r-eacute-nyi-network admonition">
+<p class="admonition-title">Working Out the Expected Degree in an Erdös-Rényi Network</p>
+<p>Suppose that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a simple network which is random. The network has <span class="math notranslate nohighlight">\(n\)</span> nodes <span class="math notranslate nohighlight">\(\mathcal V = (v_i)_{i = 1}^n\)</span>. Recall that the in a simple network, the node degree is <span class="math notranslate nohighlight">\(deg(v_i) = \sum_{j = 1}^n \mathbf a_{ij}\)</span>. What is the expected degree of a node <span class="math notranslate nohighlight">\(v_i\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is Erdös-Rényi?</p>
+<p>To describe this, we will compute the expectated value of the degree <span class="math notranslate nohighlight">\(deg(v_i)\)</span>, written <span class="math notranslate nohighlight">\(\mathbb E\left[deg(v_i)\right]\)</span>. Let’s see what happens:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i)\right] &amp;= \mathbb E\left[\sum_{j = 1}^n \mathbf a_{ij}\right] \\
+    &amp;= \sum_{j = 1}^n \mathbb E[\mathbf a_{ij}]
+\end{align*}\]</div>
+<p>We use the <em>linearity of expectation</em> in the line above, which means that the expectation of a sum with a finite number of terms being summed over (<span class="math notranslate nohighlight">\(n\)</span>, in this case) is the sum of the expectations. Finally, by definition, all of the edges <span class="math notranslate nohighlight">\(A_{ij}\)</span> have the same distribution: <span class="math notranslate nohighlight">\(Bern(p)\)</span>. The expected value of a random quantity which takes a Bernoulli distribution is just the probability <span class="math notranslate nohighlight">\(p\)</span>. This means every term <span class="math notranslate nohighlight">\(\mathbb E[\mathbf a_{ij}] = p\)</span>. Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i)\right] &amp;= \sum_{j = 1}^n p = n\cdot p
+\end{align*}\]</div>
+<p>Since all of the <span class="math notranslate nohighlight">\(n\)</span> terms being summed have the same expected value. This holds for <em>every</em> node <span class="math notranslate nohighlight">\(v_i\)</span>, which means that the expected degree of all nodes is an undirected ER network is the same number, <span class="math notranslate nohighlight">\(n \cdot p\)</span>.</p>
+</div>
+<div class="section" id="probability">
+<h3><span class="section-number">7.1.2.1. </span>Probability<a class="headerlink" href="#probability" title="Permalink to this headline">¶</a></h3>
+<p>What is the probability for realizations of Erdös-Rényi networks? Remember that for Independent-edge graphs, that the probability can be written:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_{\theta}(A) &amp;= \prod_{j &gt; i} \mathbb P_\theta(\mathbf{a}_{ij} = a_{ij})
+\end{align*}\]</div>
+<p>Next, we recall that by assumption of the ER model, that the probability matrix <span class="math notranslate nohighlight">\(P = (p)\)</span>, or that <span class="math notranslate nohighlight">\(p_{ij} = p\)</span> for all <span class="math notranslate nohighlight">\(i,j\)</span>. Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \prod_{j &gt; i} p^{a_{ij}}(1 - p)^{1 - a_{ij}} \\
+    &amp;= p^{\sum_{j &gt; i} a_{ij}} \cdot (1 - p)^{\binom{n}{2} - \sum_{j &gt; i}a_{ij}} \\
+    &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}
+\end{align*}\]</div>
+<p>This means that the probability <span class="math notranslate nohighlight">\(\mathbb P_\theta(A)\)</span> is a function <em>only</em> of the number of edges <span class="math notranslate nohighlight">\(m = \sum_{j &gt; i}a_{ij}\)</span> in the network represented by adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>. The equivalence class on the Erdös-Rényi networks are the sets:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    E_{i} &amp;= \left\{A \in \mathcal A_n : m = i\right\}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(i\)</span> index from <span class="math notranslate nohighlight">\(0\)</span> (the minimum number of edges possible) all the way up to <span class="math notranslate nohighlight">\(n^2\)</span> (the maximum number of edges possible). All of the relationships for equivalence classes discussed above apply to the sets <span class="math notranslate nohighlight">\(E_i\)</span>.</p>
+</div>
+</div>
+<div class="section" id="network-models-for-networks-which-aren-t-simple">
+<h2><span class="section-number">7.1.3. </span>Network Models for networks which aren’t simple<a class="headerlink" href="#network-models-for-networks-which-aren-t-simple" title="Permalink to this headline">¶</a></h2>
+<p>To make the discussions a little more easy to handle, in the above descriptions and all our successive descriptions, we will describe network models for <strong>simple networks</strong>. To recap, networks which are simple are binary networks which are both loopless and undirected. Stated another way, simple networks are networks whose adjacency matrices are only <span class="math notranslate nohighlight">\(0\)</span>s and <span class="math notranslate nohighlight">\(1\)</span>s, they are hollow (the diagonal is entirely <em>0</em>), and symmetric (the lower and right triangles of the adjacency matrix are the <em>same</em>). What happens our networks don’t quite look this way?</p>
+<p>For now, we’ll keep the assumption that the networks are binary, but we will discuss non-binary network models in a later chapter. We have three possibilities we can consider, and we will show how the “relaxations” of the assumptions change a description of a network model. A <em>relaxation</em>, in statistician speak, means that we are taking the assumptions that we had (in this case, that the networks are <em>simple</em>), and progressively making the assumptions weaker (more <em>relaxed</em>) so that they apply to other networks, too. We split these out so we can be as clear as possible about how the generative model changes with each relaxation step.</p>
+<p>We will compare each relaxation to the statement about the generative model for the ER generative model. To recap, for a simple network, we wrote:</p>
+<p>“Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(j &gt; i\)</span> (in terms of the adjacency matrix, this means all of the nodes in the <em>upper right</em> triangle), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>….  We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.”</p>
+<p>Any additional parts that are added are expressed in <strong><font color='green'>green</font></strong> font. Omitted parts are struck through with <font color='red'><strike>red</strike></font> font.</p>
+<p>Note that these generalizations apply to <em>any</em> of the successive networks which we describe in the Network Models section, and not just the ER model!</p>
+<div class="section" id="binary-network-model-which-has-loops-but-is-undirected">
+<h3><span class="section-number">7.1.3.1. </span>Binary network model which has loops, but is undirected<a class="headerlink" href="#binary-network-model-which-has-loops-but-is-undirected" title="Permalink to this headline">¶</a></h3>
+<p>Here, all we want to do is relax the assumption that the network is loopless. We simply ignore the statement that edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> cannot exist, and allow that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> which follow a Bernoulli distribution (with some probability which depends on the network model choice) <em>now</em> applies to <span class="math notranslate nohighlight">\(j \geq i\)</span>, and not just <span class="math notranslate nohighlight">\(j &gt; i\)</span>. We keep that an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> existing implies that <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists, which maintains the symmetry of <span class="math notranslate nohighlight">\(\mathbf A\)</span> (and consequently, the undirectedness of the network).</p>
+<p>Our description of the ER network changes to:</p>
+<p>Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(\mathbf{\color{green}{j \geq i}}\)</span> (in terms of the adjacency matrix, this means all of the nodes in the <em>upper right</em> triangle <strong><font color='green'>and the diagonal</font></strong>), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>….  We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. <font color='red'><strike>We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.</strike></font></p>
+</div>
+<div class="section" id="binary-network-model-which-is-loopless-but-directed">
+<h3><span class="section-number">7.1.3.2. </span>Binary network model which is loopless, but directed<a class="headerlink" href="#binary-network-model-which-is-loopless-but-directed" title="Permalink to this headline">¶</a></h3>
+<p>Like above, we simply ignore the statement that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span>, which removes the symmetry of <span class="math notranslate nohighlight">\(\mathbf A\)</span> (and consequently, removes the undirectedness of the network). We allow that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> which follows a Bernoulli distribution now apply to <span class="math notranslate nohighlight">\(j \neq i\)</span>, and not just <span class="math notranslate nohighlight">\(j &gt; i\)</span>. We keep that <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>, which maintains the hollowness of <span class="math notranslate nohighlight">\(\mathbf A\)</span> (and consequently, the undirectedness of the network).</p>
+<p>Our description of the ER network changes to:</p>
+<p>Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(\mathbf{\color{green}{j \neq i}}\)</span> (in terms of the adjacency matrix, this means all of the nodes <strike><font color='red'>in the <em>upper right</em> triangle</font></strike><strong><font color='green'>which are not along the diagonal</font></strong>), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>….  <font color='red'><strike>We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>.</strike></font> We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.</p>
+</div>
+<div class="section" id="binary-network-model-which-is-has-loops-and-is-directed">
+<h3><span class="section-number">7.1.3.3. </span>Binary network model which is has loops and is directed<a class="headerlink" href="#binary-network-model-which-is-has-loops-and-is-directed" title="Permalink to this headline">¶</a></h3>
+<p>Finally, for a network which has loops and is directed, we combine the above two approaches. We ignore the statements that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span>, and the statement that <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>.</p>
+<p>Our descriptiomn of the ER network changes to:</p>
+<p>Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span>  <font color='red'><strike>where <span class="math notranslate nohighlight">\(j &gt; i\)</span> (in terms of the adjacency matrix, this means all of the nodes in the <em>upper right</em> triangle)</strike></font>, that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>, <font color='green'>for all possible combinations of nodes <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(i\)</span></font>. <font color='red'><strike>We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.</strike></font></p>
+</div>
+</div>
+<div class="section" id="a-priori-stochastic-block-model">
+<h2><span class="section-number">7.1.4. </span><em>A Priori</em> Stochastic Block Model<a class="headerlink" href="#a-priori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<p>The <em>a priori</em> SBM is an SBM in which we know ahead of time (<em>a priori</em>) which nodes are in which communities. Here, we will use the variable <span class="math notranslate nohighlight">\(K\)</span> to denote the maximum number of different communities. The ordering of the communities does not matter; the community we call <span class="math notranslate nohighlight">\(1\)</span> versus <span class="math notranslate nohighlight">\(2\)</span> versus <span class="math notranslate nohighlight">\(K\)</span> is largely a symbolic distinction (the only thing that matters is that they are <em>different</em>). The <em>a priori</em> SBM has the following parameter:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{K \times K}\)</span></p></td>
+<td><p>The block matrix, which assigns edge probabilities for pairs of communities</p></td>
+</tr>
+</tbody>
+</table>
+<p>To describe the <em>A Priori</em> SBM, we will designate the community each node is a part of using a vector, which has a single community assignment for each node in the network. We will call this <strong>node assignment vector</strong> <span class="math notranslate nohighlight">\(\vec{\tau}\)</span>, and it is a <span class="math notranslate nohighlight">\(n\)</span>-length vector (one element for each node) with elements which can take values from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(K\)</span>. In symbols, we would say that <span class="math notranslate nohighlight">\(\vec\tau \in \{1, ..., K\}^n\)</span>. What this means is that for a given element of <span class="math notranslate nohighlight">\(\vec \tau\)</span>, <span class="math notranslate nohighlight">\(\tau_i\)</span>, that <span class="math notranslate nohighlight">\(\tau_i\)</span> is the community assignment (either <span class="math notranslate nohighlight">\(1\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, so on and so forth up to <span class="math notranslate nohighlight">\(K\)</span>) for the <span class="math notranslate nohighlight">\(i^{th}\)</span> node. If there we hahd an example where there were <span class="math notranslate nohighlight">\(2\)</span> communities (<span class="math notranslate nohighlight">\(K = 2\)</span>) for instance, and the first two nodes are in community <span class="math notranslate nohighlight">\(1\)</span> and the second two in community <span class="math notranslate nohighlight">\(2\)</span>, then <span class="math notranslate nohighlight">\(\vec\tau\)</span> would be a vector which looks like:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec\tau &amp;= \begin{bmatrix}1 &amp; 1 &amp; 2 &amp; 2\end{bmatrix}^\top
+\end{align*}\]</div>
+<p>Next, let’s discuss the matrix <span class="math notranslate nohighlight">\(B\)</span>, which is known as the <strong>block matrix</strong> of the SBM. We write down that <span class="math notranslate nohighlight">\(B \in [0, 1]^{K \times K}\)</span>, which means that the block matrix is a matrix with <span class="math notranslate nohighlight">\(K\)</span> rows and <span class="math notranslate nohighlight">\(K\)</span> columns. If we have a pair of nodes and know which of the <span class="math notranslate nohighlight">\(K\)</span> communities each node is from, the block matrix tells us the probability that those two nodes are connected. If our networks are simple, the matrix <span class="math notranslate nohighlight">\(B\)</span> is also symmetric, which means that if <span class="math notranslate nohighlight">\(b_{kk'} = p\)</span> where <span class="math notranslate nohighlight">\(p\)</span> is a probability, that <span class="math notranslate nohighlight">\(b_{k'k} = p\)</span>, too. The requirement of <span class="math notranslate nohighlight">\(B\)</span> to be symmetric exists <em>only</em> if we are dealing with undirected networks.</p>
+<p>Finally, let’s think about how to write down the generative model for the <em>a priori</em> SBM. Intuitionally what we want to reflect is, if we know that node <span class="math notranslate nohighlight">\(i\)</span> is in community <span class="math notranslate nohighlight">\(k'\)</span> and node <span class="math notranslate nohighlight">\(j\)</span> is in community <span class="math notranslate nohighlight">\(k\)</span>, that the <span class="math notranslate nohighlight">\((k', k)\)</span> entry of the block matrix is the probability that <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are connected. We say that given  <span class="math notranslate nohighlight">\(\tau_i = k'\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(b_{k' k})\)</span> distribution for all <span class="math notranslate nohighlight">\(j &gt; i\)</span>. Note that the adjacencies <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> are not <em>necessarily</em> identically distributed, because the probability depends on the community of edge <span class="math notranslate nohighlight">\((i,j)\)</span>. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> SBM network with parameter <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(\vec{\tau}\)</span> is a realization of the node-assignment vector, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_{n,\vec \tau}(B)\)</span>.</p>
+<div class="section" id="id1">
+<h3><span class="section-number">7.1.4.1. </span>Probability<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>What does the probability for the <em>a priori</em> SBM look like? In our previous description, we admittedly simplified things to an extent to keep the wording down. In truth, we model the <em>a priori</em> SBM using a <em>latent variable</em> model, which means that the node assignment vector, <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, is treated as <em>random</em>. For the case of the <em>a priori</em> SBM, it just so happens that we <em>know</em> the specific value that this latent variable <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> takes, <span class="math notranslate nohighlight">\(\vec \tau\)</span>, ahead of time.</p>
+<p>Fortunately, since <span class="math notranslate nohighlight">\(\vec \tau\)</span> is a <em>parameter</em> of the <em>a priori</em> SBM, the probability is a bit simpler than for the <em>a posteriori</em> SBM. This is because the <em>a posteriori</em> SBM requires an integration over potential realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, whereas the <em>a priori</em> SBM does not, since we already know that <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> was realized as <span class="math notranslate nohighlight">\(\vec\tau\)</span>.</p>
+<p>Putting these steps together gives us that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(A) &amp;= \mathbb P_{\theta}(\mathbf A = A | \vec{\pmb \tau} = \vec\tau) \\
+&amp;= \prod_{j &gt; i} \mathbb P_\theta(\mathbf a_{ij} = a_{ij} | \vec{\pmb \tau} = \vec\tau),\;\;\;\;\textrm{Independence Assumption}
+\end{align*}\]</div>
+<p>Next, for the <em>a priori</em> SBM, we know that each edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> only <em>actually</em> depends on the community assignments of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, so we know that <span class="math notranslate nohighlight">\(\mathbb P_{\theta}(\mathbf a_{ij} = a_{ij} | \vec{\pmb \tau} = \vec\tau) = \mathbb P(\mathbf a_{ij} = a_{ij} | \tau_i = k', \tau_j = k)\)</span>, where <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span> are any of the <span class="math notranslate nohighlight">\(K\)</span> possible communities. This is because the community assignments of nodes that are not nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> do not matter for edge <span class="math notranslate nohighlight">\(ij\)</span>, due to the independence assumption.</p>
+<p>Next, let’s think about the probability matrix <span class="math notranslate nohighlight">\(P = (p_{ij})\)</span> for the <em>a priori</em> SBM. We know that, given that <span class="math notranslate nohighlight">\(\tau_i = k'\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span>,  each adjacency <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently and identically from a <span class="math notranslate nohighlight">\(Bern(b_{k',k})\)</span> distribution. This means that <span class="math notranslate nohighlight">\(p_{ij} = b_{k',k}\)</span>. Completing our analysis from above:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \prod_{j &gt; i} b_{k'k}^{a_{ij}}(1 - b_{k'k})^{1 - a_{ij}} \\
+    &amp;= \prod_{k,k' \in [K]}b_{k'k}^{m_{k'k}}(1 - b_{k'k})^{n_{k'k} - m_{k'k}}
+\end{align*}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(n_{k' k}\)</span> denotes the total number of edges possible between nodes assigned to community <span class="math notranslate nohighlight">\(k'\)</span> and nodes assigned to community <span class="math notranslate nohighlight">\(k\)</span>. That is, <span class="math notranslate nohighlight">\(n_{k' k} = \sum_{j &gt; i} \mathbb 1_{\tau_i = k'}\mathbb 1_{\tau_j = k}\)</span>. Further, we will use <span class="math notranslate nohighlight">\(m_{k' k}\)</span> to denote the total number of edges observed between these two communities. That is, <span class="math notranslate nohighlight">\(m_{k' k} = \sum_{j &gt; i}\mathbb 1_{\tau_i = k'}\mathbb 1_{\tau_j = k}a_{ij}\)</span>. Note that for a single <span class="math notranslate nohighlight">\((k',k)\)</span> community pair, that the probability is analogous to the probability of a realization of an ER random variable.</p>
+<!--- We can formalize this a bit more explicitly. If we let $A^{\ell k}$ be defined as the subgraph *induced* by the edges incident nodes in community $\ell$ and those in community $k$, then we can say that $A^{\ell k}$ is a directed ER random network, --->
+<p>Like the ER model, there are again equivalence classes of the sample space <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> in terms of their probability. For a two-community setting, with <span class="math notranslate nohighlight">\(\vec \tau\)</span> and <span class="math notranslate nohighlight">\(B\)</span> given, the equivalence classes are the sets:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    E_{a,b,c}(\vec \tau, B) &amp;= \left\{A \in \mathcal A_n : m_{11} = a, m_{21}=m_{12} = b, m_{22} = c\right\}
+\end{align*}\]</div>
+<p>The number of equivalence classes possible scales with the number of communities, and the manner in which nodes are assigned to communities (particularly, the number of nodes in each community).</p>
+</div>
+</div>
+<div class="section" id="a-posteriori-stochastic-block-model">
+<h2><span class="section-number">7.1.5. </span><em>A Posteriori</em> Stochastic Block Model<a class="headerlink" href="#a-posteriori-stochastic-block-model" title="Permalink to this headline">¶</a></h2>
+<p>In the <em>a posteriori</em> Stochastic Block Model (SBM), we consider that node assignment to one of <span class="math notranslate nohighlight">\(K\)</span> communities is a random variable, that we <em>don’t</em> know already like te <em>a priori</em> SBM. We’re going to see a funky word come up, that you’re probably not familiar with, the <strong><span class="math notranslate nohighlight">\(K\)</span> probability simplex</strong>. What the heck is a probability simplex?</p>
+<p>The intuition for a simplex is probably something you’re very familiar with, but just haven’t seen a word describe. Let’s say I have a vector, <span class="math notranslate nohighlight">\(\vec\pi = (\pi_k)_{k \in [K]}\)</span>, which has a total of <span class="math notranslate nohighlight">\(K\)</span> elements. <span class="math notranslate nohighlight">\(\vec\pi\)</span> will be a vector, which indicates the <em>probability</em> that a given node is assigned to each of our <span class="math notranslate nohighlight">\(K\)</span> communities, so we need to impose some additional constraints. Symbolically, we would say that, for all <span class="math notranslate nohighlight">\(i\)</span>, and for all <span class="math notranslate nohighlight">\(k\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \pi_k = \mathbb P(\pmb\tau_i = k)
+\end{align*}\]</div>
+<p>The <span class="math notranslate nohighlight">\(\vec \pi\)</span> we’re going to use has a very special property: all of its elements are non-negative: for all <span class="math notranslate nohighlight">\(\pi_k\)</span>, <span class="math notranslate nohighlight">\(\pi_k \geq 0\)</span>. This makes sense since <span class="math notranslate nohighlight">\(\pi_k\)</span> is being used to represent the probability of a node <span class="math notranslate nohighlight">\(i\)</span> being in group <span class="math notranslate nohighlight">\(k\)</span>, so it certainly can’t be negative. Further, there’s another thing that we want our <span class="math notranslate nohighlight">\(\vec\pi\)</span> to have: in order for each element <span class="math notranslate nohighlight">\(\pi_k\)</span> to indicate the probability of something to be assigned to <span class="math notranslate nohighlight">\(k\)</span>, we need all of the <span class="math notranslate nohighlight">\(\pi_k\)</span>s to sum up to one. This is because of something called the Law of Total Probability. If we have <span class="math notranslate nohighlight">\(K\)</span> total values that <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span> could take, then it is the case that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \sum_{k=1}^K \mathbb P(\pmb \tau_i = k) = \sum_{k = 1}^K \pi_k = 1
+\end{align*}\]</div>
+<p>So, back to our question: how does a probability simplex fit in? Well, the <span class="math notranslate nohighlight">\(K\)</span> probability simplex describes all of the possible values that our vector <span class="math notranslate nohighlight">\(\vec\pi\)</span> could take! In symbols, the <span class="math notranslate nohighlight">\(K\)</span> probability simplex is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\left\{\vec\pi : \text{for all $k$ }\pi_k \geq 0, \sum_{k = 1}^K \pi_k = 1 \right\}
+\end{align*}\]</div>
+<p>So the <span class="math notranslate nohighlight">\(K\)</span> probability simplex is just the space for all possible vectors which could indicate assignment probabilities to one of <span class="math notranslate nohighlight">\(K\)</span> communities.</p>
+<p>What does the probability simplex look like? Below, we take a look at the <span class="math notranslate nohighlight">\(2\)</span>-probability simplex (2-d <span class="math notranslate nohighlight">\(\vec\pi\)</span>s) and the <span class="math notranslate nohighlight">\(3\)</span>-probability simplex (3-dimensional <span class="math notranslate nohighlight">\(\vec\pi\)</span>s):</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d.art3d</span> <span class="kn">import</span> <span class="n">Poly3DCollection</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figaspect</span><span class="p">(</span><span class="mf">.5</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Probability Simplexes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;$\pi_1$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$\pi_2$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;2-probability simplex&quot;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">verts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">))]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">add_collection3d</span><span class="p">(</span><span class="n">Poly3DCollection</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">azim</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;$\pi_1$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$\pi_2$&quot;</span><span class="p">)</span>
+<span class="n">h</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;$\pi_3$&quot;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;3-probability simplex&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-single-network_8_0.png" src="../../_images/theory-single-network_8_0.png" />
+</div>
+</div>
+<p>The values of <span class="math notranslate nohighlight">\(\vec\pi = (\pi)\)</span> that are in the <span class="math notranslate nohighlight">\(K\)</span>-probability simplex are indicated by the shaded region of each figure. This comprises the <span class="math notranslate nohighlight">\((\pi_1, \pi_2)\)</span> pairs that fall along a diagonal line from <span class="math notranslate nohighlight">\((0,1)\)</span> to <span class="math notranslate nohighlight">\((1,0)\)</span> for the <span class="math notranslate nohighlight">\(2\)</span>-simplex, and the <span class="math notranslate nohighlight">\((\pi_1, \pi_2, \pi_3)\)</span> tuples that fall on the surface of the triangular shape above with nodes at <span class="math notranslate nohighlight">\((1,0,0)\)</span>, <span class="math notranslate nohighlight">\((0,1,0)\)</span>, and <span class="math notranslate nohighlight">\((0,0,1)\)</span>.</p>
+<p>This model has the following parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\vec \pi\)</span></p></td>
+<td><p>the <span class="math notranslate nohighlight">\(K\)</span> probability simplex</p></td>
+<td><p>The probability of a node being assigned to community <span class="math notranslate nohighlight">\(K\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{K \times K}\)</span></p></td>
+<td><p>The block matrix, which assigns edge probabilities for pairs of communities</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <em>a posteriori</em> SBM is a bit more complicated than the <em>a priori</em> SBM. We will think about the <em>a posteriori</em> SBM as a variation of the <em>a priori</em> SBM, where instead of the node-assignment vector being treated as a known fixed value (the community assignments), we will treat it as <em>unknown</em>. <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> is called a <em>latent variable</em>, which means that it is a quantity that is never actually observed, but which will be useful for describing our model. In this case, <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> takes values in the space <span class="math notranslate nohighlight">\(\{1,...,K\}^n\)</span>. This means that for a given realization of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, denoted by <span class="math notranslate nohighlight">\(\vec \tau\)</span>, that for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network, we suppose that an integer value between <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(K\)</span> indicates which community a node is from. Statistically, we write that the node assignment for node <span class="math notranslate nohighlight">\(i\)</span>, denoted by <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span>, is sampled independently and identically from <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>. Stated another way, the vector <span class="math notranslate nohighlight">\(\vec\pi\)</span> indicates the probability <span class="math notranslate nohighlight">\(\pi_k\)</span> of assignment to each community <span class="math notranslate nohighlight">\(k\)</span> in the network.</p>
+<p>The matrix <span class="math notranslate nohighlight">\(B\)</span> behaves exactly the same as it did with the <em>a posteriori</em> SBM. Finally, let’s think about how to write down the generative model in the <em>a posteriori</em> SBM. The model for the <em>a posteriori</em> SBM is, in fact, nearly the same as for the <em>a priori</em> SBM: we still say that given <span class="math notranslate nohighlight">\(\tau_i = k'\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> are independent <span class="math notranslate nohighlight">\(Bern(b_{k'k})\)</span>. Here, however, we also describe that <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span> are sampled independent and identically from <span class="math notranslate nohighlight">\(Categorical(\vec\pi)\)</span>, as we learned above. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an <em>a posteriori</em> SBM network with parameters <span class="math notranslate nohighlight">\(\vec \pi\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_n(\vec \pi, B)\)</span>.</p>
+<div class="section" id="id2">
+<h3><span class="section-number">7.1.5.1. </span>Probability<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>What does the probability for the <em>a posteriori</em> SBM look like? In this case, <span class="math notranslate nohighlight">\(\theta = (\vec \pi, B)\)</span> are the parameters for the model, so the probability for a realization <span class="math notranslate nohighlight">\(A\)</span> of <span class="math notranslate nohighlight">\(\mathbf A\)</span> is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(A) &amp;= \mathbb P_\theta(\mathbf A = A)
+\end{align*}\]</div>
+<p>Next, we use the fact that the probability that <span class="math notranslate nohighlight">\(\mathbf A = A\)</span> is, in fact, the <em>integration</em> (over realizations of <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>) of the joint <span class="math notranslate nohighlight">\((\mathbf A, \vec{\pmb \tau})\)</span>. In this case, we will let <span class="math notranslate nohighlight">\(\mathcal T = \{1,...,K\}^n\)</span> be the space of all possible realizations that <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> could take:</p>
+<div class="amsmath math notranslate nohighlight" id="equation-24ccc166-43ce-4be7-9a25-0233b34793e5">
+<span class="eqno">(7.1)<a class="headerlink" href="#equation-24ccc166-43ce-4be7-9a25-0233b34793e5" title="Permalink to this equation">¶</a></span>\[\begin{align}
+\mathbb P_\theta(A)&amp;= \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A, \vec{\pmb \tau} = \vec \tau) 
+\end{align}\]</div>
+<p>Next, remember that by definition of a conditional probability for a random variable <span class="math notranslate nohighlight">\(\mathbf x\)</span> taking value <span class="math notranslate nohighlight">\(x\)</span> conditioned on random variable <span class="math notranslate nohighlight">\(\mathbf y\)</span> taking the value <span class="math notranslate nohighlight">\(y\)</span>, that <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x = x | \mathbf y = y) = \frac{\mathbb P(\mathbf x = x, \mathbf y = y)}{\mathbb P(\mathbf y = y)}\)</span>. Note that by multiplying through by <span class="math notranslate nohighlight">\(\mathbf P(\mathbf y = y)\)</span>, we can see that <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x = x, \mathbf y = y) = \mathbb P(\mathbf x = x| \mathbf y = y)\mathbb P(\mathbf y = y)\)</span>. Using this logic for <span class="math notranslate nohighlight">\(\mathbf A\)</span> and <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(A) &amp;=\sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A| \vec{\pmb \tau} = \vec \tau)\mathbb P(\vec{\pmb \tau} = \vec \tau)
+\end{align*}\]</div>
+<p>Intuitively, for each term in the sum, we are treating <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> as taking a fixed value, <span class="math notranslate nohighlight">\(\vec\tau\)</span>, to evaluate this probability statement.</p>
+<p>We will start by describing <span class="math notranslate nohighlight">\(\mathbb P(\vec{\pmb \tau} = \vec\tau)\)</span>. Remember that for <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span>, that each entry <span class="math notranslate nohighlight">\(\pmb \tau_i\)</span> is sampled <em>independently and identically</em> from <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>.The probability mass for a <span class="math notranslate nohighlight">\(Categorical(\vec \pi)\)</span>-valued random variable is <span class="math notranslate nohighlight">\(\mathbb P(\pmb \tau_i = \tau_i; \vec \pi) = \pi_{\tau_i}\)</span>. Finally, note that if we are taking the products of <span class="math notranslate nohighlight">\(n\)</span> <span class="math notranslate nohighlight">\(\pi_{\tau_i}\)</span> terms, that many of these values will end up being the same. Consider, for instance, if the vector <span class="math notranslate nohighlight">\(\tau = [1,2,1,2,1]\)</span>. We end up with three terms of <span class="math notranslate nohighlight">\(\pi_1\)</span>, and two terms of <span class="math notranslate nohighlight">\(\pi_2\)</span>, and it does not matter which order we multiply them in. Rather, all we need to keep track of are the counts of each <span class="math notranslate nohighlight">\(\pi\)</span> term. Written another way, we can use the indicator that <span class="math notranslate nohighlight">\(\tau_i = k\)</span>, given by <span class="math notranslate nohighlight">\(\mathbb 1_{\tau_i = k}\)</span>, and a running counter over all of the community probability assignments <span class="math notranslate nohighlight">\(\pi_k\)</span> to make this expression a little more sensible. We will use the symbol <span class="math notranslate nohighlight">\(n_k = \sum_{i = 1}^n \mathbb 1_{\tau_i = k}\)</span> to denote this value, which is the number of nodes in community <span class="math notranslate nohighlight">\(k\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(\vec{\pmb \tau} = \vec \tau) &amp;= \prod_{i = 1}^n \mathbb P_\theta(\pmb \tau_i = \tau_i),\;\;\;\;\textrm{Independence Assumption} \\
+&amp;= \prod_{i = 1}^n \pi_{\tau_i} ,\;\;\;\;\textrm{p.m.f. of a Categorical R.V.}\\
+&amp;= \prod_{k = 1}^K \pi_{k}^{n_k},\;\;\;\;\textrm{Reorganizing what we are taking products of}
+\end{align*}\]</div>
+<p>Next, let’s think about the conditional probability term, <span class="math notranslate nohighlight">\(\mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau)\)</span>. Remember that the entries are all independent conditional on <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> taking the value <span class="math notranslate nohighlight">\(\vec\tau\)</span>. It turns out this is exactly the same result that we obtained for the <em>a priori</em> SBM:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau)
+&amp;= \prod_{k',k} b_{\ell k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}
+\end{align*}\]</div>
+<p>Combining these into the integrand gives:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(A) &amp;= \sum_{\vec \tau \in \mathcal T} \mathbb P_\theta(\mathbf A = A \big | \vec{\pmb \tau} = \vec \tau) \mathbb P_\theta(\vec{\pmb \tau} = \vec \tau) \\
+&amp;= \sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]
+\end{align*}\]</div>
+<p>Evaluating this sum explicitly proves to be relatively tedious and is a bit outside of the scope of this book, so we will omit it here.</p>
+</div>
+</div>
+<div class="section" id="degree-corrected-stochastic-block-model-dcsbm">
+<h2><span class="section-number">7.1.6. </span>Degree-Corrected Stochastic Block Model (DCSBM)<a class="headerlink" href="#degree-corrected-stochastic-block-model-dcsbm" title="Permalink to this headline">¶</a></h2>
+<p>Let’s think back to our school example for the Stochastic Block Model. Remember, we had 100 students, each of whom could go to one of two possible schools: school one or school two. Our network had 100 nodes, representing each of the students. We said that the school for which each student attended was represented by their node assignment <span class="math notranslate nohighlight">\(\tau_i\)</span> to one of two possible communities. The matrix <span class="math notranslate nohighlight">\(B\)</span> was the block probaability matrix, where <span class="math notranslate nohighlight">\(b_{11}\)</span> was the probability that students in school one were friends, <span class="math notranslate nohighlight">\(b_{22}\)</span> was the probability that students in school two were friends, and <span class="math notranslate nohighlight">\(b_{12} = b_{21}\)</span> was the probability that students were friends if they did not go to the same school. In this case, we said that <span class="math notranslate nohighlight">\(\mathbf A\)</span> was an <span class="math notranslate nohighlight">\(SBM_n(\tau, B)\)</span> random network.</p>
+<p>When would this setup not make sense? Let’s say that Alice and Bob both go to the same school, but Alice is more popular than Bob. In general since Alice is more popular than Bob, we might want to say that for any clasasmate, Alice gets an additional “popularity benefit” to her probability of being friends with the other classmate, and Bob gets an “unpopularity penalty.” The problem here is that within a single community of an SBM, the SBM assumes that the <strong>node degree</strong> (the number of nodes each nodes is connected to) is the <em>same</em> for all nodes within a single community. This means that we would be unable to reflect this benefit/penalty system to Alice and Bob, since each student will have the same number of friends, on average. This problem is referred to as <strong>community degree homogeneity</strong> in a Stochastic Block Model Network. Community degree homogeneity just means that the node degree is <em>homogeneous</em>, or the same, for all nodes within a community.</p>
+<div class="admonition-degree-homogeneity-in-a-stochastic-block-model-network admonition">
+<p class="admonition-title">Degree Homogeneity in a Stochastic Block Model Network</p>
+<p>Suppose that <span class="math notranslate nohighlight">\(\mathbf A \sim SBM_{n, \vec\tau}(B)\)</span>, where <span class="math notranslate nohighlight">\(\mathbf A\)</span> has <span class="math notranslate nohighlight">\(K=2\)</span> communities. What is the node degree of each node in <span class="math notranslate nohighlight">\(\mathbf A\)</span>?</p>
+<p>For an arbitrary node <span class="math notranslate nohighlight">\(v_i\)</span> which is in community <span class="math notranslate nohighlight">\(k\)</span> (either one or two), we will compute the expectated value of the degree <span class="math notranslate nohighlight">\(deg(v_i)\)</span>, written <span class="math notranslate nohighlight">\(\mathbb E\left[deg(v_i); \tau_i = k\right]\)</span>. We will let <span class="math notranslate nohighlight">\(n_k\)</span> represent the number of nodes whose node assignments <span class="math notranslate nohighlight">\(\tau_i\)</span> are to community <span class="math notranslate nohighlight">\(k\)</span>. Let’s see what happens:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i); \tau_i = k\right] &amp;= \mathbb E\left[\sum_{j = 1}^n \mathbf a_{ij}\right] \\
+    &amp;= \sum_{j = 1}^n \mathbb E[\mathbf a_{ij}]
+\end{align*}\]</div>
+<p>We use the <em>linearity of expectation</em> again to get from the top line to the second line. Next, instead of summing over all the nodes, we’ll break the sum up into the nodes which are in the same community as node <span class="math notranslate nohighlight">\(i\)</span>, and the ones in the <em>other</em> community <span class="math notranslate nohighlight">\(k'\)</span>. We use the notation <span class="math notranslate nohighlight">\(k'\)</span> to emphasize that <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span> are different values:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i); \tau_i = k\right] &amp;= \sum_{j : i \neq j, \tau_j = k} \mathbb E\left[\mathbf a_{ij}\right] + \sum_{j : \tau_j =k'} \mathbb E[\mathbf a_{ij}]
+\end{align*}\]</div>
+<p>In the first sum, we have <span class="math notranslate nohighlight">\(n_k-1\)</span> total edges (the number of nodes that aren’t node <span class="math notranslate nohighlight">\(i\)</span>, but are in the same community), and in the second sum, we have <span class="math notranslate nohighlight">\(n_{k'}\)</span> total edges (the number of nodes that are in the other community). Finally, we will use that the probability of an edge in the same community is <span class="math notranslate nohighlight">\(b_{kk}\)</span>, but the probability of an edge between the communities is <span class="math notranslate nohighlight">\(b_{k' k}\)</span>. Finally, we will use that the expected value of an adjacency <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> which is Bernoulli distributed is its probability:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i); \tau_i = k\right] &amp;= \sum_{j : i \neq j, \tau_j = k} b_{kk} + \sum_{j : \tau_j = \ell} b_{kk'},\;\;\;\;\mathbf a_{ij}\textrm{ are Bernoulli distributed} \\
+    &amp;= (n_k - 1)b_{kk} + n_{k'} b_{kk'}
+\end{align*}\]</div>
+<p>This holds for any node <span class="math notranslate nohighlight">\(i\)</span> which is in community <span class="math notranslate nohighlight">\(k\)</span>. Therefore, the expected node degree is the same, or <strong>homogeneous</strong>, within a community of an SBM.</p>
+</div>
+<p>To address this limitation, we turn to the Degree-Corrected Stochastic Block Model, or DCSBM. As with the Stochastic Block Model, there is both a <em>a priori</em> and <em>a posteriori</em> DCSBM.</p>
+<div class="section" id="a-priori-dcsbm">
+<h3><span class="section-number">7.1.6.1. </span><em>A Priori</em> DCSBM<a class="headerlink" href="#a-priori-dcsbm" title="Permalink to this headline">¶</a></h3>
+<p>Like the <em>a priori</em> SBM, the <em>a priori</em> DCSBM is where we know which nodes are in which communities ahead of time. Here, we will use the variable <span class="math notranslate nohighlight">\(K\)</span> to denote the number of different communiies. The <em>a priori</em> DCSBM has the following two parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{K \times K}\)</span></p></td>
+<td><p>The block matrix, which assigns edge probabilities for pairs of communities</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\vec\theta\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb R^n_+\)</span></p></td>
+<td><p>The degree correction vector, which adjusts the degree for pairs of nodes</p></td>
+</tr>
+</tbody>
+</table>
+<p>The latent community assignment vector <span class="math notranslate nohighlight">\(\vec{\pmb \tau}\)</span> with a known <em>a priori</em> realization <span class="math notranslate nohighlight">\(\vec{\tau}\)</span> and the block matrix <span class="math notranslate nohighlight">\(B\)</span> are exactly the same for the <em>a priori</em> DCSBM as they were for the <em>a priori</em> SBM.</p>
+<p>The vector <span class="math notranslate nohighlight">\(\vec\theta\)</span> is the degree correction vector. Each entry <span class="math notranslate nohighlight">\(\theta_i\)</span> is a positive scalar. <span class="math notranslate nohighlight">\(\theta_i\)</span> defines how much more (or less) edges associated with node <span class="math notranslate nohighlight">\(i\)</span> are connected due to their association with node <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<p>Finally, let’s think about how to write down the generative model for the <em>a priori</em> DCSBM. We say that <span class="math notranslate nohighlight">\(\tau_i = k'\)</span> and <span class="math notranslate nohighlight">\(\tau_j = k\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(\theta_i \theta_j b_{k'k})\)</span> distribution for all <span class="math notranslate nohighlight">\(j &gt; i\)</span>. As we can see, <span class="math notranslate nohighlight">\(\theta_i\)</span> in a sense is “correcting” the probabilities of each adjacency to node <span class="math notranslate nohighlight">\(i\)</span> to be higher, or lower, depending on the value of <span class="math notranslate nohighlight">\(\theta_i\)</span> that that which is given by the block probabilities <span class="math notranslate nohighlight">\(b_{\ell k}\)</span>. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> DCSBM network with parameters and <span class="math notranslate nohighlight">\(B\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim DCSBM_{n,\vec\tau}(\vec \theta, B)\)</span>.</p>
+<div class="section" id="id3">
+<h4><span class="section-number">7.1.6.1.1. </span>Probability<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>The derivation for the probability is the same as for the <em>a priori</em> SBM, with the change that <span class="math notranslate nohighlight">\(p_{ij} = \theta_i \theta_j b_{k'k}\)</span> instead of just <span class="math notranslate nohighlight">\(b_{k'k}\)</span>. This gives that the probability turns out to be:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \prod_{j &gt; i} \left(\theta_i \theta_j b_{k'k}\right)^{a_{ij}}\left(1 - \theta_i \theta_j b_{k'k}\right)^{1 - a_{ij}}
+\end{align*}\]</div>
+<p>The expression doesn’t simplify much more due to the fact that the probabilities are dependent on the particular <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, so we can’t just reduce the statement in terms of <span class="math notranslate nohighlight">\(n_{k'k}\)</span> and <span class="math notranslate nohighlight">\(m_{k'k}\)</span> like for the SBM.</p>
+</div>
+</div>
+<div class="section" id="a-posteriori-dcsbm">
+<h3><span class="section-number">7.1.6.2. </span><em>A Posteriori</em> DCSBM<a class="headerlink" href="#a-posteriori-dcsbm" title="Permalink to this headline">¶</a></h3>
+<p>The <em>a posteriori</em> DCSBM is to the <em>a posteriori</em> SBM what the <em>a priori</em> DCSBM was to the <em>a priori</em> SBM. The changes are very minimal, so we will omit explicitly writing it all down here so we can get this section wrapped up, with the idea that the preceding section on the <em>a priori</em> DCSBM should tell you what needs to change. We will leave it as an exercise to the reader to write down a model and probability statement for realizations of the DCSBM.</p>
+</div>
+</div>
+<div class="section" id="random-dot-product-graph-rdpg">
+<h2><span class="section-number">7.1.7. </span>Random Dot Product Graph (RDPG)<a class="headerlink" href="#random-dot-product-graph-rdpg" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="a-priori-rdpg">
+<h3><span class="section-number">7.1.7.1. </span><em>A Priori</em> RDPG<a class="headerlink" href="#a-priori-rdpg" title="Permalink to this headline">¶</a></h3>
+<p>The <em>a priori</em> Random Dot Product Graph is an RDPG in which we know <em>a priori</em> the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. The <em>a priori</em> RDPG has the following parameter:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(X\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\( \mathbb R^{n \times d}\)</span></p></td>
+<td><p>The matrix of latent positions for each node <span class="math notranslate nohighlight">\(n\)</span>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math notranslate nohighlight">\(X\)</span> is called the <strong>latent position matrix</strong> of the RDPG. We write that <span class="math notranslate nohighlight">\(X \in \mathbb R^{n \times d}\)</span>, which means that it is a matrix with real values, <span class="math notranslate nohighlight">\(n\)</span> rows, and <span class="math notranslate nohighlight">\(d\)</span> columns. We will use the notation <span class="math notranslate nohighlight">\(\vec x_i\)</span> to refer to the <span class="math notranslate nohighlight">\(i^{th}\)</span> row of <span class="math notranslate nohighlight">\(X\)</span>. <span class="math notranslate nohighlight">\(\vec x_i\)</span> is referred to as the <strong>latent position</strong> of a node <span class="math notranslate nohighlight">\(i\)</span>. This looks something like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    X = \begin{bmatrix}
+     \vec x_{1}^\top \\
+     \vdots \\
+     \vec x_n^\top
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>Noting that <span class="math notranslate nohighlight">\(X\)</span> has <span class="math notranslate nohighlight">\(d\)</span> columns, this implies that <span class="math notranslate nohighlight">\(\vec x_i \in  \mathbb R^d\)</span>, or that each node’s latent position is a real-valued <span class="math notranslate nohighlight">\(d\)</span>-dimensional vector.</p>
+<p>What is the generative model for the <em>a priori</em> RDPG? As we discussed above, given <span class="math notranslate nohighlight">\(X\)</span>, for all <span class="math notranslate nohighlight">\(j &gt; i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij} \sim Bern(\vec x_i^\top \vec x_j)\)</span> independently. If <span class="math notranslate nohighlight">\(i &lt; j\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span> (the network is <em>undirected</em>), and <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span> (the network is <em>loopless</em>). If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> RDPG with parameter <span class="math notranslate nohighlight">\(X\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim RDPG_n(X)\)</span>.</p>
+<!-- TODO: return to add equivalence classes --><div class="section" id="id4">
+<h4><span class="section-number">7.1.7.1.1. </span>Probability<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>Given <span class="math notranslate nohighlight">\(X\)</span>, the probability for an RDPG is relatively straightforward, as an RDPG is another Independent-Edge Random Graph. The independence assumption vastly simplifies our resulting expression. We will also use many of the results we’ve identified above, such as the p.m.f. of a Bernoulli random variable. Finally, we’ll note that the probability matrix <span class="math notranslate nohighlight">\(P = (\vec x_i^\top \vec x_j)\)</span>, so <span class="math notranslate nohighlight">\(p_{ij} = \vec x_i^\top \vec x_j\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \mathbb P_\theta(A) \\
+    &amp;= \prod_{j &gt; i}\mathbb P(\mathbf a_{ij} = a_{ij}),\;\;\;\; \textrm{Independence Assumption} \\
+    &amp;= \prod_{j &gt; i}(\vec x_i^\top \vec x_j)^{a_{ij}}(1 - \vec x_i^\top \vec x_j)^{1 - a_{ij}},\;\;\;\; a_{ij} \sim Bern(\vec x_i^\top \vec x_j)
+\end{align*}\]</div>
+<p>Unfortunately, the probability equivalence classes are a bit harder to understand intuitionally here compared to the ER and SBM examples so we won’t write them down here, but they still exist!</p>
+</div>
+</div>
+<div class="section" id="a-posteriori-rdpg">
+<h3><span class="section-number">7.1.7.2. </span><em>A Posteriori</em> RDPG<a class="headerlink" href="#a-posteriori-rdpg" title="Permalink to this headline">¶</a></h3>
+<p>Like for the <em>a posteriori</em> SBM, the <em>a posteriori</em> RDPG introduces another strange set: the <strong>intersection of the unit ball and the non-negative orthant</strong>. Huh? This sounds like a real mouthful, but it turns out to be rather straightforward. You are probably already very familiar with a particular orthant: in two-dimensions, an orthant is called a quadrant. Basically, an orthant just extends the concept of a quadrant to spaces which might have more than <span class="math notranslate nohighlight">\(2\)</span> dimensions. The non-negative orthant happens to be the orthant where all of the entries are non-negative. We call the <strong><span class="math notranslate nohighlight">\(K\)</span>-dimensional non-negative orthant</strong> the set of points in <span class="math notranslate nohighlight">\(K\)</span>-dimensional real space, where:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \left\{\vec x \in \mathbb R^K : x_k \geq 0\text{ for all $k$}\right\}
+\end{align*}\]</div>
+<p>In two dimensions, this is the traditional upper-right portion of the standard coordinate axis. To give you a picture, the <span class="math notranslate nohighlight">\(2\)</span>-dimensional non-negative orthant is the blue region of the following figure:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axisartist</span> <span class="kn">import</span> <span class="n">SubplotZero</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">patch</span>
+
+<span class="k">class</span> <span class="nc">myAxes</span><span class="p">():</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xlim</span> <span class="o">=</span> <span class="n">xlim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ylim</span> <span class="o">=</span> <span class="n">ylim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figsize</span>  <span class="o">=</span> <span class="n">figsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scale_arrows</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__drawArrow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> 
+            <span class="n">color</span>       <span class="o">=</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span>
+            <span class="n">clip_on</span>     <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+            <span class="n">head_width</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_width</span><span class="p">,</span> 
+            <span class="n">head_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head_length</span>
+        <span class="p">)</span> 
+        
+    <span class="k">def</span> <span class="nf">__scale_arrows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Make the arrows look good regardless of the axis limits &quot;&quot;&quot;</span>
+        <span class="n">xrange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">yrange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_width</span>  <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">xrange</span><span class="o">/</span><span class="mi">30</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">yrange</span><span class="o">/</span><span class="mi">30</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">__drawAxis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draws the 2D cartesian axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># A subplot with two additional axis, &quot;xzero&quot; and &quot;yzero&quot;</span>
+        <span class="c1"># corresponding to the cartesian axis</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">SubplotZero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        
+        <span class="c1"># make xzero axis (horizontal axis line through y=0) visible.</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;xzero&quot;</span><span class="p">,</span><span class="s2">&quot;yzero&quot;</span><span class="p">]:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># make the other axis (left, bottom, top, right) invisible</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;top&quot;</span><span class="p">]:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            
+        <span class="c1"># Plot limits</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xlim</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ylim</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="c1"># Draw the arrows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawArrow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span> <span class="c1"># x-axis arrow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawArrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span> <span class="c1"># y-axis arrow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+        
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># First draw the axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__drawAxis</span><span class="p">()</span>
+
+<span class="n">axes</span> <span class="o">=</span> <span class="n">myAxes</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+<span class="n">rectangle</span> <span class="o">=</span><span class="n">patch</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span><span class="n">ec</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rectangle</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-single-network_18_0.png" src="../../_images/theory-single-network_18_0.png" />
+</div>
+</div>
+<p>Now, what is the unit ball? You are probably familiar with the idea of the unit ball, even if you haven’t heard it called that specifically. Remember that the Euclidean norm for a point <span class="math notranslate nohighlight">\(\vec x\)</span> which has coordinates <span class="math notranslate nohighlight">\(x_i\)</span> for <span class="math notranslate nohighlight">\(i=1,...,K\)</span> is given by the expression:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \left|\left|\vec x\right|\right|_2 = \sqrt{\sum_{i = 1}^K x_i^2}
+\end{align*}\]</div>
+<p>The Euclidean unit ball is just the set of points whose Euclidean norm is at most <span class="math notranslate nohighlight">\(1\)</span>. To be more specific, the <strong>closed unit ball</strong> with the Euclidean norm is the set of points:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \left\{\vec x \in \mathbb R^K :\left|\left|\vec x\right|\right|_2 \leq 1\right\}
+\end{align*}\]</div>
+<p>We draw the <span class="math notranslate nohighlight">\(2\)</span>-dimensional unit ball with the Euclidean norm below, where the points that make up the unit ball are shown in red:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">axes</span> <span class="o">=</span> <span class="n">myAxes</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+<span class="n">circle</span> <span class="o">=</span><span class="n">patch</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="n">ec</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-single-network_20_0.png" src="../../_images/theory-single-network_20_0.png" />
+</div>
+</div>
+<p>Now what is their intersection? Remember that the intersection of two sets <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> is the set:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A \cap B &amp;= \{x : x \in A, x \in B\}
+\end{align*}\]</div>
+<p>That is, each element must be in <em>both</em> sets to be in the intersection. The interesction of the unit ball and the non-negative orthant will be the set:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+   \mathcal X_K = \left\{\vec x \in \mathbb R^K :\left|\left|\vec x\right|\right|_2 \leq 1, x_k \geq 0 \textrm{ for all $k$}\right\}
+\end{align*}\]</div>
+<p>visually, this will be the set of points in the <em>overlap</em> of the unit ball and the non-negative orthant, which we show below in purple:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">axes</span> <span class="o">=</span> <span class="n">myAxes</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+<span class="n">circle</span> <span class="o">=</span><span class="n">patch</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="n">ec</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">circle</span><span class="p">)</span>
+<span class="n">rectangle</span> <span class="o">=</span><span class="n">patch</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span><span class="n">ec</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.2</span><span class="p">)</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rectangle</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-single-network_22_0.png" src="../../_images/theory-single-network_22_0.png" />
+</div>
+</div>
+<p>This space has an <em>incredibly</em> important corollary. It turns out that if <span class="math notranslate nohighlight">\(\vec x\)</span> and <span class="math notranslate nohighlight">\(\vec y\)</span> are both elements of <span class="math notranslate nohighlight">\(\mathcal X_K\)</span>, that <span class="math notranslate nohighlight">\(\left\langle \vec x, \vec y \right \rangle = \vec x^\top \vec y\)</span>, the <strong>inner product</strong>, is at most <span class="math notranslate nohighlight">\(1\)</span>, and at least <span class="math notranslate nohighlight">\(0\)</span>. Without getting too technical, this is because of something called the Cauchy-Schwartz inequality and the properties of <span class="math notranslate nohighlight">\(\mathcal X_K\)</span>. If you remember from linear algebra, the Cauchy-Schwartz inequality states that <span class="math notranslate nohighlight">\(\left\langle \vec x, \vec y \right \rangle\)</span> can be at most the product of <span class="math notranslate nohighlight">\(\left|\left|\vec x\right|\right|_2\)</span> and <span class="math notranslate nohighlight">\(\left|\left|\vec y\right|\right|_2\)</span>. Since <span class="math notranslate nohighlight">\(\vec x\)</span> and <span class="math notranslate nohighlight">\(\vec y\)</span> have norms both less than or equal to <span class="math notranslate nohighlight">\(1\)</span> (since they are on the <em>unit ball</em>), their inner-product is at most <span class="math notranslate nohighlight">\(1\)</span>. Further, since <span class="math notranslate nohighlight">\(\vec x\)</span> and <span class="math notranslate nohighlight">\(\vec y\)</span> are in the non-negative orthant, their inner product can never be negative. This is because both <span class="math notranslate nohighlight">\(\vec x\)</span> and <span class="math notranslate nohighlight">\(\vec y\)</span> have entries which are not negative, and therefore their element-wise products can never be negative.</p>
+<p>The <em>a posteriori</em> RDPG is to the <em>a priori</em> RDPG what the <em>a posteriori</em> SBM was to the <em>a priori</em> SBM. We instead suppose that we do <em>not</em> know the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>, but instead know how we can characterize the individual latent positions. We have the following parameter:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>F</p></td>
+<td><p>inner-product distributions</p></td>
+<td><p>A distribution which governs each latent position.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The parameter <span class="math notranslate nohighlight">\(F\)</span> is what is known as an <strong>inner-product distribution</strong>. In the simplest case, we will assume that <span class="math notranslate nohighlight">\(F\)</span> is a distribution on a subset of the possible real vectors that have <span class="math notranslate nohighlight">\(d\)</span>-dimensions with an important caveat: for any two vectors within this subset, their inner product <em>must</em> be a probability. We will refer to the subset of the possible real vectors as <span class="math notranslate nohighlight">\(\mathcal X_K\)</span>, which we learned about above. This means that for any <span class="math notranslate nohighlight">\(\vec x_i, \vec x_j\)</span> that are in <span class="math notranslate nohighlight">\(\mathcal X_K\)</span>, it is always the case that <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span> is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. This is essential because like previously, we will describe the distribution of each edge in the adjacency matrix using <span class="math notranslate nohighlight">\(\vec x_i^\top \vec x_j\)</span> to represent a probability. Next, we will treat the latent position matrix as a matrix-valued random variable which is <em>latent</em> (remember, <em>latent</em> means that we don’t get to see it in our real data). Like before, we will call <span class="math notranslate nohighlight">\(\vec{\mathbf x}_i\)</span> the random latent positions for the nodes of our network. In this case, each <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i\)</span> is sampled independently and identically from the inner-product distribution <span class="math notranslate nohighlight">\(F\)</span> described above. The latent-position matrix is the matrix-valued random variable <span class="math notranslate nohighlight">\(\mathbf X\)</span> whose entries are the latent vectors <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i\)</span>, for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes.</p>
+<p>The model for edges of the <em>a posteriori</em> RDPG can be described by conditioning on this unobserved latent-position matrix. We write down that, conditioned on <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i = \vec x\)</span> and <span class="math notranslate nohighlight">\(\vec {\mathbf x}_j = \vec y\)</span>, that if <span class="math notranslate nohighlight">\(j &gt; i\)</span>, then <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(\vec x^\top \vec y)\)</span> distribution. As before, if <span class="math notranslate nohighlight">\(i &lt; j\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span> (the network is <em>undirected</em>), and <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span> (the network is <em>loopless</em>). If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an <em>a posteriori</em> RDPG with parameter <span class="math notranslate nohighlight">\(F\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim RDPG_n(F)\)</span>.</p>
+<div class="section" id="id5">
+<h4><span class="section-number">7.1.7.2.1. </span>Probability<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>The probability for the <em>a posteriori</em> RDPG is fairly complicated. This is because, like the <em>a posteriori</em> SBM, we do not actually get to see the latent position matrix <span class="math notranslate nohighlight">\(\mathbf X\)</span>, so we need to use <em>integration</em> to obtain an expression for the probability. Here, we are concerned with realizations of <span class="math notranslate nohighlight">\(\mathbf X\)</span>. Remember that <span class="math notranslate nohighlight">\(\mathbf X\)</span> is just a matrix whose rows are <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i\)</span>, each of which individually have have the distribution <span class="math notranslate nohighlight">\(F\)</span>; e.g., <span class="math notranslate nohighlight">\(\vec{\mathbf x}_i \sim F\)</span> independently. For simplicity, we will assume that <span class="math notranslate nohighlight">\(F\)</span> is a disrete distribution on <span class="math notranslate nohighlight">\(\mathcal X_K\)</span>. This makes the logic of what is going on below much simpler since the notation gets less complicated, but does not detract from the generalizability of the result (the only difference is that sums would be replaced by multivariate integrals, and probability mass functions replaced by probability density functions).</p>
+<p>We will let <span class="math notranslate nohighlight">\(p\)</span> denote the probability mass function (p.m.f.) of this discrete distribution function <span class="math notranslate nohighlight">\(F\)</span>. The strategy will be to use the independence assumption, followed by integration over the relevant rows of <span class="math notranslate nohighlight">\(\mathbf X\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(A) &amp;= \mathbb P_\theta(\mathbf A = A) \\
+&amp;= \prod_{j &gt; i} \mathbb P(\mathbf a_{ij} = a_{ij}), \;\;\;\;\textrm{Independence Assumption} \\
+\mathbb P(\mathbf a_{ij} = a_{ij})&amp;= \sum_{\vec x \in \mathcal X_K}\sum_{\vec y \in \mathcal X_K}\mathbb P(\mathbf a_{ij} = a_{ij}, \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y),\;\;\;\;\textrm{integration over }\vec {\mathbf x}_i \textrm{ and }\vec {\mathbf x}_j
+\end{align*}\]</div>
+<p>Next, we will simplify this expression a little bit more, using the definition of a conditional probability like we did before for the SBM:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\\
+\mathbb P(\mathbf a_{ij} = a_{ij}, \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y) &amp;= \mathbb P(\mathbf a_{ij} = a_{ij}| \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y) \mathbb P(\vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y)
+\end{align*}\]</div>
+<p>Further, remember that if <span class="math notranslate nohighlight">\(\mathbf a\)</span> and <span class="math notranslate nohighlight">\(\mathbf b\)</span> are independent, then <span class="math notranslate nohighlight">\(\mathbb P(\mathbf a = a, \mathbf b = b) = \mathbb P(\mathbf a = a)\mathbb P(\mathbf b = b)\)</span>. Using that <span class="math notranslate nohighlight">\(\vec x_i\)</span> and <span class="math notranslate nohighlight">\(\vec x_j\)</span> are independent, by definition:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(\vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y) &amp;= \mathbb P(\vec{\mathbf x}_i = \vec x) \mathbb P(\vec{\mathbf x}_j = \vec y)
+\end{align*}\]</div>
+<p>Which means that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(\mathbf a_{ij} = a_{ij}, \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y) &amp;=  \mathbb P(\mathbf a_{ij} = a_{ij} | \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y)\mathbb P(\vec{\mathbf x}_i = \vec x) \mathbb P(\vec{\mathbf x}_j = \vec y)
+\end{align*}\]</div>
+<p>Finally, we that conditional on <span class="math notranslate nohighlight">\(\vec{\mathbf x}_i = \vec x_i\)</span> and <span class="math notranslate nohighlight">\(\vec{\mathbf x}_j = \vec x_j\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is <span class="math notranslate nohighlight">\(Bern(\vec x_i^\top \vec x_j)\)</span>. This means that in terms of our probability matrix, each entry <span class="math notranslate nohighlight">\(p_{ij} = \vec x_i^\top \vec x_j\)</span>. Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(\mathbf a_{ij} = a_{ij}| \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y) &amp;= (\vec x^\top \vec y)^{a_{ij}}(1 - \vec x^\top\vec y)^{1 - a_{ij}}
+\end{align*}\]</div>
+<p>This implies that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P(\mathbf a_{ij} = a_{ij}, \vec{\mathbf x}_i = \vec x, \vec{\mathbf x}_j = \vec y) &amp;=  (\vec x^\top \vec y)^{a_{ij}}(1 - \vec x^\top\vec y)^{1 - a_{ij}}\mathbb P(\vec{\mathbf x}_i = \vec x) \mathbb P(\vec{\mathbf x}_j = \vec y)
+\end{align*}\]</div>
+<p>So our complete expression for the probability is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\mathbb P_\theta(A) &amp;= \prod_{j &gt; i}\sum_{\vec x \in \mathcal X_K}\sum_{\vec y \in \mathcal X_K} (\vec x^\top \vec y)^{a_{ij}}(1 - \vec x^\top\vec y)^{1 - a_{ij}}\mathbb P(\vec{\mathbf x}_i = \vec x) \mathbb P(\vec{\mathbf x}_j = \vec y)
+\end{align*}\]</div>
+</div>
+</div>
+</div>
+<div class="section" id="generalized-random-dot-product-graph-grdpg">
+<h2><span class="section-number">7.1.8. </span>Generalized Random Dot Product Graph (GRDPG)<a class="headerlink" href="#generalized-random-dot-product-graph-grdpg" title="Permalink to this headline">¶</a></h2>
+<p>The Generalized Random Dot Product Graph, or GRDPG, is the most general random network model we will consider in this book. Note that for the RDPG, the probability matrix <span class="math notranslate nohighlight">\(P\)</span> had entries <span class="math notranslate nohighlight">\(p_{ij} = \vec x_i^\top \vec x_j\)</span>. What about <span class="math notranslate nohighlight">\(p_{ji}\)</span>? Well, <span class="math notranslate nohighlight">\(p_{ji} = \vec x_j^\top \vec x_i\)</span>, which is exactly the same as <span class="math notranslate nohighlight">\(p_{ij}\)</span>! This means that even if we were to consider a directed RDPG, the probabilities that can be captured are <em>always</em> going to be symmetric. The generalized random dot product graph, or GRDPG, relaxes this assumption. This is achieved by using <em>two</em> latent positin matrices, <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>, and letting <span class="math notranslate nohighlight">\(P = X Y^\top\)</span>. Now, the entries <span class="math notranslate nohighlight">\(p_{ij} = \vec x_i^\top \vec y_j\)</span>, but <span class="math notranslate nohighlight">\(p_{ji} = \vec x_j^\top \vec y_i\)</span>, which might be different.</p>
+<div class="section" id="a-priori-grdpg">
+<h3><span class="section-number">7.1.8.1. </span><em>A Priori</em> GRDPG<a class="headerlink" href="#a-priori-grdpg" title="Permalink to this headline">¶</a></h3>
+<p>The <em>a priori</em> GRDPG is a GRDPG in which we know <em>a priori</em> the latent position matrices <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>. The <em>a priori</em> GRDPG has the following parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(X\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\( \mathbb R^{n \times d}\)</span></p></td>
+<td><p>The matrix of left latent positions for each node <span class="math notranslate nohighlight">\(n\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(Y\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\( \mathbb R^{n \times d}\)</span></p></td>
+<td><p>The matrix of right latent positions for each node <span class="math notranslate nohighlight">\(n\)</span>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> behave nearly the same as the latent position matrix <span class="math notranslate nohighlight">\(X\)</span> for the <em>a priori</em> RDPG, with the exception that they will be called the <strong>left latent position matrix</strong> and the <strong>right latent position matrix</strong> respectively. Further, the vectors <span class="math notranslate nohighlight">\(\vec x_i\)</span> will be the left latent positions, and <span class="math notranslate nohighlight">\(\vec y_i\)</span> will be the right latent positions, for a given node <span class="math notranslate nohighlight">\(i\)</span>, for each node <span class="math notranslate nohighlight">\(i=1,...,n\)</span>.</p>
+<p>What is the generative model for the <em>a priori</em> GRDPG? As we discussed above, given <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>, for all <span class="math notranslate nohighlight">\(j \neq i\)</span>, <span class="math notranslate nohighlight">\(\mathbf a_{ij} \sim Bern(\vec x_i^\top \vec y_j)\)</span> independently. If we consider only loopless networks, <span class="math notranslate nohighlight">\(\mathbf a_{ij} = 0\)</span>. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <em>a priori</em> GRDPG with left and right latent position matrices <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim GRDPG_n(X, Y)\)</span>.</p>
+</div>
+<div class="section" id="a-posteriori-grdpg">
+<h3><span class="section-number">7.1.8.2. </span><em>A Posteriori</em> GRDPG<a class="headerlink" href="#a-posteriori-grdpg" title="Permalink to this headline">¶</a></h3>
+<p>The <em>A Posteriori</em> GRDPG is very similar to the <em>a posteriori</em> RDPG. We have two parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>F</p></td>
+<td><p>inner-product distributions</p></td>
+<td><p>A distribution which governs the left latent positions.</p></td>
+</tr>
+<tr class="row-odd"><td><p>G</p></td>
+<td><p>inner-product distributions</p></td>
+<td><p>A distribution which governs the right latent positions.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Here, we treat the left and right latent position matrices as latent variable matrices, like we did for <em>a posteriori</em> RDPG. That is, the left latent positions are sampled independently and identically from <span class="math notranslate nohighlight">\(F\)</span>, and the right latent positions <span class="math notranslate nohighlight">\(\vec y_i\)</span> are sampled independently and identically from <span class="math notranslate nohighlight">\(G\)</span>.</p>
+<p>The model for edges of the <em>a posteriori</em> RDPG can be described by conditioning on the unobserved left and right latent-position matrices. We write down that, conditioned on <span class="math notranslate nohighlight">\(\vec {\mathbf x}_i = \vec x\)</span> and <span class="math notranslate nohighlight">\(\vec {\mathbf y}_j = \vec y\)</span>, that if <span class="math notranslate nohighlight">\(j \neq i\)</span>, then <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is sampled independently from a <span class="math notranslate nohighlight">\(Bern(\vec x^\top \vec y)\)</span> distribution. As before, assuming the network is loopless, <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an <em>a posteriori</em> RDPG with parameter <span class="math notranslate nohighlight">\(F\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim GRDPG_n(F, G)\)</span>.</p>
+</div>
+</div>
+<div class="section" id="inhomogeneous-erdos-renyi-ier">
+<h2><span class="section-number">7.1.9. </span>Inhomogeneous Erdös-Rényi (IER)<a class="headerlink" href="#inhomogeneous-erdos-renyi-ier" title="Permalink to this headline">¶</a></h2>
+<p>In the preceding models, we typically made assumptions about how we could characterize the edge-existence probabilities using fewer than <span class="math notranslate nohighlight">\(\binom n 2\)</span> different probabilities (one for each edge). The reason for this is that in general, <span class="math notranslate nohighlight">\(n\)</span> is usually relatively large, so attempting to actually learn <span class="math notranslate nohighlight">\(\binom n 2\)</span> different probabilities is not, in general, going to be very feasible (it is <em>never</em> feasible when we have a single network, since a single network only one observation for each independent edge). Further, it is relatively difficult to ask questions for which assuming edges share <em>nothing</em> in common (even if they don’t share the same probabilities, there may be properties underlying the probabilities, such as the <em>latent positions</em> that we saw above with the RDPG, that we might still want to characterize) is actually favorable.</p>
+<p>Nonetheless, the most general model for an independent-edge random network is known as the Inhomogeneous Erdös-Rényi (IER) Random Network. An IER Random Network is characterized by the following parameters:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(P\)</span></p></td>
+<td><p>[0,1]<span class="math notranslate nohighlight">\(^{n \times n}\)</span></p></td>
+<td><p>The edge probability matrix.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The probability matrix <span class="math notranslate nohighlight">\(P\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, where each entry <span class="math notranslate nohighlight">\(p_{ij}\)</span> is a probability (a value between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>). Further, if we restrict ourselves to the case of simple networks like we have done so far, <span class="math notranslate nohighlight">\(P\)</span> will also be symmetric (<span class="math notranslate nohighlight">\(p_{ij} = p_{ji}\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>). The generative model is similar to the preceding models we have seen: given the <span class="math notranslate nohighlight">\((i, j)\)</span> entry of <span class="math notranslate nohighlight">\(P\)</span>, denoted <span class="math notranslate nohighlight">\(p_{ij}\)</span>, the edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> are independent <span class="math notranslate nohighlight">\(Bern(p_{ij})\)</span>, for any <span class="math notranslate nohighlight">\(j &gt; i\)</span>. Further, <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span> for all <span class="math notranslate nohighlight">\(i\)</span> (the network is <em>loopless</em>), and <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span> (the network is <em>undirected</em>). If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency maatrix for an IER network with probability matarix <span class="math notranslate nohighlight">\(P\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim IER_n(P)\)</span>.</p>
+<p>It is worth noting that <em>all</em> of the preceding models we have discussed so far are special cases of the IER model. This means that, for instance, if we were to consider only the probability matrices where all of the entries are the same, we could represent the ER models. Similarly, if we were to only to consider the probability matrices <span class="math notranslate nohighlight">\(P\)</span> where <span class="math notranslate nohighlight">\(P = XX^\top\)</span>, we could represent any RDPG.</p>
+<p>The IER Random Network can be thought of as the limit of Stochastic Block Models, as the number of communities equals the number of nodes in the network. Stated another way, an SBM Random Network where each node is in its own community is equivalent to an IER Random Network. Under this formulation, note that the block matarix for such an SBM, <span class="math notranslate nohighlight">\(B\)</span>, would have <span class="math notranslate nohighlight">\(n \times n\)</span> unique entries. Taking <span class="math notranslate nohighlight">\(P\)</span> to be this block matrix shows that the IER is a limiting case of SBMs.</p>
+<div class="section" id="id6">
+<h3><span class="section-number">7.1.9.1. </span>Probability<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<p>The probability for a network which is IER is very straightforward. We use the independence assumption, and the p.m.f. of a Bernoulli-distributed random-variable <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \mathbb P(\mathbf A = A) \\
+    &amp;= \prod_{j &gt; i}p_{ij}^{a_{ij}}(1 - p_{ij})^{1 - a_{ij}}
+\end{align*}\]</div>
+</div>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
