@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>7.2. Theory for Multiple-Network Models &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>7.2. Probability Estimation Theory &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -52,6 +52,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="7.3. Theory for Graph Matching" href="theory-matching.html" />
@@ -373,7 +375,7 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     7.2. Theory for Multiple-Network Models
+     7.2. Probability Estimation Theory
     </a>
    </li>
    <li class="toctree-l2">
@@ -577,11 +579,89 @@ const thebe_selector_output = ".output, .cell_output"
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch7/theory-multigraph.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-method-of-maximum-likelihood-estimation-mle">
+   7.2.1. The Method of Maximum Likelihood Estimation (MLE)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mle-for-er">
+     7.2.1.1. MLE for ER
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#unbiasedness-of-the-estimate-of-the-probability-parameter-for-the-er-network">
+       7.2.1.1.1. Unbiasedness of the estimate of the probability parameter for the ER network
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#showing-unbiasedness-with-simulations">
+         7.2.1.1.1.1. Showing Unbiasedness with simulations
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#consistency-of-the-estimator-of-the-probability-parameter-in-an-er-random-network">
+       7.2.1.1.2. Consistency of the estimator of the probability parameter in an ER random network
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mle-for-sbm">
+     7.2.1.2. MLE for SBM
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#consistency-and-unbiasedness-of-the-estimate-for-the-probability-parameter-in-an-sbm-network">
+       7.2.1.2.1. Consistency and unbiasedness of the estimate for the probability parameter in an SBM network
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#spectral-methods">
+   7.2.2. Spectral Methods
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-don-t-we-just-use-mle">
+   7.2.3. Why don’t we just use MLE?*
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -589,19 +669,526 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Theory for Multiple-Network Models</h1>
+                <h1>Probability Estimation Theory</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-method-of-maximum-likelihood-estimation-mle">
+   7.2.1. The Method of Maximum Likelihood Estimation (MLE)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mle-for-er">
+     7.2.1.1. MLE for ER
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#unbiasedness-of-the-estimate-of-the-probability-parameter-for-the-er-network">
+       7.2.1.1.1. Unbiasedness of the estimate of the probability parameter for the ER network
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#showing-unbiasedness-with-simulations">
+         7.2.1.1.1.1. Showing Unbiasedness with simulations
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#consistency-of-the-estimator-of-the-probability-parameter-in-an-er-random-network">
+       7.2.1.1.2. Consistency of the estimator of the probability parameter in an ER random network
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mle-for-sbm">
+     7.2.1.2. MLE for SBM
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#consistency-and-unbiasedness-of-the-estimate-for-the-probability-parameter-in-an-sbm-network">
+       7.2.1.2.1. Consistency and unbiasedness of the estimate for the probability parameter in an SBM network
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#spectral-methods">
+   7.2.2. Spectral Methods
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-don-t-we-just-use-mle">
+   7.2.3. Why don’t we just use MLE?*
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="theory-for-multiple-network-models">
-<h1><span class="section-number">7.2. </span>Theory for Multiple-Network Models<a class="headerlink" href="#theory-for-multiple-network-models" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="probability-estimation-theory">
+<h1><span class="section-number">7.2. </span>Probability Estimation Theory<a class="headerlink" href="#probability-estimation-theory" title="Permalink to this headline">¶</a></h1>
+<p>Throughout Chapter 5, we spent a lot of attention developing intuition for many of the network models that are essential to understanding random networks. Recall that the notation that we use for a random network (more specifically, a network-valued random variable), <span class="math notranslate nohighlight">\(\mathbf A\)</span>, does <em>not</em> refer to any network we could ever hope to see (or as we introduced in the previous chapter, <em>realize</em>) in the real world. This issue is extremely important in network machine learning, so we will try to drive it home one more time: no matter how much data we collected (unless we could get infinite data, which we <em>can’t</em>), we can never hope to understand the true distribution of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. As network scientists, this leaves us with a bit of a problem: what, then, can we do to make useful claims about <span class="math notranslate nohighlight">\(\mathbf A\)</span>, if we can’t actually see <span class="math notranslate nohighlight">\(\mathbf A\)</span> nor its distribution?</p>
+<p>This is where statistics, particularly, <strong>estimation</strong>, comes into play. At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using <em>only</em> the data we are given: finitely many (in network statistics, often just <em>one</em>) samples which we assume are <em>realizations</em> of the random variable we want to learn about. The properties of the random variable that we seek to learn about are called <strong>estimands</strong>, and  In the case of our network models, in particular, we will attempt to obtain reasonable estimates of the parameters (our <em>estimands</em>) associated with random networks.</p>
+<p>The most useful property that we will leverage which was developed in Chapter <span class="math notranslate nohighlight">\(5\)</span> is the independent-edge assumption. As we discussed, when working with independent-edge random network models, we will assume that edges in our random network are <em>independent</em>. This means that the probability of observing a particular realization of a random network is, in fact, the product of the probabilities of observing each edge in the random network. Notationally, what this means is that if <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network with <span class="math notranslate nohighlight">\(n\)</span> nodes and edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, and <span class="math notranslate nohighlight">\(A\)</span> is a realization of that random network with edges <span class="math notranslate nohighlight">\(a_{ij}\)</span>, then:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}), \\
+    &amp;= \prod_{i, j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij}).
+\end{align*}\]</div>
+<p>In the special case where our networks are simple (undirected and loopless), this simplifies to:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(\mathbf A = A) &amp;= \prod_{i &lt; j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij}).
+\end{align*}\]</div>
+<p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>, and we only need to worry about one of the edges (we chose the edges in the upper right triangle of the adjacency matrix arbitrarily).  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops, so we don’t need to worry about the case where <span class="math notranslate nohighlight">\(i = j\)</span> either.</p>
+<p>We will set the scene for the later examples using a common example. Let’s say we flip a coin <span class="math notranslate nohighlight">\(10\)</span> times, and see <span class="math notranslate nohighlight">\(6\)</span> heads. What is the probability that the coin lands on heads? Intuitively, the answer is rather simple! It feels like it should just be <span class="math notranslate nohighlight">\(\frac{6}{10}\)</span>. And in one particular way, that really is the <em>best</em> guess we could make!</p>
+<p>Below, we discuss the nitty-gritty technical details of how we learn about random networks using a particular method known as Maximum Likelihood Estimation (MLE). Maximum likelihood estimation is why <span class="math notranslate nohighlight">\(\frac{6}{10}\)</span> is a great guess for our coin flip example. Finding MLEs can be pretty difficult, so we leave the details in starred sections. If you aren’t familiar with MLE, you can skip these, and still learn how to use the results!</p>
+<div class="section" id="the-method-of-maximum-likelihood-estimation-mle">
+<h2><span class="section-number">7.2.1. </span>The Method of Maximum Likelihood Estimation (MLE)<a class="headerlink" href="#the-method-of-maximum-likelihood-estimation-mle" title="Permalink to this headline">¶</a></h2>
+<p>Let’s think about what exactly this means using an example that you are likely familiar with. I have a single coin, and I want to know the probability of the outcome of a roll of that coin being a heads. For sake of argument, we will call this coin <em>fair</em>, which means that the true probability it lands on heads (or tails) is <span class="math notranslate nohighlight">\(0.5\)</span>. In this case, I would call the outcome of the <span class="math notranslate nohighlight">\(i^{th}\)</span> coin flip the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>, and it can produce realizations which take one of two possible values: a heads (an outcome of a <span class="math notranslate nohighlight">\(1\)</span>) or a tails (an outcome of a <span class="math notranslate nohighlight">\(0\)</span>). We will say that we see <span class="math notranslate nohighlight">\(10\)</span> total coin flips. We will number these realizations as <span class="math notranslate nohighlight">\(x_i\)</span>, where <span class="math notranslate nohighlight">\(i\)</span> goes from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10\)</span>. To recap, the boldfaced <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> denotes the random variable, and the unbolded <span class="math notranslate nohighlight">\(x_i\)</span> denotes the realization which we actually see. Our question of interest is: how do we estimate the probability of the coin landing on a heads, if we don’t know anything about the true probability value <span class="math notranslate nohighlight">\(p\)</span>, other than the outcomes of the coin flips we got to observe?</p>
+<p>Here, since <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> takes the value <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(0\)</span> each with probability <span class="math notranslate nohighlight">\(0.5\)</span>, we would say that <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> random variable. This means that the random variable <span class="math notranslate nohighlight">\(\mathbf x\)</span> has the Bernoulli distribution, and the probability of a heads, <span class="math notranslate nohighlight">\(p\)</span>, is <span class="math notranslate nohighlight">\(0.5\)</span>. All <span class="math notranslate nohighlight">\(10\)</span> of our <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> are called <em>identically distributed</em>, since they all have the same <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> distribution.</p>
+<p>We will also assume that the outcomes of the coin flips are mutually independent, which is explained in the terminology section.</p>
+<p>For any one coin flip, the probability of observing the outcome <span class="math notranslate nohighlight">\(i\)</span> is, by definition of the Bernoulli distribution:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}.
+\end{align*}\]</div>
+<p>Note that we use the notation <span class="math notranslate nohighlight">\(\mathbb P_\theta\)</span> to indicate that the probability is a function of the parameter set <span class="math notranslate nohighlight">\(\theta\)</span> for the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>. Here, since the only parameter for each <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a probability <span class="math notranslate nohighlight">\(p\)</span>, then <span class="math notranslate nohighlight">\(\theta = p\)</span>.</p>
+<p>If we saw <span class="math notranslate nohighlight">\(n\)</span> total outcomes, the probability is, using the definition of mutual independence:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}\mathbb P(\mathbf x_i = x_i), \\
+    &amp;= \prod_{i = 1}^n p^{x_i}(1 - p)^{1 - x_i}, \\
+    &amp;= p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}.
+\end{align*}\]</div>
+<p>What if we saw <span class="math notranslate nohighlight">\(10\)</span> coin flips, and <span class="math notranslate nohighlight">\(6\)</span> were heads? Can we take a “guess” at what <span class="math notranslate nohighlight">\(p\)</span> might be? Intuitively your first reaction might be to say a good guess of <span class="math notranslate nohighlight">\(p\)</span>, which we will abbreviate <span class="math notranslate nohighlight">\(\hat p\)</span>, would be <span class="math notranslate nohighlight">\(0.6\)</span>, which is <span class="math notranslate nohighlight">\(6\)</span> heads of <span class="math notranslate nohighlight">\(10\)</span> outcomes. In many ways, this intuitive guess is spot on. However, in network machine learning, we like to be really specific about why, exactly, this guess makes sense.</p>
+<p>Looking at the above equation, one thing we can do is use the technique of <strong>maximum likelihood estimation</strong>. We call the function <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)\)</span> the <em>likelihood</em> of our sequence, for a given value of <span class="math notranslate nohighlight">\(p\)</span>. Note that we have added the term “<span class="math notranslate nohighlight">\(; p\)</span>” to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we <em>really</em> want to do is find the value that <span class="math notranslate nohighlight">\(p\)</span> could take, which <em>maximizes</em> the likelihood. Let’s see what the likelihood function looks like as a function of different values of <span class="math notranslate nohighlight">\(p\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">.02</span><span class="p">,</span> <span class="mf">.98</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">49</span><span class="p">)</span>
+<span class="n">nflips</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">nheads</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">likelihood</span> <span class="o">=</span> <span class="n">p</span><span class="o">**</span><span class="p">(</span><span class="n">nheads</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">nflips</span> <span class="o">-</span> <span class="n">nheads</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">likelihood</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Bernoulli probability parameter, p&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Likelihood, $P_{</span><span class="se">\\</span><span class="s2">theta}(x_1, ..., x_</span><span class="si">{10}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-multigraph_2_0.png" src="../../_images/theory-multigraph_2_0.png" />
+</div>
+</div>
+<p>As we can see, it turns out that our intuitive answer, that <span class="math notranslate nohighlight">\(p=0.6\)</span>, is in fact the Maximum Likelihood Estimate for the Bernoulli probability parameter <span class="math notranslate nohighlight">\(p\)</span>. Now how do we go about showing this rigorously?</p>
+<p>An easier problem, we often will find, is to instead maximize the <em>log likelihood</em> rather than the likelihood itself. This is because the log function is <em>monotone</em>, which means that if <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span>, then <span class="math notranslate nohighlight">\(\log\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span> as well for some choices <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span>. Without going too down in the weeds, the idea is that the <span class="math notranslate nohighlight">\(\log\)</span> function does not change any critical points of the likelihood. The log likelihood of the above expression is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \log \left[p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}\right], \\
+&amp;= \sum_{i = 1}^n x_i \log(p) + \left(n - \sum_{i = 1}^n x_i\right)\log(1 - p).
+\end{align*}\]</div>
+<p>And visually, the log-likelihood now looks instead like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loglikelihood</span> <span class="o">=</span> <span class="n">nheads</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">nflips</span> <span class="o">-</span> <span class="n">nheads</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">loglikelihood</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Bernoulli probability parameter, p&quot;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Log Likelihood, $</span><span class="se">\\</span><span class="s2">log P_{</span><span class="se">\\</span><span class="s2">theta}(x_1, ..., x_</span><span class="si">{10}</span><span class="s2">)$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-multigraph_6_0.png" src="../../_images/theory-multigraph_6_0.png" />
+</div>
+</div>
+<p>Although we can see that the two plots look <em>almost</em> nothing alike, the key is the word <em>almost</em> here. Notice that the absolute maximum is, in fact, the same regardless of whether we use the likelihood or the log-likelihood. Further, notice that at the maximum, the slope of the tangent line is <span class="math notranslate nohighlight">\(0\)</span>. You may recall from calculus that this is how we typically go about finding a critical point of a function. Now, let’s get make our argument a little more technical. Remembering from calculus <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, to find a maximal point of the log-likelihood function with respect to some variable <span class="math notranslate nohighlight">\(p\)</span>, our process looks like this:</p>
+<ol class="simple">
+<li><p>Take the derivative of the log-likelihood with respect to <span class="math notranslate nohighlight">\(p\)</span>,</p></li>
+<li><p>Set it equal to <span class="math notranslate nohighlight">\(0\)</span> and solve for the critical point <span class="math notranslate nohighlight">\(\tilde p\)</span>,</p></li>
+<li><p>Verify that the critical point <span class="math notranslate nohighlight">\(\tilde p\)</span> is indeed an estimate of a maximum, <span class="math notranslate nohighlight">\(\hat p\)</span>.</p></li>
+</ol>
+<p>Proceeding using the result we derived above, and using the fact that <span class="math notranslate nohighlight">\(\frac{d}{du} \log(u) = \frac{1}{u}\)</span> and that <span class="math notranslate nohighlight">\(\frac{d}{du} \log(1 - u) = -\frac{1}{1 - u}\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{d}{d p}\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \frac{\sum_{i = 1}^n x_i}{p} - \frac{n - \sum_{i = 1}^n x_i}{1 - p} = 0, \\
+\Rightarrow \frac{\sum_{i = 1}^n x_i}{p} &amp;= \frac{n - \sum_{i = 1}^n x_i}{1 - p}, \\
+\Rightarrow (1 - p)\sum_{i = 1}^n x_i &amp;= p\left(n - \sum_{i = 1}^n x_i\right), \\
+\sum_{i = 1}^n x_i - p\sum_{i = 1}^n x_i &amp;= pn - p\sum_{i = 1}^n x_i ,\\
+\Rightarrow \tilde p &amp;= \frac{1}{n}\sum_{i = 1}^n x_i.
+\end{align*}\]</div>
+<p>We use the notation <span class="math notranslate nohighlight">\(\tilde p\)</span> here to denote that <span class="math notranslate nohighlight">\(\tilde p\)</span> is a critical point of the function.</p>
+<p>Finally, we must check that this is an estimate of a maximum, which we can do by taking the second derivative and checking that the second derivative is negative. We will omit this since it’s a bit intricate and tangential from our argument, but if you work it through, you will find that the second derivative is indeed negative at <span class="math notranslate nohighlight">\(\tilde p\)</span>. This means that <span class="math notranslate nohighlight">\(\tilde p\)</span> is indeed an estimate of a maximum, which we would denote by <span class="math notranslate nohighlight">\(\hat p\)</span>.</p>
+<p>Finally, using this result, we find that with <span class="math notranslate nohighlight">\(6\)</span> heads in <span class="math notranslate nohighlight">\(10\)</span> outcomes, we would obtain an estimate:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat p &amp;= \frac{6}{10} = 0.6.
+\end{align*}\]</div>
+<p>which exactly aligns with our intuition.</p>
+<p>So, why do we need estimation tools, if in our example, our intuition gave us the answer a whole lot faster? Unfortunately, the particular scenario we described was one of the <em>simplest possible examples</em> in which a parameter requires estimation. As the scenario grows more complicated, and <em>especially</em> when we extend to network-valued data, figuring out good ways to estimate parameters is extremely difficult. For this reason, we will describe some tools which are very relevant to network machine learning to learn about network parameters.</p>
+<div class="section" id="mle-for-er">
+<h3><span class="section-number">7.2.1.1. </span>MLE for ER<a class="headerlink" href="#mle-for-er" title="Permalink to this headline">¶</a></h3>
+<p>In Chapter 5, we explored the derivation for the probability of observing a realization <span class="math notranslate nohighlight">\(A\)</span> of a given random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER, which is equivalent to the likelihood of <span class="math notranslate nohighlight">\(A\)</span>. Recall this was:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}.
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(m = \sum_{i &lt; j} a_{ij}\)</span> is the total number of edges in the observed network <span class="math notranslate nohighlight">\(A\)</span>. Our approach here parallels directly the approach for the coin; we begin by taking the log of the probability:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \log \mathbb P_\theta(A) &amp;= \log \left[p^{m} \cdot (1 - p)^{\binom{n}{2} - m}\right], \\
+    &amp;= m \log p + \left(\binom n 2 - m\right)\log (1 - p).
+\end{align*}\]</div>
+<p>Next, we take the derivative with respect to <span class="math notranslate nohighlight">\(p\)</span>, set equal to <span class="math notranslate nohighlight">\(0\)</span>, and we end up with:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{d}{d p}\log \mathbb P_\theta(A) &amp;= \frac{m}{p} - \frac{\binom n 2 - m}{1 - p} = 0, \\
+\Rightarrow \tilde p &amp;= \frac{m}{\binom n 2}.
+\end{align*}\]</div>
+<p>We omitted several detailed steps due to the fact that we show the rigorous derivation above. Checking the second derivative, which we omit since it is rather mathematically tedious, we see that the second derivative at <span class="math notranslate nohighlight">\(\tilde p\)</span> is negative, so we indeed have found an estimate of the maximum, and will be denoted by <span class="math notranslate nohighlight">\(\hat p\)</span>. This gives that the Maximum Likelihood Estimate (or, the MLE, for short) of the probability <span class="math notranslate nohighlight">\(p\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat p &amp;= \frac{m}{\binom n 2}.
+\end{align*}\]</div>
+<div class="section" id="unbiasedness-of-the-estimate-of-the-probability-parameter-for-the-er-network">
+<h4><span class="section-number">7.2.1.1.1. </span>Unbiasedness of the estimate of the probability parameter for the ER network<a class="headerlink" href="#unbiasedness-of-the-estimate-of-the-probability-parameter-for-the-er-network" title="Permalink to this headline">¶</a></h4>
+<p>If we were to repeat our experiment again and again, getting a new network each time, it would be great if our estimate of the probability were, on average, the correct value, right? This core idea underlies the concept of the <em>unbiasedness</em> of an estimate in statistical theory. An estimator is <strong>unbiased</strong> for an underlying parameter if it can be expected to attain that parameter using <em>only</em> the sample data. For this section, we’ll change our notation up slightly; we’ll use the term <span class="math notranslate nohighlight">\(\hat p_n\)</span> to mean the probability estimate we produce for a realization with <span class="math notranslate nohighlight">\(n\)</span> nodes. In this case for the probability parameter, what this means is that <span class="math notranslate nohighlight">\(\mathbb E[\hat p_n] = p\)</span>, or that we would expect our estimate of the probability <span class="math notranslate nohighlight">\(\hat p_n\)</span> to be equal to the true probability <span class="math notranslate nohighlight">\(p\)</span>. The reason we introduce the subscript <span class="math notranslate nohighlight">\(n\)</span> is to emphasize <em>really</em> strongly that the expected value is for a <em>particular</em> number of nodes which is <em>totally arbitrary</em>.</p>
+<p>Before we get started on deciding how to attack this problem, we should first specify what unbiasedness is <em>not</em> to give you some more intuition. What unbiasedness does <em>not</em> say is that the estimate <span class="math notranslate nohighlight">\(\hat p_n\)</span> itself is equal to the probability <span class="math notranslate nohighlight">\(p\)</span>. This means we wouldn’t expect, in general, for our estimate to be exactly equal to the true parameter we are trying to estimate. All that it says is, if the underlying random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> can be <em>truly</em> described by the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network, and if our realization <span class="math notranslate nohighlight">\(A\)</span> is really a realization of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, that the estimate we would produce from our data <span class="math notranslate nohighlight">\(A\)</span> would be equal to the probability parameter that <span class="math notranslate nohighlight">\(\mathbf A\)</span> has. If an estimator is unbiased, this would mean that if we looked at a bunch of realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, that on average, the estimates would equal the true parameter of <span class="math notranslate nohighlight">\(A\)</span>. Stated another way, if we had infinite realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, and then for each of these realizations of <span class="math notranslate nohighlight">\(A\)</span> we computed an estimate of the probability <span class="math notranslate nohighlight">\(\hat p\)</span>, that the average of <em>those</em> estimates would be <span class="math notranslate nohighlight">\(p\)</span>.</p>
+<p>What nuances do we need to consider? Well, first of all, our realization <span class="math notranslate nohighlight">\(A\)</span> comes down to <em>random chance</em> (due to the fact that it is a realization of a random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>), so our expected value will not be the expected value of the realization itself (since the realization just <em>is</em> or <em>is not</em> a particular value), but the expected value of the underlying <em>random</em> quantities. For instance, The estimate of <span class="math notranslate nohighlight">\(\hat p_n\)</span> has some underlying random quantity <span class="math notranslate nohighlight">\(\mathbf {\hat p}_n\)</span>. This quantity describes how the <em>estimates of the probabilities</em> would behave if the underlying random network was <span class="math notranslate nohighlight">\(ER_n(p)\)</span>. So all of the quantities that are <em>not</em> parameters of the underlying statistical model (in this case, the number of nodes and the probability <span class="math notranslate nohighlight">\(p\)</span>) will be random variables here, since <em>only</em> <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(p\)</span> determine the underlying random system we got to realize.</p>
+<p>So, how do we get started here? Well, we begin with just writing down what we know so far. The expected value of the estimate of the probability is obviously equal to the expected value of the equation we have above, since the estimate of the probability is equal to this thing:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E[\mathbf{\hat p}_n] &amp;= \mathbb E\left[\frac{\mathbf m}{\binom n 2}\right] .
+\end{align*}\]</div>
+<p>Next, as we can see since <span class="math notranslate nohighlight">\(\mathbb A\)</span> has <span class="math notranslate nohighlight">\(n\)</span> nodes (it is an <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network), then <span class="math notranslate nohighlight">\(\frac{1}{\binom n 2}\)</span> is just a constant, so we can pull this out front:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E[\mathbf{\hat p}_n] &amp;= \frac{1}{\binom n 2}\mathbb E[\mathbf m].
+\end{align*}\]</div>
+<p>Remember that we defined <span class="math notranslate nohighlight">\(m\)</span> to be <span class="math notranslate nohighlight">\(\sum_{i &lt; j} a_{ij}\)</span>, so now let’s plug that in here, but where <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(a_{ij}\)</span> are now random variables (so they are bold faced):</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E[\mathbf m] &amp;= \mathbb E\left[\sum_{i &lt; j}\mathbf a_{ij}\right].
+\end{align*}\]</div>
+<p>Next, we use the fact that the expected value of a finite sum is the sum of the expected values:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\sum_{i &lt; j}\mathbf a_{ij}\right] &amp;= \sum_{i &lt; j}\mathbb E[\mathbf a_{ij}].
+\end{align*}\]</div>
+<p>Next, we use the underlying statistical model that we have. We remember that <em>every</em> edge in an ER random network <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is like a coin flip with a probability of landing on heads of <span class="math notranslate nohighlight">\(p\)</span>, so there is nothing really unique about any particular edge. This means that the sum is really a sum of quantities which will have the <em>same</em> expected value, so since there are <span class="math notranslate nohighlight">\(\binom n 2\)</span> possible edges where <span class="math notranslate nohighlight">\(i &lt; j\)</span>, then:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\sum_{i &lt; j}\mathbf a_{ij}\right] &amp;= \binom n 2\mathbb E[\mathbf a_{ij}].
+\end{align*}\]</div>
+<p>Finally, we’ll use a thing called the law of total expectation, which basically says that the expected value of a random variable is the (probability weighted) average of the possible values that random variable could take. This means that since <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> can only take values of <span class="math notranslate nohighlight">\(0\)</span>s and <span class="math notranslate nohighlight">\(1\)</span>s, that the expected value is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E[\mathbf a_{ij}] &amp;= 1 \cdot Pr(\mathbf a_{ij} = 1) + 0 \cdot Pr(\mathbf a_{ij} = 0), \\
+    &amp;= 1 \cdot p + 0 \cdot (1 - p) = p.
+\end{align*}\]</div>
+<p>Putting this together gives us that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E[\mathbf m] &amp;= \binom n 2 p,
+\end{align*}\]</div>
+<p>and taking this a step further:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E[\mathbf{\hat p}] &amp;= \frac{1}{\binom n 2}\binom n 2 p = p,
+\end{align*}\]</div>
+<p>so our estimator <span class="math notranslate nohighlight">\(\hat p\)</span> is unbiased!</p>
+<div class="section" id="showing-unbiasedness-with-simulations">
+<h5><span class="section-number">7.2.1.1.1.1. </span>Showing Unbiasedness with simulations<a class="headerlink" href="#showing-unbiasedness-with-simulations" title="Permalink to this headline">¶</a></h5>
+<p>We can show this property numerically very simply. What we will use to show this is called a <em>parameteric bootstrap</em>. What the heck is that?</p>
+<p>The use behind a parametric bootstrap is, we have some random quantity which we think follows a particular distribution (e.g., it is a <em>parametric quantity</em>, or a random variable with a particular parameter), and we want to see what some <em>function</em> of that random variable looks like when we manipulate it in a way which makes the distribution a <em>lot</em> harder to work with! For instance, if we had a random variables <span class="math notranslate nohighlight">\(\mathbf x\)</span> and <span class="math notranslate nohighlight">\(\mathbf y\)</span> which followed a normal distribution with mean <span class="math notranslate nohighlight">\(0\)</span>, variance <span class="math notranslate nohighlight">\(1\)</span>, and were independent, we might not know off the top of our heads that <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span> was chi-squared distributed with <span class="math notranslate nohighlight">\(2\)</span> degree of freedoms. However, if we did a parametric bootstrap, we could still take a guess at properties about <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span> just by simulating it. We begin by simulating 1000 realizations of <span class="math notranslate nohighlight">\(\mathbf x\)</span> and <span class="math notranslate nohighlight">\(\mathbf y\)</span>, and then looking at how the squares of these realizations behave:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+<span class="c1"># simulation of 1000 values from the N(0,1) distn</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+<span class="c1"># compute the square</span>
+<span class="n">xssq</span> <span class="o">=</span> <span class="n">xs</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">yssq</span> <span class="o">=</span> <span class="n">ys</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">sum_xsq_ysq</span> <span class="o">=</span> <span class="n">xssq</span> <span class="o">+</span> <span class="n">yssq</span>
+
+<span class="c1"># compute the centers for bin histograms from 0 to maxval in</span>
+<span class="c1"># 30 even bins</span>
+<span class="n">nbins</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">bincenters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">sum_xsq_ysq</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">nbins</span><span class="p">)</span>
+
+<span class="c1"># compute the pdf of the chi-squared distribution for X^2 + Y^2, which when</span>
+<span class="c1"># X, Y are N(0, 1), is Chi2(2), the chi-squared distn with 2 degrees of freedom</span>
+<span class="n">dof</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">true_pdf</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">bincenters</span><span class="p">,</span> <span class="n">dof</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we plot a normalized histogram of <code class="docutils literal notranslate"><span class="pre">sum_xsq_ysq</span></code> (blue bars) against the true distribution of <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span> (red line). For the histograms, these will correspond to the approximate densities of <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span>, and for the red line, this is the <em>exact</em> density of <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span>. What we will see is that they align virtually perfectly:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">bincenters</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">true_pdf</span><span class="p">})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">sum_xsq_ysq</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">stat</span> <span class="o">=</span> <span class="s2">&quot;density&quot;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;value of $x^2 + y^2$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;approximate density&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Comparing approximate distribution from parametric bootstrap to exact (true) distribution&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/theory-multigraph_12_0.png" src="../../_images/theory-multigraph_12_0.png" />
+</div>
+</div>
+<p>If we wanted to compute the mean of <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span>, for instance, we can approximate it using the points we sampled, and don’t even have to worry about the (extensive) amount of mathematics to obtain the true distribution of <span class="math notranslate nohighlight">\(\mathbf x^2 + \mathbf y^2\)</span> as <span class="math notranslate nohighlight">\(\chi^2\)</span> with 2 degrees of freedom:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Approximate mean: </span><span class="si">{:2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sum_xsq_ysq</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;True mean: </span><span class="si">{:2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Approximate mean: 1.985514
+True mean: 2.000000
+</pre></div>
+</div>
+</div>
+</div>
+<p>When the random quantities are networks, and particularly, <em>functions</em> of those networks, this gets even <em>more</em> tedious very fast. For this reason, this technique for <em>parametric bootstrap</em> is going to be very valuable as we develop intuition for how to demonstrate (empirically) many of the results we will see later.</p>
+<p>Remember that the idea is that, for a particular choice of <span class="math notranslate nohighlight">\(n\)</span>, we will obtain a distribution for the probability parameter, <span class="math notranslate nohighlight">\(\mathbf{\hat p}_n\)</span>. To do so, we will simulate <span class="math notranslate nohighlight">\(100\)</span> network realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span> which are <span class="math notranslate nohighlight">\(ER_{20}(0.4)\)</span> (the number of nodes <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(20\)</span> and the probability is <span class="math notranslate nohighlight">\(0.4\)</span>). For each of the networks <span class="math notranslate nohighlight">\(j\)</span>, we will estimate the probability parameter <span class="math notranslate nohighlight">\(\hat p^{(j)}\)</span> for the network, and then show (as a histogram) what the <span class="math notranslate nohighlight">\(\hat p^{(j)}\)</span>s take value-wise. This serves as an <em>approximation</em> for the distribution of <span class="math notranslate nohighlight">\(\mathbf{\hat p}_{20}\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graspologic</span> <span class="k">as</span> <span class="nn">gp</span>
+
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># number of nodes</span>
+<span class="n">nsims</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># number of networks to simulate</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.4</span>
+
+<span class="n">As</span> <span class="o">=</span> <span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">simulations</span><span class="o">.</span><span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsims</span><span class="p">)]</span>  <span class="c1"># realizations</span>
+<span class="n">fit_models</span> <span class="o">=</span> <span class="p">[</span><span class="n">gp</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">EREstimator</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">As</span><span class="p">]</span>  <span class="c1"># fit ER models</span>
+<span class="n">hatps</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">p_</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">fit_models</span><span class="p">]</span>  <span class="c1"># the probability parameters</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we look at the distribution of <span class="math notranslate nohighlight">\(\mathbf{\hat p}_{20}\)</span> by showing a histogram of <code class="docutils literal notranslate"><span class="pre">hatps</span></code>, along with the true probability parameter and the mean of <code class="docutils literal notranslate"><span class="pre">hatps</span></code>, which will show that the estimates of the probability have a mean which is (approximately) the true probability:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">hatps</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;probability&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hatps</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hatps</span><span class="p">)</span> <span class="o">-</span> <span class="mf">.06</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;mean of means&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">.43</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="s2">&quot;p = 0.4&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Distribution of $</span><span class="se">\\</span><span class="s2">mathbf{</span><span class="se">\\</span><span class="s2">hat p}_</span><span class="si">{20}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Value of estimate of $</span><span class="se">\\</span><span class="s2">hat p_</span><span class="si">{20}</span><span class="s2">$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;Value of estimate of $\\hat p_{20}$&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/theory-multigraph_18_1.png" src="../../_images/theory-multigraph_18_1.png" />
+</div>
+</div>
+<p>As we can see in the above plot, the “mean of means”, or the mean of the , is fairly similar to the true mean, <span class="math notranslate nohighlight">\(p = 0.4\)</span>. If we repeated this experiment with even more simulations than <span class="math notranslate nohighlight">\(200\)</span>, we would expect this mean of means to be arbitrarily close to <span class="math notranslate nohighlight">\(p=0.4\)</span>. This empirically exhibits the property of unbiasedness for <span class="math notranslate nohighlight">\(\hat p\)</span> that we were able to prove above.</p>
+</div>
+</div>
+<div class="section" id="consistency-of-the-estimator-of-the-probability-parameter-in-an-er-random-network">
+<h4><span class="section-number">7.2.1.1.2. </span>Consistency of the estimator of the probability parameter in an ER random network<a class="headerlink" href="#consistency-of-the-estimator-of-the-probability-parameter-in-an-er-random-network" title="Permalink to this headline">¶</a></h4>
+<p>While the unbiasedness property is great for us, it is important to highlight another limitation of unbiasedness: unbiasedness tells us <em>only</em> that if we repeated the experimental setup we had again and again, the average of our estimates of the probability would be the true probability. But there’s a caveat: we only conduct our experiment once! We need to know that if we conducted our experiment in a reasonable way (collecting as much data as possible) that our estimate <span class="math notranslate nohighlight">\(\hat p\)</span> of the underlying parameter <span class="math notranslate nohighlight">\(p\)</span> is reasonable. The property that we care about here is called <em>asymptotic consistency</em>, or <em>consistency</em> for short. An estimator is <strong>asymptotically consistent</strong> if, as the number of nodes in the network increases, the estimator converges <em>in probability</em> to the true underlying parameter. What the heck does this mean?</p>
+<p>In a mathematical statement, asymptotic consistency is written that, for any possible choice of <span class="math notranslate nohighlight">\(\epsilon\)</span> which exceeds zero, that <span class="math notranslate nohighlight">\(Pr(|\mathbf{\hat p}_n - p| &gt; \epsilon) \rightarrow 0\)</span>, as the number of nodes grows to infinity. In other words, if we were to see a network which was <em>big enough</em>, our estimate of the probability of that network would be <em>really close</em> to the true probability of the network <span class="math notranslate nohighlight">\(p\)</span>.</p>
+<p>As it turns out, this really isn’t too difficult for us to prove. To prove this statement, we’re going to first need the variance of <span class="math notranslate nohighlight">\(\mathbf{\hat p}_n\)</span>, which we’ll see why in a second. Let’s get started by plugging in the definition of <span class="math notranslate nohighlight">\(\mathbf {\hat p}_n\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf {\hat p}_n) &amp;= var\left(\frac{\mathbf m}{\binom n 2}\right).
+\end{align*}\]</div>
+<p>Since the variance of a constant times a random quantity is that constant squared times the variance of the random quantity:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2^2}var\left(\mathbf m\right),
+\end{align*}\]</div>
+<p>So all we need is the variance of <span class="math notranslate nohighlight">\(\mathbf m\)</span>, where <span class="math notranslate nohighlight">\(\mathbf m\)</span> is defined as <span class="math notranslate nohighlight">\(\sum_{i &lt; j}\mathbf a_{ij}\)</span>. By definition of an independent edge random graph, the edges are just that: independent. This means that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>s are all independent. The variance of a sum of independent random variables is the sum of the variances, so:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2^2}\sum_{i &lt; j}var(\mathbf a_{ij})
+\end{align*}\]</div>
+<p>Next, we remember that these edges all have the exact same probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore, have the same distribution, so their variances will all be identical. This means that the sum is over a bunch of terms with the same value, so the sum will just be the total number of terms we are summing times the value of the variance of any edge in the graph. There are <span class="math notranslate nohighlight">\(\binom n 2\)</span> possible edges where <span class="math notranslate nohighlight">\(i &lt; j\)</span>, so:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2^2}\cdot \binom n 2 var(\mathbf a_{ij}) = 
+var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} var(\mathbf a_{ij}),
+\end{align*}\]</div>
+<p>and all we are left to do is compute the variance of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>. Remember that the variance is defined as <span class="math notranslate nohighlight">\(var(\mathbf x) = \mathbb E[(\mathbf x - \mathbb E[\mathbf x])^2]\)</span>. Let’s plug this in and see if we get anywhere:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf a_{ij}) &amp;= \mathbb E[(\mathbf a_{ij} - \mathbb E[\mathbf a_{ij}])^2].
+\end{align*}\]</div>
+<p>Remember that <span class="math notranslate nohighlight">\(\mathbb E[\mathbf a_{ij}] = p\)</span>, which we learned when showing the consistency of the mean. This means that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf a_{ij}) &amp;= \mathbb E[(\mathbf a_{ij} - p)^2] = \mathbb E[(\mathbf a_{ij}^2 - 2p\mathbf a_{ij} + p^2],
+\end{align*}\]</div>
+<p>which if we combine the facts that <span class="math notranslate nohighlight">\(p^2\)</span> and <span class="math notranslate nohighlight">\(2p\)</span> are constant, and use the fact that the expectation of the sum is the sum of the expectations, we get that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf a_{ij}) &amp;= \mathbb E[(\mathbf a_{ij}^2] - 2p\mathbb E[\mathbf a_{ij}] + p^2 = \mathbb E[(\mathbf a_{ij}^2] - 2p^2 + p^2 =  \mathbb E[(\mathbf a_{ij}^2] - p^2,
+\end{align*}\]</div>
+<p>and we are just about finished. We just need the expected value of the square of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, which is called the second moment of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>. This term is fortunately easy to calculate too, since we can just use the law of total expectation:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+ \mathbb E[(\mathbf a_{ij}^2] &amp;= \sum_{a \in\{0, 1\}}a^2 \cdot Pr(\mathbf a_{ij} = a)
+\end{align*}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is <span class="math notranslate nohighlight">\(0\)</span> with probability <span class="math notranslate nohighlight">\((1 - p)\)</span> and <span class="math notranslate nohighlight">\(1\)</span> with probability <span class="math notranslate nohighlight">\(p\)</span>, this term is easy, too:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+ \mathbb E[(\mathbf a_{ij}^2] &amp;= 1^2 \cdot p + 0^2\cdot(1 - p) = p
+\end{align*}\]</div>
+<p>And we get that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf a_{ij}) &amp;= p - p^2 = p\cdot (1 - p).
+\end{align*}\]</div>
+<p>Now for the cool part. Putting this together for <span class="math notranslate nohighlight">\(\mathbf {\hat p}_n\)</span>, we get that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} \cdot p \cdot (1 - p) = \frac{p(1 - p)}{\binom n 2}
+\end{align*}\]</div>
+<p>We can turn to a thing called <a class="reference external" href="https://en.wikipedia.org/wiki/Chebyshev%27s_inequality"><em>Chebyshev’s Inequality</em></a>. <strong>Chebyshev’s Inequality</strong> states that, if <span class="math notranslate nohighlight">\(\mathbf x\)</span> is a random variable with a finite mean <span class="math notranslate nohighlight">\(\mathbb E[\mathbf x] = \mu\)</span> and a finite variance <span class="math notranslate nohighlight">\(\sigma^2\)</span>, that, for any value of <span class="math notranslate nohighlight">\(k\)</span> that is greater than <span class="math notranslate nohighlight">\(0\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr(|\mathbf x - \mu| \geq k\sigma) \leq \frac{1}{k^2}.
+\end{align*}\]</div>
+<p>What this statement says is that the probability that the difference between a random quantity and its mean <span class="math notranslate nohighlight">\(\mu\)</span> is less than a value (<span class="math notranslate nohighlight">\(k\sigma\)</span>) can be <em>upper bounded</em> (it will be <em>at most</em>) <span class="math notranslate nohighlight">\(\frac{1}{k^2}\)</span>. In statistics, we don’t really worry too much about <span class="math notranslate nohighlight">\(\geq\)</span> and <span class="math notranslate nohighlight">\(\leq\)</span> compared to <span class="math notranslate nohighlight">\(&gt;\)</span> and <span class="math notranslate nohighlight">\(&lt;\)</span> when a random variable is <em>continuous</em> on some interval, so these specifics aren’t too important to us here. As we can see, however, this statement looks <em>really</em> similar to the one we needed for convergence in probability, and it is, in fact, exactly what we will use to prove convergence in probability. Notice that in this case, <span class="math notranslate nohighlight">\(\sigma\)</span> is just a constant (it is a <em>parameter</em> of <span class="math notranslate nohighlight">\(\mathbf {\hat p}_n\)</span>, and parameters are constant), and that this inequality holds true for <em>any</em> constant <span class="math notranslate nohighlight">\(k &gt; 0\)</span>. So what if we pick <span class="math notranslate nohighlight">\(k\)</span> to be <span class="math notranslate nohighlight">\(\frac{\epsilon}{\sigma}\)</span>? Let’s find out. Remember that the mean of <span class="math notranslate nohighlight">\(\mathbf {\hat p}_n\)</span> was just <span class="math notranslate nohighlight">\(p\)</span>, which we use here:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr\left(|\mathbf {\hat p}_n - p| \geq \frac{\epsilon}{\sigma}\sigma\right) &amp;\leq \frac{1}{\left(\frac{\epsilon}{\sigma}\right)^2}, \\
+    &amp;\leq \frac{\sigma^2}{\epsilon^2}
+\end{align*}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\sigma\)</span> was defined to be the standard deviation of the random variable, so its square is the variance. So let’s plug in what we obtained a second ago:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr\left(|\mathbf {\hat p}_n - p| \geq \epsilon\right) &amp;\leq \frac{p(1 - p)}{\binom n 2 \epsilon^2}, \\
+    &amp;\leq \frac{1}{\binom n 2}\frac{p(1 - p)}{\epsilon^2},
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(\epsilon\)</span> are both <em>constants</em>. Finally, remember that <span class="math notranslate nohighlight">\(\binom n 2 = \frac{1}{2}n(n - 1)\)</span>, so:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr\left(|\mathbf {\hat p}_n - p| \geq \epsilon\right) &amp;\leq \frac{1}{n(n - 1)}\frac{2p(1 - p)}{\epsilon^2}
+\end{align*}\]</div>
+<p>And what happens when <span class="math notranslate nohighlight">\(n\)</span> gets really big? Since it is in the denominator, it’s pretty clear that <span class="math notranslate nohighlight">\(\frac{1}{n(n - 1)}\)</span> is going to go to zero really fast! This means that as <span class="math notranslate nohighlight">\(n\)</span> grows, the upper bound for this probability goes to zero, so certainly the probability itself goes to zero as well. We have finished off our proof, and we can say that <span class="math notranslate nohighlight">\(Pr(|\mathbf{\hat p}_n - p| \geq \epsilon) \rightarrow 0\)</span> as <span class="math notranslate nohighlight">\(n\)</span> goes to infinity. This is equivalent to what we said previously in the statement for asymptotic consistency, with the exception that we have a <span class="math notranslate nohighlight">\(\geq\)</span> instead of a <span class="math notranslate nohighlight">\(&gt;\)</span> sign. However, this doesn’t matter much at all here.</p>
+<p>For why the <span class="math notranslate nohighlight">\(\geq\)</span> does not make a huge difference, one can check out a real analysis textbook, combined with some background in continuous random variables. The arbitrariness of the choice of <span class="math notranslate nohighlight">\(\epsilon\)</span> combined with the fact that <span class="math notranslate nohighlight">\(\mathbf{\hat p}_n\)</span> is continuous gives the result that the equality condition is irrelevant here.</p>
+</div>
+</div>
+<div class="section" id="mle-for-sbm">
+<h3><span class="section-number">7.2.1.2. </span>MLE for SBM<a class="headerlink" href="#mle-for-sbm" title="Permalink to this headline">¶</a></h3>
+<p>When we derived the probability for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which could be characterized using the <em>a priori</em> Stochasic Block Model, we obtained that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \prod_{k, k' \in [K]}b_{k'k}^{m_{k'k}} \cdot (1 - b_{k'k})^{n_{k'k - m_{k'k}}},
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}\)</span> was the number of possible edges between nodes in community <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>, and <span class="math notranslate nohighlight">\(m_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}a_{ij}\)</span> was the number of edges in the realization <span class="math notranslate nohighlight">\(A\)</span> between nodes within communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>.</p>
+<p>Noting that the log of the product is the sum of the logs, or that <span class="math notranslate nohighlight">\(\log \prod_i x_i = \sum_i \log x_i\)</span>, the log of the probability is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \log \mathbb P_\theta(A) &amp;= \sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}).
+\end{align*}\]</div>
+<p>We notice a side-note that we mentioned briefly in the network models section: in a lot of ways, the probability (and consequently, the log probability) of a random network which is an <em>a priori</em> SBM behaves very similarly to that of a random network which is ER, with the caveat that the probability term <span class="math notranslate nohighlight">\(p\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(\binom n 2\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m\)</span> have been replaced with the probability term <span class="math notranslate nohighlight">\(b_{k'k}\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(n_{k'k}\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m_{k'k}\)</span> which <em>apply only to that particular pair of communities</em>. In this sense, the <em>a priori</em> SBM is kind of like a collection of communities of ER networks. Pretty neat right? Well, it doesn’t stop there. When we take the partial derivative of <span class="math notranslate nohighlight">\(\log \mathbb P_\theta(A)\)</span> with respect to any of the probability terms <span class="math notranslate nohighlight">\(b_{l'l}\)</span>, we see an even more direct consequence of this observation:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= \frac{\partial}{\partial b_{l'l}}\sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}), \\
+    &amp;= \sum_{k, k' \in [K]} \frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right].
+\end{align*}\]</div>
+<p>Now what? Notice that any of the summands in which <span class="math notranslate nohighlight">\(k \neq l\)</span> and <span class="math notranslate nohighlight">\(k' \neq l'\)</span>, the partial derivative with respect to <span class="math notranslate nohighlight">\(b_{l'l}\)</span> is in fact exactly <span class="math notranslate nohighlight">\(0\)</span>! Why is this? Well, let’s consider a <span class="math notranslate nohighlight">\(k\)</span> which is different from <span class="math notranslate nohighlight">\(l\)</span>, and a <span class="math notranslate nohighlight">\(k'\)</span> which is different from <span class="math notranslate nohighlight">\(l'\)</span>. Notice that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right] = 0,
+\end{align*}\]</div>
+<p>which simply follows since the quantity to the right of the partial derivative is not a funcion of <span class="math notranslate nohighlight">\(b_{l'l}\)</span> at all! Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= 0 + \frac{\partial}{\partial b_{l'l}}\left[m_{l'l}\log b_{l'l} + \left(n_{l'l} - m_{l'l}\right)\log(1 - b_{l'l})\right] \\
+    &amp;= \frac{m_{l'l}}{b_{l'l}} - \frac{n_{l'l} - m_{l'l}}{1 - b_{l'l}} = 0, \\
+\Rightarrow b_{l'l}^* &amp;= \frac{m_{l'l}}{n_{l'l}}.
+\end{align*}\]</div>
+<p>Like above, we omit the second derivative test, and conclude that the MLE of the block matrix <span class="math notranslate nohighlight">\(B\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is <em>a priori</em> SBM is the matrix <span class="math notranslate nohighlight">\(\hat B\)</span> with entries:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat b_{l'l} &amp;= \frac{m_{l'l}}{n_{l'l}}.
+\end{align*}\]</div>
+<div class="section" id="consistency-and-unbiasedness-of-the-estimate-for-the-probability-parameter-in-an-sbm-network">
+<h4><span class="section-number">7.2.1.2.1. </span>Consistency and unbiasedness of the estimate for the probability parameter in an SBM network<a class="headerlink" href="#consistency-and-unbiasedness-of-the-estimate-for-the-probability-parameter-in-an-sbm-network" title="Permalink to this headline">¶</a></h4>
+<p>By a similar argument to the one we made for the probability parameter <span class="math notranslate nohighlight">\(\hat p\)</span> for an ER network, the estimator of the probability parameter <span class="math notranslate nohighlight">\(\hat b_{l,l'}\)</span> is unbiased and consistent for the probability <span class="math notranslate nohighlight">\(b_{l,l'}\)</span> too. However, there’s a slight twist: we need our statements to apply to <em>each community</em> for the SBM. However, this really isn’t much work on top of what we’ve already done.</p>
+<p>The unbiasedness result is virtually identical for the <em>a priori</em> and <em>a posteriori</em> SBMs as it was to the ER random network. The caveat is that none of the communities can have <span class="math notranslate nohighlight">\(0\)</span> nodes for the <em>a posteriori</em> SBM, and none of the communities can have a probability of <span class="math notranslate nohighlight">\(0\)</span> for the <em>a priori</em> SBM.</p>
+<p>The consistency result depends on which model we chose.</p>
+<ol class="simple">
+<li><p><em>a posteriori</em> SBM: Remember that the <em>a posteriori</em> SBM fully specifies ahead of time which nodes are in which communities. Instead of having the total number of nodes go to infinity, we simply needs to specify that the estimator is consistent if the number of nodes <em>in each community</em> goes to infinity.</p></li>
+<li><p><em>a priori</em> SBM: In the <em>a priori</em> SBM, we knew that the node assignments took a distribution; here, taking community <span class="math notranslate nohighlight">\(k\)</span> with probability <span class="math notranslate nohighlight">\(p_k\)</span>. In this case, as long as none of the probabilities are identically <span class="math notranslate nohighlight">\(0\)</span>, the number of nodes in the network going to infinity <em>implies</em> that the number of nodes <em>in each community</em> goes to infinity, too.</p></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="spectral-methods">
+<h2><span class="section-number">7.2.2. </span>Spectral Methods<a class="headerlink" href="#spectral-methods" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="why-don-t-we-just-use-mle">
+<h2><span class="section-number">7.2.3. </span>Why don’t we just use MLE?*<a class="headerlink" href="#why-don-t-we-just-use-mle" title="Permalink to this headline">¶</a></h2>
+<p>The a posteriori Stochastic Block Model has a pair of parameters, the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, and the community probability vector, <span class="math notranslate nohighlight">\(\vec \pi\)</span>. If you are keeping up with the log-likelihood derivations in the single network models section, you will recall that the log-likelihood for an a posteriori Stochastic Block Model, we obtain that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb P_\theta(A) &amp;= \sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]
+\end{align*}\]</div>
+<p>That expression, it turns out, is a lot more complicated than what we had to deal with for the <em>a priori</em> Stochastic Block Model. Taking the log gives us that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\log 
+    \mathbb P_\theta(A) &amp;= \log\left(\sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]\right)
+\end{align*}\]</div>
+<p>Whereas the log of a product of terms is the sum of the logs of the terms, no such easy simplification exists for the log of a <em>sum</em> of terms. This means that we will have to get a bit creative here. Instead, we will turn first to the <em>a priori</em> Random Dot Product Graph, and then figure out how to estimate parameters from an <em>a posteriori</em> SBM using that.</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
