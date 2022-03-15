@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>6.5. Random-Walk and Diffusion-based Methods &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>6.5. Random walk and diffusion-based methods &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -333,7 +333,7 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     6.5. Random-Walk and Diffusion-based Methods
+     6.5. Random walk and diffusion-based methods
     </a>
    </li>
    <li class="toctree-l2">
@@ -590,25 +590,64 @@ const thebe_selector_output = ".output, .cell_output"
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-simplified-random-walk-on-a-network">
-   6.5.1. A simplified random walk on a network
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#markov-chains-and-the-markov-property">
-   6.5.2. Markov chains and the markov property
+  <a class="reference internal nav-link" href="#a-simplified-first-order-random-walk-on-a-network">
+   6.5.1. A simplified first-order random walk on a network
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#random-walks-on-a-network-as-a-markov-chain">
-     6.5.2.1. Random walks on a network as a markov chain
+    <a class="reference internal nav-link" href="#markov-chains-and-the-markov-property">
+     6.5.1.1. Markov chains and the markov property
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#first-order-random-walks-on-a-network-as-a-markov-chain">
+       6.5.1.1.1. First-order random walks on a network as a markov chain
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-do-markov-chains-and-random-walks-have-to-do-with-embedding-networks">
+   6.5.2. What do markov chains and random walks have to do with embedding networks?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#second-order-biased-random-walk">
+     6.5.2.1. Second-order biased random walk
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-bias-factor-lets-us-control-our-ability-to-leave-or-remain-amongst-a-neighborhood-of-nodes">
+       6.5.2.1.1. The bias factor lets us control our ability to
+       <em>
+        leave
+       </em>
+       or
+       <em>
+        remain
+       </em>
+       amongst a neighborhood of nodes
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#adjusting-the-transition-probabilities-with-the-bias-vector">
+       6.5.2.1.2. Adjusting the transition probabilities with the bias vector
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#node2vec">
    6.5.3. node2vec
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#extending-to-weighted-networks">
+   6.5.4. Extending to weighted networks
   </a>
  </li>
 </ul>
@@ -621,7 +660,7 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Random-Walk and Diffusion-based Methods</h1>
+                <h1>Random walk and diffusion-based methods</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -632,25 +671,64 @@ const thebe_selector_output = ".output, .cell_output"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#a-simplified-random-walk-on-a-network">
-   6.5.1. A simplified random walk on a network
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#markov-chains-and-the-markov-property">
-   6.5.2. Markov chains and the markov property
+  <a class="reference internal nav-link" href="#a-simplified-first-order-random-walk-on-a-network">
+   6.5.1. A simplified first-order random walk on a network
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#random-walks-on-a-network-as-a-markov-chain">
-     6.5.2.1. Random walks on a network as a markov chain
+    <a class="reference internal nav-link" href="#markov-chains-and-the-markov-property">
+     6.5.1.1. Markov chains and the markov property
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#first-order-random-walks-on-a-network-as-a-markov-chain">
+       6.5.1.1.1. First-order random walks on a network as a markov chain
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-do-markov-chains-and-random-walks-have-to-do-with-embedding-networks">
+   6.5.2. What do markov chains and random walks have to do with embedding networks?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#second-order-biased-random-walk">
+     6.5.2.1. Second-order biased random walk
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-bias-factor-lets-us-control-our-ability-to-leave-or-remain-amongst-a-neighborhood-of-nodes">
+       6.5.2.1.1. The bias factor lets us control our ability to
+       <em>
+        leave
+       </em>
+       or
+       <em>
+        remain
+       </em>
+       amongst a neighborhood of nodes
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#adjusting-the-transition-probabilities-with-the-bias-vector">
+       6.5.2.1.2. Adjusting the transition probabilities with the bias vector
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#node2vec">
    6.5.3. node2vec
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#extending-to-weighted-networks">
+   6.5.4. Extending to weighted networks
   </a>
  </li>
 </ul>
@@ -663,11 +741,11 @@ const thebe_selector_output = ".output, .cell_output"
               <div>
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="random-walk-and-diffusion-based-methods">
-<h1><span class="section-number">6.5. </span>Random-Walk and Diffusion-based Methods<a class="headerlink" href="#random-walk-and-diffusion-based-methods" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">6.5. </span>Random walk and diffusion-based methods<a class="headerlink" href="#random-walk-and-diffusion-based-methods" title="Permalink to this headline">¶</a></h1>
 <p>Although this book puts a heavy emphasis on spectral methods, there are many ways in which you can learn lower-dimensional representations for networks which don’t involve spectral approaches. As opposed to spectral methods, a <strong>random walk on a network</strong> is a random process which focuses on the analysis of paths which start at a node in the network, and proceed to generate successions of random steps to other nodes in the network. The manner in which these random processes materialize is a function of the topology of the random network, including the nodes, edges, and (optionally, if the network is weighted), the edge weights.</p>
-<div class="section" id="a-simplified-random-walk-on-a-network">
-<h2><span class="section-number">6.5.1. </span>A simplified random walk on a network<a class="headerlink" href="#a-simplified-random-walk-on-a-network" title="Permalink to this headline">¶</a></h2>
-<p>For instance, let’s consider an extremely simplified approach for a random walk on the network that you saw back in <a class="reference external" href="#link?">Chapter 4</a>, which was our New York example. To begin, let’s redefine the nodes and edges of the network. The nodes of the network are the five boroughs of New York City (Staten Island SI, Brooklyn BK, Queens Q, the Bronx BX, and Manhattan MH). The nodes in your network are the five boroughs. The edges <span class="math notranslate nohighlight">\((i,j)\)</span> of your network exist if one can travel from borough <span class="math notranslate nohighlight">\(i\)</span> to borough <span class="math notranslate nohighlight">\(j\)</span> along a bridge.</p>
+<div class="section" id="a-simplified-first-order-random-walk-on-a-network">
+<h2><span class="section-number">6.5.1. </span>A simplified first-order random walk on a network<a class="headerlink" href="#a-simplified-first-order-random-walk-on-a-network" title="Permalink to this headline">¶</a></h2>
+<p>For instance, let’s consider an extremely simplified approach for a first-order random walk on the network that you saw back in <a class="reference external" href="#link?">Chapter 4</a>, which was our New York example. To begin, let’s redefine the nodes and edges of the network. The nodes of the network are the five boroughs of New York City (Staten Island SI, Brooklyn BK, Queens Q, the Bronx BX, and Manhattan MH). The nodes in your network are the five boroughs. The edges <span class="math notranslate nohighlight">\((i,j)\)</span> of your network exist if one can travel from borough <span class="math notranslate nohighlight">\(i\)</span> to borough <span class="math notranslate nohighlight">\(j\)</span> along a bridge.</p>
 <p>Below, you will look at a map of New York City, with the bridges connecting the different boroughs. In the middle, you look at this map as a network layout plot. The arrows indicate the direction of travel. On the right, you look at this map as an adjacency matrix:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -734,15 +812,14 @@ const thebe_selector_output = ".output, .cell_output"
 <img alt="../../_images/random-walk-diffusion-methods_3_0.png" src="../../_images/random-walk-diffusion-methods_3_0.png" />
 </div>
 </div>
-<p>You are staying at a hotel which is located in Manhattan, and you decide that you are going to explore the city as follows. When you are in a given borough <span class="math notranslate nohighlight">\(i\)</span>, you will determine the next borough you will explore by letting random chance do the work for you. To better define a random walk, we need to introduce a background concept first: the Markov chain and the Markov property.</p>
-</div>
+<p>You are staying at a hotel which is located in Manhattan, and you decide that you are going to explore the city as follows. When you are in a given borough <span class="math notranslate nohighlight">\(i\)</span>, you will determine the next borough you will explore by letting random chance do the work for you. To better define a first-order random walk, we need to introduce a background concept first: the Markov chain and the Markov property.</p>
 <div class="section" id="markov-chains-and-the-markov-property">
-<h2><span class="section-number">6.5.2. </span>Markov chains and the markov property<a class="headerlink" href="#markov-chains-and-the-markov-property" title="Permalink to this headline">¶</a></h2>
+<h3><span class="section-number">6.5.1.1. </span>Markov chains and the markov property<a class="headerlink" href="#markov-chains-and-the-markov-property" title="Permalink to this headline">¶</a></h3>
 <p>A <strong>finite-space markov chain</strong> is a model of a random system in which we have a sequence of possible events which can occur which are <em>finite</em> (the boroughs we will visit on a day <span class="math notranslate nohighlight">\(t\)</span>) in which the probability of each event depends <em>only</em> on the event in which you were previously. For network analysis, we only need to think about <em>finite-space</em> Markov chains, because the network has a <em>finite</em> collection of possible events which can occur (the nodes in the network being visited). To put this down quantitatively, the markov chain is represented by the sequence <span class="math notranslate nohighlight">\(\mathbf s_0, \mathbf s_1, \mathbf s_2, ...\)</span>, where each <span class="math notranslate nohighlight">\(\mathbf s_t\)</span> takes the value of one of the <span class="math notranslate nohighlight">\(n\)</span> total nodes in the network.</p>
 <p>You will notice that in our definition of the finite-space markov chain, we made a disclaimer: the probability of each event depends <em>only</em> on the state in which we were previously. This is called the <strong>markov property</strong>. The idea is that, if we were in Manhattan at the previous step in time <span class="math notranslate nohighlight">\(t - 1\)</span> (e.g., <span class="math notranslate nohighlight">\(\mathbf s_{t-1}\)</span> realized the value <span class="math notranslate nohighlight">\(v_{MH}\)</span>, or <span class="math notranslate nohighlight">\(\mathbf s_{t-1} = v_{MH}\)</span> for short), that if our current step in the Markov Chain were Brooklyn (<span class="math notranslate nohighlight">\(\mathbf s_t = v_{BK}\)</span>), that the next step in the Markov chain would not depend <em>at all</em> on the fact that we already saw Manhattan.</p>
-<div class="section" id="random-walks-on-a-network-as-a-markov-chain">
-<h3><span class="section-number">6.5.2.1. </span>Random walks on a network as a markov chain<a class="headerlink" href="#random-walks-on-a-network-as-a-markov-chain" title="Permalink to this headline">¶</a></h3>
-<p>To exhibit the ideas of a markov chain, we’ll define a random walk on your New York Boroughs. Remember that the borough you are at, <span class="math notranslate nohighlight">\(i\)</span>, has <span class="math notranslate nohighlight">\(d_i\)</span> possible neighboring boroughs, where <span class="math notranslate nohighlight">\(d_i\)</span> was the <em>degree</em> of node <span class="math notranslate nohighlight">\(i\)</span>. You will visit one of the other nodes in the network as follows. If borough <span class="math notranslate nohighlight">\(j\)</span> is a neighbor of borough <span class="math notranslate nohighlight">\(i\)</span> (an edge exists from borough <span class="math notranslate nohighlight">\(i\)</span> to borough <span class="math notranslate nohighlight">\(j\)</span>), you will visit borough <span class="math notranslate nohighlight">\(j\)</span> with probability <span class="math notranslate nohighlight">\(\frac{1}{d_i}\)</span>. The idea is that you will visit neighbors of each borough at random, depending only on whether you can get to that borough along an edge of the network. If the node is not a neighbor of your current borough, you will visit it with probability <span class="math notranslate nohighlight">\(0\)</span>. Stated another way, if you are in node <span class="math notranslate nohighlight">\(i\)</span>, the probability of going to another node <span class="math notranslate nohighlight">\(j\)</span> is defined as:</p>
+<div class="section" id="first-order-random-walks-on-a-network-as-a-markov-chain">
+<h4><span class="section-number">6.5.1.1.1. </span>First-order random walks on a network as a markov chain<a class="headerlink" href="#first-order-random-walks-on-a-network-as-a-markov-chain" title="Permalink to this headline">¶</a></h4>
+<p>To exhibit the ideas of a markov chain, we’ll define a first-order random walk on your New York Boroughs. Remember that the borough you are at, <span class="math notranslate nohighlight">\(i\)</span>, has <span class="math notranslate nohighlight">\(d_i\)</span> possible neighboring boroughs, where <span class="math notranslate nohighlight">\(d_i\)</span> was the <em>degree</em> of node <span class="math notranslate nohighlight">\(i\)</span>. You will visit one of the other nodes in the network as follows. If borough <span class="math notranslate nohighlight">\(j\)</span> is a neighbor of borough <span class="math notranslate nohighlight">\(i\)</span> (an edge exists from borough <span class="math notranslate nohighlight">\(i\)</span> to borough <span class="math notranslate nohighlight">\(j\)</span>), you will visit borough <span class="math notranslate nohighlight">\(j\)</span> with probability <span class="math notranslate nohighlight">\(\frac{1}{d_i}\)</span>. The idea is that you will visit neighbors of each borough at random, depending only on whether you can get to that borough along an edge of the network. This is called a <strong>first-order random walk</strong> because it is a random walk where you <em>ignore</em> everything about the path you have taken to get to your current <em>borough</em> to date, except for the fact that you are at that borough <em>now</em>. This means that your next borough will not depend <em>at all</em> on whether you have already been to that borough in your exploration of the city. If the node is not a neighbor of your current borough, you will visit it with probability <span class="math notranslate nohighlight">\(0\)</span>. Stated another way, if you are in node <span class="math notranslate nohighlight">\(i\)</span>, the probability of going to another node <span class="math notranslate nohighlight">\(j\)</span> is defined as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     p_{ij} &amp;= \begin{cases}
@@ -754,10 +831,10 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute the degree of each node</span>
-<span class="n">di</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">di</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="c1"># the probability matrix is the adjacency divided by</span>
 <span class="c1"># degree of the starting node</span>
-<span class="n">P</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="n">di</span>
+<span class="n">P</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">/</span> <span class="n">di</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 </div>
 </div>
@@ -785,7 +862,99 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <p>To understand this transition probability matrix, let’s think about the individual rows. Notice that if you are in Staten Island, there is only one borough you can go from here, so with probability <span class="math notranslate nohighlight">\(1\)</span>, you will visit its only neighbor: Brooklyn. If you are in Manhattan, you could go to any of its three neighbors (Brooklyn, Queens, or Bronx), with equal probability <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span>. If you were in Brooklyn, you could visit any of its two neighbors (Manhattan or Staten Island) with equal probability <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span>. This continues for each node in the network until you have successfully generated the transition probability matrix <span class="math notranslate nohighlight">\(P\)</span>.</p>
 <p>There are a lot of interesting properties you can use the transition probability matrix <span class="math notranslate nohighlight">\(P\)</span> to learn about, but we won’t cover them all here. If you want some more details on transition probability matrices and Markov chains in general, we would recommend that you check out a book on stochastic processes, such as the author’s favorite by Dean Isaacson, called <a class="reference external" href="https://www.amazon.com/dp/0471428620?tag=uuid10-20">Markov Chains: Theory and Applications</a>.</p>
-<p>Next, let’s use this transition probability matrix to generate a random walk on the New York City boroughs. As we mentioned, your hotel is in Manhattan, so you are going to start your random walk through the city here. In other words, <span class="math notranslate nohighlight">\(\mathbf s_0 = v_{MH}\)</span>. For your next step in the Markov chain, you will visit either Brooklyn, Bronx, or Queens with probability <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span>, or Staten Island with probability <span class="math notranslate nohighlight">\(0\)</span>. In the following figure, we will show the nodes you could possibly go to in green, and the nodes you cannot go to in red. You choose between the three using the transition probabilities, and decided to go to Brooklyn, so we will indicate an “arrow” in green from Manhattan to Brooklyn:</p>
+<p>Next, let’s use this transition probability matrix to generate a random walk on the New York City boroughs. As we mentioned, your hotel is in Manhattan, so you are going to start your random walk through the city here. In other words, <span class="math notranslate nohighlight">\(\mathbf s_0 = v_{MH}\)</span>. For your next step in the Markov chain, you will visit either Brooklyn, Bronx, or Queens with probability <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span>, or Staten Island with probability <span class="math notranslate nohighlight">\(0\)</span>. In the following figure, we show the place you start out at, Manhattan, in blue, and the other nodes in gray:</p>
+<p>You can visit each of the neighboring nodes, shown in the next plot with green, and the probabilities of visiting each of these nodes are correspondingly highlighted in the transition probability matrix with a green block:</p>
+<p>You then choose the next node to visit, using these transition probabilities, by generating the probability vector of the <em>next step</em> in the random walk <em>given the current step</em>. We will denote this probability vector with the symbol <span class="math notranslate nohighlight">\(\vec p^{(t+1)}_i\)</span>, which is the probability vector for which node you will visit at the next step <span class="math notranslate nohighlight">\(t+1\)</span> given that you are currently at node <span class="math notranslate nohighlight">\(i\)</span>. Notice that this is just the entries of the <span class="math notranslate nohighlight">\(i^{th}\)</span> row of the transition probability matrix, which can be calculated using the relationship:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec p^{(t+1)}_i &amp;= P^\top \vec x^{(i)}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\vec x^{(i)}\)</span> is the vector which has a value of <span class="math notranslate nohighlight">\(0\)</span> for all entries except for entry <span class="math notranslate nohighlight">\(i\)</span>, where it has a value of <span class="math notranslate nohighlight">\(1\)</span>. This ends up <em>pulling out</em> the <span class="math notranslate nohighlight">\(i^{th}\)</span> row of <span class="math notranslate nohighlight">\(P\)</span>, because every multiplication except for those against the <span class="math notranslate nohighlight">\(i^{th}\)</span> column of <span class="math notranslate nohighlight">\(P^\top\)</span> (which is the <span class="math notranslate nohighlight">\(i^{th}\)</span> row of <span class="math notranslate nohighlight">\(P\)</span>, by definition of a transpose) will end up just being <span class="math notranslate nohighlight">\(0\)</span>! We can see this with the following detailed exploration:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec p^{(t+1)}_i &amp;= \begin{bmatrix}
+    p_{11} &amp; ... &amp; p_{1n} \\
+    \vdots &amp; \ddots &amp; \vdots \\
+    p_{n1} &amp; ... &amp; p_{nn}
+    \end{bmatrix}^\top\vec x^{(i)} \\
+     &amp;= \begin{bmatrix}
+    p_{11} &amp; ... &amp; p_{n1} \\
+    \vdots &amp; \ddots &amp; \vdots \\
+    p_{1n} &amp; ... &amp; p_{nn}
+    \end{bmatrix}^\top\vec x^{(i)},\;\;\;\text{in this step, we just transposed $P$} \\
+    &amp;= \begin{bmatrix}
+        p_{11}x_{1}^{(i)} + p_{21} x_2^{(i)} + ... p_{n1}x_n^{(i)} \\
+        \vdots \\
+        p_{1n}x_{1}^{(i)} + p_{2n} x_2^{(i)} + ... p_{nn}x_n^{(i)} 
+    \end{bmatrix} \\
+    &amp;= \begin{bmatrix}
+        p_{i1} \\
+        \vdots \\
+        p_{in}
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>where the last step in the multiplication is because <span class="math notranslate nohighlight">\(x_{i}^{(i)}\)</span> is the only entry which has a value of <span class="math notranslate nohighlight">\(1\)</span>, so all of the other multipilications are just <span class="math notranslate nohighlight">\(0\)</span>. We can pick the next node easily by just using <code class="docutils literal notranslate"><span class="pre">numpy</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xMH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># x vector indicating we start at MH</span>
+<span class="n">p_1_startat_MH</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">xMH</span>  <span class="c1"># p vector for timestep 1 starting at MH</span>
+<span class="c1"># choose the next node using the probability vector we calculated</span>
+<span class="n">next_node</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">node_names</span><span class="p">)),</span> <span class="n">p</span><span class="o">=</span><span class="n">p_1_startat_MH</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Next node: </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_names</span><span class="p">[</span><span class="n">next_node</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next node: Q
+</pre></div>
+</div>
+</div>
+</div>
+<p>We indicate the path we took between Manhattan and our realization in green, shown below:</p>
+<p>This gives us a realization of <span class="math notranslate nohighlight">\(\mathbf s_1\)</span> as the indicated node in the network, conditional on the starting node being <span class="math notranslate nohighlight">\(\mathbf s_0 = v_{MH}\)</span>. We repeat this process again to give us a realization of <span class="math notranslate nohighlight">\(\mathbf s_2\)</span>, conditional on <span class="math notranslate nohighlight">\(\mathbf s_1\)</span>’s value which we just calculated a realization of.</p>
+<p>We then repeat this procedure over and over again on the network to obtain a realization of a random walk on the New York boroughs, given only the starting node <span class="math notranslate nohighlight">\(\mathbf s_0 = v_{MH}\)</span>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="what-do-markov-chains-and-random-walks-have-to-do-with-embedding-networks">
+<h2><span class="section-number">6.5.2. </span>What do markov chains and random walks have to do with embedding networks?<a class="headerlink" href="#what-do-markov-chains-and-random-walks-have-to-do-with-embedding-networks" title="Permalink to this headline">¶</a></h2>
+<p>In the preface for this section, we said we were going to cover how to use a random walk to embed our network, but we’ve ignored that thus far! To get us to what this has to do with embeddings, we need to introduce a slight variation of the random walk we developed in the preceding section, called the second-order biased random walk.</p>
+<div class="section" id="second-order-biased-random-walk">
+<h3><span class="section-number">6.5.2.1. </span>Second-order biased random walk<a class="headerlink" href="#second-order-biased-random-walk" title="Permalink to this headline">¶</a></h3>
+<p>Remember when we developed our first-order random walk, we did something kind of nonsensical: we ignored all of the previous boroughs of New York you had already seen, and said that the next borough was <em>only</em> a function of the current borough you are at. You could certainly imagine that you get caught in a legitimate random walk (it is a <em>possible realization</em> because all of the transition probabilities are <em>positive</em>) where you explore going from Manhattan to Brooklyn, and then over to Staten Island, and then back to Brooklyn, and then back to Staten Island, so on and so forth, because you <em>totally ignored</em> the previous places you had been when making your decision for where to go from your current borough.</p>
+<p>If you are a tourist trying to explore New York, you obviously will want to get a better sense of <em>all</em> of the city, and want to favor the boroughs you haven’t been to as recently! In the second-order biased random walk, we introduce the idea of the return and in-out parameters, <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span>, respectively.</p>
+<div class="section" id="the-bias-factor-lets-us-control-our-ability-to-leave-or-remain-amongst-a-neighborhood-of-nodes">
+<h4><span class="section-number">6.5.2.1.1. </span>The bias factor lets us control our ability to <em>leave</em> or <em>remain</em> amongst a neighborhood of nodes<a class="headerlink" href="#the-bias-factor-lets-us-control-our-ability-to-leave-or-remain-amongst-a-neighborhood-of-nodes" title="Permalink to this headline">¶</a></h4>
+<p>Remember that the steps in our random walk, <span class="math notranslate nohighlight">\(\left\{\mathbf s_0, \mathbf s_1, ..., \mathbf s_{t-1}, \mathbf s_t, ...\right\}\)</span>, were sequences of random variables which took values of our nodes in the network. Let’s assume that we have a random walk so far, where at our previous state, <span class="math notranslate nohighlight">\(\mathbf s_{t-1} = s_{t-1}\)</span>, and we are currently at node <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\mathbf s_t = i\)</span>. Here, <span class="math notranslate nohighlight">\(s_{t-1}\)</span> is some other node which we just came from to get to node <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<p>The <strong>in-out</strong> parameter <span class="math notranslate nohighlight">\(q\)</span> is a value which indicates a bias factor of <span class="math notranslate nohighlight">\(\frac{1}{q}\)</span> that we will go to some node <span class="math notranslate nohighlight">\(j\)</span> that is <em>totally</em> disconnected from the previous node that we visited, <span class="math notranslate nohighlight">\(s_{t-1}\)</span>. This means that in our network, there is no edge starting at node <span class="math notranslate nohighlight">\(j\)</span> and going to node <span class="math notranslate nohighlight">\(s_{t-1}\)</span>. If the in-out parameter <span class="math notranslate nohighlight">\(q\)</span> takes big values, then <span class="math notranslate nohighlight">\(\frac{1}{q}\)</span> will be very small, and we will be biased <em>against</em> visiting nodes which are not connected to the previous node we visited. If <span class="math notranslate nohighlight">\(q\)</span> is small, then <span class="math notranslate nohighlight">\(\frac{1}{q}\)</span> will be very big, and we will be biased <em>towards</em> visiting nodes which are not connected to the previous node we visited.</p>
+<p>The <strong>return</strong> parameter <span class="math notranslate nohighlight">\(p\)</span> is a value which indicates a bias factor of <span class="math notranslate nohighlight">\(\frac{1}{p}\)</span> that we will <em>go back</em> to the node which we visited previously in the last state <span class="math notranslate nohighlight">\(s_{t-1}\)</span>. If the return parameter <span class="math notranslate nohighlight">\(p\)</span> takes big values, <span class="math notranslate nohighlight">\(\frac{1}{p}\)</span> will be very small, and we will be biased <em>against</em> visiting a node we have just been to. If <span class="math notranslate nohighlight">\(p\)</span> is small, then <span class="math notranslate nohighlight">\(\frac{1}{p}\)</span> will be very big, and we will be biased <em>towards</em> visiting a node which we were just at.</p>
+<p>If a node satisfies neither of these conditions, the bias factor is just left at <span class="math notranslate nohighlight">\(1\)</span>. Together, these relationships are summarized with the <strong>bias factor</strong> <span class="math notranslate nohighlight">\(\alpha_{ij}^{(t+1)}(p,q, s_{t-1})\)</span> starting at node <span class="math notranslate nohighlight">\(i\)</span> and proceeding to node <span class="math notranslate nohighlight">\(j\)</span> with parameters <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span> for the next step <span class="math notranslate nohighlight">\(t+1\)</span> given that we just left state <span class="math notranslate nohighlight">\(s_{t-1}\)</span> as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \alpha_{ij}(p,q,s_{t-1}) &amp;= \begin{cases}
+        \frac{1}{p} &amp; \text{$s_{t-1} = j$} \\
+        \frac{1}{q} &amp; \text{$s_{t-1} \neq j$} \\
+        1 &amp; \text{otherwise}
+    \end{cases}
+\end{align*}\]</div>
+<p>And the corresponding bias vector <span class="math notranslate nohighlight">\(\vec \alpha_i(p,q, s_{t-1})\)</span>, which is a vector of each of the bias factors for all of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network (which are indexed by <span class="math notranslate nohighlight">\(j\)</span>).</p>
+</div>
+<div class="section" id="adjusting-the-transition-probabilities-with-the-bias-vector">
+<h4><span class="section-number">6.5.2.1.2. </span>Adjusting the transition probabilities with the bias vector<a class="headerlink" href="#adjusting-the-transition-probabilities-with-the-bias-vector" title="Permalink to this headline">¶</a></h4>
+<p>In our second order random walk, instead of the transition probabilities being a function only of the <em>current</em> state, they are also a function of the preceding state we were at <span class="math notranslate nohighlight">\(s_{t-1}\)</span>. This means that our transition probability matrix is going to look <em>different</em> based on which node we just came from. The transition probabilities are defined using the indexed <em>triplet</em> <span class="math notranslate nohighlight">\(p_{s_{t-1}ij}(p,q)\)</span>, where <span class="math notranslate nohighlight">\(s_{t-1}\)</span> is the preceding node we visited, <span class="math notranslate nohighlight">\(i\)</span> is the current node we are at, <span class="math notranslate nohighlight">\(j\)</span> is any other node in the network, and <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span> are the return and in-out parameters respectively. The <strong>second-order bias-adjusted transition factors</strong> the terms:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \beta_{s_{t-1}ij}(p,q) &amp;= \alpha_{ij}(p, q, s_{t-1})p_{ij}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(p_{ij}\)</span> are the first-order markov transition probabilities we used previously. These are called <em>second-order</em> because they depend on the current node, <span class="math notranslate nohighlight">\(i\)</span>, as well as the preceding node, <span class="math notranslate nohighlight">\(s_{t-1}\)</span>.</p>
+<p>In effect, what this statement says is that all we do is <em>up</em> or <em>down</em>-weight (or don’t change it at all, if the bias factor is <span class="math notranslate nohighlight">\(1\)</span>) the probability <span class="math notranslate nohighlight">\(p_{ij}\)</span> of going from node <span class="math notranslate nohighlight">\(i\)</span> to node <span class="math notranslate nohighlight">\(j\)</span> based on the <em>bias factor</em> <span class="math notranslate nohighlight">\(\alpha_{ij}(p, q, s_{t-1})\)</span>. These are no longer probabilities, because starting at a node <span class="math notranslate nohighlight">\(i\)</span>, we might end up with the bias-adjusted transition factors no longer summing to one. This is because we did not require anything about how <span class="math notranslate nohighlight">\(\alpha_{ij}^{(t+1)}(p,q,s_{t-1})\)</span> behaved across all possible nodes <span class="math notranslate nohighlight">\(j\)</span> we could transition to from our current node <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<p>Finally, we then use the bias-adjusted transition factors to compute the <strong>second-order biased transition probabilities</strong>. These are just normalized versions of the bias-adjusted transition factors, where we normalize to make sure that they all sum up to one (and hence, produce a valid transition probability from node <span class="math notranslate nohighlight">\(i\)</span> outwards):</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    p_{s_{t-1}ij}(p,q) &amp;= \frac{\beta_{s_{t-1}ij}(p,q)}{\sum_{j' = 1}^n\beta_{s_{t-1}ij'}(p,q)}
+\end{align*}\]</div>
+<p>Notice that in the denominator, that we are just normalizing the bias-adjusted transition factor by the sum of all the other bias-adjusted transition factors from node <span class="math notranslate nohighlight">\(i\)</span> to any other nodes <span class="math notranslate nohighlight">\(j'\)</span> in the network.</p>
+</div>
 </div>
 </div>
 <div class="section" id="node2vec">
@@ -816,7 +985,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../../_images/random-walk-diffusion-methods_10_1.png" src="../../_images/random-walk-diffusion-methods_10_1.png" />
+<img alt="../../_images/random-walk-diffusion-methods_24_1.png" src="../../_images/random-walk-diffusion-methods_24_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -833,7 +1002,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="nn">Input In [6],</span> in <span class="ni">&lt;cell line: 6&gt;</span><span class="nt">()</span>
+<span class="nn">Input In [7],</span> in <span class="ni">&lt;cell line: 6&gt;</span><span class="nt">()</span>
 <span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">latents</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
@@ -854,16 +1023,22 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING:gensim.models.base_any2vec:consider setting layer size to a multiple of 4 for greater performance
-WARNING:gensim.models.base_any2vec:under 10 jobs per worker: consider setting a smaller `batch_words&#39; for smoother alpha decay
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">24</span><span class="o">-</span><span class="mi">996282</span><span class="n">b86c3d</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> 
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">networkx_sbm</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">a</span><span class="p">,</span> <span class="n">nodes</span> <span class="o">=</span> <span class="n">node2vec_embed</span><span class="p">(</span><span class="n">networkx_sbm</span><span class="p">,</span> <span class="n">dimensions</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">walk_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;node2vec_embed&#39; is not defined
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.PairGrid at 0x165a39f40&gt;
-</pre></div>
-</div>
-<img alt="../../_images/random-walk-diffusion-methods_12_2.png" src="../../_images/random-walk-diffusion-methods_12_2.png" />
 </div>
 </div>
+</div>
+<div class="section" id="extending-to-weighted-networks">
+<h2><span class="section-number">6.5.4. </span>Extending to weighted networks<a class="headerlink" href="#extending-to-weighted-networks" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
