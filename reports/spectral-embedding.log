@@ -17,17 +17,47 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-print("Estimated number of latent dimensions: {:d}".format(lse.n_components_))
+# from graspologic.plot import screeplot
+from matplotlib.patches import Circle
+from matplotlib.patheffects import withStroke
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredDrawingArea
+from scipy.linalg import svdvals
 
-plot_latents(embedding, labels=labels, title="Laplacian Spectral Embedding");
+fig, ax = plt.subplots(figsize=(8, 5))
+
+# eigval plot
+D = svdvals(L2)
+ax.plot(D[:10])
+ax.set_xlabel("Singular value index")
+ax.set_ylabel("Singular value")
+
+# plot circle
+x, y = .15, .15
+radius = .15
+ada = AnchoredDrawingArea(150, 150, 0, 0, loc='lower left', pad=0., frameon=False)
+circle = Circle((105, 35), 20, clip_on=False, zorder=10, linewidth=1,
+                edgecolor='black', facecolor=(0, 0, 0, .0125),
+                path_effects=[withStroke(linewidth=5, foreground='w')])
+ada.da.add_artist(circle)
+ax.add_artist(ada)
+
+# add text
+def text(x, y, text):
+    ax.text(x, y, text, backgroundcolor="white",
+            ha='center', va='top', color='blue')
+    
+text(2, .19, "Elbow")
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-Input [0;32mIn [22][0m, in [0;36m<cell line: 1>[0;34m()[0m
-[0;32m----> 1[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mEstimated number of latent dimensions: [39m[38;5;132;01m{:d}[39;00m[38;5;124m"[39m[38;5;241m.[39mformat([43mlse[49m[38;5;241m.[39mn_components_))
-[1;32m      3[0m plot_latents(embedding, labels[38;5;241m=[39mlabels, title[38;5;241m=[39m[38;5;124m"[39m[38;5;124mLaplacian Spectral Embedding[39m[38;5;124m"[39m)
+Input [0;32mIn [20][0m, in [0;36m<cell line: 10>[0;34m()[0m
+[1;32m      7[0m fig, ax [38;5;241m=[39m plt[38;5;241m.[39msubplots(figsize[38;5;241m=[39m([38;5;241m8[39m, [38;5;241m5[39m))
+[1;32m      9[0m [38;5;66;03m# eigval plot[39;00m
+[0;32m---> 10[0m D [38;5;241m=[39m svdvals([43mL2[49m)
+[1;32m     11[0m ax[38;5;241m.[39mplot(D[:[38;5;241m10[39m])
+[1;32m     12[0m ax[38;5;241m.[39mset_xlabel([38;5;124m"[39m[38;5;124mSingular value index[39m[38;5;124m"[39m)
 
-[0;31mNameError[0m: name 'lse' is not defined
-NameError: name 'lse' is not defined
+[0;31mNameError[0m: name 'L2' is not defined
+NameError: name 'L2' is not defined
 
