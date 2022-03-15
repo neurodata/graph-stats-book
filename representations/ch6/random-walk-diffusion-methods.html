@@ -1016,7 +1016,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next node: BK
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next node: Q
 </pre></div>
 </div>
 </div>
@@ -1368,6 +1368,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">Pcp</span> <span class="o">=</span> <span class="n">zveccp_ohe</span> <span class="o">@</span> <span class="n">Bcp</span> <span class="o">@</span> <span class="n">zveccp_ohe</span><span class="o">.</span><span class="n">T</span>
 
 <span class="n">P_aff_and_cp</span> <span class="o">=</span> <span class="p">(</span><span class="n">Pcp</span> <span class="o">+</span> <span class="n">Paff</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
 <span class="n">A_aff_and_cp</span> <span class="o">=</span>  <span class="n">gp</span><span class="o">.</span><span class="n">simulations</span><span class="o">.</span><span class="n">sample_edges</span><span class="p">(</span><span class="n">P_aff_and_cp</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1397,7 +1398,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span> <span class="n">T</span> <span class="o">=</span> <span class="mi">200</span>
 <span class="n">d</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># number of embedding dimensions to use</span>
-<span class="n">Xhat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">node2vec</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">return_hyperparameter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
+<span class="n">Xhat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">node2vec</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">A_aff_and_cp</span><span class="p">),</span> <span class="n">return_hyperparameter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
                      <span class="n">inout_hyperparameter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">num_walks</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">walk_length</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
                      <span class="n">iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
@@ -1413,27 +1414,10 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="nn">Input In [24],</span> in <span class="ni">&lt;cell line: 3&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">zvecaff</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/plot/plot.py:631,</span> in <span class="ni">pairplot</span><span class="nt">(X, labels, col_names, title, legend_name, variables, height, context, font_scale, palette, alpha, size, marker, diag_kind)</span>
-<span class="g g-Whitespace">    </span><span class="mi">627</span>     <span class="k">elif</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">628</span>         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Expected length </span><span class="si">{}</span><span class="s2">, but got length </span><span class="si">{}</span><span class="s2"> instead for Y.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">629</span>             <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">630</span>         <span class="p">)</span>
-<span class="ne">--&gt; </span><span class="mi">631</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">633</span> <span class="c1"># Handle col_names</span>
-<span class="g g-Whitespace">    </span><span class="mi">634</span> <span class="k">if</span> <span class="n">col_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-
-<span class="ne">ValueError</span>: Expected length 5, but got length 100 instead for Y.
-</pre></div>
+<img alt="../../_images/random-walk-diffusion-methods_41_0.png" src="../../_images/random-walk-diffusion-methods_41_0.png" />
 </div>
 </div>
-</div>
-<p>Looking ,a this pairs plot, we can see that the disparity between communities one and two is largely captured by the first embedding dimension.</p>
+<p>Looking at this pairs plot, we can see that the disparity between communities one and two is largely captured by the first embedding dimension.</p>
 <p>We can also look at this embedding using a heatmap of the individual nodes in the network, like we did for <code class="docutils literal notranslate"><span class="pre">ASE</span></code> and <code class="docutils literal notranslate"><span class="pre">LSE</span></code>:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1457,6 +1441,9 @@ const thebe_selector_output = ".output, .cell_output"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/random-walk-diffusion-methods_43_0.png" src="../../_images/random-walk-diffusion-methods_43_0.png" />
+</div>
 </div>
 </div>
 <div class="section" id="why-do-we-need-a-second-order-biased-random-walk-to-generate-an-embedding">
@@ -1467,9 +1454,9 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">d</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># number of embedding dimensions to use</span>
-<span class="n">Xhat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">node2vec</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">return_hyperparameter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
+<span class="n">Xhat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">node2vec</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">from_numpy_matrix</span><span class="p">(</span><span class="n">A_aff_and_cp</span><span class="p">),</span> <span class="n">return_hyperparameter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">),</span>
                      <span class="n">inout_hyperparameter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">num_walks</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">walk_length</span><span class="o">=</span><span class="n">T</span><span class="p">,</span>
-                     <span class="n">iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                     <span class="n">iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1480,14 +1467,20 @@ const thebe_selector_output = ".output, .cell_output"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/random-walk-diffusion-methods_46_0.png" src="../../_images/random-walk-diffusion-methods_46_0.png" />
 </div>
-<p>It looks like dimensions two and three do a great job of capturing the differences between the two communities.</p>
+</div>
+<p>It looks like dimensions one and two do a great job of capturing the differences between the two communities.</p>
 <p>Simultaneously, when we remember that the <code class="docutils literal notranslate"><span class="pre">node2vec</span></code> algorithm builds off the idea of the <code class="docutils literal notranslate"><span class="pre">word2vec</span></code> algorithm at preserving nodes which have a similar <em>context</em>, we know that the core nodes all share a similar context (they are more strongly connected) than the peripheral nodes (which are less strongly connected). When we plot which nodes are core and which are periphery, we see that:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">zveccp</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Node type&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/random-walk-diffusion-methods_48_0.png" src="../../_images/random-walk-diffusion-methods_48_0.png" />
 </div>
 </div>
 <p>The core nodes (in blue) all tend to be relatively tightly clustered around the around the center across all of the dimensions, and the periphery nodes (in red) tend to be on the exterior of the blob of data. If we have a clustering technique could determine which nodes were in the center versus which nodes were in the exterior, we could effectively capture the core versus the periphery nodes.</p>
