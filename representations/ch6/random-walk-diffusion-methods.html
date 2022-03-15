@@ -52,6 +52,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="6.6. Graph Neural Networks" href="graph-neural-networks.html" />
@@ -577,23 +579,6 @@ const thebe_selector_output = ".output, .cell_output"
 
             <!-- Launch buttons -->
 
-<div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
-        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
-    <div class="dropdown-buttons">
-        
-        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch6/random-walk-diffusion-methods.ipynb"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
-                data-placement="left"><img class="binder-button-logo"
-                    src="../../_static/images/logo_binder.svg"
-                    alt="Interact on binder">Binder</button></a>
-        
-        
-        
-        
-    </div>
-</div>
-
         </div>
 
         <!-- Table of contents -->
@@ -605,8 +590,25 @@ const thebe_selector_output = ".output, .cell_output"
             <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-simplified-random-walk-on-a-network">
+   6.5.1. A simplified random walk on a network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#markov-chains-and-the-markov-property">
+   6.5.2. Markov chains and the markov property
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#random-walks-on-a-network-as-a-markov-chain">
+     6.5.2.1. Random walks on a network as a markov chain
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#node2vec">
-   6.5.1. node2vec
+   6.5.3. node2vec
   </a>
  </li>
 </ul>
@@ -630,8 +632,25 @@ const thebe_selector_output = ".output, .cell_output"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-simplified-random-walk-on-a-network">
+   6.5.1. A simplified random walk on a network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#markov-chains-and-the-markov-property">
+   6.5.2. Markov chains and the markov property
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#random-walks-on-a-network-as-a-markov-chain">
+     6.5.2.1. Random walks on a network as a markov chain
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#node2vec">
-   6.5.1. node2vec
+   6.5.3. node2vec
   </a>
  </li>
 </ul>
@@ -645,9 +664,132 @@ const thebe_selector_output = ".output, .cell_output"
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="random-walk-and-diffusion-based-methods">
 <h1><span class="section-number">6.5. </span>Random-Walk and Diffusion-based Methods<a class="headerlink" href="#random-walk-and-diffusion-based-methods" title="Permalink to this headline">¶</a></h1>
-<p>Although this book puts a heavy emphasis on spectral methods, there are many ways to learn lower-dimensional representations for networks which don’t involve spectral clustering in any way. These methods might be more computationally efficient on large networks, or they might be more easily parallelizable; they might avoid problems like nonidentifiability, or they could provide representations which are better for the particular downstream machine learning task that you want to use the representation for. Maybe you want to cluster in a way that groups together different types of nodes than spectral methods. Regardless of your reasoning, this chapter is intended to give you a some insight into the world of alternative ways to represent networks.</p>
+<p>Although this book puts a heavy emphasis on spectral methods, there are many ways in which you can learn lower-dimensional representations for networks which don’t involve spectral approaches. As opposed to spectral methods, a <strong>random walk on a network</strong> is a random process which focuses on the analysis of paths which start at a node in the network, and proceed to generate successions of random steps to other nodes in the network. The manner in which these random processes materialize is a function of the topology of the random network, including the nodes, edges, and (optionally, if the network is weighted), the edge weights.</p>
+<div class="section" id="a-simplified-random-walk-on-a-network">
+<h2><span class="section-number">6.5.1. </span>A simplified random walk on a network<a class="headerlink" href="#a-simplified-random-walk-on-a-network" title="Permalink to this headline">¶</a></h2>
+<p>For instance, let’s consider an extremely simplified approach for a random walk on the network that you saw back in <a class="reference external" href="#link?">Chapter 4</a>, which was our New York example. To begin, let’s redefine the nodes and edges of the network. The nodes of the network are the five boroughs of New York City (Staten Island SI, Brooklyn BK, Queens Q, the Bronx BX, and Manhattan MH). The nodes in your network are the five boroughs. The edges <span class="math notranslate nohighlight">\((i,j)\)</span> of your network exist if one can travel from borough <span class="math notranslate nohighlight">\(i\)</span> to borough <span class="math notranslate nohighlight">\(j\)</span> along a bridge.</p>
+<p>Below, you will look at a map of New York City, with the bridges connecting the different boroughs. In the middle, you look at this map as a network layout plot. The arrows indicate the direction of travel. On the right, you look at this map as an adjacency matrix:</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># define the node names</span>
+<span class="n">node_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SI&quot;</span><span class="p">,</span> <span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="s2">&quot;BK&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;BX&quot;</span><span class="p">]</span>
+<span class="c1"># define the adjacency matrix</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># staten island is neighbors of brooklyn</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># manhattan is neighbors of all but staten island</span>
+              <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># brooklyn is neighbors of staten island and manhattan</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># queens is neighbors of manhattan and bronx</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span> <span class="c1"># bronx is neighbors of manhattan and queens</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;../ch4/img/newyork.png&#39;</span><span class="p">)</span>
+
+<span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;SI&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;BK&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;BX&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">get_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="s1">&#39;pos&#39;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;SI&quot;</span><span class="p">,</span> <span class="s2">&quot;BK&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="s2">&quot;BK&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="s2">&quot;BX&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;BX&quot;</span><span class="p">)</span>
+
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;BK&quot;</span><span class="p">,</span> <span class="s2">&quot;SI&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;BK&quot;</span><span class="p">,</span> <span class="s2">&quot;MH&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;MH&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;BX&quot;</span><span class="p">,</span> <span class="s2">&quot;MH&quot;</span><span class="p">)</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;BX&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Map of New York City Boroughs and Connections&quot;</span><span class="p">)</span>
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="n">node_size</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Layout Plot of New York City Boroughs and Connections&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">xticklabels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">4.5</span><span class="p">],</span> <span class="n">yticklabels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">4.5</span><span class="p">])</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Adjacency Matrix of New York City Boroughs and Connections&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">node_names</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">node_names</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/random-walk-diffusion-methods_3_0.png" src="../../_images/random-walk-diffusion-methods_3_0.png" />
+</div>
+</div>
+<p>You are staying at a hotel which is located in Manhattan, and you decide that you are going to explore the city as follows. When you are in a given borough <span class="math notranslate nohighlight">\(i\)</span>, you will determine the next borough you will explore by letting random chance do the work for you. To better define a random walk, we need to introduce a background concept first: the Markov chain and the Markov property.</p>
+</div>
+<div class="section" id="markov-chains-and-the-markov-property">
+<h2><span class="section-number">6.5.2. </span>Markov chains and the markov property<a class="headerlink" href="#markov-chains-and-the-markov-property" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>finite-space markov chain</strong> is a model of a random system in which we have a sequence of possible events which can occur which are <em>finite</em> (the boroughs we will visit on a day <span class="math notranslate nohighlight">\(t\)</span>) in which the probability of each event depends <em>only</em> on the event in which you were previously. For network analysis, we only need to think about <em>finite-space</em> Markov chains, because the network has a <em>finite</em> collection of possible events which can occur (the nodes in the network being visited). To put this down quantitatively, the markov chain is represented by the sequence <span class="math notranslate nohighlight">\(\mathbf s_0, \mathbf s_1, \mathbf s_2, ...\)</span>, where each <span class="math notranslate nohighlight">\(\mathbf s_t\)</span> takes the value of one of the <span class="math notranslate nohighlight">\(n\)</span> total nodes in the network.</p>
+<p>You will notice that in our definition of the finite-space markov chain, we made a disclaimer: the probability of each event depends <em>only</em> on the state in which we were previously. This is called the <strong>markov property</strong>. The idea is that, if we were in Manhattan at the previous step in time <span class="math notranslate nohighlight">\(t - 1\)</span> (e.g., <span class="math notranslate nohighlight">\(\mathbf s_{t-1}\)</span> realized the value <span class="math notranslate nohighlight">\(v_{MH}\)</span>, or <span class="math notranslate nohighlight">\(\mathbf s_{t-1} = v_{MH}\)</span> for short), that if our current step in the Markov Chain were Brooklyn (<span class="math notranslate nohighlight">\(\mathbf s_t = v_{BK}\)</span>), that the next step in the Markov chain would not depend <em>at all</em> on the fact that we already saw Manhattan.</p>
+<div class="section" id="random-walks-on-a-network-as-a-markov-chain">
+<h3><span class="section-number">6.5.2.1. </span>Random walks on a network as a markov chain<a class="headerlink" href="#random-walks-on-a-network-as-a-markov-chain" title="Permalink to this headline">¶</a></h3>
+<p>To exhibit the ideas of a markov chain, we’ll define a random walk on your New York Boroughs. Remember that the borough you are at, <span class="math notranslate nohighlight">\(i\)</span>, has <span class="math notranslate nohighlight">\(d_i\)</span> possible neighboring boroughs, where <span class="math notranslate nohighlight">\(d_i\)</span> was the <em>degree</em> of node <span class="math notranslate nohighlight">\(i\)</span>. You will visit one of the other nodes in the network as follows. If borough <span class="math notranslate nohighlight">\(j\)</span> is a neighbor of borough <span class="math notranslate nohighlight">\(i\)</span> (an edge exists from borough <span class="math notranslate nohighlight">\(i\)</span> to borough <span class="math notranslate nohighlight">\(j\)</span>), you will visit borough <span class="math notranslate nohighlight">\(j\)</span> with probability <span class="math notranslate nohighlight">\(\frac{1}{d_i}\)</span>. The idea is that you will visit neighbors of each borough at random, depending only on whether you can get to that borough along an edge of the network. If the node is not a neighbor of your current borough, you will visit it with probability <span class="math notranslate nohighlight">\(0\)</span>. Stated another way, if you are in node <span class="math notranslate nohighlight">\(i\)</span>, the probability of going to another node <span class="math notranslate nohighlight">\(j\)</span> is defined as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    p_{ij} &amp;= \begin{cases}
+        \frac{1}{d_i}  &amp; \text{edge $(i,j)$ exists} \\
+        0  &amp; \text{edge $(i,j)$ does not exist}
+    \end{cases}
+\end{align*}\]</div>
+<p>Note that these probabilities, called the <strong>transition probability</strong> from node <span class="math notranslate nohighlight">\(i\)</span> to node <span class="math notranslate nohighlight">\(j\)</span>, do not have <em>anything</em> to do with which nodes we have visited yet, and these transition probabilities are <em>always the same</em>! For this reason, they are often organized into a matrix, called the <strong>transition probability matrix</strong> <span class="math notranslate nohighlight">\(P\)</span>. In this case, the transition probability matrix looks like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># compute the degree of each node</span>
+<span class="n">di</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># the probability matrix is the adjacency divided by</span>
+<span class="c1"># degree of the starting node</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="n">di</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+<span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s2">&quot;tab:blue&quot;</span><span class="p">,</span> <span class="n">node_size</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;whitesmoke&quot;</span><span class="p">,</span> <span class="n">arrows</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Layout Plot of New York City Boroughs and Connections&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">xticklabels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">4.5</span><span class="p">],</span> <span class="n">yticklabels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">4.5</span><span class="p">])</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Transition probability matrix $P$ for New York Random Walk&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s2">&quot;SI&quot;</span><span class="p">,</span> <span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="s2">&quot;BK&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;BX&quot;</span><span class="p">])</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;SI&quot;</span><span class="p">,</span> <span class="s2">&quot;MH&quot;</span><span class="p">,</span> <span class="s2">&quot;BK&quot;</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">,</span> <span class="s2">&quot;BX&quot;</span><span class="p">])</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Starting borough $i$&quot;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Next borough $j$&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/random-walk-diffusion-methods_6_0.png" src="../../_images/random-walk-diffusion-methods_6_0.png" />
+</div>
+</div>
+<p>To understand this transition probability matrix, let’s think about the individual rows. Notice that if you are in Staten Island, there is only one borough you can go from here, so with probability <span class="math notranslate nohighlight">\(1\)</span>, you will visit its only neighbor: Brooklyn. If you are in Manhattan, you could go to any of its three neighbors (Brooklyn, Queens, or Bronx), with equal probability <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span>. If you were in Brooklyn, you could visit any of its two neighbors (Manhattan or Staten Island) with equal probability <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span>. This continues for each node in the network until you have successfully generated the transition probability matrix <span class="math notranslate nohighlight">\(P\)</span>.</p>
+<p>There are a lot of interesting properties you can use the transition probability matrix <span class="math notranslate nohighlight">\(P\)</span> to learn about, but we won’t cover them all here. If you want some more details on transition probability matrices and Markov chains in general, we would recommend that you check out a book on stochastic processes, such as the author’s favorite by Dean Isaacson, called <a class="reference external" href="https://www.amazon.com/dp/0471428620?tag=uuid10-20">Markov Chains: Theory and Applications</a>.</p>
+<p>Next, let’s use this transition probability matrix to generate a random walk on the New York City boroughs. As we mentioned, your hotel is in Manhattan, so you are going to start your random walk through the city here. In other words, <span class="math notranslate nohighlight">\(\mathbf s_0 = v_{MH}\)</span>. For your next step in the Markov chain, you will visit either Brooklyn, Bronx, or Queens with probability <span class="math notranslate nohighlight">\(\frac{1}{3}\)</span>, or Staten Island with probability <span class="math notranslate nohighlight">\(0\)</span>. In the following figure, we will show the nodes you could possibly go to in green, and the nodes you cannot go to in red. You choose between the three using the transition probabilities, and decided to go to Brooklyn, so we will indicate an “arrow” in green from Manhattan to Brooklyn:</p>
+</div>
+</div>
 <div class="section" id="node2vec">
-<h2><span class="section-number">6.5.1. </span>node2vec<a class="headerlink" href="#node2vec" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">6.5.3. </span>node2vec<a class="headerlink" href="#node2vec" title="Permalink to this headline">¶</a></h2>
 <p>node2vec is one such method. Instead of relying on taking eigenvectors or eigenvalues, like a Laplacian, node2vec uses a random walk to preserve the relationships between nodes and their <em>local neighborhoods</em>: all of the nodes which you can get to by walking along a small number of edges from your starting node. For example, take</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -674,7 +816,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../../_images/random-walk-diffusion-methods_4_1.png" src="../../_images/random-walk-diffusion-methods_4_1.png" />
+<img alt="../../_images/random-walk-diffusion-methods_10_1.png" src="../../_images/random-walk-diffusion-methods_10_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -689,10 +831,16 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.PairGrid at 0x164e99580&gt;
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [6],</span> in <span class="ni">&lt;cell line: 6&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">latents</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;pairplot&#39; is not defined
 </pre></div>
 </div>
-<img alt="../../_images/random-walk-diffusion-methods_5_1.png" src="../../_images/random-walk-diffusion-methods_5_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -713,7 +861,7 @@ WARNING:gensim.models.base_any2vec:under 10 jobs per worker: consider setting a 
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;seaborn.axisgrid.PairGrid at 0x165a39f40&gt;
 </pre></div>
 </div>
-<img alt="../../_images/random-walk-diffusion-methods_6_2.png" src="../../_images/random-walk-diffusion-methods_6_2.png" />
+<img alt="../../_images/random-walk-diffusion-methods_12_2.png" src="../../_images/random-walk-diffusion-methods_12_2.png" />
 </div>
 </div>
 </div>
