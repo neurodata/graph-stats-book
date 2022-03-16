@@ -1023,7 +1023,7 @@ d \end{array}
 \]
     </div>
 And as we learned above, therefore $f(A_T, A_B) = 0$. As we can see, when we compare the networks with the nodes ordered correctly (Person $1$ Twitter is the first node, Person $a$ from Facebook is its first node, Person $2$ from Twitter is the first node of $A_T$, Person $b$ from Facebook is the second node of $A_F$, so on and so forth). What we've done here by ordering the nodes in such tuples is implicitly made the statement that, there is something similar about the nodes $j$ between Twitter and Facebook, and therefore, ordering the adjacency matrices while obeying this similarity is going to give us a *low* edge disagreement (here, just zero). 
-<p>We can see this easily, by considering what happens if we reorder the nodes <em>simultaneously</em> for each network. Let’s instead order the nodes for Twitter and Facebook as <span class="math notranslate nohighlight">\(\{2, 0, 1, 3\}\)</span> and <span class="math notranslate nohighlight">\(\{d, b, c, a\}\)</span>, respectively:</p>
+<p>We can see this easily, by considering what happens if we reorder the nodes <em>simultaneously</em> for each network. Let’s instead order the nodes for Twitter and Facebook as <span class="math notranslate nohighlight">\(\{2, 0, 1, 3\}\)</span> and <span class="math notranslate nohighlight">\(\{c, a, b, d\}\)</span>, respectively. We will call these new adjacency matrices with the new node ordering <span class="math notranslate nohighlight">\(A_T''\)</span> and <span class="math notranslate nohighlight">\(A_F''\)</span> respectively:</p>
 <div class="math">
 \[
 A_T = 
@@ -1076,54 +1076,54 @@ d \end{array}
 <p>Unfortunately, nothing in life nor network machine learning is ever this simple. The spatial layout of a network’s nodes is arbirary, and in reality it can often be much harder to tell whether two networks are the same. For graph matching, we don’t actually <em>know</em> the node correspondance between the two networks: we have no idea that person <span class="math notranslate nohighlight">\(0\)</span> on Twitter is person <span class="math notranslate nohighlight">\(a\)</span> on Facebook, person <span class="math notranslate nohighlight">\(1\)</span> on Twitter is person <span class="math notranslate nohighlight">\(b\)</span> on Facebook, so on and so forth.</p>
 <p>For instance, we can swap the spatial location of nodes <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(d\)</span> in network <span class="math notranslate nohighlight">\(F\)</span>, as shown below. Even with such a small network, it’s hard to tell whether the networks are the same.</p>
 <p><img alt="gm_22" src="../../_images/gm_2.png" /></p>
+<p>Further, let’s say we just had an arbitrary ordering of the nodes for Facebook, which is now a little bit different from the one which we just saw. Let’s imagine we have the nodes ordered instead as <span class="math notranslate nohighlight">\(\{a, b, d, c\}\)</span> instead of <span class="math notranslate nohighlight">\(\{a, b, c, d\}\)</span>, like we did before, but Twitter’s nodes are still ordered as <span class="math notranslate nohighlight">\(\{0, 1, 2, 3\}\)</span>. Now, the adjacency matrices won’t be equal either, where we use <span class="math notranslate nohighlight">\(A_F'\)</span> to denote the adjacency matrix for the Facebook network with this new node ordering:</p>
 <div class="math">
-<p>Further, let’s say we just had an arbitrary ordering of the nodes for Facebook, which is now a little bit different from the one which we just saw. Let’s imagine we have the nodes ordered instead as <span class="math notranslate nohighlight">\(\{a, b, d, c\}\)</span> instead of <span class="math notranslate nohighlight">\(\{a, b, c, d\}\)</span>, like we did before, but Twitter’s nodes are still ordered as <span class="math notranslate nohighlight">\(\{0, 1, 2, 3\}\)</span>. Now, the adjacency matrices won’t be equal either, where we use <span class="math notranslate nohighlight">\(A_F'\)</span> to denote the adjacency matrix for the Facebook network with this new node ordering:
-[
-A_T =
-\begin{array}{cc} &amp;
-\begin{array}{cccc} 0 &amp; 1 &amp; 2 &amp; 3 \end{array}
-\
+\[
+A_T = 
+\begin{array}{cc} &
+\begin{array}{cccc} 0 & 1 & 2 & 3 \end{array}
+\\
 \begin{array}{cccc}
-0 \
-1 \
-2 \
+0 \\
+1 \\
+2 \\
 3 \end{array}
-&amp;
+&
 \left(
 \begin{array}{cccc}
-0 &amp; 1 &amp; 1 &amp; 0\
-1 &amp; 0 &amp; 0 &amp; 1\
-1 &amp; 0 &amp; 0 &amp; 1\
-0 &amp; 1 &amp; 1 &amp; 0\end{array}
+0 & 1 & 1 & 0\\
+1 & 0 & 0 & 1\\
+1 & 0 & 0 & 1\\
+0 & 1 & 1 & 0\end{array}
 \right)\end{array}
 \quad \quad
-A_F’ =
-\begin{array}{cc} &amp;
-\begin{array}{cccc} a &amp; b &amp; d &amp; c \end{array}
-\
+A_F' = 
+\begin{array}{cc} &
+\begin{array}{cccc} a & b & d & c \end{array}
+\\
 \begin{array}{ccc}
-a \
-b \
-d \
+a \\
+b \\
+d \\
 c \end{array}
-&amp;
+&
 \left(
 \begin{array}{ccc}
-0 &amp; 1 &amp; 0 &amp; 1\
-1 &amp; 0 &amp; 1 &amp; 0\
-0 &amp; 1 &amp; 0 &amp; 1\
-1 &amp; 0 &amp; 1 &amp; 0\end{array}
-\right)\end{array} \
-|A_T - A_F’| = \left(
+0 & 1 & 0 & 1\\
+1 & 0 & 1 & 0\\
+0 & 1 & 0 & 1\\
+1 & 0 & 1 & 0\end{array}
+\right)\end{array} \\
+|A_T - A_F'| = \left(
 \begin{array}{ccc}
-0 &amp; 0 &amp; 1 &amp; 1\
-0 &amp; 0 &amp; 1 &amp; 1\
-1 &amp; 1 &amp; 0 &amp; 0\
-1 &amp; 1 &amp; 0 &amp; 0\end{array}
+0 & 0 & 1 & 1\\
+0 & 0 & 1 & 1\\
+1 & 1 & 0 & 0\\
+1 & 1 & 0 & 0\end{array}
 \right)
-]
-</div>
-and we get that <span class="math notranslate nohighlight">\(f(A_T, A_F') = 8\)</span>, since there are <span class="math notranslate nohighlight">\(8\)</span> entries which are different in the adjacency matrices between <span class="math notranslate nohighlight">\(A_T\)</span> and <span class="math notranslate nohighlight">\(A_F\)</span>. This might seem a bit high, but note that because the network is undirected, adjecency disagreements are effectively counted twice (a single edge disagreement for an edge <span class="math notranslate nohighlight">\((i,j)\)</span> also yield a difference for edge <span class="math notranslate nohighlight">\((j, i)\)</span>, since the adjacency matrix is symmetric). By comparing the nodes of Twitter and Facebook with the nodes <em>misaligned</em>, we have effectively <em>broken</em> the node correspondance between the nodes of Twitter and Facebook.</p>
+\]
+    </div>
+and we get that $f(A_T, A_F') = 8$, since there are $8$ entries which are different in the adjacency matrices between $A_T$ and $A_F$. This might seem a bit high, but note that because the network is undirected, adjecency disagreements are effectively counted twice (a single edge disagreement for an edge $(i,j)$ also yield a difference for edge $(j, i)$, since the adjacency matrix is symmetric). By comparing the nodes of Twitter and Facebook with the nodes *misaligned*, we have effectively *broken* the node correspondance between the nodes of Twitter and Facebook. 
 <p>In this sense, we can see how networks with a low number of edge disagreements might be considered to be better <em>matches</em> in terms of the node correspondance. When the nodes are <em>aligned</em> in a way which respects the node correspondance, identical networks have a low number of disagreements, and when the nodes are <em>aligned</em> in a way which disregards the node correspodance, the networks have a high number of disagreements. We will build upon this idea further, by exploring how to manipulate our adjacency matrices such that we can find alignments that match well. You can do this using something called a permutation matrix.</p>
 </div>
 <div class="section" id="permutation-matrices">
@@ -1177,7 +1177,7 @@ and we get that <span class="math notranslate nohighlight">\(f(A_T, A_F') = 8\)<
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_9_0.png" src="../../_images/graph-matching-vertex_9_0.png" />
+<img alt="../../_images/graph-matching-vertex_10_0.png" src="../../_images/graph-matching-vertex_10_0.png" />
 </div>
 </div>
 </div>
@@ -1220,7 +1220,7 @@ and we get that <span class="math notranslate nohighlight">\(f(A_T, A_F') = 8\)<
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_12_0.png" src="../../_images/graph-matching-vertex_12_0.png" />
+<img alt="../../_images/graph-matching-vertex_13_0.png" src="../../_images/graph-matching-vertex_13_0.png" />
 </div>
 </div>
 </div>
@@ -1260,7 +1260,7 @@ and we get that <span class="math notranslate nohighlight">\(f(A_T, A_F') = 8\)<
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_15_0.png" src="../../_images/graph-matching-vertex_15_0.png" />
+<img alt="../../_images/graph-matching-vertex_16_0.png" src="../../_images/graph-matching-vertex_16_0.png" />
 </div>
 </div>
 <p>So, looking at the permutation matrix, if we were to apply this as a row or column permutation, row/column 3 and 4 will stay the same (<span class="math notranslate nohighlight">\(p_{33} = 1\)</span> and <span class="math notranslate nohighlight">\(p_{44} = 1\)</span>, so row/column <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(4\)</span> will become row/column <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(4\)</span> respectively in the new representations), and row/column <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> would swap (row/column <span class="math notranslate nohighlight">\(1\)</span> would become row/column <span class="math notranslate nohighlight">\(2\)</span>, and vice versa). Let’s see what happens when we apply these sequentially:</p>
@@ -1290,7 +1290,7 @@ and we get that <span class="math notranslate nohighlight">\(f(A_T, A_F') = 8\)<
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_18_0.png" src="../../_images/graph-matching-vertex_18_0.png" />
+<img alt="../../_images/graph-matching-vertex_19_0.png" src="../../_images/graph-matching-vertex_19_0.png" />
 </div>
 </div>
 <p>So, we take the original matrix, and first begin by swapping rows <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> to give us <span class="math notranslate nohighlight">\(PD\)</span>. Next, using this row-permuted matrix, we then permute the columns by swapping columns <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> of <span class="math notranslate nohighlight">\(PD\)</span>, to give us <span class="math notranslate nohighlight">\(PD^\top\)</span>. This shows that by using a permutation matrix to row and then column swap, we can reorder the rows and columns of <span class="math notranslate nohighlight">\(D\)</span> simultaneously.</p>
@@ -1441,7 +1441,7 @@ c \end{array}
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/graph-matching-vertex_22_0.png" src="../../_images/graph-matching-vertex_22_0.png" />
+<img alt="../../_images/graph-matching-vertex_23_0.png" src="../../_images/graph-matching-vertex_23_0.png" />
 </div>
 </div>
 <p>As shown in the code block above, using a properly chosen permutation matrix <span class="math notranslate nohighlight">\(P\)</span>, we are able to recover the node correspondance between the networks for Twitter and Facebook. We obtain that for this particular choice of <span class="math notranslate nohighlight">\(P\)</span>, that <span class="math notranslate nohighlight">\(f(A_T, PA_F'P^\top) = 0\)</span>.</p>
@@ -1496,7 +1496,7 @@ c \end{array}
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjecnecy disagreements: 16
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_29_1.png" src="../../_images/graph-matching-vertex_29_1.png" />
+<img alt="../../_images/graph-matching-vertex_30_1.png" src="../../_images/graph-matching-vertex_30_1.png" />
 </div>
 </div>
 <p>Below, we create a model to solve the Graph Matching Problem using the <code class="docutils literal notranslate"><span class="pre">GraphMatch</span></code> class. The model is then fit for the two networks A and B.</p>
@@ -1533,10 +1533,10 @@ c \end{array}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjacency disagreements: 8
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjacency disagreements: 0
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_32_1.png" src="../../_images/graph-matching-vertex_32_1.png" />
+<img alt="../../_images/graph-matching-vertex_33_1.png" src="../../_images/graph-matching-vertex_33_1.png" />
 </div>
 </div>
 <p>The graph matching algorithm is able to successfully unshuffle <span class="math notranslate nohighlight">\(B\)</span>, with zero adjacency disagreements between <span class="math notranslate nohighlight">\(A\)</span> and the matched <span class="math notranslate nohighlight">\(B\)</span>.</p>
@@ -1588,10 +1588,10 @@ B &amp;= \begin{bmatrix}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjacency disagreements: 2198
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjacency disagreements: 2133
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_38_1.png" src="../../_images/graph-matching-vertex_38_1.png" />
+<img alt="../../_images/graph-matching-vertex_39_1.png" src="../../_images/graph-matching-vertex_39_1.png" />
 </div>
 </div>
 <p>To emphasize the effectiveness of <code class="docutils literal notranslate"><span class="pre">SGM</span></code>, as well as why having seeds is important, we will randomly shuffle the vertices of network <span class="math notranslate nohighlight">\(A^{(2)}\)</span>. We will call this version of <span class="math notranslate nohighlight">\(A^{(2)}\)</span> after shuffling <span class="math notranslate nohighlight">\(A^{(2),s}\)</span>. This random permutation is stored, and unshuffled, such that we have available the optimal permutation that returns the original <span class="math notranslate nohighlight">\(A^{(2)}\)</span>.</p>
@@ -1620,10 +1620,10 @@ B &amp;= \begin{bmatrix}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjacency disagreements: 25041
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of adjacency disagreements: 25354
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_41_1.png" src="../../_images/graph-matching-vertex_41_1.png" />
+<img alt="../../_images/graph-matching-vertex_42_1.png" src="../../_images/graph-matching-vertex_42_1.png" />
 </div>
 </div>
 <div class="section" id="unshuffling-network-2-without-seeds">
@@ -1658,11 +1658,11 @@ B &amp;= \begin{bmatrix}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Match Ratio with no seeds: 0.031
-Disagreements no seeds: 17546
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Match Ratio with no seeds: 1.000
+Disagreements no seeds: 2133
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_44_1.png" src="../../_images/graph-matching-vertex_44_1.png" />
+<img alt="../../_images/graph-matching-vertex_45_1.png" src="../../_images/graph-matching-vertex_45_1.png" />
 </div>
 </div>
 <p>While the predicted permutation for <span class="math notranslate nohighlight">\(A^{(2),s}\)</span> after unshuffling was successful in recovering the basic structure of the stochastic block model (i.e. network <span class="math notranslate nohighlight">\(A^{(1)}\)</span> and network <span class="math notranslate nohighlight">\(PA^{(2),s}P^\top\)</span> look qualitatively similar), we see that the number of edge disagreements between them is still quite high, and the match ratio of successfully unshuffled nodes is quite low.</p>
@@ -1708,10 +1708,10 @@ Disagreements no seeds: 17546
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Match Ratio with no seeds: 1.000
-Disagreements no seeds: 2198
+Disagreements no seeds: 2133
 </pre></div>
 </div>
-<img alt="../../_images/graph-matching-vertex_48_1.png" src="../../_images/graph-matching-vertex_48_1.png" />
+<img alt="../../_images/graph-matching-vertex_49_1.png" src="../../_images/graph-matching-vertex_49_1.png" />
 </div>
 </div>
 <p>From the results above, we see that when running SGM on the same two networks, with no seeds there is match ratio is quite low. However including 10 seeds increases the match ratio to 100% (meaning that the shuffled <span class="math notranslate nohighlight">\(A^{(2),s}\)</span> was completely correctly unshuffled).</p>
