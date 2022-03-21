@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>9.4. Vertex Nomination For Multiple Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>9.4. Vertex Nomination For Two Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -52,6 +52,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="10. Applications for Many Networks" href="../ch10/ch10.html" />
@@ -449,7 +451,7 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     9.4. Vertex Nomination For Multiple Networks
+     9.4. Vertex Nomination For Two Networks
     </a>
    </li>
   </ul>
@@ -594,6 +596,19 @@ const thebe_selector_output = ".output, .cell_output"
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav" aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conceptually-understanding-the-problem-space">
+   9.4.1. Conceptually Understanding the problem space
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -601,19 +616,44 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Vertex Nomination For Multiple Networks</h1>
+                <h1>Vertex Nomination For Two Networks</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conceptually-understanding-the-problem-space">
+   9.4.1. Conceptually Understanding the problem space
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
             
               <div>
                 
-  <div class="tex2jax_ignore mathjax_ignore section" id="vertex-nomination-for-multiple-networks">
-<h1><span class="section-number">9.4. </span>Vertex Nomination For Multiple Networks<a class="headerlink" href="#vertex-nomination-for-multiple-networks" title="Permalink to this headline">¶</a></h1>
+  <div class="tex2jax_ignore mathjax_ignore section" id="vertex-nomination-for-two-networks">
+<h1><span class="section-number">9.4. </span>Vertex Nomination For Two Networks<a class="headerlink" href="#vertex-nomination-for-two-networks" title="Permalink to this headline">¶</a></h1>
+<p>Back in <a class="reference external" href="#link?">Chapter 8</a>, you learned about the vertex nomination problem when you had one network. Now, we’re going to reshape this problem a little bit.</p>
+<p>To do this, you’re going to roll back to your classic example: the school SBM. You have a total of 200 students, each of whom attends one of two schools. Here, the nodes are students in the network, and 100 of the students attend the first school (community one) and the remaining 100 students attend the second school (community two).</p>
+<p>This problem is going to get a little hairy for two reasons, and we’ll start with the first one. First, for 125 of these students, you have a copy of their friends list for a social networking site. You were able to get a copy of the friends list for 75 of the students who attend school one, but only 50 of the students who attend school two. Here, the edges represent whether two students are friends on a social networking site. The probability that two students are friends if they attend the same school is <span class="math notranslate nohighlight">\(0.5\)</span>, and the probability that two students are friends if they do not attend the same school is <span class="math notranslate nohighlight">\(0.2\)</span>. A realization of this network looks like this:</p>
+<p>Now it’s time for the second hairy part of the example. For another 125 students, you ask them who they are friends with. This time, you are able to get survey responses for 75 of the students who attended school two, but only 50 of the students who attended school one. Here, the edges represent whether either of the two students reported that they were friends with the other student. The probability that two students are friends if they attend the same school is <span class="math notranslate nohighlight">\(0.4\)</span>, and the probability that two students are friends if they do not attend the same school is <span class="math notranslate nohighlight">\(0.1\)</span>. A realization of the network looks like this:</p>
+<p>The problem is as follows: when processing the social networking friends lists and the self-reported surveys, you numbered the students from 1 to 125 in the first network, and 1 to 125 in the second network, and then <em>totally</em> forgot the names of all but 5 of the students! Given a student for whom you have their corresponding friends list for, can you identify the corresponding node or nodes in the second network (the self-reported survey) that these results correspond to?</p>
+<p>To better understand this problem better, let’s explore how this problem looks a lot like two problems we’ve seen already.</p>
+<p>This looks a lot like the <a class="reference external" href="#link?">vertex nomination problem</a> because we have one node from the social networking friends lists, and we want to identify a set of nodes that look “similar” to this node in the self-reported surveys. By “similar”, we mean that we want the set of nodes to have patterns that look a lot like this node (the <em>nominee</em> nodes). This problem is different from the vertex nomination problem because the nominees are nodes from the self-reported survey network, and <em>not</em> from the social networking friends list network.</p>
+<p>This problem looks like the <a class="reference external" href="#link?">seeded graph matching problem</a>, too, which we just learned about in the preceding section. This is because we have two networks (the social networking friends list network and the self-reported friend survey network), and we know a <em>node correspondance</em> for 5 of the nodes in the network (the 5 students we still have the names of). This problem is different from the seeded graph matching problem because don’t want to match the whole network, we just want to find candidate nodes for a small subset of the network.</p>
+<div class="section" id="conceptually-understanding-the-problem-space">
+<h2><span class="section-number">9.4.1. </span>Conceptually Understanding the problem space<a class="headerlink" href="#conceptually-understanding-the-problem-space" title="Permalink to this headline">¶</a></h2>
+<p>You know that for each school, you were able to obtain 40 students from each school across both the social networking friends list and the survey. This means you have both the social networking friends list and survey results from a total of 80 students across both the social networking friends list and the survey results. If we remember way back to <a class="reference external" href="#link?">Chapter 4</a>, we introduced the concept of the “subnetwork induced by a set of nodes,” which will come in handy here for illustration purposes. The subnetwork induced by a set of nodes, if you recall, consists of all of the nodes in your set (the 80 students across each of the schools) and all of the edges amongst these nodes (for any two students which are in your set of nodes, whether or not they are friends). Since we have two networks here (the social networking site friend data and the self-reported friend survey results), we have two edge sets. In this case, we will plot the</p>
+</div>
 </div>
 
     <script type="text/x-thebe-config">
