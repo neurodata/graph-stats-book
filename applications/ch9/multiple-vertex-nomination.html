@@ -574,41 +574,11 @@ const thebe_selector_output = ".output, .cell_output"
 
             <!-- Launch buttons -->
 
-<div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
-        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
-    <div class="dropdown-buttons">
-        
-        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/applications/ch9/multiple-vertex-nomination.ipynb"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
-                data-placement="left"><img class="binder-button-logo"
-                    src="../../_static/images/logo_binder.svg"
-                    alt="Interact on binder">Binder</button></a>
-        
-        
-        
-        
-    </div>
-</div>
-
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show noprint">
             
-            <div class="tocsection onthispage pt-5 pb-3">
-                <i class="fas fa-list"></i> Contents
-            </div>
-            <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#conceptually-understanding-the-problem-space">
-   9.4.1. Conceptually Understanding the problem space
-  </a>
- </li>
-</ul>
-
-            </nav>
         </div>
     </div>
 </div>
@@ -621,19 +591,6 @@ const thebe_selector_output = ".output, .cell_output"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#conceptually-understanding-the-problem-space">
-   9.4.1. Conceptually Understanding the problem space
-  </a>
- </li>
-</ul>
-
-                        </nav>
                     </div>
                 </div>
             </div>
@@ -643,16 +600,91 @@ const thebe_selector_output = ".output, .cell_output"
   <div class="tex2jax_ignore mathjax_ignore section" id="vertex-nomination-for-two-networks">
 <h1><span class="section-number">9.4. </span>Vertex Nomination For Two Networks<a class="headerlink" href="#vertex-nomination-for-two-networks" title="Permalink to this headline">¶</a></h1>
 <p>Back in <a class="reference external" href="#link?">Chapter 8</a>, you learned about the vertex nomination problem when you had one network. Now, we’re going to reshape this problem a little bit.</p>
-<p>To do this, you’re going to roll back to your classic example: the school SBM. You have a total of 200 students, each of whom attends one of two schools. Here, the nodes are students in the network, and 100 of the students attend the first school (community one) and the remaining 100 students attend the second school (community two).</p>
-<p>This problem is going to get a little hairy for two reasons, and we’ll start with the first one. First, for 125 of these students, you have a copy of their friends list for a social networking site. You were able to get a copy of the friends list for 75 of the students who attend school one, but only 50 of the students who attend school two. Here, the edges represent whether two students are friends on a social networking site. The probability that two students are friends if they attend the same school is <span class="math notranslate nohighlight">\(0.5\)</span>, and the probability that two students are friends if they do not attend the same school is <span class="math notranslate nohighlight">\(0.2\)</span>. A realization of this network looks like this:</p>
-<p>Now it’s time for the second hairy part of the example. For another 125 students, you ask them who they are friends with. This time, you are able to get survey responses for 75 of the students who attended school two, but only 50 of the students who attended school one. Here, the edges represent whether either of the two students reported that they were friends with the other student. The probability that two students are friends if they attend the same school is <span class="math notranslate nohighlight">\(0.4\)</span>, and the probability that two students are friends if they do not attend the same school is <span class="math notranslate nohighlight">\(0.1\)</span>. A realization of the network looks like this:</p>
-<p>The problem is as follows: when processing the social networking friends lists and the self-reported surveys, you numbered the students from 1 to 125 in the first network, and 1 to 125 in the second network, and then <em>totally</em> forgot the names of all but 5 of the students! Given a student for whom you have their corresponding friends list for, can you identify the corresponding node or nodes in the second network (the self-reported survey) that these results correspond to?</p>
+<p>To do this, we’re going to turn to a classic example: school networks. First, you have the friends lists of 50 students from a popular social networking site. For any two individual students in the school, there is a probability of <span class="math notranslate nohighlight">\(0.7\)</span> that they are friends on the social networking site. The realization of the network you are given will be called your social network, and looks like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
+
+<span class="n">nsoc</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">Asoc</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">nsoc</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">Asoc</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Social Network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multiple-vertex-nomination_3_0.png" src="../../_images/multiple-vertex-nomination_3_0.png" />
+</div>
+</div>
+<p>Separately, you also conduct a survey of the students at the school. The nodes are 40 students from the school. You poll the 40 students, and ask them who their friends are. For any given pair of students, an edge exists if either of the two students listed they were friends with the other. As it turns out, students are friends on the social networking site with people at a much higher rate than they are friends with people in real life, so <span class="math notranslate nohighlight">\(50\%\)</span> of the edges from the social network don’t exist in this survey network:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># pick 40 students at random from the original network</span>
+<span class="c1"># as your seeds</span>
+<span class="n">nsurvey</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="c1"># choose the nodes that we have survey data for</span>
+<span class="n">nodes_matched</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">nsoc</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nsurvey</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="c1"># copy over the corresponding subnetwork induced by nodes_matched</span>
+<span class="n">Asoc_ss</span> <span class="o">=</span> <span class="n">Asoc</span><span class="p">[</span><span class="n">nodes_matched</span><span class="p">,:][:,</span><span class="n">nodes_matched</span><span class="p">]</span>
+
+<span class="c1"># remove 50% of the edges at random</span>
+<span class="c1"># create a mask for upper triangle</span>
+<span class="n">utri_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nsurvey</span><span class="p">,</span> <span class="n">nsurvey</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="n">utri_mask</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="n">nsurvey</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="c1"># compute nnz edges</span>
+<span class="n">Asoc_ss</span><span class="p">[</span><span class="o">~</span><span class="n">utri_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">nnz</span> <span class="o">=</span> <span class="n">Asoc_ss</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="c1"># choose the 50% of edges to remain</span>
+<span class="n">nz_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">Asoc_ss</span><span class="p">)</span>
+<span class="n">retain_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">nz_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">nnz</span><span class="p">)),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">Asurvey</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nsurvey</span><span class="p">,</span> <span class="n">nsurvey</span><span class="p">))</span>
+<span class="n">Asurvey</span><span class="p">[</span><span class="n">nz_edges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">retain_edges</span><span class="p">],</span> <span class="n">nz_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">retain_edges</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># symmetrize</span>
+<span class="n">Asurvey</span> <span class="o">=</span> <span class="n">Asurvey</span> <span class="o">+</span> <span class="n">Asurvey</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">draw_multiplot</span><span class="p">(</span><span class="n">Asurvey</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Survey Network&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/multiple-vertex-nomination_6_0.png" src="../../_images/multiple-vertex-nomination_6_0.png" />
+</div>
+</div>
+<p>The problem is as follows: when processing the social networking friends lists and the self-reported surveys, you numbered the students from 1 to 50 in the first network, and 1 to 40 in the second network, and then <em>totally</em> forgot the names of all but 4 of the students! Given a student for whom you have their corresponding friends list for, can you identify the corresponding node or nodes in the second network (the self-reported survey) that these results correspond to?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># choose which of the 40 nodes in the second network</span>
+<span class="c1"># will be seeds</span>
+<span class="n">nseeds</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">seeds_survey</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">nsurvey</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nseeds</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># and get the corresponding node number from the social network</span>
+<span class="n">seeds_soc</span> <span class="o">=</span> <span class="n">nodes_matched</span><span class="p">[</span><span class="n">seeds_survey</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
 <p>To better understand this problem better, let’s explore how this problem looks a lot like two problems we’ve seen already.</p>
-<p>This looks a lot like the <a class="reference external" href="#link?">vertex nomination problem</a> because we have one node from the social networking friends lists, and we want to identify a set of nodes that look “similar” to this node in the self-reported surveys. By “similar”, we mean that we want the set of nodes to have patterns that look a lot like this node (the <em>nominee</em> nodes). This problem is different from the vertex nomination problem because the nominees are nodes from the self-reported survey network, and <em>not</em> from the social networking friends list network.</p>
-<p>This problem looks like the <a class="reference external" href="#link?">seeded graph matching problem</a>, too, which we just learned about in the preceding section. This is because we have two networks (the social networking friends list network and the self-reported friend survey network), and we know a <em>node correspondance</em> for 5 of the nodes in the network (the 5 students we still have the names of). This problem is different from the seeded graph matching problem because don’t want to match the whole network, we just want to find candidate nodes for a small subset of the network.</p>
-<div class="section" id="conceptually-understanding-the-problem-space">
-<h2><span class="section-number">9.4.1. </span>Conceptually Understanding the problem space<a class="headerlink" href="#conceptually-understanding-the-problem-space" title="Permalink to this headline">¶</a></h2>
-<p>You know that for each school, you were able to obtain 40 students from each school across both the social networking friends list and the survey. This means you have both the social networking friends list and survey results from a total of 80 students across both the social networking friends list and the survey results. If we remember way back to <a class="reference external" href="#link?">Chapter 4</a>, we introduced the concept of the “subnetwork induced by a set of nodes,” which will come in handy here for illustration purposes. The subnetwork induced by a set of nodes, if you recall, consists of all of the nodes in your set (the 80 students across each of the schools) and all of the edges amongst these nodes (for any two students which are in your set of nodes, whether or not they are friends). Since we have two networks here (the social networking site friend data and the self-reported friend survey results), we have two edge sets. In this case, we will plot the</p>
+<p>This looks a lot like the <a class="reference external" href="#link?">vertex nomination problem</a> because we have one node of interest, and we want to identify a set of nodes that look “similar” to this node. By “similar”, we mean that we want the set of nodes that we identify to have patterns that look a lot like this node (the <em>nominee</em> nodes). This problem is different from the vertex nomination problem because the nominees are nodes from the self-reported survey network, and <em>not</em> from the social networking friends list network.</p>
+<p>This problem looks like the <a class="reference external" href="#link?">seeded graph matching problem</a>, too, which we just learned about in the preceding section. This is because we have two networks (the social networking friends list network and the self-reported friend survey network), and we know a <em>node correspondance</em> for 5 of the nodes in the network (the 5 students we still have the names of). This problem is different from the seeded graph matching problem because don’t necessarily need to match the whole network, we just want to find candidate nodes for a small subset of the network.</p>
+<div class="figure align-center" id="graphbook-mod">
+<a class="reference internal image-reference" href="../../_images/vnsgm.png"><img alt="../../_images/vnsgm.png" src="../../_images/vnsgm.png" style="width: 1005.6px; height: 637.6px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 9.1 </span><span class="caption-text">The graphic illustrates the two-graph vertex nomination problem. We have two sets of nodes, one for the social network (green) and one for the self-reported survey (orange). Amongst these nodes, we have a subset of nodes (squares) for which there exists a corresponding matched seed in the second network (dashed lines). For our node of interest in the social network (yellow star), we seek to identify a set of nominee nodes in the survey network (red circles)</span><a class="headerlink" href="#graphbook-mod" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 
