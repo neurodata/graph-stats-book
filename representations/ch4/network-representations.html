@@ -574,23 +574,6 @@ const thebe_selector_output = ".output, .cell_output"
 
             <!-- Launch buttons -->
 
-<div class="dropdown-buttons-trigger">
-    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
-        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
-    <div class="dropdown-buttons">
-        
-        <a class="binder-button" href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch4/network-representations.ipynb"><button type="button"
-                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
-                data-placement="left"><img class="binder-button-logo"
-                    src="../../_static/images/logo_binder.svg"
-                    alt="Interact on binder">Binder</button></a>
-        
-        
-        
-        
-    </div>
-</div>
-
         </div>
 
         <!-- Table of contents -->
@@ -738,9 +721,9 @@ const thebe_selector_output = ".output, .cell_output"
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="representations-of-networks">
 <h1><span class="section-number">4.3. </span>Representations of Networks<a class="headerlink" href="#representations-of-networks" title="Permalink to this headline">¶</a></h1>
-<p>Now that we know how to represent networks with matrices, let’s take a step back and take a look at what network representation is in general, and the different ways you might think about representing networks to understand different aspects of the network.</p>
-<p>We already know that the topological structure of networks is just a collection of nodes, with pairs of nodes potentially linked together by edges. Mathematically, this means that a network is defined by two objects: the set of nodes, and the set of edges, with each edge just being defined as a pair of nodes for undirected networks. Networks can have additional structure: you might have extra information about each node (“features” or “covariates”), which we’ll talk about in the joint representation section in chapter 6. Edges might also have weights, which are usually measure the connection strength in some way. We learned in the previous section that network topology can be represented with matrices in a number of ways – with adjacency matrices, Laplacians, or (less commonly) with incidence matrices.</p>
-<p>One major challenge in working with networks is that a lot of standard mathematical operations and metrics remain undefined. What does it mean to add a network to another network, for instance? How would network multiplication work? How do you define a distance between one node and another node? Without these kinds of basic operations and metrics, we are left in the dark when we try to find analogies to non-network data analysis.</p>
+<p>Now that you know how to represent networks with matrices, let’s take a step back and take a look at what network representation is in general, and the different ways you might think about representing networks to understand different aspects of the network.</p>
+<p>We already know that the topological structure of networks is just a collection of nodes, with pairs of nodes potentially linked together by edges. Mathematically, this means that a network is defined by two objects: the set of nodes, and the set of edges, with each edge just being defined as a pair of nodes for undirected networks. Networks can have additional structure: you might have extra information about each node (“features” or “covariates”), which we’ll talk about in the joint representation section in <a class="reference external" href="#link?">Chapter 6</a>. Edges might also have weights, which are usually measure the connection strength in some way. We learned in the previous section that network topology can be represented with matrices in a number of ways – with adjacency matrices, Laplacians, or (less commonly) with incidence matrices.</p>
+<p>One major challenge in working with networks is that a lot of standard mathematical operations and metrics remain undefined. What does it mean to add a network to another network, for instance? How would network multiplication work? How do you define a distance between one node and another node? Without these kinds of basic operations and metrics, you are left in the dark when you try to find analogies to non-network data analysis.</p>
 <p>Another major challenge is that the number of possible networks can get obscene fairly quickly. See the figure below, for instance. When you allow for only 50 nodes, there are already more than <span class="math notranslate nohighlight">\(10^{350}\)</span> possible networks. Just for reference, if you took all hundred-thousand quadrillion vigintillion atoms in the universe, and then made a new entire universe for each of those atoms… you’d still be nowhere near <span class="math notranslate nohighlight">\(10^{350}\)</span> atoms.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -770,14 +753,14 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_4617/3329702103.py:11: RuntimeWarning: overflow encountered in power
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_4632/3329702103.py:11: RuntimeWarning: overflow encountered in power
   n_graphs = np.log10(2**comb(vertices, 2))
 </pre></div>
 </div>
 <img alt="../../_images/network-representations_2_1.png" src="../../_images/network-representations_2_1.png" />
 </div>
 </div>
-<p>To address these challenges, we can generally group analysis into four approaches, each of which addresses these challenges in some way: the bag of features, the bag of edges, the bag of nodes, and the bag of networks, each so-called because you’re essentially throwing data into a bag and treating each thing in it as its own object. Let’s get into some details!</p>
+<p>To address these challenges, you can generally group analysis into four approaches, each of which addresses these challenges in some way: the bag of features, the bag of edges, the bag of nodes, and the bag of networks, each so-called because you’re essentially throwing data into a bag and treating each thing in it as its own object. Let’s get into some details!</p>
 <div class="section" id="bag-of-features">
 <h2><span class="section-number">4.3.1. </span>Bag of Features<a class="headerlink" href="#bag-of-features" title="Permalink to this headline">¶</a></h2>
 <p>The first approach is called the bag of features. The idea is that you take networks and you compute statistics from them, either for each node or for the entire network. These statistics could be simple things like the edge count or average path length between two nodes, or more complicated metrics like the modularity, which measures how well a network can be separated into communities. Unfortunately, network statistics like this tend to be correlated; the value of one network statistic will almost always influence the other. This means that it can be difficult to interpret analysis that works by comparing network statistics. It’s also hard to figure out which statistics to compute, since there are an infinite number of them.</p>
@@ -789,7 +772,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="section" id="network-features-tend-to-be-correlated">
 <h4><span class="section-number">4.3.1.1.1. </span>Network Features Tend to be Correlated<a class="headerlink" href="#network-features-tend-to-be-correlated" title="Permalink to this headline">¶</a></h4>
 <p>The other issue with the bag of features approach is that network features tend to be correlated with each other: if you consider all possible networks, knowing the value of any of the network features gives you information about what the value of other network features might be.</p>
-<p>Let’s play around with this. We’ll make 100 random networks, each with 50 nodes, and then we’ll compute some of the most common network features that people use on them (we’ll explain what each network feature is along the way). Then, we’ll look at how correlated these features are. For now, just think of a random network as being a network with each node being connected to each other node with some set probability. Each network will have a different connection probability. These networks will also have communities – groups of nodes which are more connected with each other than other nodes – the strength of which will also be determined randomly. When we generate data later on in this book, we’ll get into different types of random network models you can use.</p>
+<p>Let’s play around with this. We’ll make 100 random networks, each with 50 nodes, and then you’ll compute some of the most common network features that people use on them (you’ll explain what each network feature is along the way). Then, you’ll look at how correlated these features are. For now, just think of a random network as being a network with each node being connected to each other node with some set probability. Each network will have a different connection probability. These networks will also have communities – groups of nodes which are more connected with each other than other nodes – the strength of which will also be determined randomly. When you generate data later on in this book, you’ll get into different types of random network models you can use.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
@@ -811,12 +794,12 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>Now, for each of these networks, we’ll calculate a set of network features. These will just be a collection of some of the most common metrics you can use to define graphs. We’ll use the network density, the clustering coefficient, the path length, and the modularity. We’ll go over these features with more depth later, but here are some brief explanations for now just to get a sense for what we’re actually calculating.</p>
+<p>Now, for each of these networks, you’ll calculate a set of network features, using some of the various properties you learned about in the previous section on <a class="reference external" href="#link?">Properties of Networks</a>.</p>
 <p>The <strong>Modularity</strong> measures the fraction of edges in your network that belong to the same community, subtracting out the probability of an edge existing at random. It effectively measures how much better a particular assignment of community labels is at defining communities than a completely random assignment.</p>
 <p>The <strong>Network Density</strong> is the fraction of all possible edges that a network can have which actually exist. If every node were connected to every other node, the network density would be 1; and if no node is connected to anything, the network density would be 0.</p>
 <p>The <strong>Clustering Coefficient</strong> indicates how much nodes tend to cluster together. If you pick out three nodes, and two of them are connected, a high clustering coefficient would mean that the third is probably connected as well.</p>
 <p>The <strong>Path Length</strong> indicates how far apart two nodes in your network are on average. If two nodes are directly connected, their path length is one. If two nodes are connected through an intermediate node, their path length is two.</p>
-<p>The code below defines functions to calculate each of these network features, and then calculates them for each of the networks we created above. Since most of these metrics already exist in <code class="docutils literal notranslate"><span class="pre">networkx</span></code>, we’ll just pull from there. You can check the <code class="docutils literal notranslate"><span class="pre">networkx</span></code> documentation for details.</p>
+<p>The code below defines functions to calculate each of these network features, and then calculates them for each of the networks you created above. Since most of these metrics already exist in <code class="docutils literal notranslate"><span class="pre">networkx</span></code>, you’ll just pull from there. You can check the <code class="docutils literal notranslate"><span class="pre">networkx</span></code> documentation for details.</p>
 <p>We’ll also define a preprocessing decorator, which just converts the network from a numpy array into the format networkx uses.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -855,7 +838,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>Now, we’ll calculate all of these features for each network, and finally we’ll create a heatmap of their correlation.</p>
+<p>Now, you’ll calculate all of these features for each network, and finally you’ll create a heatmap of their correlation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -884,7 +867,7 @@ const thebe_selector_output = ".output, .cell_output"
 
 <span class="n">plot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">feature_correlation</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
                    <span class="n">cmap</span><span class="o">=</span><span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;divergent&quot;</span><span class="p">],</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;aspect&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]})</span>
-<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Average Correlation </span><span class="se">\n</span><span class="s2">For Our Network Features&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Average Correlation </span><span class="se">\n</span><span class="s2">For Your Network Features&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -896,8 +879,8 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="why-network-feature-correlatedness-can-lead-to-problems">
 <h4><span class="section-number">4.3.1.1.2. </span>Why Network Feature Correlatedness Can Lead To Problems<a class="headerlink" href="#why-network-feature-correlatedness-can-lead-to-problems" title="Permalink to this headline">¶</a></h4>
-<p>Let’s take a step back to the implications of using the bag of features approach to analyze networks, now that we can see how correlated they usually are. Say you have a bunch of brain networks of mice, where the nodes are neurons and the edges are connections between neurons. You have a group of mice who were raised total darkness, and another group who were raised normally: let’s call the ones who were raised in the darkness the batman mice. You’re interested in how the visual parts of the brain are affected in the batman mice. You find the networks for only the visual parts of their brain, and then you calculate some network feature; maybe the density. It turns out that the network density is much lower for batman mice than it is for normal mice, so you conclude that raising mice in the darkness causes lower network density. Seems reasonable.</p>
-<p>The problem is that network density is correlated with pretty much every other network feature you could have used. For example, just looking at the heatmap above, we can see that it’s lower for more modularity; higher with a greater clustering coefficient; and much lower for smaller average path lengths. So, for instance, if you measured modularity instead of density, then you could have just as easily concluded that raising mice in total darkness causes their brains to have more well-defined clusters of neurons, and you’d then write an entire paper on the implications of that.</p>
+<p>Let’s take a step back to the implications of using the bag of features approach to analyze networks, now that you can see how correlated they usually are. Say you have a bunch of brain networks of mice, where the nodes are neurons and the edges are connections between neurons. You have a group of mice who were raised total darkness, and another group who were raised normally: let’s call the ones who were raised in the darkness the batman mice. You’re interested in how the visual parts of the brain are affected in the batman mice. You find the networks for only the visual parts of their brain, and then you calculate some network feature; maybe the density. It turns out that the network density is much lower for batman mice than it is for normal mice, so you conclude that raising mice in the darkness causes lower network density. Seems reasonable.</p>
+<p>The problem is that network density is correlated with pretty much every other network feature you could have used. For example, just looking at the heatmap above, you can see that it’s lower for more modularity; higher with a greater clustering coefficient; and much lower for smaller average path lengths. So, for instance, if you measured modularity instead of density, then you could have just as easily concluded that raising mice in total darkness causes their brains to have more well-defined clusters of neurons, and you’d then write an entire paper on the implications of that.</p>
 </div>
 </div>
 </div>
@@ -936,8 +919,8 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="figuring-out-which-edge-is-the-outlier">
 <h3><span class="section-number">4.3.2.1. </span>Figuring out which edge is the outlier<a class="headerlink" href="#figuring-out-which-edge-is-the-outlier" title="Permalink to this headline">¶</a></h3>
-<p>By design, we know that the edge between nodes 0 and 1 is an outlier - the probability that it’s there changes depending on whether your network is in the first or the second group. One common goal when using the bag of edges approach is finding signal edges: an edge whose probability of existing changes depending on which type of network you’re looking at. In our case, we’re trying to figure out (without using our prior knowledge) that the edge between nodes 0 and 1 is a signal edge.</p>
-<p>To find the outlier edge, we’ll first get the set of all edges, along with their indices. Since all of our networks are undirected, we’ll get the edges and their indices by finding all of the values in the the upper-triangular portion of the adjacency matrices.</p>
+<p>By design, you know that the edge between nodes 0 and 1 is an outlier - the probability that it’s there changes depending on whether your network is in the first or the second group. One common goal when using the bag of edges approach is finding signal edges: an edge whose probability of existing changes depending on which type of network you’re looking at. In your case, we’re trying to figure out (without using your prior knowledge) that the edge between nodes 0 and 1 is a signal edge.</p>
+<p>To find the outlier edge, you’ll first get the set of all edges, along with their indices. Since all of your networks are undirected, you’ll get the edges and their indices by finding all of the values in the the upper-triangular portion of the adjacency matrices.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -945,7 +928,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>Now, we’ll use a hypothesis test called <em>dcorr</em> to find the outlier edge. You don’t need to worry too much about what dcorr is; it’s essentially a hypothesis that is useful with networks, which doesn’t make any assumptions about the relationships between edges or the way your networks were randomly generated.</p>
+<p>Now, you’ll use a hypothesis test called <em>dcorr</em> to find the outlier edge. You don’t need to worry too much about what dcorr is; it’s essentially a hypothesis that is useful with networks, which doesn’t make any assumptions about the relationships between edges or the way your networks were randomly generated.</p>
 <p>In the code below, we:</p>
 <ol class="simple">
 <li><p>Loop through the edge indices</p></li>
@@ -973,15 +956,15 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.001, 0.334, 0.823])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.017, 1.   , 0.205])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="correcting-for-multiple-comparisons">
 <h4><span class="section-number">4.3.2.1.1. </span>Correcting for Multiple Comparisons<a class="headerlink" href="#correcting-for-multiple-comparisons" title="Permalink to this headline">¶</a></h4>
-<p>Because we are doing multiple tests, we’re running into a multiple comparisons problem here. If you’re not familiar with the idea of multiple comparisons in statistics, it is as follows. Suppose you have a test that estimates the probability of making a discovery (or, to be more rigorous, tells you whether you should reject the idea that you didn’t make a discovery). You run that test multiple times. If you run this test enough times, even if there’s no discovery to be made, eventually random chance will make it <em>seem</em> like you’ve made a discovery. So, the chance that you make a false discovery increases with the number of tests that you run. For example, say your test has a 5% false-positive rate, and you run this test 100 times. On average, there will be 5 false positives. If there was only one true positive in all of your data, and your test finds it, then you’ll end up with 6 positives total, 5 of which were false.</p>
-<p>We need to correct for this here because we’re doing a new test for each edge. There are a few standard ways to do this, but we’ll use something called the <em>Holm-Bonferroni correction</em>. Don’t worry about the details of this; all you need to know for now is that it corrects for the multiple comparisons problem by being a bit more conservative with what we classify as a positive result. This correction is implemented in the <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> library, a popular library for statistical tests and data exploration.</p>
+<p>Because you are doing multiple tests, we’re running into a multiple comparisons problem here. If you’re not familiar with the idea of multiple comparisons in statistics, it is as follows. Suppose you have a test that estimates the probability of making a discovery (or, to be more rigorous, tells you whether you should reject the idea that you didn’t make a discovery). You run that test multiple times. If you run this test enough times, even if there’s no discovery to be made, eventually random chance will make it <em>seem</em> like you’ve made a discovery. So, the chance that you make a false discovery increases with the number of tests that you run. For example, say your test has a 5% false-positive rate, and you run this test 100 times. On average, there will be 5 false positives. If there was only one true positive in all of your data, and your test finds it, then you’ll end up with 6 positives total, 5 of which were false.</p>
+<p>We need to correct for this here because we’re doing a new test for each edge. There are a few standard ways to do this, but you’ll use something called the <em>Holm-Bonferroni correction</em>. Don’t worry about the details of this; all you need to know for now is that it corrects for the multiple comparisons problem by being a bit more conservative with what you classify as a positive result. This correction is implemented in the <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> library, a popular library for statistical tests and data exploration.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
@@ -991,7 +974,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>You can see below that the corrected p-value for the edge connecting nodes 0 and 1 is still extremely small. We somewhat arbitrarily chose a value of .05 as the cutoff for determining an outlier, so we can say that any edge with a corrected p-value below .05 is an outlier edge. We’ve used the bag-of-edges approach to find an edge whose probability of existing changed depending on which group a network belongs to!</p>
+<p>You can see below that the corrected p-value for the edge connecting nodes 0 and 1 is still extremely small. We somewhat arbitrarily chose a value of .05 as the cutoff for determining an outlier, so you can say that any edge with a corrected p-value below .05 is an outlier edge. We’ve used the bag-of-edges approach to find an edge whose probability of existing changed depending on which group a network belongs to!</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corrected_pvals</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -999,7 +982,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.004, 0.668, 0.823])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.05, 1.  , 0.41])
 </pre></div>
 </div>
 </div>
@@ -1009,10 +992,10 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 <div class="section" id="bag-of-nodes">
 <h2><span class="section-number">4.3.3. </span>Bag of Nodes<a class="headerlink" href="#bag-of-nodes" title="Permalink to this headline">¶</a></h2>
-<p>Similarly to the bag of edges, you can treat all of the nodes as their own entity and do analysis on a bag of nodes. Much of this book will focus on the bag of nodes approach, because you’ll often use edge count, covariate information, and other things when you work with bags of nodes – and, although there’s still dependence between nodes, it generally isn’t as big of an issue. Most of the single-network methods we’ll use in this book will take the bag of nodes approach. What you’ll see repeatedly is that we take the nodes of a network and <em>embed</em> them so each node is associated with a point on a plot (this is called the Euclidean representation of the node). Then, you can use other methods from mainstream machine learning to learn about your network. We’ll get into this heavily in future chapters.</p>
+<p>Similarly to the bag of edges, you can treat all of the nodes as their own entity and do analysis on a bag of nodes. Much of this book will focus on the bag of nodes approach, because you’ll often use edge count, covariate information, and other things when you work with bags of nodes – and, although there’s still dependence between nodes, it generally isn’t as big of an issue. Most of the single-network methods you’ll use in this book will take the bag of nodes approach. What you’ll see repeatedly is that you take the nodes of a network and <em>embed</em> them so each node is associated with a point on a plot (this is called the Euclidean representation of the node). Then, you can use other methods from mainstream machine learning to learn about your network. We’ll get into this heavily in future chapters.</p>
 <p>We’ll also often associate node representation with community investigation. The idea is that sometimes you have groups of nodes which behave similarly – maybe they have a higher chance of being connected to each other, or maybe they’re all connected to certain other groups of nodes. Regardless of how you define communities, a community investigation motif will pop up: you get your node representation, then you associate nearby nodes to the same community. We can then look at the properties of the node belonging to a particular community, or look at relationships between communities of nodes.</p>
-<p>Since we’ll use the bag of nodes approach heavily throughout this book, you’ll be getting a much better sense for what you can do with it later. As a sneak preview right now, let’s generate a few networks and embed their nodes to get a feel for what bag-of-nodes type analysis might look like.</p>
-<p>Don’t worry about the specifics, but below we generate a simple network with two communities. Nodes in the same community have an 80% chance of being connected, whereas nodes in separate communities have a 20% chance of being connected. There are 20 nodes per community.</p>
+<p>Since you’ll use the bag of nodes approach heavily throughout this book, you’ll be getting a much better sense for what you can do with it later. As a sneak preview right now, let’s generate a few networks and embed their nodes to get a feel for what bag-of-nodes type analysis might look like.</p>
+<p>Don’t worry about the specifics, but below you generate a simple network with two communities. Nodes in the same community have an 80% chance of being connected, whereas nodes in separate communities have a 20% chance of being connected. There are 20 nodes per community.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
@@ -1025,7 +1008,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>Now, we’ll use graspologic to find the points in 2D space that each node is associated with. Again, don’t worry about the specifics: this will be heavily explained later in the book. All you have to know right now is that we’re moving the nodes of our network from network space, where each node is associated with a set of edges with other nodes, to 2D Euclidean space, where each node is associated with an x-coordinate and a y-coordinate.</p>
+<p>Now, you’ll use graspologic to find the points in 2D space that each node is associated with. Again, don’t worry about the specifics: this will be heavily explained later in the book. All you have to know right now is that we’re moving the nodes of your network from network space, where each node is associated with a set of edges with other nodes, to 2D Euclidean space, where each node is associated with an x-coordinate and a y-coordinate.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
@@ -1036,7 +1019,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>Below you can see the result, colored by community. Each of the dots in this plot is one of the nodes of our network. You can see that the nodes cluster into two groups: one group for the first community, and another group for the second community. Using this representation for the nodes of our network, we can open the door to later downstream machine learning tasks.</p>
+<p>Below you can see the result, colored by community. Each of the dots in this plot is one of the nodes of your network. You can see that the nodes cluster into two groups: one group for the first community, and another group for the second community. Using this representation for the nodes of your network, you can open the door to later downstream machine learning tasks.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span><span class="p">,</span> <span class="n">draw_cartesian</span><span class="p">,</span> <span class="n">add_circle</span><span class="p">,</span> <span class="n">text</span>
@@ -1061,7 +1044,7 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="section" id="bag-of-networks">
 <h2><span class="section-number">4.3.4. </span>Bag of Networks<a class="headerlink" href="#bag-of-networks" title="Permalink to this headline">¶</a></h2>
 <p>The last approach is the bag of networks, which you’d use when you have more than one network that you’re working with. Here, you’d study the networks as a whole and you’d want to test for differences across different networks or classify entire networks into one category or another. You might want to figure out if two networks were drawn from the same probability distribution, or whether you can find a smaller group of nodes that can represent the whole network, preserving its important properties. This is can be useful if you have extremely large networks, with millions of nodes.</p>
-<p>To showcase the bag of networks approach, let’s create a few networks. We’ll have one group of networks distributed the same way, and another group distributed differently. What we want to do is plot each network as a point in space, so that we can see the communities of networks directly.</p>
+<p>To showcase the bag of networks approach, let’s create a few networks. We’ll have one group of networks distributed the same way, and another group distributed differently. What you want to do is plot each network as a point in space, so that you can see the communities of networks directly.</p>
 <p>Both sets of networks will have two communities of nodes, but the first set will have slightly stronger within-community connections than the second. Each network will have 200 nodes in it, 100 for each community.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1088,7 +1071,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>Again, don’t worry too much yet about the process with which these networks were generated - that will all be explained in the next few chapters. All you need to get out of this code is that we have six networks from the first group, and another twelve networks from the second. You can see these networks in heatmap form below.</p>
+<p>Again, don’t worry too much yet about the process with which these networks were generated - that will all be explained in the next few chapters. All you need to get out of this code is that you have six networks from the first group, and another twelve networks from the second. You can see these networks in heatmap form below.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
@@ -1128,17 +1111,17 @@ const thebe_selector_output = ".output, .cell_output"
 <img alt="../../_images/network-representations_42_0.png" src="../../_images/network-representations_42_0.png" />
 </div>
 </div>
-<p>Now, we have to figure out some way of plotting each network as a point in space. Here’s a rough overview for how we’ll do it.</p>
-<p>First, we’ll take all of our networks and get a Euclidean location for each of their nodes. The nodes for all of the networks will exist in the same space, meaning their locations can be compared with each other. We’ll have a bunch of matrices, one for each network. Since each network has 200 nodes, and we’re embedding into 2-dimensional space, we’ll have six 200 by 2 matrices for the first group of networks, and another twelve 200 by 2 matrices for the second group.</p>
-<p>Now, we’ll look at pairwise dissimilarity for each matrix. The dissimilarity between the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> network is defined as the norm of the difference between the <span class="math notranslate nohighlight">\(i_{th}\)</span> matrix and the <span class="math notranslate nohighlight">\(j_{th}\)</span> matrix that we’ve created this way. You can think of this pairwise dissimilarity as just a number that tells you how different the representations for the nodes are between the two networks: a low number means the networks have very similar nodes, and a high number means the networks have very different nodes.</p>
-<p>Then, we’ll organize all of these pairwise dissimilarities into a dissimilarity <em>matrix</em>, where the <span class="math notranslate nohighlight">\(i, j_{th}\)</span> entry is the dissimilarity between the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> network. Embedding this <em>new</em> matrix will give us a point in space for each network.</p>
+<p>Now, you have to figure out some way of plotting each network as a point in space. Here’s a rough overview for how you’ll do it.</p>
+<p>First, you’ll take all of your networks and get a Euclidean location for each of their nodes. The nodes for all of the networks will exist in the same space, meaning their locations can be compared with each other. We’ll have a bunch of matrices, one for each network. Since each network has 200 nodes, and we’re embedding into 2-dimensional space, you’ll have six 200 by 2 matrices for the first group of networks, and another twelve 200 by 2 matrices for the second group.</p>
+<p>Now, you’ll look at pairwise dissimilarity for each matrix. The dissimilarity between the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> network is defined as the norm of the difference between the <span class="math notranslate nohighlight">\(i_{th}\)</span> matrix and the <span class="math notranslate nohighlight">\(j_{th}\)</span> matrix that we’ve created this way. You can think of this pairwise dissimilarity as just a number that tells you how different the representations for the nodes are between the two networks: a low number means the networks have very similar nodes, and a high number means the networks have very different nodes.</p>
+<p>Then, you’ll organize all of these pairwise dissimilarities into a dissimilarity <em>matrix</em>, where the <span class="math notranslate nohighlight">\(i, j_{th}\)</span> entry is the dissimilarity between the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> network. Embedding this <em>new</em> matrix will give us a point in space for each network.</p>
 <p>Again, don’t worry if you don’t understand the details: embedding and how it works will be explained in future chapters.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">OmnibusEmbed</span> <span class="k">as</span> <span class="n">OMNI</span>
 <span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">ClassicalMDS</span>
 
-<span class="c1"># Find a euclidean location for the nodes of all of our networks</span>
+<span class="c1"># Find a euclidean location for the nodes of all of your networks</span>
 <span class="n">omni</span> <span class="o">=</span> <span class="n">OMNI</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">omni_embedding</span> <span class="o">=</span> <span class="n">omni</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">first_group</span> <span class="o">+</span> <span class="n">second_group</span><span class="p">)</span>
 
@@ -1152,7 +1135,7 @@ const thebe_selector_output = ".output, .cell_output"
 </div>
 </div>
 </div>
-<p>You can see the dissimilarity matrix below, with values between 0 and 1 since we normalized it. As you can see, there are two groups, with the values for two networks in different groups having high dissimilarity, and the values for two networks in the same group having low dissimilarity. The diagonals of the matrix are all 0, because the dissimilarity between a network and itself is 0.</p>
+<p>You can see the dissimilarity matrix below, with values between 0 and 1 since you normalized it. As you can see, there are two groups, with the values for two networks in different groups having high dissimilarity, and the values for two networks in the same group having low dissimilarity. The diagonals of the matrix are all 0, because the dissimilarity between a network and itself is 0.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">heatmap</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Pairwise Dissimilarity Matrix&quot;</span><span class="p">);</span>
@@ -1163,12 +1146,13 @@ const thebe_selector_output = ".output, .cell_output"
 <img alt="../../_images/network-representations_46_0.png" src="../../_images/network-representations_46_0.png" />
 </div>
 </div>
-<p>Once we find the embedding for this dissimilarity matrix, we can plot each of the networks in space. In the plot below, each network represents a single point in space. We can easily see the two clusters, which represent the two types of networks we created. Since there are six networks of the first type and twelve of the second type, one of the clusters has six dots, and the other has twelve dots.</p>
+<p>Once you find the embedding for this dissimilarity matrix, you can plot each of the networks in space. In the plot below, each network represents a single point in space. We can easily see the two clusters, which represent the two types of networks you created. Since there are six networks of the first type and twelve of the second type, one of the clusters has six dots, and the other has twelve dots.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">12</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">draw_cartesian</span><span class="p">(</span><span class="n">xrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yrange</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">cmds_embedding</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">legend_</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Cluster&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Different groups of networks&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
 </pre></div>
 </div>
