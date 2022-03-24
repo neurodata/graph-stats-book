@@ -1,0 +1,89 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+    return future.result()
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import numpy as np
+from graspologic.simulations import sbm
+from graspologic.embed import AdjacencySpectralEmbed as ASE
+
+# construct network
+n = 100
+B = np.array([[0.5, 0.35, 0.2],
+              [0.35, 0.6, 0.3],
+              [0.2, 0.3, 0.65]])
+
+# Create a network from and SBM, then embed
+A, labels = sbm([n, n, n], p=B, return_labels=True)
+ase = ASE()
+X = ase.fit_transform(A)
+
+# Let's say we know that the first five nodes belong to the first community.
+# We'll say that those are our seed nodes.
+seeds = np.ones(5)
+
+# grab a set of seed nodes
+memberships = labels.copy() + 1
+mask = np.zeros(memberships.shape)
+seed_idx = np.arange(len(seeds))
+mask[seed_idx] = 1
+memberships[~mask.astype(bool)] = 0
+
+# find the latent positions for the seed nodes
+seed_latents = X[memberships.astype(bool)]
+------------------
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+Input [0;32mIn [1][0m, in [0;36m<cell line: 2>[0;34m()[0m
+[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01msimulations[39;00m [38;5;28;01mimport[39;00m sbm
+[1;32m      3[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01membed[39;00m [38;5;28;01mimport[39;00m AdjacencySpectralEmbed [38;5;28;01mas[39;00m ASE
+[1;32m      5[0m [38;5;66;03m# construct network[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/__init__.py:9[0m, in [0;36m<module>[0;34m[0m
+[1;32m      7[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01membed[39;00m
+[1;32m      8[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01minference[39;00m
+[0;32m----> 9[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mlayouts[39;00m
+[1;32m     10[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmodels[39;00m
+[1;32m     11[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mnominate[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/layouts/__init__.py:6[0m, in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [38;5;66;03m# Copyright (c) Microsoft Corporation.[39;00m
+[1;32m      2[0m [38;5;66;03m# Licensed under the MIT license.[39;00m
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mclasses[39;00m [38;5;28;01mimport[39;00m NodePosition
+[0;32m----> 6[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mcolors[39;00m [38;5;28;01mimport[39;00m categorical_colors, sequential_colors
+[1;32m      7[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mrender[39;00m [38;5;28;01mimport[39;00m save_graph, show_graph
+[1;32m      9[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mauto[39;00m [38;5;28;01mimport[39;00m layout_tsne, layout_umap  [38;5;66;03m# isort:skip[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/layouts/colors.py:36[0m, in [0;36m<module>[0;34m[0m
+[1;32m     32[0m     dark: Dict[Any, Any] [38;5;241m=[39m thematic_json[[38;5;124m"[39m[38;5;124mdark[39m[38;5;124m"[39m]
+[1;32m     33[0m     [38;5;28;01mreturn[39;00m light, dark
+[0;32m---> 36[0m _CACHED_LIGHT, _CACHED_DARK [38;5;241m=[39m [43m_load_thematic_json[49m[43m([49m[38;5;28;43;01mNone[39;49;00m[43m)[49m
+[1;32m     39[0m [38;5;28;01mdef[39;00m [38;5;21m_get_colors[39m(light_background: [38;5;28mbool[39m, theme_path: Optional[[38;5;28mstr[39m]) [38;5;241m-[39m[38;5;241m>[39m Dict[Any, Any]:
+[1;32m     40[0m     light [38;5;241m=[39m _CACHED_LIGHT
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/layouts/colors.py:29[0m, in [0;36m_load_thematic_json[0;34m(path)[0m
+[1;32m     26[0m     include_path [38;5;241m=[39m pkg_resources[38;5;241m.[39mresource_filename(__package__, [38;5;124m"[39m[38;5;124minclude[39m[38;5;124m"[39m)
+[1;32m     27[0m     colors_path [38;5;241m=[39m os[38;5;241m.[39mpath[38;5;241m.[39mjoin(include_path, [38;5;124m"[39m[38;5;124mcolors-100.json[39m[38;5;124m"[39m)
+[0;32m---> 29[0m [38;5;28;01mwith[39;00m [38;5;28;43mopen[39;49m[43m([49m[43mcolors_path[49m[43m)[49m [38;5;28;01mas[39;00m thematic_json_io:
+[1;32m     30[0m     thematic_json [38;5;241m=[39m json[38;5;241m.[39mload(thematic_json_io)
+[1;32m     31[0m light: Dict[Any, Any] [38;5;241m=[39m thematic_json[[38;5;124m"[39m[38;5;124mlight[39m[38;5;124m"[39m]
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/layouts/include/colors-100.json'
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/layouts/include/colors-100.json'
+
