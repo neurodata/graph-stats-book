@@ -710,21 +710,26 @@ const thebe_selector_output = ".output, .cell_output"
 <p>In this case, the simplest possible thing to do would be to say, for any two students in our network, there is some probability (which we will call <span class="math notranslate nohighlight">\(p\)</span>) that describes how likely they are to be friends. In the below example, for the sake of argument, we will let <span class="math notranslate nohighlight">\(p=0.3\)</span>. What does a sample from this network look like?</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">er_np</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># network with 50 nodes</span>
+<span class="n">p</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># probability of an edge existing is .3</span>
+
+<span class="c1"># sample a single simple adjacency matrix from ER(50, .3)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">er_np</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(0.3) Simulation&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="nn">Input In [1],</span> in <span class="ni">&lt;cell line: 2&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ER(0.3) Simulation&quot;</span><span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;A&#39; is not defined
-</pre></div>
-</div>
+<img alt="../../_images/single-network-models_ER_2_0.png" src="../../_images/single-network-models_ER_2_0.png" />
 </div>
 </div>
 <p>As we mentioned in the preface for this chapter, every statisical model in this book will come down to the coin flip model. In network machine learning, we get to see an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> whose entries <span class="math notranslate nohighlight">\(a_{ij}\)</span> are one if the students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are friends on the social networking site, and <span class="math notranslate nohighlight">\(0\)</span> if the students <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are not friends on the social networking site. Just like we had a random coin <span class="math notranslate nohighlight">\(\mathbf x\)</span> which behaved like a <span class="math notranslate nohighlight">\(Bern(p)\)</span> coin from the collection <span class="math notranslate nohighlight">\(\{Bern(q) : q \text{ is a probability between \)</span>0<span class="math notranslate nohighlight">\( and \)</span>1<span class="math notranslate nohighlight">\(}\}\)</span>, we will assume that the network <span class="math notranslate nohighlight">\(A\)</span> is a sample of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which behaves like an element of a collection of random neworks. This might seem like a big stretch, so let’s try to put it into perspective.</p>
@@ -769,6 +774,9 @@ const thebe_selector_output = ".output, .cell_output"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_5_0.png" src="../../_images/single-network-models_ER_5_0.png" />
+</div>
 </div>
 <p>Above, we visualize the network using a heatmap. The dark squares indicate that an edge exists between a pair of nodes, and white squares indicate that an edge does not exist between a pair of nodes.</p>
 <p>Next, let’s see what happens when we use a higher edge probability, like <span class="math notranslate nohighlight">\(p=0.7\)</span>:</p>
@@ -783,6 +791,9 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$ER_</span><span class="si">{10}</span><span class="s2">(0.7)$ Simulation&quot;</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_8_0.png" src="../../_images/single-network-models_ER_8_0.png" />
 </div>
 </div>
 <p>As the edge probability increases, the sampled adjacency matrix tends to indicate that there are more connections in the network. This is because there is a higher chance of an edge existing when <span class="math notranslate nohighlight">\(p\)</span> is larger.</p>
@@ -815,6 +826,9 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">ax</span><span class="p">;</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_ER_11_0.png" src="../../_images/single-network-models_ER_11_0.png" />
 </div>
 </div>
 <p>This is an enormous quantity! When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(6\)</span>, the number of possible networks is <span class="math notranslate nohighlight">\(2^{\binom 6 2} = 2^{6}\)</span> which is over <span class="math notranslate nohighlight">\(32,000\)</span>. When <span class="math notranslate nohighlight">\(n\)</span> is <span class="math notranslate nohighlight">\(15\)</span>, the number of posssible networks balloons up to <span class="math notranslate nohighlight">\(2^{\binom{15}{2}} = 2^{105}\)</span> which is over <span class="math notranslate nohighlight">\(10^{30}\)</span>. As the number of nodes increases, the number of possible network balloons really, really fast!</p>
