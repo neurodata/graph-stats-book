@@ -17,80 +17,135 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import matplotlib.pyplot as plt
-from graphbook_code import heatmap, cmaps
-import seaborn as sns
+import numpy as np
+from graspologic.simulations import rdpg
 
-def rm_ticks(ax, x=False, y=False, **kwargs):
-    if x is not None:
-        ax.axes.xaxis.set_visible(x)
-    if y is not None:
-        ax.axes.yaxis.set_visible(y)
-    sns.despine(ax=ax, **kwargs)
 
-fig = plt.figure();
-
-# adjacency matrices
-perturbed_points = {5, 6}
-for i in range(time_points):
-    if i not in perturbed_points:
-        ax = fig.add_axes([.02*i, -.02*i, .8, .8])
-    else:
-        ax = fig.add_axes([.02*i+.8, -.02*i, .8, .8])
-    ax = heatmap(networks[i], ax=ax, cbar=False)
-    if i == 0:
-        ax.set_title("Ten Normal Time Points", loc="left", fontsize=16)
-    if i == 5:
-        ax.set_title("Two Perturbed Time Points", loc="left", fontsize=16)
-    rm_ticks(ax, top=False, right=False)
+def gen_timepoint(X, perturbed=False, n_perturbed=20):
+    if perturbed:
+        X = np.squeeze(X)
+        baseline = np.array([1, -1, 0])
+        delta = np.repeat(baseline, (n_perturbed//2, 
+                                     n_perturbed//2, 
+                                     nodes-n_perturbed))
+        X += (delta * .15)
+    if X.ndim == 1:
+        X = X[:, np.newaxis]
+    A = rdpg(X)
+    return A
     
-plt.figtext(1, -.3, "Figure 8.1")
-fig.suptitle("Network Timeseries Data", fontsize=24, x=1);
+
+time_points = 12
+nodes = 100
+X = np.random.uniform(.2, .8, size=nodes)
+networks = []
+
+for time in range(time_points - 2):
+    A = gen_timepoint(X)
+    networks.append(A)
+
+for perturbed_time in range(5, 7):
+    A = gen_timepoint(X, perturbed=True)
+    networks.insert(perturbed_time, A)
+    
+networks = np.array(networks)
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mImportError[0m                               Traceback (most recent call last)
-Input [0;32mIn [2][0m, in [0;36m<cell line: 2>[0;34m()[0m
-[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mmatplotlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01mpyplot[39;00m [38;5;28;01mas[39;00m [38;5;21;01mplt[39;00m
-[0;32m----> 2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraphbook_code[39;00m [38;5;28;01mimport[39;00m heatmap, cmaps
-[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mseaborn[39;00m [38;5;28;01mas[39;00m [38;5;21;01msns[39;00m
-[1;32m      5[0m [38;5;28;01mdef[39;00m [38;5;21mrm_ticks[39m(ax, x[38;5;241m=[39m[38;5;28;01mFalse[39;00m, y[38;5;241m=[39m[38;5;28;01mFalse[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs):
+Input [0;32mIn [1][0m, in [0;36m<cell line: 2>[0;34m()[0m
+[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01msimulations[39;00m [38;5;28;01mimport[39;00m rdpg
+[1;32m      5[0m [38;5;28;01mdef[39;00m [38;5;21mgen_timepoint[39m(X, perturbed[38;5;241m=[39m[38;5;28;01mFalse[39;00m, n_perturbed[38;5;241m=[39m[38;5;241m20[39m):
+[1;32m      6[0m     [38;5;28;01mif[39;00m perturbed:
 
-File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/__init__.py:30[0m, in [0;36m<module>[0;34m[0m
-[1;32m     28[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mutils[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
-[1;32m     29[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01msiem[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
-[0;32m---> 30[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01msbm[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
-[1;32m     31[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mier[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/__init__.py:8[0m, in [0;36m<module>[0;34m[0m
+[1;32m      6[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mdatasets[39;00m
+[1;32m      7[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01membed[39;00m
+[0;32m----> 8[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01minference[39;00m
+[1;32m      9[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mlayouts[39;00m
+[1;32m     10[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmodels[39;00m
 
-File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graphbook_code/sbm.py:39[0m, in [0;36m<module>[0;34m[0m
-[1;32m     37[0m [38;5;28;01mfrom[39;00m [38;5;21;01mpandas[39;00m [38;5;28;01mimport[39;00m DataFrame
-[1;32m     38[0m [38;5;28;01mfrom[39;00m [38;5;21;01mhyppo[39;00m[38;5;21;01m.[39;00m[38;5;21;01mksample[39;00m [38;5;28;01mimport[39;00m KSample
-[0;32m---> 39[0m [38;5;28;01mfrom[39;00m [38;5;21;01mFisherExact[39;00m [38;5;28;01mimport[39;00m fisher_exact
-[1;32m     42[0m [38;5;28;01mdef[39;00m [38;5;21m_check_common_inputs[39m(
-[1;32m     43[0m     n_components: Optional[[38;5;28mint[39m],
-[1;32m     44[0m     min_comm: [38;5;28mint[39m,
-[0;32m   (...)[0m
-[1;32m     47[0m     embed_kws: Dict[[38;5;28mstr[39m, Any],
-[1;32m     48[0m ) [38;5;241m-[39m[38;5;241m>[39m [38;5;28;01mNone[39;00m:
-[1;32m     49[0m     [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(n_components, [38;5;28mint[39m) [38;5;129;01mand[39;00m n_components [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/inference/__init__.py:4[0m, in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [38;5;66;03m# Copyright (c) Microsoft Corporation and contributors.[39;00m
+[1;32m      2[0m [38;5;66;03m# Licensed under the MIT License.[39;00m
+[0;32m----> 4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mlatent_distribution_test[39;00m [38;5;28;01mimport[39;00m latent_distribution_test
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mlatent_position_test[39;00m [38;5;28;01mimport[39;00m latent_position_test
+[1;32m      7[0m __all__ [38;5;241m=[39m [[38;5;124m"[39m[38;5;124mlatent_position_test[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mlatent_distribution_test[39m[38;5;124m"[39m]
 
-File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/FisherExact/__init__.py:14[0m, in [0;36m<module>[0;34m[0m
-[1;32m      1[0m [38;5;66;03m# FisherExact Copyright (C) 2016  Emmanuel Noutahi[39;00m
-[1;32m      2[0m [38;5;66;03m# This program is free software: you can redistribute it and/or modify[39;00m
-[1;32m      3[0m [38;5;66;03m# it under the terms of the GNU General Public License as published by[39;00m
-[0;32m   (...)[0m
-[1;32m     11[0m [38;5;66;03m# You should have received a copy of the GNU General Public License[39;00m
-[1;32m     12[0m [38;5;66;03m# along with this program.  If not, see <http://www.gnu.org/licenses/>.[39;00m
-[0;32m---> 14[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mFisher[39;00m [38;5;28;01mimport[39;00m fisher_exact
-[1;32m     15[0m __all__ [38;5;241m=[39m [[38;5;124m'[39m[38;5;124mfisher_exact[39m[38;5;124m'[39m]
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/inference/latent_distribution_test.py:7[0m, in [0;36m<module>[0;34m[0m
+[1;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01mtyping[39;00m [38;5;28;01mimport[39;00m Any, Callable, NamedTuple, Optional, Union
+[1;32m      6[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 7[0m [38;5;28;01mfrom[39;00m [38;5;21;01mhyppo[39;00m[38;5;21;01m.[39;00m[38;5;21;01mksample[39;00m [38;5;28;01mimport[39;00m KSample
+[1;32m      8[0m [38;5;28;01mfrom[39;00m [38;5;21;01mjoblib[39;00m [38;5;28;01mimport[39;00m Parallel, delayed
+[1;32m      9[0m [38;5;28;01mfrom[39;00m [38;5;21;01mscipy[39;00m [38;5;28;01mimport[39;00m stats
 
-File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/FisherExact/Fisher.py:4[0m, in [0;36m<module>[0;34m[0m
-[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mscipy[39;00m[38;5;21;01m.[39;00m[38;5;21;01mstats[39;00m [38;5;28;01mas[39;00m [38;5;21;01mss[39;00m
-[1;32m      3[0m [38;5;28;01mfrom[39;00m [38;5;21;01mscipy[39;00m[38;5;21;01m.[39;00m[38;5;21;01mspecial[39;00m [38;5;28;01mimport[39;00m gammaln [38;5;28;01mas[39;00m lgamma
-[0;32m----> 4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mstatlib[39;00m [38;5;28;01mimport[39;00m fexact [38;5;28;01mas[39;00m f
-[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mstatlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01mfexact[39;00m [38;5;28;01mimport[39;00m fisher_exact [38;5;28;01mas[39;00m f_exact
-[1;32m      6[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mstatlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01masa159[39;00m [38;5;28;01mimport[39;00m rcont2
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/__init__.py:1[0m, in [0;36m<module>[0;34m[0m
+[0;32m----> 1[0m [38;5;28;01mimport[39;00m [38;5;21;01mhyppo[39;00m[38;5;21;01m.[39;00m[38;5;21;01mdiscrim[39;00m
+[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mhyppo[39;00m[38;5;21;01m.[39;00m[38;5;21;01mindependence[39;00m
+[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mhyppo[39;00m[38;5;21;01m.[39;00m[38;5;21;01mksample[39;00m
 
-[0;31mImportError[0m: numpy.core.multiarray failed to import
-ImportError: numpy.core.multiarray failed to import
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/discrim/__init__.py:1[0m, in [0;36m<module>[0;34m[0m
+[0;32m----> 1[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mdiscrim_one_samp[39;00m [38;5;28;01mimport[39;00m DiscrimOneSample
+[1;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mdiscrim_two_samp[39;00m [38;5;28;01mimport[39;00m DiscrimTwoSample
+[1;32m      4[0m __all__ [38;5;241m=[39m [s [38;5;28;01mfor[39;00m s [38;5;129;01min[39;00m [38;5;28mdir[39m()]
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/discrim/discrim_one_samp.py:5[0m, in [0;36m<module>[0;34m[0m
+[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[1;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01mscipy[39;00m[38;5;21;01m.[39;00m[38;5;21;01m_lib[39;00m[38;5;21;01m.[39;00m[38;5;21;01m_util[39;00m [38;5;28;01mimport[39;00m MapWrapper
+[0;32m----> 5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m_utils[39;00m [38;5;28;01mimport[39;00m _CheckInputs
+[1;32m      6[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mbase[39;00m [38;5;28;01mimport[39;00m DiscriminabilityTest
+[1;32m      7[0m [38;5;28;01mfrom[39;00m [38;5;21;01msklearn[39;00m[38;5;21;01m.[39;00m[38;5;21;01mutils[39;00m [38;5;28;01mimport[39;00m check_random_state
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/discrim/_utils.py:4[0m, in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[1;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01msklearn[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmetrics[39;00m [38;5;28;01mimport[39;00m pairwise_distances
+[0;32m----> 4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m.[39;00m[38;5;21;01mtools[39;00m [38;5;28;01mimport[39;00m check_ndarray_xy, check_reps, contains_nan, convert_xy_float64
+[1;32m      7[0m [38;5;28;01mclass[39;00m [38;5;21;01m_CheckInputs[39;00m:
+[1;32m      8[0m     [38;5;124;03m"""Checks inputs for discriminability tests"""[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/tools/__init__.py:4[0m, in [0;36m<module>[0;34m[0m
+[1;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mindep_sim[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[1;32m      3[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mksample_sim[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[0;32m----> 4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mpower[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mtime_series_sim[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[1;32m      7[0m __all__ [38;5;241m=[39m [s [38;5;28;01mfor[39;00m s [38;5;129;01min[39;00m [38;5;28mdir[39m() [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m s[38;5;241m.[39mstartswith([38;5;124m"[39m[38;5;124m_[39m[38;5;124m"[39m)]
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/tools/power.py:5[0m, in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mmath[39;00m [38;5;28;01mimport[39;00m ceil
+[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m.[39;00m[38;5;21;01mindependence[39;00m [38;5;28;01mimport[39;00m INDEP_TESTS
+[1;32m      6[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m.[39;00m[38;5;21;01mksample[39;00m [38;5;28;01mimport[39;00m KSAMP_TESTS, KSample, k_sample_transform
+[1;32m      7[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m.[39;00m[38;5;21;01md_variate[39;00m [38;5;28;01mimport[39;00m MULTI_TESTS
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/independence/__init__.py:3[0m, in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m_utils[39;00m [38;5;28;01mimport[39;00m sim_matrix
+[1;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mcca[39;00m [38;5;28;01mimport[39;00m CCA
+[0;32m----> 3[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mdcorr[39;00m [38;5;28;01mimport[39;00m Dcorr
+[1;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mhhg[39;00m [38;5;28;01mimport[39;00m HHG
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mhsic[39;00m [38;5;28;01mimport[39;00m Hsic
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/independence/dcorr.py:2[0m, in [0;36m<module>[0;34m[0m
+[1;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m----> 2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mnumba[39;00m [38;5;28;01mimport[39;00m jit
+[1;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m.[39;00m[38;5;21;01mtools[39;00m [38;5;28;01mimport[39;00m check_perm_blocks_dim, chi2_approx, compute_dist
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m_utils[39;00m [38;5;28;01mimport[39;00m _CheckInputs
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/numba/__init__.py:200[0m, in [0;36m<module>[0;34m[0m
+[1;32m    197[0m     [38;5;28;01mreturn[39;00m [38;5;28;01mFalse[39;00m
+[1;32m    199[0m _ensure_llvm()
+[0;32m--> 200[0m [43m_ensure_critical_deps[49m[43m([49m[43m)[49m
+[1;32m    202[0m [38;5;66;03m# we know llvmlite is working as the above tests passed, import it now as SVML[39;00m
+[1;32m    203[0m [38;5;66;03m# needs to mutate runtime options (sets the `-vector-library`).[39;00m
+[1;32m    204[0m [38;5;28;01mimport[39;00m [38;5;21;01mllvmlite[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/numba/__init__.py:140[0m, in [0;36m_ensure_critical_deps[0;34m()[0m
+[1;32m    138[0m     [38;5;28;01mraise[39;00m [38;5;167;01mImportError[39;00m([38;5;124m"[39m[38;5;124mNumba needs NumPy 1.18 or greater[39m[38;5;124m"[39m)
+[1;32m    139[0m [38;5;28;01melif[39;00m numpy_version [38;5;241m>[39m ([38;5;241m1[39m, [38;5;241m21[39m):
+[0;32m--> 140[0m     [38;5;28;01mraise[39;00m [38;5;167;01mImportError[39;00m([38;5;124m"[39m[38;5;124mNumba needs NumPy 1.21 or less[39m[38;5;124m"[39m)
+[1;32m    142[0m [38;5;28;01mtry[39;00m:
+[1;32m    143[0m     [38;5;28;01mimport[39;00m [38;5;21;01mscipy[39;00m
+
+[0;31mImportError[0m: Numba needs NumPy 1.21 or less
+ImportError: Numba needs NumPy 1.21 or less
 

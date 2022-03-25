@@ -17,43 +17,24 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graspologic.plot import heatmap
-import numpy as np
-import matplotlib.pyplot as plt
-from graphbook_code import ier
+import graspologic as gp
 
-n = 5
-P_hum = np.random.beta(size=n*n, a=3, b=8).reshape(n, n)
-P_hum = (P_hum + P_hum.T)/2
-P_hum = P_hum - np.diag(np.diag(P_hum))
 
-nodenames = ["Occipital", "Frontal", "Temporal", "Frontal", "Insula"]
-E = np.array([[0,1,1,1,1], [1,0,0,0,0], [1,0,0,0,0], [1,0,0,0,0], [1,0,0,0,0]], dtype=bool)
-P_ast = np.copy(P_hum)
+n = 10  # number of nodes
+nsims = 200  # number of networks to simulate
+p = 0.4
 
-P_ast[E] = np.sqrt(P_ast[E])  # probabilities for signal edges are higher in astronauts than humans
-
-Ahum = ier(P_hum, loops=False, directed=False)
-Aast = ier(P_ast, loops=False, directed=False)
-
-fig, axs = plt.subplots(1, 2, figsize=(20, 6))
-
-heatmap(Ahum, ax=axs[0], xticklabels=[0.5, 1.5, 2.5, 3.5, 4.5],
-                yticklabels=[0.5, 1.5, 2.5, 3.5, 4.5], title="Earthling Brain Network")
-heatmap(Aast, ax=axs[1], xticklabels=[0.5, 1.5, 2.5, 3.5, 4.5],
-                yticklabels=[0.5, 1.5, 2.5, 3.5, 4.5], title="Astronaut Brain Network")
-axs[0].set_xticklabels(nodenames);
-axs[1].set_xticklabels(nodenames);
-axs[0].set_yticklabels(nodenames);
-axs[1].set_yticklabels(nodenames);
+As = [gp.simulations.er_np(n, p, directed=False, loops=False) for i in range(0, nsims)]  # realizations
+fit_models = [gp.models.EREstimator(directed=False, loops=False).fit(A) for A in As]  # fit ER models
+hatps = [model.p_ for model in fit_models]  # the probability parameters
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mImportError[0m                               Traceback (most recent call last)
-Input [0;32mIn [1][0m, in [0;36m<cell line: 1>[0;34m()[0m
-[0;32m----> 1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mplot[39;00m [38;5;28;01mimport[39;00m heatmap
-[1;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
-[1;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mmatplotlib[39;00m[38;5;21;01m.[39;00m[38;5;21;01mpyplot[39;00m [38;5;28;01mas[39;00m [38;5;21;01mplt[39;00m
+Input [0;32mIn [8][0m, in [0;36m<cell line: 1>[0;34m()[0m
+[0;32m----> 1[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m [38;5;28;01mas[39;00m [38;5;21;01mgp[39;00m
+[1;32m      4[0m n [38;5;241m=[39m [38;5;241m10[39m  [38;5;66;03m# number of nodes[39;00m
+[1;32m      5[0m nsims [38;5;241m=[39m [38;5;241m200[39m  [38;5;66;03m# number of networks to simulate[39;00m
 
 File [0;32m/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/graspologic/__init__.py:8[0m, in [0;36m<module>[0;34m[0m
 [1;32m      6[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mdatasets[39;00m
