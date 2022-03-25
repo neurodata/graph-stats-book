@@ -694,25 +694,39 @@ const thebe_selector_output = ".output, .cell_output"
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="stochastic-block-models-sbm">
 <h1><span class="section-number">5.3. </span>Stochastic Block Models (SBM)<a class="headerlink" href="#stochastic-block-models-sbm" title="Permalink to this headline">¶</a></h1>
-<p>Let’s imagine that we have <span class="math notranslate nohighlight">\(100\)</span> students, each of whom can go to one of two possible schools: school one or school two. Our network has <span class="math notranslate nohighlight">\(100\)</span> nodes, and each node represents a single student. The edges of this network represent whether a pair of students are friends. Intuitively, if two students go to the same school, the probably have a higher chance of being friends than if they do not go to the same school. If we were to try to characterize this using an ER random network, we would run into a problem: we have no way to capture the impact that school has on friendships. Intuitively, there must be a better way!</p>
+<p>Let’s imagine that we have <span class="math notranslate nohighlight">\(100\)</span> students, each of whom can go to one of two possible schools: school one or school two. Our network has <span class="math notranslate nohighlight">\(100\)</span> nodes, and each node represents a single student. The edges of this network represent whether a pair of students are friends. Intuitively, if two students go to the same school, the probably have a higher chance of being friends than if they do not go to the same school. If we were to try to characterize this using an ER random network, we would run into a problem: we have no way to capture the impact that school has on friendships. To do this, we need to build upon our ER model to make things a little more complicated.</p>
 <p>The Stochastic Block Model, or SBM, captures this idea by assigning each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities. A <strong>community</strong> is a group of nodes within the network. In our example case, the communities would represent the schools that students are able to attend. We use <span class="math notranslate nohighlight">\(K\)</span> here to just denote an integer greater than <span class="math notranslate nohighlight">\(1\)</span> (for example, in the school example we gave above, <span class="math notranslate nohighlight">\(K\)</span> is <span class="math notranslate nohighlight">\(2\)</span>) for the number of <em>possible</em> communities that nodes could be members of. In an SBM, instead of describing all pairs of nodes with a fixed probability like with the ER model, we instead describe properties that hold for edges between <em>pairs of communities</em>. In our example, what this means is that if two students go to school one, the probability that they are friends might be different than if the two students went to school two, or if one student went to school one and the other to school two. Let’s take a look at what a realization of this setup we have described might look like:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
-<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
 
 <span class="n">ns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>  <span class="c1"># network with 50 nodes</span>
 <span class="n">B</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]]</span>  <span class="c1"># probability of an edge existing is .3</span>
 
 <span class="c1"># sample a single simple adjacency matrix from ER(50, .3)</span>
 <span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ns</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)]</span>
+<span class="n">zs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SBM_n(z, B)$ Simulation&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_2_0.png" src="../../_images/single-network-models_SBM_2_0.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [2],</span> in <span class="ni">&lt;cell line: 2&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SBM_n(z, B)$ Simulation&quot;</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;ys&#39; is not defined
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="defining-the-paramaters-of-an-sbm-random-network">
@@ -735,7 +749,7 @@ const thebe_selector_output = ".output, .cell_output"
     \end{bmatrix}
 \end{align*}\]</div>
 <p>Each of the entries of <span class="math notranslate nohighlight">\(B\)</span>, which we denote as <span class="math notranslate nohighlight">\(b_{kl}\)</span> in the above matrix, is a probability of an edge existing between a node in community <span class="math notranslate nohighlight">\(k\)</span> and a node in community <span class="math notranslate nohighlight">\(l\)</span>.</p>
-<p>Fortunately, we can also think of this formulation of a random network using coin flips. In our mini example above, if node <span class="math notranslate nohighlight">\(1\)</span> is in community <span class="math notranslate nohighlight">\(1\)</span> (since <span class="math notranslate nohighlight">\(z_1 = 1\)</span>) and node <span class="math notranslate nohighlight">\(2\)</span> is in community <span class="math notranslate nohighlight">\(1\)</span> (since <span class="math notranslate nohighlight">\(z_2 = 1\)</span>), we have a weighted coin which has a probability <span class="math notranslate nohighlight">\(b_{11}\)</span> (the first row, first column of the block matrix above) of landing on heads, and a <span class="math notranslate nohighlight">\(1 - b_{11}\)</span> chance of landing on tails. An edge between nodes one and two exists if the weighted coin lands on heads, and does not exist if that weighted coin lands on tails. If we wanted to describe an edge between nodes one and three instead, note that <span class="math notranslate nohighlight">\(z_3 = 2\)</span>. Therefore, we use the entry <span class="math notranslate nohighlight">\(b_{12}\)</span> as the probability of obtaining a heads for the weighted coin we flip this time. In the general case, to use the block matrix to obtain the probability of an edge <span class="math notranslate nohighlight">\((i, j)\)</span> existing between any pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> in our network, we will flip a coin with probability <span class="math notranslate nohighlight">\(b_{z_i z_j}\)</span>, where <span class="math notranslate nohighlight">\(z_i\)</span> is the community assignment for the <span class="math notranslate nohighlight">\(i^{th}\)</span> node and <span class="math notranslate nohighlight">\(z_j\)</span> is the community assignment for the <span class="math notranslate nohighlight">\(j^{th}\)</span> node.</p>
+<p>Fortunately, we can also think of this formulation of a random network using coin flips. In our mini example above, if node <span class="math notranslate nohighlight">\(1\)</span> is in community <span class="math notranslate nohighlight">\(1\)</span> (since <span class="math notranslate nohighlight">\(z_1 = 1\)</span>) and node <span class="math notranslate nohighlight">\(2\)</span> is in community <span class="math notranslate nohighlight">\(1\)</span> (since <span class="math notranslate nohighlight">\(z_2 = 1\)</span>), we have a weighted coin which has a probability <span class="math notranslate nohighlight">\(b_{11}\)</span> (the first row, first column of the block matrix above) of landing on heads, and a <span class="math notranslate nohighlight">\(1 - b_{11}\)</span> chance of landing on tails. An edge between nodes one and two exists if the weighted coin lands on heads, and does not exist if that weighted coin lands on tails. If we wanted to describe an edge between nodes one and three instead, note that <span class="math notranslate nohighlight">\(z_3 = 2\)</span>. Therefore, we use the entry <span class="math notranslate nohighlight">\(b_{12}\)</span> as the probability of obtaining a heads for the weighted coin we flip this time. In the general case, to use the block matrix to obtain the probability of an edge <span class="math notranslate nohighlight">\((i, j)\)</span> existing between any pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, we will flip a coin with probability <span class="math notranslate nohighlight">\(b_{z_i z_j}\)</span>, where <span class="math notranslate nohighlight">\(z_i\)</span> is the community assignment for the <span class="math notranslate nohighlight">\(i^{th}\)</span> node and <span class="math notranslate nohighlight">\(z_j\)</span> is the community assignment for the <span class="math notranslate nohighlight">\(j^{th}\)</span> node.</p>
 <p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an SBM random network with <span class="math notranslate nohighlight">\(n\)</span> nodes, the community vector <span class="math notranslate nohighlight">\(\vec z\)</span>, and the block matrix <span class="math notranslate nohighlight">\(B\)</span>, we say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network.</p>
 </div>
 <div class="section" id="how-do-we-simulate-realizations-of-sbm-n-vec-z-b-random-networks">
@@ -788,17 +802,14 @@ const thebe_selector_output = ".output, .cell_output"
 
 <span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of students</span>
 
-<span class="c1"># tau is a column vector of 150 1s followed by 50 2s</span>
-<span class="c1"># this vector gives the school each of the 300 students are from</span>
-<span class="n">tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="c1"># z is a column vector of 50 1s followed by 50 2s</span>
+<span class="c1"># this vector gives the school each of the 100 students are from</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">1</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
 
-<span class="n">plot_tau</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Tau, Node Assignment Vector&quot;</span><span class="p">,</span>
+<span class="n">plot_tau</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">vec z$, Node Assignment Vector&quot;</span><span class="p">,</span>
         <span class="n">xlab</span><span class="o">=</span><span class="s2">&quot;Student&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_4_0.png" src="../../_images/single-network-models_SBM_4_0.png" />
 </div>
 </div>
 <p>So as we can see, the first <span class="math notranslate nohighlight">\(50\)</span> students are from the first school, and the second <span class="math notranslate nohighlight">\(50\)</span> students are from second school.</p>
@@ -843,9 +854,6 @@ const thebe_selector_output = ".output, .cell_output"
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_7_0.png" src="../../_images/single-network-models_SBM_7_0.png" />
-</div>
 </div>
 <p>As we can see, the matrix <span class="math notranslate nohighlight">\(B\)</span> is a symmetric block matrix, since our network is undirected. Finally, let’s sample a single network from the <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> with parameters <span class="math notranslate nohighlight">\(\vec z\)</span> and <span class="math notranslate nohighlight">\(B\)</span>:</p>
 <div class="cell docutils container">
@@ -860,9 +868,6 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SBM_n(z, B)$ Simulation&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_9_0.png" src="../../_images/single-network-models_SBM_9_0.png" />
 </div>
 </div>
 <p>The above network shows students, ordered by the school they are in (first school and the second school, respectively). As we can see in the above network, people from the first school are more connected than people from school <span class="math notranslate nohighlight">\(2\)</span>. Also, the connections between people from different schools (the <em>off-diagonal</em> blocks of the adjacency matrix, the lower left and upper right blocks) appear to be a bit <em>more sparse</em> (fewer edges) than connections betwen schools (the <em>on-diagonal</em> blocks of the adjacency matrix, the upper left and lower right blocks). The above heatmap can be described as <strong>modular</strong>: it has clear communities. Remember that the connections for each node are indicated by a single row, or a single column, of the adjacency matrix. The first half of the rows have strong connections with the first half of the columns, which indicates that the first half of students tend to be better friends with other students in the first half. We can duplicate this argument for the second half of students ot see that it seems reasonable to conclude that there are two communities of students here.</p>
@@ -880,9 +885,6 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">Aperm</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SBM_n(z, B)$ Simulation&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_11_0.png" src="../../_images/single-network-models_SBM_11_0.png" />
 </div>
 </div>
 <p>Now, the students are <em>not</em> organized according to school, because they have been randomly reordered. It becomes pretty tough to figure out whether there are communities just by looking at an adjacency matrix, unless you are looking at a network in which the nodes are <em>already arranged</em> in an order which respects the community structure. By an <em>order that respects the community structure</em>, we mean that the community assignment vector <span class="math notranslate nohighlight">\(\vec z\)</span> is arranged so that all of the nodes in the first community come first, followed by all of the nodes in the second community, followed by all of the nodes in the third community, so on and so forth up to the nodes of the community <span class="math notranslate nohighlight">\(K\)</span>.</p>
