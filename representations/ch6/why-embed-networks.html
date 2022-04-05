@@ -849,10 +849,197 @@ const thebe_selector_output = ".output, .cell_output"
 <div class="section" id="the-dimensions-are-intrinsically-linked">
 <h3><span class="section-number">6.2.1.1. </span>The dimensions are intrinsically linked<a class="headerlink" href="#the-dimensions-are-intrinsically-linked" title="Permalink to this headline">¶</a></h3>
 <p>If you are familiar with linear regression, you can understand another major problem when dealing with network data. Not only are there a <em>lot</em> of dimensions to network data, but these dimensions are <em>intrinsically linked</em> to one another.</p>
-<p>Let’s start you off by first doing a quick recap of a logistic regression problem. Let’s say that you have <span class="math notranslate nohighlight">\(100\)</span> lobsters, and you know that these lobsters are a mix of male and female lobsters. Lobsters are <em>indeterminate growers</em>, which means that they just keep growing as they get older and older. Of these lobsters, you know whether they are male or female, and you also know their age. As it turns out, male lobsters have <em>substantially</em> larger claws than female lobsters. You want to learn whether, given whether a lobster is male or female and its age, can you predict its claw size?</p>
-<p>Because the lobster keeps growing, its age is obviously going to be extremely impactful on the size of its claw. Also, because male lobsters have bigger claws than female lobsters, the biological sex of the lobster will be a big factor on the size of the claw. You come up with a model that the age and biological sex operate as predictors for the claw size. You do this by just saying that claw size is a function of biological sex and age. Perhaps, on average, being male tends to increase claw size by <span class="math notranslate nohighlight">\(2\)</span> inches on average, and every year of life tends to add another few millimeters to its claw size.</p>
-<p>When you force this through the wheel of linear regression like this, you are shortchanging yourself. You might be able to use your logistic regression to conclude that being male tends to make lobster claws larger, and being older tends to make lobster claws larger, but you will <em>totally miss</em> that for male lobsters who are old, the impact on claw size is a <em>lot</em> more! This is called an <em>interaction</em>, and the basic idea is that having a <em>set</em> of characteristics in conjunction (such as being both male <em>and</em> old) has a substantial role on your overall regression. If you steer clear of this when you do your linear regression, you have <em>completely</em> missed a valuable part of the system, and your algorithm won’t work quite as well as it could. If you add this additional term to your model (biological sex, age, <em>and</em> the interaction of biological sex with age) you will do a much better job at predicting claw size.</p>
-<p>All the same, networks have this sort of coupling of the edges. This is called <em>dependence</em>, which (without getting too technical), means that edges are related. Let’s imagine you have a social network of <span class="math notranslate nohighlight">\(100\)</span> students. Here, the nodes are the students, and the edges are whether or not a pair of students are friends. If you knew that the school president was extremely popular, then all of the edges in the network that are associated with the school president are also <em>interacting</em>, in that if you knew that an edge had a node which represented the school president, it would be <em>much</em> more likely to exist (since the school president has many friends). While this would be an extreme example, as you can see, these sorts of <em>dependences</em> permeate through the entire network. If Alice is friends with Bob and Bob is friends with Desean, it might make sense to think that Alice might be more likely to be friends with Desean too. This would be another type of edge interaction. This pattern just builds and builds in network data. Since there are an enormous number of edges to start with, and a similarly enormous number of interactions between edges and all of the other edges they tend to be associated with, successfully capturing the system underlying the network becomes a real headache.</p>
+<p>Let’s start you off by first doing a quick recap of a linear regression problem. Let’s say that you have <span class="math notranslate nohighlight">\(2560\)</span> lobsters, and you know that these lobsters are a mix of male and female lobsters. Lobsters are <em>indeterminate growers</em>, which means that they just keep growing as they get older and older. Of these lobsters, you know whether they are male or female, and you also know the total length of the lobster. As it turns out, male lobsters have <em>substantially</em> larger claws than female lobsters. You want to learn whether, given whether a lobster is male or female and its length, can you predict its claw size? Let’s start by importing in the dataset we will be using. You can find the data from Tonje Knutsen Sørdalen over <a class="reference external" href="https://datadryad.org/stash/dataset/doi:10.5061/dryad.m37pvmczq">here</a> if you want to have more information about how it was collected. You can download the data locally using python with the following commands:</p>
+<p>Let’s get to it:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+
+<span class="n">BOOK_ROOT</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/neurodata/graph-stats-book/&quot;</span>
+<span class="n">LOBST_DEST</span> <span class="o">=</span> <span class="s2">&quot;datasets&quot;</span>
+<span class="n">LOBST_URL</span> <span class="o">=</span> <span class="n">BOOK_ROOT</span> <span class="o">+</span> <span class="s2">&quot;master/network_machine_learning_in_python/representations/ch6/datasets&quot;</span>
+<span class="n">LOBST_NAME</span> <span class="o">=</span> <span class="s2">&quot;lobster.tsv&quot;</span>
+
+<span class="k">def</span> <span class="nf">fetch_lobster_data</span><span class="p">(</span><span class="n">lobst_url</span><span class="o">=</span><span class="n">LOBST_URL</span><span class="p">,</span> <span class="n">lobst_dest</span><span class="o">=</span><span class="n">LOBST_DEST</span><span class="p">,</span>
+                       <span class="n">lobst_name</span><span class="o">=</span><span class="n">LOBST_NAME</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">lobst_dest</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">lobst_dest</span><span class="p">)</span>
+    <span class="n">lobst_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lobst_dest</span><span class="p">,</span> <span class="n">lobst_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">lobst_file</span><span class="p">):</span>
+        <span class="n">lobst_tsv_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lobst_url</span><span class="p">,</span> <span class="n">lobst_name</span><span class="p">)</span>
+        <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">lobst_tsv_url</span><span class="p">,</span> <span class="n">lobst_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">lobst_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">lobst_dat</span> <span class="o">=</span> <span class="n">fetch_lobster_data</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">UnicodeDecodeError</span><span class="g g-Whitespace">                        </span>Traceback (most recent call last)
+<span class="nn">Input In [7],</span> in <span class="ni">&lt;cell line: 20&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span>         <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">lobst_tsv_url</span><span class="p">,</span> <span class="n">lobst_file</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span>     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">lobst_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">20</span> <span class="n">lobst_dat</span> <span class="o">=</span> <span class="n">fetch_lobster_data</span><span class="p">()</span>
+
+<span class="nn">Input In [7],</span> in <span class="ni">fetch_lobster_data</span><span class="nt">(lobst_url, lobst_dest, lobst_name)</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span>     <span class="n">lobst_tsv_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lobst_url</span><span class="p">,</span> <span class="n">lobst_name</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span>     <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">lobst_tsv_url</span><span class="p">,</span> <span class="n">lobst_file</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">18</span> <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">lobst_file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/util/_decorators.py:311,</span> in <span class="ni">deprecate_nonkeyword_arguments.&lt;locals&gt;.decorate.&lt;locals&gt;.wrapper</span><span class="nt">(*args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">305</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_allow_args</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">306</span>     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">307</span>         <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">),</span>
+<span class="g g-Whitespace">    </span><span class="mi">308</span>         <span class="ne">FutureWarning</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">309</span>         <span class="n">stacklevel</span><span class="o">=</span><span class="n">stacklevel</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">310</span>     <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">311</span> <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:680,</span> in <span class="ni">read_csv</span><span class="nt">(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, squeeze, prefix, mangle_dupe_cols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, error_bad_lines, warn_bad_lines, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options)</span>
+<span class="g g-Whitespace">    </span><span class="mi">665</span> <span class="n">kwds_defaults</span> <span class="o">=</span> <span class="n">_refine_defaults_read</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">666</span>     <span class="n">dialect</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">667</span>     <span class="n">delimiter</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">676</span>     <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;delimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span><span class="p">},</span>
+<span class="g g-Whitespace">    </span><span class="mi">677</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">678</span> <span class="n">kwds</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds_defaults</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">680</span> <span class="k">return</span> <span class="n">_read</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="n">kwds</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:575,</span> in <span class="ni">_read</span><span class="nt">(filepath_or_buffer, kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">572</span> <span class="n">_validate_names</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">574</span> <span class="c1"># Create the parser.</span>
+<span class="ne">--&gt; </span><span class="mi">575</span> <span class="n">parser</span> <span class="o">=</span> <span class="n">TextFileReader</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">577</span> <span class="k">if</span> <span class="n">chunksize</span> <span class="ow">or</span> <span class="n">iterator</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">578</span>     <span class="k">return</span> <span class="n">parser</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:933,</span> in <span class="ni">TextFileReader.__init__</span><span class="nt">(self, f, engine, **kwds)</span>
+<span class="g g-Whitespace">    </span><span class="mi">930</span>     <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;has_index_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwds</span><span class="p">[</span><span class="s2">&quot;has_index_names&quot;</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">932</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">:</span> <span class="n">IOHandles</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="ne">--&gt; </span><span class="mi">933</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_engine</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/io/parsers/readers.py:1235,</span> in <span class="ni">TextFileReader._make_engine</span><span class="nt">(self, f, engine)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1232</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1234</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">-&gt; </span><span class="mi">1235</span>     <span class="k">return</span> <span class="n">mapping</span><span class="p">[</span><span class="n">engine</span><span class="p">](</span><span class="n">f</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1236</span> <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1237</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/io/parsers/c_parser_wrapper.py:75,</span> in <span class="ni">CParserWrapper.__init__</span><span class="nt">(self, src, **kwds)</span>
+<span class="g g-Whitespace">     </span><span class="mi">72</span>     <span class="n">kwds</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">74</span> <span class="n">kwds</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensure_dtype_objs</span><span class="p">(</span><span class="n">kwds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<span class="ne">---&gt; </span><span class="mi">75</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">TextReader</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">77</span> <span class="bp">self</span><span class="o">.</span><span class="n">unnamed_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reader</span><span class="o">.</span><span class="n">unnamed_cols</span>
+<span class="g g-Whitespace">     </span><span class="mi">79</span> <span class="c1"># error: Cannot determine type of &#39;names&#39;</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:544,</span> in <span class="ni">pandas._libs.parsers.TextReader.__cinit__</span><span class="nt">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:633,</span> in <span class="ni">pandas._libs.parsers.TextReader._get_header</span><span class="nt">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:847,</span> in <span class="ni">pandas._libs.parsers.TextReader._tokenize_rows</span><span class="nt">()</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/pandas/_libs/parsers.pyx:1952,</span> in <span class="ni">pandas._libs.parsers.raise_parser_error</span><span class="nt">()</span>
+
+<span class="ne">UnicodeDecodeError</span>: &#39;utf-8&#39; codec can&#39;t decode byte 0xd8 in position 12811: invalid continuation byte
+</pre></div>
+</div>
+</div>
+</div>
+<p>Because lobsters tend to grow over their entire bodies, the size will tend to be associated with the claw size. Also, because male lobsters have bigger claws than female lobsters, the biological sex of the lobster will be a big factor on the size of the claw. Let’s take a look at how these relationships exist in our data, by looking at the size of the claw as a function of the size of the lobster, separated by biological sex:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Males&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;Females&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">}</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;TotalLength&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;CrusherClawWidth&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Sex&quot;</span><span class="p">,</span>
+               <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Total Length (TL)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Crusher Claw Width (CW)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Plot of Lobster Claw Dataset&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/why-embed-networks_15_0.png" src="../../_images/why-embed-networks_15_0.png" />
+</div>
+</div>
+<p>As you can see, it looks like larger lobsters tend to have larger claws, and male lobsters tend to have larger claws. As you can also see, the points do not really lie parallel: if a lobster is male, its claw increases at a <em>higher rate</em> with length than if a lobster is female.</p>
+<p>You come up with a model that the lobster size and biological sex operate as predictors for the claw size. You do this by just saying that claw size is a function of biological sex and length. Let’s do this with <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> OLS (ordinary least squares linear regression) function. We’ll take a look at the estimates of the parameters for how sex and length predict claw size:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+
+<span class="c1"># regression of claw width onto length and sex of lobster</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s1">&#39;CrusherClawWidth ~ TotalLength + Sex&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Intercept      -20.438015
+Sex[T.Males]     9.508218
+TotalLength      0.237113
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>The interpretation of the parameter for sex is that, if a lobster is a male, its claw tends to be <span class="math notranslate nohighlight">\(9.51\)</span> units larger than if the lobster was female, at a given length. The interpretation of the parameter for total length is that, with biological sex fixed, a single unit increase in the total length tends to increase its claw width by <span class="math notranslate nohighlight">\(.24\)</span> units. We can look at our prediction quality as well, by looking at the two lines we fit:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lobst_dat</span><span class="p">[</span><span class="s2">&quot;Predictions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;TotalLength&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Predictions&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Sex&quot;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">fig</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/why-embed-networks_19_0.png" src="../../_images/why-embed-networks_19_0.png" />
+</div>
+</div>
+<p>When you force this through the wheel of linear regression like this, you are shortchanging yourself. As you can see from the scatter plot, these lines are <em>totally</em> parallel, which doesn’t reflect the fact that the male lobster length/claw width relationship is steeper than for females. If we were to adjust the regression to allow for this <em>interaction</em> of length and biological sex, we would get a much better model:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+
+<span class="c1"># add interaction term between total length and sex</span>
+<span class="n">model_interact</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s1">&#39;CrusherClawWidth ~ TotalLength + Sex + TotalLength:Sex&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">)</span>
+<span class="n">model_interact</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lobst_dat</span><span class="p">[</span><span class="s2">&quot;Predictions (Interaction)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;TotalLength&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Predictions&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Sex&quot;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Males&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;Females&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">}</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;TotalLength&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;CrusherClawWidth&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Sex&quot;</span><span class="p">,</span>
+               <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Total Length (TL)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Crusher Claw Width (CW)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Plot of Lobster Claw Dataset, Interaction Model&quot;</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lobst_dat</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;TotalLength&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Predictions (Interaction)&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Sex&quot;</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/why-embed-networks_22_0.png" src="../../_images/why-embed-networks_22_0.png" />
+</div>
+</div>
+<p>The lines are no longer parallel, and as you can see, we are able to do a much better job of capturing that male lobster claw width increases with total length at a faster rate than for females. In this sense, there is a dependence of crusher claw width on the total length of the lobster, its biological sex, and the relationship between the total length and the biological sex.</p>
+<p>All the same, networks have this sort of interaction, too, but on a much wider scale. This is called <em>dependence</em>, which (without getting too technical), means that edges are related to one another. Let’s imagine you have a social network of <span class="math notranslate nohighlight">\(100\)</span> students. Here, the nodes are the students, and the edges are whether or not a pair of students are friends. If you knew that the school president was extremely popular, then all of the edges in the network that are associated with the school president are also <em>interacting</em>, in that if you knew that an edge had a node which represented the school president, it would be <em>much</em> more likely to exist (since the school president has many friends). While this would be an extreme example, as you can see, these sorts of <em>dependences</em> can permeate through the entire network. If Alice is friends with Bob and Bob is friends with Desean, it might make sense to think that Alice might be more likely to be friends with Desean too. This would be another type of edge interaction. This pattern just builds and builds in network data. Since there are an enormous number of edges to start with, and a similarly enormous number of interactions between edges and all of the other edges they tend to be associated with, successfully capturing the system underlying the network becomes a real headache.</p>
 </div>
 </div>
 <div class="section" id="how-do-you-embed-network-data">
@@ -909,9 +1096,6 @@ const thebe_selector_output = ".output, .cell_output"
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/why-embed-networks_18_0.png" src="../../_images/why-embed-networks_18_0.png" />
-</div>
 </div>
 <p>It’s good to emphasize here that you’re modeling our networks as <em>random dot-product graphs</em> (RDPGs). One implication is that you can think of a network as having some underlying probability distribution, and any specific network is one of many possible realizations of that distribution. It also means that each edge in our network has some <em>probability</em> of existing: nodes 0 and 3, for instance, may or may not have an edge. The concept of a latent position only works under the assumption that the network is drawn from an RDPG.</p>
 <div class="section" id="estimating-a-probability-matrix-from-the-estimated-patent-positions">
@@ -947,9 +1131,6 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">text</span><span class="p">(</span><span class="s2">&quot;.1&quot;</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="mf">.75</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/why-embed-networks_22_0.png" src="../../_images/why-embed-networks_22_0.png" />
 </div>
 </div>
 </div>
@@ -1043,9 +1224,6 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Latent Positions In The Same Community </span><span class="se">\n</span><span class="s2">Have A Higher Dot Product&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">22</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/why-embed-networks_25_0.png" src="../../_images/why-embed-networks_25_0.png" />
 </div>
 </div>
 <p>If you have an <em>estimate</em> for the latent positions, there’s math that shows that you get a pretty good estimate for the block probability matrix as well. In practice, that’s what you’re actually doing: getting an estimate of the latent positions with spectral embedding, then using those to do more downstream tasks or estimating block probability matrices.</p>
