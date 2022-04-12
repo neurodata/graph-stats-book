@@ -17,22 +17,59 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graspologic.models import SBMEstimator
+fig, axs = plt.subplots(1, 3, figsize=(18, 6))
 
-model = SBMEstimator(directed=False, loops=False)
-model.fit(A, y=y)
-Bhat = model.block_p_
-Phat = model.p_mat_
+heatmap(Phat,
+        inner_hier_labels=z,
+        vmin=0,
+        vmax=1,
+        font_scale=1.5,
+        title="$\hat P_{SBM}$",
+        ax=axs[0])
+
+P = 0.2*np.ones((n[0] + n[1], n[0] + n[1]))  # default entries to 0.2
+P[0:20,0:20] = 0.8  # B11
+P[20:40,20:40] = 0.8  # B22
+np.fill_diagonal(P, 0)  # loopless
+
+heatmap(P,
+        inner_hier_labels=y,
+        vmin=0,
+        vmax=1,
+        font_scale=1.5,
+        title="$P_{SBM}$",
+        ax=axs[1])
+
+heatmap(np.abs(Phat - P),
+        inner_hier_labels=y,
+        vmin=0,
+        vmax=1,
+        font_scale=1.5,
+        title="$|\hat P_{SBM} - P_{SBM}|$",
+        ax=axs[2])
+
+fig;
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-Input [0;32mIn [7][0m, in [0;36m<cell line: 4>[0;34m()[0m
-[1;32m      1[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmodels[39;00m [38;5;28;01mimport[39;00m SBMEstimator
-[1;32m      3[0m model [38;5;241m=[39m SBMEstimator(directed[38;5;241m=[39m[38;5;28;01mFalse[39;00m, loops[38;5;241m=[39m[38;5;28;01mFalse[39;00m)
-[0;32m----> 4[0m model[38;5;241m.[39mfit(A, y[38;5;241m=[39m[43my[49m)
-[1;32m      5[0m Bhat [38;5;241m=[39m model[38;5;241m.[39mblock_p_
-[1;32m      6[0m Phat [38;5;241m=[39m model[38;5;241m.[39mp_mat_
+Input [0;32mIn [9][0m, in [0;36m<cell line: 16>[0;34m()[0m
+[1;32m     13[0m P[[38;5;241m20[39m:[38;5;241m40[39m,[38;5;241m20[39m:[38;5;241m40[39m] [38;5;241m=[39m [38;5;241m0.8[39m  [38;5;66;03m# B22[39;00m
+[1;32m     14[0m np[38;5;241m.[39mfill_diagonal(P, [38;5;241m0[39m)  [38;5;66;03m# loopless[39;00m
+[1;32m     16[0m heatmap(P,
+[0;32m---> 17[0m         inner_hier_labels[38;5;241m=[39m[43my[49m,
+[1;32m     18[0m         vmin[38;5;241m=[39m[38;5;241m0[39m,
+[1;32m     19[0m         vmax[38;5;241m=[39m[38;5;241m1[39m,
+[1;32m     20[0m         font_scale[38;5;241m=[39m[38;5;241m1.5[39m,
+[1;32m     21[0m         title[38;5;241m=[39m[38;5;124m"[39m[38;5;124m$P_[39m[38;5;132;01m{SBM}[39;00m[38;5;124m$[39m[38;5;124m"[39m,
+[1;32m     22[0m         ax[38;5;241m=[39maxs[[38;5;241m1[39m])
+[1;32m     24[0m heatmap(np[38;5;241m.[39mabs(Phat [38;5;241m-[39m P),
+[1;32m     25[0m         inner_hier_labels[38;5;241m=[39my,
+[1;32m     26[0m         vmin[38;5;241m=[39m[38;5;241m0[39m,
+[0;32m   (...)[0m
+[1;32m     29[0m         title[38;5;241m=[39m[38;5;124m"[39m[38;5;124m$|[39m[38;5;124m\[39m[38;5;124mhat P_[39m[38;5;132;01m{SBM}[39;00m[38;5;124m - P_[39m[38;5;132;01m{SBM}[39;00m[38;5;124m|$[39m[38;5;124m"[39m,
+[1;32m     30[0m         ax[38;5;241m=[39maxs[[38;5;241m2[39m])
+[1;32m     32[0m fig
 
 [0;31mNameError[0m: name 'y' is not defined
 NameError: name 'y' is not defined
