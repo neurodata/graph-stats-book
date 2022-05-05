@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>&lt;no title&gt; &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>Single-Network Vertex Nomination &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <link href="../../_static/css/theme.css" rel="stylesheet">
   <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
@@ -52,6 +52,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -579,7 +581,29 @@ const thebe_selector_output = ".output, .cell_output"
                 <i class="fas fa-list"></i> Contents
             </div>
             <nav id="bd-toc-nav" aria-label="Page">
-                <ul class="simple visible nav section-nav flex-column">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#spectral-vertex-nomination">
+   Spectral Vertex Nomination
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#finding-a-single-set-of-nominations">
+     Finding a single set of nominations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#finding-nominations-for-each-node">
+   Finding Nominations for Each Node
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   References
+  </a>
+ </li>
 </ul>
 
             </nav>
@@ -590,7 +614,7 @@ const thebe_selector_output = ".output, .cell_output"
         <div class="col-12 col-md-9 pl-md-3 pr-md-0">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1><no title></h1>
+                <h1>Single-Network Vertex Nomination</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -599,7 +623,29 @@ const thebe_selector_output = ".output, .cell_output"
                             <h2> Contents </h2>
                         </div>
                         <nav aria-label="Page">
-                            <ul class="simple visible nav section-nav flex-column">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#spectral-vertex-nomination">
+   Spectral Vertex Nomination
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#finding-a-single-set-of-nominations">
+     Finding a single set of nominations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#finding-nominations-for-each-node">
+   Finding Nominations for Each Node
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -609,7 +655,271 @@ const thebe_selector_output = ".output, .cell_output"
             
               <div>
                 
-  
+  <div class="tex2jax_ignore mathjax_ignore section" id="single-network-vertex-nomination">
+<h1>Single-Network Vertex Nomination<a class="headerlink" href="#single-network-vertex-nomination" title="Permalink to this headline">¶</a></h1>
+<p>Say you’re a criminal investigator trying to uncover a human trafficking ring. You build a network of potential suspects: some of the nodes in the network represent human traffickers, and some represent innocent people. The edges of the network represent a working relationship between a given pair of individuals.</p>
+<p>Your team has limited resources, and so it’s difficult to scrutinize everybody in the network directly to see if they are human traffickers. Ideally, you’d like to use your network to nominate potential suspects, so that you can prioritize your investigative efforts. You’ve already done some work: you have a list of a few nodes of the network who are known to be traffickers, and you have a list of a few who you know are not. Your goal, then, is to build an ordered list of nodes in the network that are most similar to the nodes you already know belong to human traffickers. Ideally, the first nodes in the list would be more likely to be traffickers, and the nodes would get less and less likely the further down in the list you go.</p>
+<p>This is the idea behind <em>single-network vertex nomination</em>. You have a group of “seed nodes” that you know have the right community membership, and then you take the rest of the nodes in your network and order them by their relationship to the seed nodes in terms of that community membership. A <strong>seed node</strong> is a node in a network for which we have information which we know to be true. The nomination task here isn’t just classification: it’s prioritization. You’re prioritizing how important the rest of your nodes are with respect to the seed nodes, with the most important nodes at the top.</p>
+<div class="section" id="spectral-vertex-nomination">
+<h2>Spectral Vertex Nomination<a class="headerlink" href="#spectral-vertex-nomination" title="Permalink to this headline">¶</a></h2>
+<p>There are a few approaches to vertex nomination. You can take a maximum likelihood approach, or a bayes-optimal approach - but what we’ll focus on is <em>Spectral Vertex Nomination</em>. The general idea is that you embed your network, and then you just order the latent positions by how close they are to the seed node latent positions. There are a few ways of doing this: you could create a <em>separate</em> set of nominees for each seed node, for instance. This would correspond to finding the people closest to <em>each</em> human trafficker, rather than finding a single list of nominees.</p>
+<p>You could also just get a single list of nominees: you could first take the centroid of the latent positions of your seed nodes, and then find the closest nodes to that <em>centroid</em>. There are also a few different ways of defining what it means to be “close” to seed node latent positions. The obvious way is Euclidean distance, which is what you’d traditionally think of as the distance between two points.</p>
+<p>In any case, all forms of Spectral Vertex Nomination involve finding embeddings and then taking distances. In contrast to the other approaches, it scales well with very large networks (since you’re essentially just doing an embedding followed by a simple calculation) and doesn’t require any prior knowledge of community membership.</p>
+<p>Let’s see what spectral vertex nomination looks like. We begin by generating a network from an SBM with two communities, where the total number of nodes is <span class="math notranslate nohighlight">\(40\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
+
+<span class="c1"># construct network</span>
+<span class="n">nnodes</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]])</span>
+
+<span class="c1"># Create a network from and SBM</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">zs</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">([</span><span class="n">nnodes</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">nnodes</span><span class="o">//</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
+<span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">zs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SBM_n(z, B)$ Simulation&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/vertex-nomination_5_0.png" src="../../_images/vertex-nomination_5_0.png" />
+</div>
+</div>
+<p>Below, we see the latent positions for a network with two communities. We do a standard adjacency spectral embedding, and we end up with a set of latent positions. Our seed nodes - the ones whose community membership we know - are marked.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span> <span class="k">as</span> <span class="n">ASE</span>
+
+<span class="n">ase</span> <span class="o">=</span> <span class="n">ASE</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">ase</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># Let&#39;s say we know that the first five nodes belong to the first community.</span>
+<span class="c1"># We&#39;ll say that those are our seed nodes.</span>
+<span class="n">seeds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># grab a set of seed nodes</span>
+<span class="n">memberships</span> <span class="o">=</span> <span class="n">zs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">memberships</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">seed_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seeds</span><span class="p">))</span>
+<span class="n">mask</span><span class="p">[</span><span class="n">seed_idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">memberships</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># find the latent positions for the seed nodes</span>
+<span class="n">seed_latents</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">memberships</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">memberships</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Latent positions and seeds for an SBM </span><span class="se">\n</span><span class="s2">with two communities&quot;</span><span class="p">,</span> 
+                    <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#ff0000&quot;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Second Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;latent positions </span><span class="se">\n</span><span class="s2">for seed nodes&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mf">.55</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
+              <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">.45</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="p">});</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/vertex-nomination_8_0.png" src="../../_images/vertex-nomination_8_0.png" />
+</div>
+</div>
+<p>Now, we’d like to order the rest of the vertices in this network by their degree of similarity to the seed nodes. Remember that we talked about two ways of doing this: we could find a separate set of nominations for each seed node, or we could find a single set of nominations for all of the seed nodes. Let’s start by finding a single set, using the centroid.</p>
+<div class="section" id="finding-a-single-set-of-nominations">
+<h3>Finding a single set of nominations<a class="headerlink" href="#finding-a-single-set-of-nominations" title="Permalink to this headline">¶</a></h3>
+<p>Computing the centroid is as easy as just taking the mean value for the seed latent positions along each coordinate axis. Since our example is in 2 dimensions, we can just take our <span class="math notranslate nohighlight">\(m \times 2\)</span> matrix of seed latent positions and take the mean along the first axis to create a <span class="math notranslate nohighlight">\(1 \times 2\)</span> vector. That vector will be the centroid, and its location in Euclidean space will be right in the middle of the seeds. You can see the centroid (red star) along with the seed latent positions (red circles) below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">centroid</span> <span class="o">=</span> <span class="n">seed_latents</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">memberships</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Centroid for seed latent positions&quot;</span><span class="p">,</span> 
+                    <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span> <span class="s2">&quot;#ff0000&quot;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">);</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+             <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Second Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Centroid&quot;</span><span class="p">,</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.2</span><span class="p">),</span> 
+              <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.01</span><span class="p">,</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.05</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+              <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="p">});</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/vertex-nomination_13_0.png" src="../../_images/vertex-nomination_13_0.png" />
+</div>
+</div>
+<p>Now, all we do is order the rest of the latent positions (the blue dots in the figure above) by their distance to the centroid. The nodes corresponding to the closer latent positions will be higher up in our nomination list. Scikit-learn has a <code class="docutils literal notranslate"><span class="pre">NearestNeighbors</span></code> classifier, so we’ll just use that. Below, we fit the classifier to our latent positions matrix, then get our nominations using the <code class="docutils literal notranslate"><span class="pre">kneighbors</span></code> function. The latent positions closer to the centroid are more visible, and they get progressively less visible the further from the centroid they are.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+
+<span class="c1"># Find the nearest neighbors to the seeds, excluding other seeds</span>
+<span class="n">neighbors</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+<span class="n">neighbors</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">distances</span><span class="p">,</span> <span class="n">nominations</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">plot_latents</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nominations</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">distances</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    
+    <span class="n">alpha_</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">distances</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha_</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Second Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Nominations closer to the </span><span class="se">\n</span><span class="s2">centroid are more visible&quot;</span><span class="p">,</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.2</span><span class="p">),</span>
+            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+              <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.01</span><span class="p">,</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.05</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="p">});</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Nomination List&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/vertex-nomination_16_0.png" src="../../_images/vertex-nomination_16_0.png" />
+</div>
+</div>
+<p>Let’s look at the network directly, and see where our nominations tend to be. Below is a network colored by nomination rank: nodes that are better nominations (ranks near <span class="math notranslate nohighlight">\(1\)</span>) are more pink, and nodes that are lower in the nomination list are more purple. You can see that the higher up in the nomination list you get (more pink), the more well-connected nodes tend to be to the seed node.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">networkplot</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="n">plot</span> <span class="o">=</span> <span class="n">networkplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">node_hue</span><span class="o">=</span> <span class="n">nominations</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+            <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;ch:start=-.1,rot=.3&quot;</span><span class="p">,</span> <span class="n">edge_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Better nominations tend to be</span><span class="se">\n</span><span class="s2"> in the same group as the seed nodes&quot;</span><span class="p">,</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.2</span><span class="p">),</span> 
+              <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mf">.01</span><span class="p">,</span> <span class="n">centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mf">.05</span><span class="p">),</span> <span class="n">arrowprops</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;arrowstyle&quot;</span><span class="p">:</span> <span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="p">});</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Second Latent Dimension&quot;</span><span class="p">)</span>
+<span class="c1"># TODO: add colorbar</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &#39;Second Latent Dimension&#39;)
+</pre></div>
+</div>
+<img alt="../../_images/vertex-nomination_18_1.png" src="../../_images/vertex-nomination_18_1.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="finding-nominations-for-each-node">
+<h2>Finding Nominations for Each Node<a class="headerlink" href="#finding-nominations-for-each-node" title="Permalink to this headline">¶</a></h2>
+<p>Another approach, if we don’t want to combine the information from all of our seed nodes, is to create a different nomination list for each node. This would correspond to finding multiple sets of people close to <em>each</em> human trafficker, rather than finding a single set of people for the <em>group</em> of human traffickers. Graspologic does this natively; the only real difference between the two approaches is that we take the nearest neighbors of the centroid for the first method rather than for each individual. Because of this, we’ll just use graspologic directly, rather than showcasing the algorithm.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.nominate</span> <span class="kn">import</span> <span class="n">SpectralVertexNomination</span>
+
+<span class="c1"># Choose the number of nominations we want for each seed node</span>
+<span class="n">svn</span> <span class="o">=</span> <span class="n">SpectralVertexNomination</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">svn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># get nominations and distances for each seed index</span>
+<span class="n">nominations</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="n">svn</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">seed_idx</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Below you can see the nominations for each node. The first row contains the indices for each seed node, and each subsequent row contains the nearest neighbors for those seed nodes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nominations</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 0,  1,  2,  3,  4],
+       [42, 29, 29, 43, 14],
+       [43, 27, 28, 17, 31],
+       [ 3, 15, 13,  0,  9],
+       [12,  2,  1,  7, 45]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we plot the seed nodes each in their own color with a star, and plot the nominations for each seed node in the same color with a circle. Note that some of the nominations might not look maximally similar to their respective seed node, but this is because we are only visualizing the first and second latent dimensions. The other latent dimensions also factor into the nomination list, but we are not visualizing them here.</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;cyan&#39;</span><span class="p">,</span> <span class="s1">&#39;pink&#39;</span><span class="p">]</span>
+<span class="n">seed_color</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;lightgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;gold&#39;</span><span class="p">,</span> <span class="s1">&#39;cyan&#39;</span><span class="p">,</span> <span class="s1">&#39;pink&#39;</span><span class="p">]</span>
+
+<span class="n">fix</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">seed_latents</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
+             <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seed_group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nominations</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]):</span>
+    <span class="n">seed_group</span> <span class="o">=</span> <span class="n">seed_group</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seed_idx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">seed_group</span><span class="p">])]</span>
+    <span class="n">neighbors</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">seed_group</span><span class="p">,:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">neighbors</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">neighbors</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">seed_color</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">non_noms_bool</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nominations</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nnodes</span><span class="p">)]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">non_noms_bool</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">non_noms_bool</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;First Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Second Latent Dimension&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Nominees for each seed node&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/vertex-nomination_26_0.png" src="../../_images/vertex-nomination_26_0.png" />
+</div>
+</div>
+<p>These approaches are each useful in different situations depending on whether you want a single list of nominees or a list of nominees for each seed node.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p>theory papers:</p>
+<ul class="simple">
+<li><p>theory of consistency and Bayes optimality: On consistent vertex nomination schemes</p></li>
+<li><p>dealing with corrupted networks (e.g., not one-to-one correspondence): Vertex Nomination, Consistent Estimation, and Adversarial Modification</p></li>
+</ul>
+<p>applications papers:</p>
+<ul class="simple">
+<li><p>social networks: Vertex nomination via local neighborhood matching</p></li>
+<li><p>data associated with human trafficking: Vertex nomination schemes for membership prediction</p></li>
+</ul>
+</div>
+</div>
+
     <script type="text/x-thebe-config">
     {
         requestKernel: true,
