@@ -1,0 +1,949 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>10.3. Erdös-Rényi (ER) Random Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="10.4. Stochastic Block Models" href="sbms.html" />
+    <link rel="prev" title="10.2. Foundation" href="foundation.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../coverpage.html">
+                    Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What is network machine learning?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. How do we study networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
+     1.3. Types of Network Machine Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.4. Examples of applications
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
+     2.4. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch3/ch3.html">
+   3. End-to-end Business Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/big-picture.html">
+     3.1. Look at the Big Picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/get-the-data.html">
+     3.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/discover-and-visualize.html">
+     3.3. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/prepare-the-data.html">
+     3.4. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch4/ch4.html">
+   4. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/matrix-representations.html">
+     4.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/properties-of-networks.html">
+     4.2. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/network-representations.html">
+     4.3. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/regularization.html">
+     4.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch5/ch5.html">
+   5. Why Use Statistical Models?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/why-use-models.html">
+     5.1. Why Use Statistical Models?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">
+     5.2. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">
+     5.3. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">
+     5.4. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">
+     5.5. Inhomogeneous Erdos Renyi (IER) Random Network Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/multi-network-models.html">
+     5.6. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
+     5.7. Network Models with Covariates
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch6/ch6.html">
+   6. Learning Network Representations
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">
+     6.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/spectral-embedding.html">
+     6.2. Spectral Embedding Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_spectral.html">
+     6.3. Estimating Parameters for the RDPG
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/random-walk-diffusion-methods.html">
+     6.4. Random walk and diffusion-based methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/graph-neural-networks.html">
+     6.5. Graph Neural Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">
+     6.6. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">
+     6.7. Joint Representation Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch8/ch8.html">
+   7. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch9/ch9.html">
+   8. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Appendix
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch10/ch10.html">
+   9. Representations (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch10/alt-reps.html">
+     9.1. Alternative Network Representations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="ch11.html">
+   10. Network Model Theory
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="foundation.html">
+     10.2. Foundation
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     10.3. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sbms.html">
+     10.4. Stochastic Block Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rdpgs.html">
+     10.5. RDPGs and more general network models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch12/ch12.html">
+   11. Learning Representations Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch12/mle-theory.html">
+     11.1. Maximum Likelihood Estimate Theory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch12/spectral-theory.html">
+     11.2. Spectral Method Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/appendix/ch11/ers.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fappendix/ch11/ers.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/appendix/ch11/ers.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/appendix/ch11/ers.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#probability">
+   10.3.1. Probability
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#network-models-for-networks-which-aren-t-simple">
+   10.3.2. Network Models for networks which aren’t simple
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-has-loops-but-is-undirected">
+     10.3.2.1. Binary network model which has loops, but is undirected
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-loopless-but-directed">
+     10.3.2.2. Binary network model which is loopless, but directed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-has-loops-and-is-directed">
+     10.3.2.3. Binary network model which is has loops and is directed
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Erdös-Rényi (ER) Random Networks</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#probability">
+   10.3.1. Probability
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#network-models-for-networks-which-aren-t-simple">
+   10.3.2. Network Models for networks which aren’t simple
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-has-loops-but-is-undirected">
+     10.3.2.1. Binary network model which has loops, but is undirected
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-loopless-but-directed">
+     10.3.2.2. Binary network model which is loopless, but directed
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#binary-network-model-which-is-has-loops-and-is-directed">
+     10.3.2.3. Binary network model which is has loops and is directed
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="erdos-renyi-er-random-networks">
+<h1><span class="section-number">10.3. </span>Erdös-Rényi (ER) Random Networks<a class="headerlink" href="#erdos-renyi-er-random-networks" title="Permalink to this headline">#</a></h1>
+<p>The Erdös Rényi model formalizes this relatively simple situation with a single parameter and an <span class="math notranslate nohighlight">\(iid\)</span> assumption:</p>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Space</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(p\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p>Probability that an edge exists between a pair of nodes, which is identical for all pairs of nodes</p></td>
+</tr>
+</tbody>
+</table>
+<p>From here on out, when we talk about an Erdös Rényi random variable, we will simply call it an ER network. In an ER network, each pair of nodes is connected with probability <span class="math notranslate nohighlight">\(p\)</span>, and therefore not connected with probability <span class="math notranslate nohighlight">\(1-p\)</span>. Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(j &gt; i\)</span> (in terms of the adjacency matrix, this means all of the edges in the <em>upper right</em> triangle), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>. The word “independent” means that edges in the network occurring or not occurring do not affect one another. For instance, this means that if we knew a student named Alice was friends with Bob, and Alice was also friends with Chadwick, that we do not learn any information about whether Bob is friends with Chadwick. The word “identical” means that every edge in the network has the same probability <span class="math notranslate nohighlight">\(p\)</span> of being connected. If Alice and Bob are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, then Alice and Chadwick are friends with probability <span class="math notranslate nohighlight">\(p\)</span>, too. We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself. If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the adjacency matrix for an ER network with probability <span class="math notranslate nohighlight">\(p\)</span>, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim ER_n(p)\)</span>.</p>
+<p>Next, let’s formalize an example of one of the limitations of an ER random network. Remember that we said that ER random networks are often too simple. Well, one way in which they are simple is called <strong>degree homogeneity</strong>, which is a property in which <em>all</em> of the nodes in an ER network have the <em>exact</em> same expected node degree! What this means is that if we were to take an ER random network <span class="math notranslate nohighlight">\(\mathbf A\)</span>, we would expect that <em>all</em> of the nodes in the network had the same degree. Let’s see how this works:</p>
+<div class="admonition-working-out-the-expected-degree-in-an-erd-ouml-s-r-eacute-nyi-network admonition">
+<p class="admonition-title">Working Out the Expected Degree in an Erdös-Rényi Network</p>
+<p>Suppose that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a simple network which is random. The network has <span class="math notranslate nohighlight">\(n\)</span> nodes <span class="math notranslate nohighlight">\(\mathcal V = (v_i)_{i = 1}^n\)</span>. Recall that the in a simple network, the node degree is <span class="math notranslate nohighlight">\(deg(v_i) = \sum_{j = 1}^n \mathbf a_{ij}\)</span>. What is the expected degree of a node <span class="math notranslate nohighlight">\(v_i\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is Erdös-Rényi?</p>
+<p>To describe this, we will compute the expectated value of the degree <span class="math notranslate nohighlight">\(deg(v_i)\)</span>, written <span class="math notranslate nohighlight">\(\mathbb E\left[deg(v_i)\right]\)</span>. Let’s see what happens:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i)\right] &amp;= \mathbb E\left[\sum_{j = 1}^n \mathbf a_{ij}\right] \\
+    &amp;= \sum_{j = 1}^n \mathbb E[\mathbf a_{ij}]
+\end{align*}\]</div>
+<p>We use the <em>linearity of expectation</em> in the line above, which means that the expectation of a sum with a finite number of terms being summed over (<span class="math notranslate nohighlight">\(n\)</span>, in this case) is the sum of the expectations. Finally, by definition, all of the edges <span class="math notranslate nohighlight">\(A_{ij}\)</span> have the same distribution: <span class="math notranslate nohighlight">\(Bern(p)\)</span>. The expected value of a random quantity which takes a Bernoulli distribution is just the probability <span class="math notranslate nohighlight">\(p\)</span>. This means every term <span class="math notranslate nohighlight">\(\mathbb E[\mathbf a_{ij}] = p\)</span>. Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[deg(v_i)\right] &amp;= \sum_{j = 1}^n p = n\cdot p
+\end{align*}\]</div>
+<p>Since all of the <span class="math notranslate nohighlight">\(n\)</span> terms being summed have the same expected value. This holds for <em>every</em> node <span class="math notranslate nohighlight">\(v_i\)</span>, which means that the expected degree of all nodes is an undirected ER network is the same number, <span class="math notranslate nohighlight">\(n \cdot p\)</span>.</p>
+</div>
+<section id="probability">
+<h2><span class="section-number">10.3.1. </span>Probability<a class="headerlink" href="#probability" title="Permalink to this headline">#</a></h2>
+<p>What is the probability for realizations of Erdös-Rényi networks? Remember that for Independent-edge graphs, that the probability can be written:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr_{\theta}(A) &amp;= \prod_{j &gt; i} Pr_\theta(\mathbf{a}_{ij} = a_{ij})
+\end{align*}\]</div>
+<p>Next, we recall that by assumption of the ER model, that the probability matrix <span class="math notranslate nohighlight">\(P = (p)\)</span>, or that <span class="math notranslate nohighlight">\(p_{ij} = p\)</span> for all <span class="math notranslate nohighlight">\(i,j\)</span>. Therefore:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr_\theta(A) &amp;= \prod_{j &gt; i} p^{a_{ij}}(1 - p)^{1 - a_{ij}} \\
+    &amp;= p^{\sum_{j &gt; i} a_{ij}} \cdot (1 - p)^{\binom{n}{2} - \sum_{j &gt; i}a_{ij}} \\
+    &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}
+\end{align*}\]</div>
+<p>This means that the probability <span class="math notranslate nohighlight">\(Pr_\theta(A)\)</span> is a function <em>only</em> of the number of edges <span class="math notranslate nohighlight">\(m = \sum_{j &gt; i}a_{ij}\)</span> in the network represented by adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>. The equivalence class on the Erdös-Rényi networks are the sets:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    E_{i} &amp;= \left\{A \in \mathcal A_n : m = i\right\}
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(i\)</span> index from <span class="math notranslate nohighlight">\(0\)</span> (the minimum number of edges possible) all the way up to <span class="math notranslate nohighlight">\(n^2\)</span> (the maximum number of edges possible). All of the relationships for equivalence classes discussed above apply to the sets <span class="math notranslate nohighlight">\(E_i\)</span>.</p>
+</section>
+<section id="network-models-for-networks-which-aren-t-simple">
+<h2><span class="section-number">10.3.2. </span>Network Models for networks which aren’t simple<a class="headerlink" href="#network-models-for-networks-which-aren-t-simple" title="Permalink to this headline">#</a></h2>
+<p>To make the discussions a little more easy to handle, in the above descriptions and all our successive descriptions, we will describe network models for <strong>simple networks</strong>. To recap, networks which are simple are binary networks which are both loopless and undirected. Stated another way, simple networks are networks whose adjacency matrices are only <span class="math notranslate nohighlight">\(0\)</span>s and <span class="math notranslate nohighlight">\(1\)</span>s, they are hollow (the diagonal is entirely <em>0</em>), and symmetric (the lower and right triangles of the adjacency matrix are the <em>same</em>). What happens our networks don’t quite look this way?</p>
+<p>For now, we’ll keep the assumption that the networks are binary, but we will discuss non-binary network models in a later chapter. We have three possibilities we can consider, and we will show how the “relaxations” of the assumptions change a description of a network model. A <em>relaxation</em>, in statistician speak, means that we are taking the assumptions that we had (in this case, that the networks are <em>simple</em>), and progressively making the assumptions weaker (more <em>relaxed</em>) so that they apply to other networks, too. We split these out so we can be as clear as possible about how the generative model changes with each relaxation step.</p>
+<p>We will compare each relaxation to the statement about the generative model for the ER generative model. To recap, for a simple network, we wrote:</p>
+<p>“Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(j &gt; i\)</span> (in terms of the adjacency matrix, this means all of the nodes in the <em>upper right</em> triangle), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>….  We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.”</p>
+<p>Any additional parts that are added are expressed in <strong><font color='green'>green</font></strong> font. Omitted parts are struck through with <font color='red'><strike>red</strike></font> font.</p>
+<p>Note that these generalizations apply to <em>any</em> of the successive networks which we describe in the Network Models section, and not just the ER model!</p>
+<section id="binary-network-model-which-has-loops-but-is-undirected">
+<h3><span class="section-number">10.3.2.1. </span>Binary network model which has loops, but is undirected<a class="headerlink" href="#binary-network-model-which-has-loops-but-is-undirected" title="Permalink to this headline">#</a></h3>
+<p>Here, all we want to do is relax the assumption that the network is loopless. We simply ignore the statement that edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> cannot exist, and allow that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> which follow a Bernoulli distribution (with some probability which depends on the network model choice) <em>now</em> applies to <span class="math notranslate nohighlight">\(j \geq i\)</span>, and not just <span class="math notranslate nohighlight">\(j &gt; i\)</span>. We keep that an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> existing implies that <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists, which maintains the symmetry of <span class="math notranslate nohighlight">\(\mathbf A\)</span> (and consequently, the undirectedness of the network).</p>
+<p>Our description of the ER network changes to:</p>
+<p>Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(\mathbf{\color{green}{j \geq i}}\)</span> (in terms of the adjacency matrix, this means all of the nodes in the <em>upper right</em> triangle <strong><font color='green'>and the diagonal</font></strong>), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>….  We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. <font color='red'><strike>We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.</strike></font></p>
+</section>
+<section id="binary-network-model-which-is-loopless-but-directed">
+<h3><span class="section-number">10.3.2.2. </span>Binary network model which is loopless, but directed<a class="headerlink" href="#binary-network-model-which-is-loopless-but-directed" title="Permalink to this headline">#</a></h3>
+<p>Like above, we simply ignore the statement that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span>, which removes the symmetry of <span class="math notranslate nohighlight">\(\mathbf A\)</span> (and consequently, removes the undirectedness of the network). We allow that the <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> which follows a Bernoulli distribution now apply to <span class="math notranslate nohighlight">\(j \neq i\)</span>, and not just <span class="math notranslate nohighlight">\(j &gt; i\)</span>. We keep that <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>, which maintains the hollowness of <span class="math notranslate nohighlight">\(\mathbf A\)</span> (and consequently, the undirectedness of the network).</p>
+<p>Our description of the ER network changes to:</p>
+<p>Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> for every pair of nodes where <span class="math notranslate nohighlight">\(\mathbf{\color{green}{j \neq i}}\)</span> (in terms of the adjacency matrix, this means all of the nodes <strike><font color='red'>in the <em>upper right</em> triangle</font></strike><strong><font color='green'>which are not along the diagonal</font></strong>), that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>….  <font color='red'><strike>We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>.</strike></font> We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.</p>
+</section>
+<section id="binary-network-model-which-is-has-loops-and-is-directed">
+<h3><span class="section-number">10.3.2.3. </span>Binary network model which is has loops and is directed<a class="headerlink" href="#binary-network-model-which-is-has-loops-and-is-directed" title="Permalink to this headline">#</a></h3>
+<p>Finally, for a network which has loops and is directed, we combine the above two approaches. We ignore the statements that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = \mathbf a_{ij}\)</span>, and the statement that <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>.</p>
+<p>Our descriptiomn of the ER network changes to:</p>
+<p>Statistically, we say that for each edge <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span>  <font color='red'><strike>where <span class="math notranslate nohighlight">\(j &gt; i\)</span> (in terms of the adjacency matrix, this means all of the nodes in the <em>upper right</em> triangle)</strike></font>, that <span class="math notranslate nohighlight">\(\mathbf{a}_{ij}\)</span> is sampled independently and identically from a <em>Bernoulli</em> distribution with probability <span class="math notranslate nohighlight">\(p\)</span>, <font color='green'>for all possible combinations of nodes <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(i\)</span></font>. <font color='red'><strike>We assume here that the networks are undirected, which means that if an edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> exists from node <span class="math notranslate nohighlight">\(i\)</span> to <span class="math notranslate nohighlight">\(j\)</span>, then the edge <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> also exists from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span>. We also assume that the networks are loopless, which means that no edges <span class="math notranslate nohighlight">\(\mathbf a_{ii}\)</span> can go from node <span class="math notranslate nohighlight">\(i\)</span> to itself.</strike></font></p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./appendix/ch11"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="foundation.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">10.2. </span>Foundation</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="sbms.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">10.4. </span>Stochastic Block Models</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

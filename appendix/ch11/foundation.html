@@ -1,0 +1,972 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>10.2. Foundation &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="10.3. Erdös-Rényi (ER) Random Networks" href="ers.html" />
+    <link rel="prev" title="10. Network Model Theory" href="ch11.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../coverpage.html">
+                    Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What is network machine learning?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. How do we study networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
+     1.3. Types of Network Machine Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.4. Examples of applications
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
+     2.4. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch3/ch3.html">
+   3. End-to-end Business Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/big-picture.html">
+     3.1. Look at the Big Picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/get-the-data.html">
+     3.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/discover-and-visualize.html">
+     3.3. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/prepare-the-data.html">
+     3.4. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch4/ch4.html">
+   4. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/matrix-representations.html">
+     4.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/properties-of-networks.html">
+     4.2. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/network-representations.html">
+     4.3. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/regularization.html">
+     4.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch5/ch5.html">
+   5. Why Use Statistical Models?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/why-use-models.html">
+     5.1. Why Use Statistical Models?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">
+     5.2. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">
+     5.3. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">
+     5.4. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">
+     5.5. Inhomogeneous Erdos Renyi (IER) Random Network Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/multi-network-models.html">
+     5.6. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
+     5.7. Network Models with Covariates
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch6/ch6.html">
+   6. Learning Network Representations
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">
+     6.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/spectral-embedding.html">
+     6.2. Spectral Embedding Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_spectral.html">
+     6.3. Estimating Parameters for the RDPG
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/random-walk-diffusion-methods.html">
+     6.4. Random walk and diffusion-based methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/graph-neural-networks.html">
+     6.5. Graph Neural Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">
+     6.6. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">
+     6.7. Joint Representation Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch8/ch8.html">
+   7. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch9/ch9.html">
+   8. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Appendix
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch10/ch10.html">
+   9. Representations (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch10/alt-reps.html">
+     9.1. Alternative Network Representations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="ch11.html">
+   10. Network Model Theory
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     10.2. Foundation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="ers.html">
+     10.3. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="sbms.html">
+     10.4. Stochastic Block Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="rdpgs.html">
+     10.5. RDPGs and more general network models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch12/ch12.html">
+   11. Learning Representations Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch12/mle-theory.html">
+     11.1. Maximum Likelihood Estimate Theory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch12/spectral-theory.html">
+     11.2. Spectral Method Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/appendix/ch11/foundation.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fappendix/ch11/foundation.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/appendix/ch11/foundation.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/appendix/ch11/foundation.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#equivalence-classes">
+   10.2.1. Equivalence Classes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#independent-edge-random-networks">
+   10.2.2. Independent-Edge Random Networks
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Foundation</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#equivalence-classes">
+   10.2.1. Equivalence Classes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#independent-edge-random-networks">
+   10.2.2. Independent-Edge Random Networks
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="foundation">
+<h1><span class="section-number">10.2. </span>Foundation<a class="headerlink" href="#foundation" title="Permalink to this headline">#</a></h1>
+<p>To understand network models, it is crucial to understand the concept of a network as a random quantity, taking a probability distribution. We have a realization <span class="math notranslate nohighlight">\(A\)</span>, and we think that this realization is random in some way. Stated another way, we think that there exists a network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> that governs the realizations we get to see. Since <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random variable, we can describe it using a probability distribution. The distribution of the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is the function <span class="math notranslate nohighlight">\(Pr\)</span> which assigns probabilities to every possible configuration that <span class="math notranslate nohighlight">\(\mathbf A\)</span> could take. Notationally, we write that <span class="math notranslate nohighlight">\(\mathbf A \sim Pr\)</span>, which is read in words as “the random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is distributed according to <span class="math notranslate nohighlight">\(Pr\)</span>.”</p>
+<p>In the preceding description, we made a fairly substantial claim: <span class="math notranslate nohighlight">\(Pr\)</span> assigns probabilities to every possible configuration that realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, denoted by <span class="math notranslate nohighlight">\(A\)</span>, could take. How many possibilities are there for a network with <span class="math notranslate nohighlight">\(n\)</span> nodes? Let’s limit ourselves to simple networks: that is, <span class="math notranslate nohighlight">\(A\)</span> takes values that are unweighted (<span class="math notranslate nohighlight">\(A\)</span> is <em>binary</em>), undirected (<span class="math notranslate nohighlight">\(A\)</span> is <em>symmetric</em>), and loopless (<span class="math notranslate nohighlight">\(A\)</span> is <em>hollow</em>). In words, <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> is the set of all possible adjacency matrices <span class="math notranslate nohighlight">\(A\)</span> that correspond to simple networks with <span class="math notranslate nohighlight">\(n\)</span> nodes. Stated another way: every <span class="math notranslate nohighlight">\(A\)</span> that is found in <span class="math notranslate nohighlight">\(\mathcal A\)</span> is a <em>binary</em> <span class="math notranslate nohighlight">\(n \times n\)</span> matrix (<span class="math notranslate nohighlight">\(A \in \{0, 1\}^{n \times n}\)</span>), <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A = A^\top\)</span>), and <span class="math notranslate nohighlight">\(A\)</span> is <em>hollow</em> (<span class="math notranslate nohighlight">\(diag(A) = 0\)</span>, or <span class="math notranslate nohighlight">\(A_{ii} = 0\)</span> for all <span class="math notranslate nohighlight">\(i = 1,...,n\)</span>). We describe <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal A_n = \left\{A : A \textrm{ is an $n \times n$ matrix with $0$s and $1$s}, A\textrm{ is symmetric}, A\textrm{ is hollow}\right\}
+\end{align*}\]</div>
+<p>To summarize the statement that <span class="math notranslate nohighlight">\(Pr\)</span> assigns probabilities to every possible configuration that realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span> can take, we write that <span class="math notranslate nohighlight">\(Pr : \mathcal A_n \rightarrow [0, 1]\)</span>. This means that for any <span class="math notranslate nohighlight">\(A \in \mathcal A_n\)</span> which is a possible realization of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span>, that <span class="math notranslate nohighlight">\(Pr(\mathbf A = A)\)</span> is a probability (it takes a value between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>). If it is completely unambiguous what the random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> refers to, we might abbreviate <span class="math notranslate nohighlight">\(Pr(\mathbf A = A)\)</span> with <span class="math notranslate nohighlight">\(Pr(A)\)</span>. This statement can alternatively be read that the probability that the random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> takes the value <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(Pr(A)\)</span>. Finally, let’s address that question we had in the previous paragraph. How many possible adjacency matrices are in <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>?</p>
+<p>Let’s imagine what just one <span class="math notranslate nohighlight">\(A \in \mathcal A_n\)</span> can look like. Note that each matrix <span class="math notranslate nohighlight">\(A\)</span> has <span class="math notranslate nohighlight">\(n \times n = n^2\)</span> possible entries, in total, since <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix. There are <span class="math notranslate nohighlight">\(n\)</span> possible self-loops for a network, but since <span class="math notranslate nohighlight">\(\mathbf A\)</span> is simple, it is loopless. This means that we can subtract <span class="math notranslate nohighlight">\(n\)</span> possible edges from <span class="math notranslate nohighlight">\(n^2\)</span>, leaving us with <span class="math notranslate nohighlight">\(n^2 - n = n(n-1)\)</span> possible edges that might not be unconnected. If we think in terms of a realization <span class="math notranslate nohighlight">\(A\)</span>, this means that we are ignoring the diagonal entries <span class="math notranslate nohighlight">\(a_{ii}\)</span>, for all <span class="math notranslate nohighlight">\(i \in [n]\)</span>.  Remember that a simple network is also undirected. In terms of the realization <span class="math notranslate nohighlight">\(A\)</span>, this means that for every pair <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, that <span class="math notranslate nohighlight">\(a_{ij} = a_{ji}\)</span>. If we were to learn about an entry in the upper triangle of <span class="math notranslate nohighlight">\(A\)</span> where <span class="math notranslate nohighlight">\(a_{ij}\)</span> is such that <span class="math notranslate nohighlight">\(j &gt; i\)</span>, note that we have also learned what <span class="math notranslate nohighlight">\(a_{ji}\)</span> is, too. This symmetry of <span class="math notranslate nohighlight">\(A\)</span> means that of the <span class="math notranslate nohighlight">\(n(n-1)\)</span> entries that are not on the diagonal of <span class="math notranslate nohighlight">\(A\)</span>, we would, in fact, “double count” the possible number of unique values that <span class="math notranslate nohighlight">\(A\)</span> could have. This means that <span class="math notranslate nohighlight">\(A\)</span> has a total of <span class="math notranslate nohighlight">\(\frac{1}{2}n(n - 1)\)</span> possible entries which are <em>free</em>, which is equal to the expression <span class="math notranslate nohighlight">\(\binom{n}{2}\)</span>. Finally, note that for each entry of <span class="math notranslate nohighlight">\(A\)</span>, that the adjacency can take one of two possible values: <span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>. To write this down formally, for every possible edge which is randomly determined, we have <em>two</em> possible values that edge could take. Let’s think about building some intuition here:</p>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(2 \times 2\)</span>, there are <span class="math notranslate nohighlight">\(\binom{2}{2} = 1\)</span> unique entry of <span class="math notranslate nohighlight">\(A\)</span>, which takes one of <span class="math notranslate nohighlight">\(2\)</span> values. There are <span class="math notranslate nohighlight">\(2\)</span> possible ways that <span class="math notranslate nohighlight">\(A\)</span> could look:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \begin{bmatrix}
+        0 &amp; 1 \\
+        1 &amp; 0
+    \end{bmatrix}\textrm{ or }
+    \begin{bmatrix}
+        0 &amp; 0 \\
+        0 &amp; 0
+    \end{bmatrix}
+\end{align*}\]</div>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(3 \times 3\)</span>, there are <span class="math notranslate nohighlight">\(\binom{3}{2} = \frac{3 \times 2}{2} = 3\)</span> unique entries of <span class="math notranslate nohighlight">\(A\)</span>, each of which takes one of <span class="math notranslate nohighlight">\(2\)</span> values. There are <span class="math notranslate nohighlight">\(8\)</span> possible ways that <span class="math notranslate nohighlight">\(A\)</span> could look:</p></li>
+</ol>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+&amp;\begin{bmatrix}
+    0 &amp; 1 &amp; 1 \\
+    1 &amp; 0 &amp; 1 \\
+    1 &amp; 1 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 1 &amp; 0 \\
+    1 &amp; 0 &amp; 1 \\
+    0 &amp; 1 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 1 \\
+    0 &amp; 0 &amp; 1 \\
+    1 &amp; 1 &amp; 0
+    \end{bmatrix}
+    \textrm{ or }\\
+&amp;\begin{bmatrix}
+    0 &amp; 1 &amp; 1 \\
+    1 &amp; 0 &amp; 0 \\
+    1 &amp; 0 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 1 \\
+    0 &amp; 0 &amp; 0 \\
+    1 &amp; 0 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 1 \\
+    0 &amp; 1 &amp; 0
+    \end{bmatrix}\textrm{ or }\\
+&amp;\begin{bmatrix}
+    0 &amp; 1 &amp; 0 \\
+    1 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 0
+    \end{bmatrix}\textrm{ or }
+\begin{bmatrix}
+    0 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 0 \\
+    0 &amp; 0 &amp; 0
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>How do we generalize this to an arbitrary choice of <span class="math notranslate nohighlight">\(n\)</span>? The answer is to use <em>combinatorics</em>. Basically, the approach is to look at each entry of <span class="math notranslate nohighlight">\(A\)</span> which can take different values, and multiply the total number of possibilities by <span class="math notranslate nohighlight">\(2\)</span> for every element which can take different values. Stated another way, if there are <span class="math notranslate nohighlight">\(2\)</span> choices for each one of <span class="math notranslate nohighlight">\(x\)</span> possible items, we have <span class="math notranslate nohighlight">\(2^x\)</span> possible ways in which we could select those <span class="math notranslate nohighlight">\(x\)</span> items. But we already know how many different elements there are in <span class="math notranslate nohighlight">\(A\)</span>, so we are ready to come up with an expression for the number. In total, there are <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span> unique adjacency matrices in <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>. Stated another way, the <em>cardinality</em> of <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>, described by the expression <span class="math notranslate nohighlight">\(|\mathcal A_n|\)</span>, is <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span>. The <strong>cardinality</strong> here just means the number of elements that the set <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> contains. When <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(15\)</span>, note that <span class="math notranslate nohighlight">\(\left|\mathcal A_{15}\right| = 2^{\binom{15}{2}} = 2^{105}\)</span>, which when expressed as a power of <span class="math notranslate nohighlight">\(10\)</span>, is more than <span class="math notranslate nohighlight">\(10^{30}\)</span> possible networks that can be realized with just <span class="math notranslate nohighlight">\(15\)</span> nodes! As <span class="math notranslate nohighlight">\(n\)</span> increases, how many unique possible networks are there? In the below figure, look at the value of <span class="math notranslate nohighlight">\(|\mathcal A_n| = 2^{\binom n 2}\)</span> as a function of <span class="math notranslate nohighlight">\(n\)</span>. As we can see, as <span class="math notranslate nohighlight">\(n\)</span> gets big, <span class="math notranslate nohighlight">\(|\mathcal A_n|\)</span> grows really really fast!</p>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">comb</span>
+
+
+<span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">51</span><span class="p">)</span>
+<span class="n">logAn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">comb</span><span class="p">(</span><span class="n">ni</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">ni</span> <span class="ow">in</span> <span class="n">n</span><span class="p">])</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">logAn</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of Nodes&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of Possible Graphs $|A_n|$ (log scale)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">&quot;$10^{{</span><span class="si">{pow:d}</span><span class="s2">}}$&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">pow</span><span class="o">=</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">350</span><span class="p">]])</span>
+<span class="n">ax</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/foundation_2_0.png" src="../../_images/foundation_2_0.png" />
+</div>
+</div>
+<p>So, now we know that we have probability distributions on networks, and a set <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> which defines all of the adjacency matrices that every probability distribution must assign a probability to. Now, just what is a network model? A <strong>network model</strong> is a set <span class="math notranslate nohighlight">\(\mathcal P\)</span> of probability distributions on <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>. Stated another way, we can describe <span class="math notranslate nohighlight">\(\mathcal P\)</span> to be:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal P &amp;\subseteq \{Pr: Pr\textrm{ is a probability distribution on }\mathcal A_n\}
+\end{align*}\]</div>
+<p>In general, we will simplify <span class="math notranslate nohighlight">\(\mathcal P\)</span> through something called <em>parametrization</em>. We define <span class="math notranslate nohighlight">\(\Theta\)</span> to be the set of all possible parameters of the random network model, and <span class="math notranslate nohighlight">\(\theta \in \Theta\)</span> is a particular parameter choice that governs the parameters of a specific network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In this case, we will write <span class="math notranslate nohighlight">\(\mathcal P\)</span> as the set:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathcal P(\Theta) &amp;= \left\{Pr_\theta : \theta \in \Theta\right\}
+\end{align*}\]</div>
+<p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network that follows a network model, we will write that <span class="math notranslate nohighlight">\(\mathbf A \sim Pr_\theta\)</span>, for some arbitrary set of parameters <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
+<p>If you are used to traditional univariate or multivariate statistical modelling, an extremely natural choice for when you have a discrete sample space (like <span class="math notranslate nohighlight">\(\mathcal A_n\)</span>, which is discrete because we can count it) would be to use a categorical model. In the categorical model, we would have a single parameter for all possible configurations of an <span class="math notranslate nohighlight">\(n\)</span>-node network; that is, <span class="math notranslate nohighlight">\(|\theta| = \left|\mathcal A_n\right| = 2^{\binom n 2}\)</span>. What is wrong with this model? The limitations are two-fold:</p>
+<ol class="simple">
+<li><p>As we explained previously, when <span class="math notranslate nohighlight">\(n\)</span> is just <span class="math notranslate nohighlight">\(15\)</span>, we would need over <span class="math notranslate nohighlight">\(10^{30}\)</span> bits of storage just to define <span class="math notranslate nohighlight">\(\theta\)</span>. This amounts to more than <span class="math notranslate nohighlight">\(10^{8}\)</span> zetabytes, which exceeds the storage capacity of <em>the entire world</em>.</p></li>
+<li><p>With a single network observed (or really, any number of networks we could collect in the real world) we would never be able to get a reasonable estimate of <span class="math notranslate nohighlight">\(2^{\binom n 2}\)</span> parameters for any reasonably non-trivial number of nodes <span class="math notranslate nohighlight">\(n\)</span>. For the case of one observed network <span class="math notranslate nohighlight">\(A\)</span>, an estimate of <span class="math notranslate nohighlight">\(\theta\)</span> (referred to as <span class="math notranslate nohighlight">\(\hat\theta\)</span>) would simply be for <span class="math notranslate nohighlight">\(\hat\theta\)</span> to have a <span class="math notranslate nohighlight">\(1\)</span> in the entry corresponding to our observed network, and a <span class="math notranslate nohighlight">\(0\)</span> everywhere else. Inferentially, this would imply that the network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> which governs realizations <span class="math notranslate nohighlight">\(A\)</span> is deterministic, even if this is not the case. Even if we collected potentially <em>many</em> observed networks, we would still (with very high probability) just get <span class="math notranslate nohighlight">\(\hat \theta\)</span> as a series of point masses on the observed networks we see, and <span class="math notranslate nohighlight">\(0\)</span>s everywhere else. This would mean our parameter estimates <span class="math notranslate nohighlight">\(\hat\theta\)</span> would not generalize to new observations at <em>all</em>, with high probability.</p></li>
+</ol>
+<p>So, what are some more reasonable descriptions of <span class="math notranslate nohighlight">\(\mathcal P\)</span>? We explore some choices below. Particularly, we will be most interested in the <em>independent-edge</em> networks. These are the families of networks in which the generative procedure which governs the random networks assume that the edges of the network are generated <em>independently</em>. <strong>Statistical Independence</strong> is a property which greatly simplifies many of the modelling assumptions which are crucial for proper estimation and rigorous statistical inference, which we will learn more about in the later chapters.</p>
+<section id="equivalence-classes">
+<h2><span class="section-number">10.2.1. </span>Equivalence Classes<a class="headerlink" href="#equivalence-classes" title="Permalink to this headline">#</a></h2>
+<p>In all of the below models, we will explore the concept of the <strong>probability equivalence class</strong>, or an <em>equivalence class</em>, for short. The probability is a function which in general, describes how effective a particular observation can be described by a random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> with parameters <span class="math notranslate nohighlight">\(\theta\)</span>, written <span class="math notranslate nohighlight">\(\mathbf A \sim F(\theta)\)</span>. The probability will be used to describe the probability <span class="math notranslate nohighlight">\(Pr_\theta(\mathbf A)\)</span> of observing the realization <span class="math notranslate nohighlight">\(A\)</span> if the underlying random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span> has parameters <span class="math notranslate nohighlight">\(\theta\)</span>.  Why does this matter when it comes to equivalence classes? An equivalence class is a subset of the sample space <span class="math notranslate nohighlight">\(E \subseteq \mathcal A_n\)</span>, which has the following properties. Holding the parameters <span class="math notranslate nohighlight">\(\theta\)</span> fixed:</p>
+<ol class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A'\)</span> are members of the same equivalence class <span class="math notranslate nohighlight">\(E\)</span> (written <span class="math notranslate nohighlight">\(A, A' \in E\)</span>), then <span class="math notranslate nohighlight">\(Pr_\theta(A) = Pr_\theta(A')\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A''\)</span> are members of different equivalence classes; that is, <span class="math notranslate nohighlight">\(A \in E\)</span> and <span class="math notranslate nohighlight">\(A'' \in E'\)</span> where <span class="math notranslate nohighlight">\(E, E'\)</span> are equivalence classes, then <span class="math notranslate nohighlight">\(Pr_\theta(A) \neq Pr_\theta(A'')\)</span>.</p></li>
+<li><p>Using points 1 and 2, we can establish that if <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(E'\)</span> are two different equivalence classes, then <span class="math notranslate nohighlight">\(E \cap E' = \varnothing\)</span>. That is, the equivalence classes are <strong>mutually disjoint</strong>.</p></li>
+<li><p>We can use the preceding properties to deduce that given the sample space <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> and a probability function <span class="math notranslate nohighlight">\(Pr_\theta\)</span>, we can define a partition of the sample space into equivalence classes <span class="math notranslate nohighlight">\(E_i\)</span>, where <span class="math notranslate nohighlight">\(i \in \mathcal I\)</span> is an arbitrary indexing set. A <strong>partition</strong> of <span class="math notranslate nohighlight">\(\mathcal A_n\)</span> is a sequence of sets which are mutually disjoint, and whose union is the whole space. That is, <span class="math notranslate nohighlight">\(\bigcup_{i \in \mathcal I} E_i = \mathcal A_n\)</span>.</p></li>
+</ol>
+<p>We will see more below about how the equivalence classes come into play with network models, and in a later section, we will see their relevance to the estimation of the parameters <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
+</section>
+<section id="independent-edge-random-networks">
+<span id="representations-whyuse-networkmodels-iern"></span><h2><span class="section-number">10.2.2. </span>Independent-Edge Random Networks<a class="headerlink" href="#independent-edge-random-networks" title="Permalink to this headline">#</a></h2>
+<p>The below models are all special families of something called <strong>independent-edge random networks</strong>. An independent-edge random network is a network-valued random variable, in which the collection of edges are all independent. In words, this means that for every adjacency <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> of the network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>, that <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is independent of <span class="math notranslate nohighlight">\(\mathbf a_{i'j'}\)</span>, any time that <span class="math notranslate nohighlight">\((i,j) \neq (i',j')\)</span>. When the networks are simple, the easiest thing to do is to assume that each edge <span class="math notranslate nohighlight">\((i,j)\)</span> is connected with some probability (which might be different for each edge) <span class="math notranslate nohighlight">\(p_{ij}\)</span>. We use the <span class="math notranslate nohighlight">\(ij\)</span> subscript to denote that this probability is not necessarily the same for each edge. This simple model can be described as <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> has the distribution <span class="math notranslate nohighlight">\(Bern(p_{ij})\)</span>, for every <span class="math notranslate nohighlight">\(j &gt; i\)</span>, and is independent of every other edge in <span class="math notranslate nohighlight">\(\mathbf A\)</span>. We only look at the entries <span class="math notranslate nohighlight">\(j &gt; i\)</span>, since our networks are simple. This means that knowing a realization of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> also gives us the realizaaion of <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> (and thus <span class="math notranslate nohighlight">\(\mathbf a_{ji}\)</span> is a <em>deterministic</em> function of <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>). Further, we know that the random network is loopless, which means that every <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>. We will call the matrix <span class="math notranslate nohighlight">\(P = (p_{ij})\)</span> the <strong>probability matrix</strong> of the network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In general, we will see a common theme for the probabilities of a realization <span class="math notranslate nohighlight">\(A\)</span> of a network-valued random variable <span class="math notranslate nohighlight">\(\mathbf A\)</span>, which is that it will greatly simplify our computation. Remember that if <span class="math notranslate nohighlight">\(\mathbf x\)</span> and <span class="math notranslate nohighlight">\(\mathbf y\)</span> are binary variables which are independent, that <span class="math notranslate nohighlight">\(Pr(\mathbf x = x, \mathbf y = y) = Pr(\mathbf x = x) Pr(\mathbf y = y)\)</span>. Using this fact:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+Pr(\mathbf A = A) &amp;= Pr(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}) \\
+    &amp;= Pr(\mathbf a_{ij} = a_{ij} \text{ for all }j &gt; i) \\
+    &amp;= \prod_{j &gt; i}Pr(\mathbf a_{ij} = a_{ij}), \;\;\;\;\textrm{Independence Assumption}
+\end{align*}\]</div>
+<p>Next, we will use the fact that if a random variable <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> has the Bernoulli distribution with probability <span class="math notranslate nohighlight">\(p_{ij}\)</span>, that <span class="math notranslate nohighlight">\(Pr(\mathbf a_{ij} = a_{ij}) = p_{ij}^{a_{ij}}(1 - p_{ij})^{1 - p_{ij}}\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr_\theta(A) &amp;= \prod_{j &gt; i}p_{ij}^{a_{ij}}(1 - p_{ij})^{1 - p_{ij}}
+\end{align*}\]</div>
+<p>Now that we’ve specified a probability and a very generalizable model, we’ve learned the full story behind network models and are ready to skip to estimating parameters, right? <em>Wrong!</em> Unfortunately, if we tried too estimate anything about each <span class="math notranslate nohighlight">\(p_{ij}\)</span> individually, we would obtain that <span class="math notranslate nohighlight">\(p_{ij} = a_{ij}\)</span> if we only have one realization <span class="math notranslate nohighlight">\(A\)</span>. Even if we had many realizations of <span class="math notranslate nohighlight">\(\mathbf A\)</span>, this still would not be very interesting, since we have a <em>lot</em> of <span class="math notranslate nohighlight">\(p_{ij}\)</span>s to estimate, and we’ve ignored any sort of structural model that might give us deeper insight into <span class="math notranslate nohighlight">\(\mathbf A\)</span>. In the below sections, we will learn successively less restrictive (and hence, <em>more expressive</em>) assumptions about <span class="math notranslate nohighlight">\(p_{ij}\)</span>s, which will allow us to convey fairly complex random networks, but <em>still</em> enable us with plenty of intteresting things to learn about later on.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./appendix/ch11"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="ch11.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">10. </span>Network Model Theory</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="ers.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">10.3. </span>Erdös-Rényi (ER) Random Networks</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
