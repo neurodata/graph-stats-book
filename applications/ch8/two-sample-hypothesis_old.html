@@ -1,0 +1,1245 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Two-Sample Hypothesis Testing &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../coverpage.html">
+                    Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What is network machine learning?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. How do we study networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
+     1.3. Types of Network Machine Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.4. Examples of applications
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
+     2.4. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch3/ch3.html">
+   3. End-to-end Business Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/big-picture.html">
+     3.1. Look at the Big Picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/get-the-data.html">
+     3.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/discover-and-visualize.html">
+     3.3. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch3/prepare-the-data.html">
+     3.4. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch4/ch4.html">
+   4. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/matrix-representations.html">
+     4.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/properties-of-networks.html">
+     4.2. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/network-representations.html">
+     4.3. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/regularization.html">
+     4.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch5/ch5.html">
+   5. Why Use Statistical Models?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/why-use-models.html">
+     5.1. Why Use Statistical Models?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">
+     5.2. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">
+     5.3. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">
+     5.4. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">
+     5.5. Inhomogeneous Erdos Renyi (IER) Random Network Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/multi-network-models.html">
+     5.6. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
+     5.7. Network Models with Covariates
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch6/ch6.html">
+   6. Learning Network Representations
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">
+     6.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/spectral-embedding.html">
+     6.2. Spectral Embedding Methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_spectral.html">
+     6.3. Estimating Parameters for the RDPG
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/random-walk-diffusion-methods.html">
+     6.4. Random walk and diffusion-based methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/graph-neural-networks.html">
+     6.5. Graph Neural Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">
+     6.6. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">
+     6.7. Joint Representation Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch7/ch7.html">
+   7. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/community-detection.html">
+     7.1. Community Detection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/testing-differences.html">
+     7.2. Testing for Differences between Groups of Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/model-selection.html">
+     7.3. Model Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/single-vertex-nomination.html">
+     7.4. Single-Network Vertex Nomination
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch7/out-of-sample.html">
+     7.5. Out-of-sample Embedding
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="ch8.html">
+   8. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="two-sample-hypothesis.html">
+     8.1. Latent Two-Sample Hypothesis Testing
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="significant-communities.html">
+     8.2. Two-sample hypothesis testing in SBMs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="graph-matching-vertex.html">
+     8.3. Graph Matching
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiple-vertex-nomination.html">
+     8.4. Vertex Nomination For Two Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch9/ch9.html">
+   9. Applications for Many Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch9/anomaly-detection.html">
+     9.1. Anomaly Detection For Timeseries of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch9/significant-edges.html">
+     9.2. Testing for Significant Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch9/significant-vertices.html">
+     9.3. Testing for Significant Vertices
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Appendix
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch10/ch10.html">
+   10. Representations (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch10/alt-reps.html">
+     10.1. Alternative Network Representations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch11/ch11.html">
+   11. Network Model Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch11/foundation.html">
+     11.1. Foundation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch11/ers.html">
+     11.2. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch11/sbms.html">
+     11.3. Stochastic Block Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch11/rdpgs.html">
+     11.4. RDPGs and more general network models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch12/ch12.html">
+   12. Learning Representations Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/mle-theory.html">
+     12.1. Maximum Likelihood Estimate Theory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/spectral-theory.html">
+     12.2. Spectral Method Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/applications/ch8/two-sample-hypothesis_old.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fapplications/ch8/two-sample-hypothesis_old.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/applications/ch8/two-sample-hypothesis_old.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/applications/ch8/two-sample-hypothesis_old.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hypothesis-testing">
+   Hypothesis Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#latent-position-graph-testing">
+   Latent Position Graph Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#latent-distribution-two-graph-testing">
+   Latent Distribution Two-Graph Testing
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Two-Sample Hypothesis Testing</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hypothesis-testing">
+   Hypothesis Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#latent-position-graph-testing">
+   Latent Position Graph Testing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#latent-distribution-two-graph-testing">
+   Latent Distribution Two-Graph Testing
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="two-sample-hypothesis-testing">
+<h1>Two-Sample Hypothesis Testing<a class="headerlink" href="#two-sample-hypothesis-testing" title="Permalink to this headline">#</a></h1>
+<p>We have learned a lot thus far about graph statistics, and now we want to apply some of that knowledge to doing two-sample graph testing. Imagine you are part of an alien race called the Moops. You live in harmony with another race, called the Moors, that look very similar to you, on the planet Zinthar. The evil overlord Zelu takes a random number of Moops and Moors and puts them on an island. You want to find your fellow Moops, but the Moops and Moors look very similar to each other. The one difference between the groups is that if you had an MRI machine, there is a difference between the scans of Moops and Moors. Lucky for you, you have an MRI machine on the island. What do you do?</p>
+<p>This problem requires you to use two-sample testing on graphs. There are two types of tests that you can perform The first is given two graphs, and their corresponding latent positions, are their positions the same? Or, we can ask, are the distributions of the latent positions the same? Before we learn how to perform these tests, we should go through what hypothesis testing is and how algorithms in <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> answer these questions.</p>
+<section id="hypothesis-testing">
+<h2>Hypothesis Testing<a class="headerlink" href="#hypothesis-testing" title="Permalink to this headline">#</a></h2>
+<p>Hypothesis testing is quite the daunting subject to explain, but it essentially boils down to it’s name, testing hypotheses. We first need to fomulate a statistical model of what the data looks like. In general, that means making a few assumptions about how the data we observed came to be; in our case, we each sample is observed independently from the other, and that the probability of observing such data is identical for each data. This is what is known as independently and identically distributed (i.i.d.). We consider the distribution where our observations are sampled from as really anything. Our model could say that this distribution of a Gaussian, for example, in which case we would have to estimate the parameters of this Gaussian. This would be a <strong>parametric model</strong>. When we consider the distribution to be something else, called <span class="math notranslate nohighlight">\(F\)</span>, then we have a <strong>nonparametric model</strong>. Mathematically, we can write the above as follows: we are given data <span class="math notranslate nohighlight">\(X_1, \ldots, X_n\)</span> (so, <span class="math notranslate nohighlight">\(n\)</span> observations) sampled i.i.d. from <span class="math notranslate nohighlight">\(F\)</span>.</p>
+<p>Now, we need to set up the actual test. When testing, we have two types of hypotheses, a null hypothesis and an alternative hypothesis. We generally test against the null hypothesis, so, in practice, the null hypothesis is one of “no effect” or “no difference”. It is denoted by <span class="math notranslate nohighlight">\(H_0\)</span>. The alternative hypothesis, denoted by <span class="math notranslate nohighlight">\(H_A\)</span> is generally what we believe. So, when performing hypothesis tests, we generally want to reject our null hypothesis, meaning that the general “accepted” belief of the model is not true, and our hypothesis is true. We can not always do that, in which case we do not necessarily accept the alternative hypothesis, but failr to reject the null hypothesis. This is because the lack of evidence from our data doesn’t mean that the null hypothesis effect does not exist.</p>
+<p>We won’t given an exhaustive list of the types of hypothesis tests, since, quite frankly, there are a lot. So, here, we will focus on two common used ones: independence testing and two-sample testing. When performing indepdence testing, we are testing whether two random variables, <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are sampled independently from some joint distribution of <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> (called <span class="math notranslate nohighlight">\(F_{XY}\)</span>) or not. In this case, <span class="math notranslate nohighlight">\(F_X\)</span> is the distribution of <span class="math notranslate nohighlight">\(X\)</span>, and <span class="math notranslate nohighlight">\(F_Y\)</span> is the distribution of <span class="math notranslate nohighlight">\(Y\)</span>. Specifially, this means</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    H_0 &amp;: F_{XY} = F_X F_Y \\
+    H_A &amp;: F_{XY} \neq F_X F_Y
+\end{align*}\]</div>
+<p>This is what is known as a general independence test. Here, the null hypothesis is the <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are independent (which means the joint distribution is equal to the product of the marginal distributions <span class="math notranslate nohighlight">\(F_X\)</span> and <span class="math notranslate nohighlight">\(F_Y\)</span>). The alternative hypothesis is that <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are not independent (and so the joint distribution is not equal to the product of the marginal distributions).</p>
+<p>Another type of testing is two-sample testing. Here, we are testing whether the distribution of <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are the same or different. So, is <span class="math notranslate nohighlight">\(X\)</span> has distribution <span class="math notranslate nohighlight">\(F_X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> has distribution <span class="math notranslate nohighlight">\(F_Y\)</span>, we are testing</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    H_0 &amp;: F_X = F_Y \\
+    H_A &amp;: F_X \neq F_Y
+\end{align*}\]</div>
+<p>This is known as a general two-sample testing. Here, the null hypothesis is that the distributions of <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> are the same, and the alternative is that <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> do not have the same distribution.</p>
+<p>Now that we know what testing essentially is, how do we perform it? Well, we have independence tests and two-sample tests that actually perform the tests. When running any test, the minmum information we get is a test statistic and p-value. The test statistic tells you, given your data, whether or not you should reject the null hypothesis. Of course, the ranges of test statics are large and varied, some are between -1 and 1, some are between 0 and 1, etc. So, we need a crtical value for the test, and that tells us that if our test statistic is above this critical value, we should reject, and if our test statistic is below that value, we should reject.The value of the critical value depends on the test, can depend on the sample size, etc.</p>
+<p>The p-value can be thought of as a way to gauge our confidence, like what is the probability that the result that we got occurs due to chance? Specifically, what is the probability that we observe statstics in our the distribution of our null hypothesis more extreme than our observed statistic? In general, we consider whether our p-value is greater than or less than 0.05; we reject the null hypothesis when the p-value is less than 0.05 and fail to reject the null hypothesis when our p-value is greater than 0.05. This basically allows us to say that we are 95% conifident that our test results are not due to chance. It’s worth noting that the threshold of 0.05 is fairly arbitray. Lower values like 0.01 and even 0.001 are also valid to use. This allows us to be even more confident in the results of our test. Changing the threshold involves rerunning the test, since it changes the p-value you get.</p>
+<p>Sometimes, for certain tests, the p-value can be found finding the null distribution by estimating parameters of a distribution and computing the p-value that way. For the nonparametric model, which we end up using in our tests, we need another solution instead. So, we can estimate the null distribution using a permutation test. Here, we compute an observed test statistic. Then, we permute our data and recompute our test statistics a number of times. This permutation our data essentially estimates our null distribution. Then, we can compute our crtical value and p-value from this estimated null distribution. Of course, this process isn’t perfect since it is an estimate of the null distribution and not the actual distribution, but it is the best that can be done.</p>
+</section>
+<section id="latent-position-graph-testing">
+<h2>Latent Position Graph Testing<a class="headerlink" href="#latent-position-graph-testing" title="Permalink to this headline">#</a></h2>
+<p>Now that we have introduded what hypothesis testing is specifically, we can go back to our example. Let’s answer the first question: given two graphs, and their corresponding latent positions, are their latent positions the same?</p>
+<p>First, let’s input some relevant packages:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">graspologic.inference</span> <span class="kn">import</span> <span class="n">latent_position_test</span><span class="p">,</span> <span class="n">latent_distribution_test</span>
+<span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span>
+<span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span><span class="p">,</span> <span class="n">rdpg</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">symmetrize</span>
+<span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">heatmap</span><span class="p">,</span> <span class="n">pairplot</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+<p>We previously discussed what a stochastic block model (SBM) was. Remember that an adjancy matrix is a matrix where each entry denotes a node’s connection to another node. When the matrix is composed of “communities” or “blocks”, where a node’s block membership in a graph determines its probability of connection to the other nodes in the graph. We embedded the graph using adjancy spectral embedding (ASE), visualized it using a pairplot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_components</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># the number of embedding dimensions for ASE</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">]])</span>
+
+<span class="n">P</span> <span class="o">=</span> <span class="n">symmetrize</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+<span class="n">csize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">csize</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;4-block SBM adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;4-block adjacency spectral embedding&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_6_0.png" src="../../_images/two-sample-hypothesis_old_6_0.png" />
+<img alt="../../_images/two-sample-hypothesis_old_6_1.png" src="../../_images/two-sample-hypothesis_old_6_1.png" />
+</div>
+</div>
+<p>In the adjacency matrix above, we can see a clearly defined block structure in the 4 communities in the graph. Below it, we see the adjancy spectral embedding (ASE). ASE is one such embedding procedures, and it allows us to estimate latent positions of the graph. Latent positions refer to the the ideas in random dot product graphs (RDPG).</p>
+<p>For a graph with adjancy matrix <span class="math notranslate nohighlight">\(A\)</span>, the proability of an edge existing between two nodes is determined by a matrix <span class="math notranslate nohighlight">\(P\)</span>. We can represent P as <span class="math notranslate nohighlight">\(P = XX^T\)</span>, where <span class="math notranslate nohighlight">\(X\)</span> is the latent positions of the graph. ASE allows us to obtain an estimate of these positions. Since, in the pairplot, we see 4 clusters of nodes corresponding to the 4 blocks, ASE is ablove to recover the positions and so RDPGs can model an SBM.</p>
+<p>Now, we can estimate <span class="math notranslate nohighlight">\(X\)</span> and sample two new RDPGs from the same latent positions:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A1</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">,</span>
+          <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">rescale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">A2</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">,</span>
+          <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">rescale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">Xhat1</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A1</span><span class="p">)</span>
+<span class="n">Xhat2</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A2</span><span class="p">)</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 1 adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 2 adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 1 adjacency spectral embedding&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 2 adjacency spectral embedding&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_8_0.png" src="../../_images/two-sample-hypothesis_old_8_0.png" />
+<img alt="../../_images/two-sample-hypothesis_old_8_1.png" src="../../_images/two-sample-hypothesis_old_8_1.png" />
+<img alt="../../_images/two-sample-hypothesis_old_8_2.png" src="../../_images/two-sample-hypothesis_old_8_2.png" />
+<img alt="../../_images/two-sample-hypothesis_old_8_3.png" src="../../_images/two-sample-hypothesis_old_8_3.png" />
+</div>
+</div>
+<p>Both the simulated RDPGs have 4 clear blocks and 4 clusters. Now, we must test whether or not they cam from the same latent positions.</p>
+<p>Based on the way we simulated the graph, we know that our two inputs are sampled from the same latent positions. So, we can test whether or not the RDPGs are the same up to a rotation using <code class="docutils literal notranslate"><span class="pre">latent_position_test</span></code> in <code class="docutils literal notranslate"><span class="pre">graspologic</span></code>. So, we are testing,</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    H_0 &amp;: X_1 = X_2 R \\
+    H_A &amp;: X_1 \neq X_2 R
+\end{align*}\]</div>
+<p>So, are latent positions for graph 1 (<span class="math notranslate nohighlight">\(X_1\)</span>) and latent positions for graph 2 (<span class="math notranslate nohighlight">\(X_2\)</span>) the same (null) or different (alternative) up to a rotation. In this case, we know they are the same, so we expect the p-value to be high. Here, <span class="math notranslate nohighlight">\(R\)</span> is an orthogonal rotaion matrix found from solving the orthogonal procrustes problem (we won’t go over it in detail here). So, we run the test:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lpt</span> <span class="o">=</span> <span class="n">latent_position_test</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">n_bootstraps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;p = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lpt</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p = 1.7380900457737998
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that the p-value is high, much greater than 0.05, and so this means that any observed differences between the latent positions of sampled RDPG 1 and 2 are likely due to chance.</p>
+<p>Next, we can do the same test, except we add noise to one of the RDPGs. The matched test should have a low p-value and so we should reject the null hypothesis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A3</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span><span class="p">,</span>
+          <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">rescale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">A4</span> <span class="o">=</span> <span class="n">rdpg</span><span class="p">(</span><span class="n">X</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)),</span>
+          <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">rescale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">Xhat3</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A3</span><span class="p">)</span>
+<span class="n">Xhat4</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A4</span><span class="p">)</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 3 adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A4</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 4 (distorted) adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 3 adjacency spectral embedding&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">Xhat4</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Sampled RDPG 4 (distorted) adjacency spectral embedding&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_12_0.png" src="../../_images/two-sample-hypothesis_old_12_0.png" />
+<img alt="../../_images/two-sample-hypothesis_old_12_1.png" src="../../_images/two-sample-hypothesis_old_12_1.png" />
+<img alt="../../_images/two-sample-hypothesis_old_12_2.png" src="../../_images/two-sample-hypothesis_old_12_2.png" />
+<img alt="../../_images/two-sample-hypothesis_old_12_3.png" src="../../_images/two-sample-hypothesis_old_12_3.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lpt</span> <span class="o">=</span> <span class="n">latent_position_test</span><span class="p">(</span><span class="n">A3</span><span class="p">,</span> <span class="n">A4</span><span class="p">,</span> <span class="n">n_bootstraps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;p = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lpt</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p = 2.2394273242447857
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that the p-value is high, less than 0.05, and so this means that any observed differences between the latent positions of sampled RDPG 1 and 2 are likely due to chance.</p>
+</section>
+<section id="latent-distribution-two-graph-testing">
+<h2>Latent Distribution Two-Graph Testing<a class="headerlink" href="#latent-distribution-two-graph-testing" title="Permalink to this headline">#</a></h2>
+<p>Now that we have introduded what hypothesis testing is specifically, we can go back to our example. Let’s answer the first question: given two graphs, and their corresponding latent positions, are the distributions of their latent positions the same?</p>
+<p>Let’s generate a 2-block SBM and embed it with ASE like we did above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_components</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># the number of embedding dimensions for ASE</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
+              <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+<span class="n">csize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="n">A1</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">csize</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span>
+<span class="n">X1</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A1</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block SBM adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block adjacency spectral embedding&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">4.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_16_0.png" src="../../_images/two-sample-hypothesis_old_16_0.png" />
+<img alt="../../_images/two-sample-hypothesis_old_16_1.png" src="../../_images/two-sample-hypothesis_old_16_1.png" />
+</div>
+</div>
+<p>Next, we can generate a second SBM with a different number of vertices in each block, but the same probability matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">csize_2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">75</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="n">A2</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">csize_2</span><span class="p">,</span> <span class="n">P</span><span class="p">)</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A2</span><span class="p">)</span>
+
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block SBM adjacency matrix&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block adjacency spectral embedding&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">4.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_18_0.png" src="../../_images/two-sample-hypothesis_old_18_0.png" />
+<img alt="../../_images/two-sample-hypothesis_old_18_1.png" src="../../_images/two-sample-hypothesis_old_18_1.png" />
+</div>
+</div>
+<p>Here, we want to test whether the latent positions of the two graphs that we generated are from the same latent distribution. In other words, we are testing</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    H_0 &amp;: F_{X_1} = F_{X_2} Q \\
+    H_A &amp;: F_{X_1} \neq F_{X_2} Q
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(F_{X_1}\)</span> is the distribution of <span class="math notranslate nohighlight">\(X_1\)</span> and <span class="math notranslate nohighlight">\(F_{X_2}\)</span> is the distribution of <span class="math notranslate nohighlight">\(X_2\)</span>. <span class="math notranslate nohighlight">\(Q\)</span> is the orthogonal rotation matrix, which is necessary since the test can give identical results up to a rotation. We then test using <code class="docutils literal notranslate"><span class="pre">latent_distribution_test</span></code> in <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> on undirected graphs. In this first case, we know that the distributions of the two graphs should be the same, and so we would expect a high p-value.</p>
+<p>Before we go into running the test, we have to talk about two independence tests, distance correlation (Dcorr), and multiscale graph correlation (MGC). These are powerful independence tests that operate really well on highly nonlinear and multivariate data. More information about those can be found in the <code class="docutils literal notranslate"><span class="pre">hyppo</span></code> package. Here, we plot the null distribution of the test statistics in blue, the test staitstc in red, and the p-value we get in the title.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ldt_dcorr</span> <span class="o">=</span> <span class="n">latent_distribution_test</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="s2">&quot;dcorr&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">n_bootstraps</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ldt_mgc</span> <span class="o">=</span> <span class="n">latent_distribution_test</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="s2">&quot;mgc&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">n_bootstraps</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/independence/mgc.py:236: RuntimeWarning: Input x has 0 redundant rows, and input y has 248 redundant rows. MGC Map will be of shape (250, 2).
+  warnings.warn(
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-0.0032276786353068695 -0.0018222635512639709
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;null_distribution&#39;</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;DCorr: P-value = </span><span class="si">{:0.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;test static&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;null_distribution&#39;</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;MGC: P-value = </span><span class="si">{:0.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;test static&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_23_0.png" src="../../_images/two-sample-hypothesis_old_23_0.png" />
+</div>
+</div>
+<p>We see that while the test statistics are samal, the resulting p-value is above 0.05.  So, we fail to reject the null hypothesis that the two graphs come from the same generating distributions.</p>
+<p>We can repeat the saem process when generate another SBM with a different interblock probability. We run the test again with the first graph and this new test:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">P2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+               <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+
+<span class="n">A3</span> <span class="o">=</span> <span class="n">sbm</span><span class="p">(</span><span class="n">csize_2</span><span class="p">,</span> <span class="n">P2</span><span class="p">)</span>
+
+<span class="n">X1</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A1</span><span class="p">)</span>
+<span class="n">X3</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A3</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block SBM adjacency matrix A1&#39;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block SBM adjacency matrix A3&#39;</span><span class="p">)</span>
+<span class="n">pairplot</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block adjacency spectral embedding A1&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">4.5</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">X3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;2-block adjacency spectral embedding A3&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">4.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_25_0.png" src="../../_images/two-sample-hypothesis_old_25_0.png" />
+<img alt="../../_images/two-sample-hypothesis_old_25_1.png" src="../../_images/two-sample-hypothesis_old_25_1.png" />
+<img alt="../../_images/two-sample-hypothesis_old_25_2.png" src="../../_images/two-sample-hypothesis_old_25_2.png" />
+<img alt="../../_images/two-sample-hypothesis_old_25_3.png" src="../../_images/two-sample-hypothesis_old_25_3.png" />
+</div>
+</div>
+<p>We once again plot the null distribution as before:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ldt_dcorr</span> <span class="o">=</span> <span class="n">latent_distribution_test</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="s2">&quot;dcorr&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">n_bootstraps</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ldt_mgc</span> <span class="o">=</span> <span class="n">latent_distribution_test</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">A3</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="s2">&quot;mgc&quot;</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">n_bootstraps</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.12/x64/lib/python3.8/site-packages/hyppo/independence/mgc.py:236: RuntimeWarning: Input x has 0 redundant rows, and input y has 248 redundant rows. MGC Map will be of shape (250, 2).
+  warnings.warn(
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.03291622333045907 0.15642706561067424
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;null_distribution&#39;</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;DCorr: P-value = </span><span class="si">{:0.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ldt_dcorr</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;test static&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;null_distribution&#39;</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;MGC: P-value = </span><span class="si">{:0.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ldt_mgc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;test static&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;frequency&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/two-sample-hypothesis_old_30_0.png" src="../../_images/two-sample-hypothesis_old_30_0.png" />
+</div>
+</div>
+<p>Thus, we have shown how to do latent position two sample position and distribution testing using methods in graspologic. Now, if you’re ever stuck on a mysterious island with an alien race, and the only way to find you people is do MRI scans and latent positions two sample tests, you know what to do!</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./applications/ch8"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
