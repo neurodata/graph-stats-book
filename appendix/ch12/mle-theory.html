@@ -947,13 +947,13 @@ title="Print to PDF"
 <p>The most useful property that we will leverage which was developed in Chapter <span class="math notranslate nohighlight">\(5\)</span> is the independent-edge assumption. As we discussed, when working with independent-edge random network models, we will assume that edges in our random network are <em>independent</em>. This means that the probability of observing a particular realization of a random network is, in fact, the product of the probabilities of observing each edge in the random network. Notationally, what this means is that if <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network with <span class="math notranslate nohighlight">\(n\)</span> nodes and edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, and <span class="math notranslate nohighlight">\(A\)</span> is a realization of that random network with edges <span class="math notranslate nohighlight">\(a_{ij}\)</span>, then:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(\mathbf A = A) &amp;= \mathbb P(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}), \\
-    &amp;= \prod_{i, j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij}).
+    Pr_\theta(\mathbf A = A) &amp;= Pr(\mathbf a_{11} = a_{11}, \mathbf a_{12} = a_{12}, ..., \mathbf a_{nn} = a_{nn}), \\
+    &amp;= \prod_{i, j} Pr_\theta(\mathbf a_{ij} = a_{ij}).
 \end{align*}\]</div>
 <p>In the special case where our networks are simple (undirected and loopless), this simplifies to:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(\mathbf A = A) &amp;= \prod_{i &lt; j} \mathbb P_\theta(\mathbf a_{ij} = a_{ij}).
+    Pr_\theta(\mathbf A = A) &amp;= \prod_{i &lt; j} Pr_\theta(\mathbf a_{ij} = a_{ij}).
 \end{align*}\]</div>
 <p>for any network realization <span class="math notranslate nohighlight">\(A\)</span> which is simple. This is because if <span class="math notranslate nohighlight">\(\mathbf a_{ij} = a\)</span>, then we also know that <span class="math notranslate nohighlight">\(\mathbf a_{ji} = a\)</span>, and we only need to worry about one of the edges (we chose the edges in the upper right triangle of the adjacency matrix arbitrarily).  Further, since <span class="math notranslate nohighlight">\(A\)</span> is also simple, then we know hat <span class="math notranslate nohighlight">\(\mathbf a_{ii} = 0\)</span>; that is, no nodes have loops, so we don’t need to worry about the case where <span class="math notranslate nohighlight">\(i = j\)</span> either.</p>
 <p>We will set the scene for the later examples using a common example. Let’s say we flip a coin <span class="math notranslate nohighlight">\(10\)</span> times, and see <span class="math notranslate nohighlight">\(6\)</span> heads. What is the probability that the coin lands on heads? Intuitively, the answer is rather simple! It feels like it should just be <span class="math notranslate nohighlight">\(\frac{6}{10}\)</span>. And in one particular way, that really is the <em>best</em> guess we could make!</p>
@@ -962,22 +962,26 @@ title="Print to PDF"
 <h2><span class="section-number">12.1.1. </span>The Method of Maximum Likelihood Estimation (MLE)<a class="headerlink" href="#the-method-of-maximum-likelihood-estimation-mle" title="Permalink to this headline">#</a></h2>
 <p>Let’s think about what exactly this means using an example that you are likely familiar with. I have a single coin, and I want to know the probability of the outcome of a roll of that coin being a heads. For sake of argument, we will call this coin <em>fair</em>, which means that the true probability it lands on heads (or tails) is <span class="math notranslate nohighlight">\(0.5\)</span>. In this case, I would call the outcome of the <span class="math notranslate nohighlight">\(i^{th}\)</span> coin flip the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>, and it can produce realizations which take one of two possible values: a heads (an outcome of a <span class="math notranslate nohighlight">\(1\)</span>) or a tails (an outcome of a <span class="math notranslate nohighlight">\(0\)</span>). We will say that we see <span class="math notranslate nohighlight">\(10\)</span> total coin flips. We will number these realizations as <span class="math notranslate nohighlight">\(x_i\)</span>, where <span class="math notranslate nohighlight">\(i\)</span> goes from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(10\)</span>. To recap, the boldfaced <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> denotes the random variable, and the unbolded <span class="math notranslate nohighlight">\(x_i\)</span> denotes the realization which we actually see. Our question of interest is: how do we estimate the probability of the coin landing on a heads, if we don’t know anything about the true probability value <span class="math notranslate nohighlight">\(p\)</span>, other than the outcomes of the coin flips we got to observe?</p>
 <p>Here, since <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> takes the value <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(0\)</span> each with probability <span class="math notranslate nohighlight">\(0.5\)</span>, we would say that <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> random variable. This means that the random variable <span class="math notranslate nohighlight">\(\mathbf x\)</span> has the Bernoulli distribution, and the probability of a heads, <span class="math notranslate nohighlight">\(p\)</span>, is <span class="math notranslate nohighlight">\(0.5\)</span>. All <span class="math notranslate nohighlight">\(10\)</span> of our <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> are called <em>identically distributed</em>, since they all have the same <span class="math notranslate nohighlight">\(Bernoulli(0.5)\)</span> distribution.</p>
-<p>We will also assume that the outcomes of the coin flips are mutually independent, which is explained in the terminology section.</p>
+<p>We will also assume that the outcomes of the coin flips are mutually independent, which as we learned previously, just means that the probability of observing all <span class="math notranslate nohighlight">\(n\)</span> outcomes simultaneously is the product of observing each outcome individually:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    Pr_\theta(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n) &amp;= \prod_{i = 1}^nPr_\theta(\mathbf x_i = x_i)
+\end{align*}\]</div>
 <p>For any one coin flip, the probability of observing the outcome <span class="math notranslate nohighlight">\(i\)</span> is, by definition of the Bernoulli distribution:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}.
+    Pr_\theta(\mathbf x_i = x_i) = p^{x_i} (1 - p)^{1 - x_i}.
 \end{align*}\]</div>
-<p>Note that we use the notation <span class="math notranslate nohighlight">\(\mathbb P_\theta\)</span> to indicate that the probability is a function of the parameter set <span class="math notranslate nohighlight">\(\theta\)</span> for the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>. Here, since the only parameter for each <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a probability <span class="math notranslate nohighlight">\(p\)</span>, then <span class="math notranslate nohighlight">\(\theta = p\)</span>.</p>
+<p>Note that we use the notation <span class="math notranslate nohighlight">\(Pr_\theta\)</span> to indicate that the probability is a function of the parameter set <span class="math notranslate nohighlight">\(\theta\)</span> for the random variable <span class="math notranslate nohighlight">\(\mathbf x_i\)</span>. Here, since the only parameter for each <span class="math notranslate nohighlight">\(\mathbf x_i\)</span> is a probability <span class="math notranslate nohighlight">\(p\)</span>, then <span class="math notranslate nohighlight">\(\theta = p\)</span>.</p>
 <p>If we saw <span class="math notranslate nohighlight">\(n\)</span> total outcomes, the probability is, using the definition of mutual independence:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}\mathbb P(\mathbf x_i = x_i), \\
+    Pr_\theta(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \prod_{i = 1}^{n}Pr(\mathbf x_i = x_i), \\
     &amp;= \prod_{i = 1}^n p^{x_i}(1 - p)^{1 - x_i}, \\
     &amp;= p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}.
 \end{align*}\]</div>
 <p>What if we saw <span class="math notranslate nohighlight">\(10\)</span> coin flips, and <span class="math notranslate nohighlight">\(6\)</span> were heads? Can we take a “guess” at what <span class="math notranslate nohighlight">\(p\)</span> might be? Intuitively your first reaction might be to say a good guess of <span class="math notranslate nohighlight">\(p\)</span>, which we will abbreviate <span class="math notranslate nohighlight">\(\hat p\)</span>, would be <span class="math notranslate nohighlight">\(0.6\)</span>, which is <span class="math notranslate nohighlight">\(6\)</span> heads of <span class="math notranslate nohighlight">\(10\)</span> outcomes. In many ways, this intuitive guess is spot on. However, in network machine learning, we like to be really specific about why, exactly, this guess makes sense.</p>
-<p>Looking at the above equation, one thing we can do is use the technique of <strong>maximum likelihood estimation</strong>. We call the function <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)\)</span> the <em>likelihood</em> of our sequence, for a given value of <span class="math notranslate nohighlight">\(p\)</span>. Note that we have added the term “<span class="math notranslate nohighlight">\(; p\)</span>” to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we <em>really</em> want to do is find the value that <span class="math notranslate nohighlight">\(p\)</span> could take, which <em>maximizes</em> the likelihood. Let’s see what the likelihood function looks like as a function of different values of <span class="math notranslate nohighlight">\(p\)</span>:</p>
+<p>Looking at the above equation, one thing we can do is use the technique of <strong>maximum likelihood estimation</strong>. We call the function <span class="math notranslate nohighlight">\(Pr(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p)\)</span> the <em>likelihood</em> of our sequence, for a given value of <span class="math notranslate nohighlight">\(p\)</span>. Note that we have added the term “<span class="math notranslate nohighlight">\(; p\)</span>” to our notation, which is simply to emphasize the dependence of the likelihood on the probability. So, what we <em>really</em> want to do is find the value that <span class="math notranslate nohighlight">\(p\)</span> could take, which <em>maximizes</em> the likelihood. Let’s see what the likelihood function looks like as a function of different values of <span class="math notranslate nohighlight">\(p\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1006,10 +1010,10 @@ title="Print to PDF"
 </div>
 </div>
 <p>As we can see, it turns out that our intuitive answer, that <span class="math notranslate nohighlight">\(p=0.6\)</span>, is in fact the Maximum Likelihood Estimate for the Bernoulli probability parameter <span class="math notranslate nohighlight">\(p\)</span>. Now how do we go about showing this rigorously?</p>
-<p>An easier problem, we often will find, is to instead maximize the <em>log likelihood</em> rather than the likelihood itself. This is because the log function is <em>monotone</em>, which means that if <span class="math notranslate nohighlight">\(\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span>, then <span class="math notranslate nohighlight">\(\log\mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span> as well for some choices <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span>. Without going too down in the weeds, the idea is that the <span class="math notranslate nohighlight">\(\log\)</span> function does not change any critical points of the likelihood. The log likelihood of the above expression is:</p>
+<p>An easier problem, we often will find, is to instead maximize the <em>log likelihood</em> rather than the likelihood itself. This is because the log function is <em>monotone</em>, which means that if <span class="math notranslate nohighlight">\(Pr(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; Pr(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span>, then <span class="math notranslate nohighlight">\(\log Pr(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_1) &lt; \log Pr(\mathbf x_1 = x_1, ..., \mathbf x_n = x_n; p_2)\)</span> as well for some choices <span class="math notranslate nohighlight">\(p_1\)</span> and <span class="math notranslate nohighlight">\(p_2\)</span>. Without going too down in the weeds, the idea is that the <span class="math notranslate nohighlight">\(\log\)</span> function does not change any critical points of the likelihood. The log likelihood of the above expression is:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \log \left[p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}\right], \\
+\log Pr(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \log \left[p^{\sum_{i = 1}^n x_i}(1 - p)^{n - \sum_{i = 1}^n x_i}\right], \\
 &amp;= \sum_{i = 1}^n x_i \log(p) + \left(n - \sum_{i = 1}^n x_i\right)\log(1 - p).
 \end{align*}\]</div>
 <p>And visually, the log-likelihood now looks instead like this:</p>
@@ -1043,7 +1047,7 @@ title="Print to PDF"
 <p>Proceeding using the result we derived above, and using the fact that <span class="math notranslate nohighlight">\(\frac{d}{du} \log(u) = \frac{1}{u}\)</span> and that <span class="math notranslate nohighlight">\(\frac{d}{du} \log(1 - u) = -\frac{1}{1 - u}\)</span>:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\frac{d}{d p}\log \mathbb P(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \frac{\sum_{i = 1}^n x_i}{p} - \frac{n - \sum_{i = 1}^n x_i}{1 - p} = 0, \\
+\frac{d}{d p}\log Pr(\mathbf x_1 = x_1, ..., \mathbf x_{n} = x_{n}; p) &amp;= \frac{\sum_{i = 1}^n x_i}{p} - \frac{n - \sum_{i = 1}^n x_i}{1 - p} = 0, \\
 \Rightarrow \frac{\sum_{i = 1}^n x_i}{p} &amp;= \frac{n - \sum_{i = 1}^n x_i}{1 - p}, \\
 \Rightarrow (1 - p)\sum_{i = 1}^n x_i &amp;= p\left(n - \sum_{i = 1}^n x_i\right), \\
 \sum_{i = 1}^n x_i - p\sum_{i = 1}^n x_i &amp;= pn - p\sum_{i = 1}^n x_i ,\\
@@ -1064,18 +1068,18 @@ title="Print to PDF"
 <p>In Chapter 5, we explored the derivation for the probability of observing a realization <span class="math notranslate nohighlight">\(A\)</span> of a given random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER, which is equivalent to the likelihood of <span class="math notranslate nohighlight">\(A\)</span>. Recall this was:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(A) &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}.
+    Pr_\theta(A) &amp;= p^{m} \cdot (1 - p)^{\binom{n}{2} - m}.
 \end{align*}\]</div>
 <p>where <span class="math notranslate nohighlight">\(m = \sum_{i &lt; j} a_{ij}\)</span> is the total number of edges in the observed network <span class="math notranslate nohighlight">\(A\)</span>. Our approach here parallels directly the approach for the coin; we begin by taking the log of the probability:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \log \mathbb P_\theta(A) &amp;= \log \left[p^{m} \cdot (1 - p)^{\binom{n}{2} - m}\right], \\
+    \log Pr_\theta(A) &amp;= \log \left[p^{m} \cdot (1 - p)^{\binom{n}{2} - m}\right], \\
     &amp;= m \log p + \left(\binom n 2 - m\right)\log (1 - p).
 \end{align*}\]</div>
 <p>Next, we take the derivative with respect to <span class="math notranslate nohighlight">\(p\)</span>, set equal to <span class="math notranslate nohighlight">\(0\)</span>, and we end up with:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-\frac{d}{d p}\log \mathbb P_\theta(A) &amp;= \frac{m}{p} - \frac{\binom n 2 - m}{1 - p} = 0, \\
+\frac{d}{d p}\log Pr_\theta(A) &amp;= \frac{m}{p} - \frac{\binom n 2 - m}{1 - p} = 0, \\
 \Rightarrow \tilde p &amp;= \frac{m}{\binom n 2}.
 \end{align*}\]</div>
 <p>We omitted several detailed steps due to the fact that we show the rigorous derivation above. Checking the second derivative, which we omit since it is rather mathematically tedious, we see that the second derivative at <span class="math notranslate nohighlight">\(\tilde p\)</span> is negative, so we indeed have found an estimate of the maximum, and will be denoted by <span class="math notranslate nohighlight">\(\hat p\)</span>. This gives that the Maximum Likelihood Estimate (or, the MLE, for short) of the probability <span class="math notranslate nohighlight">\(p\)</span> for a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is ER is:</p>
@@ -1200,7 +1204,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Approximate mean: 2.006666
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Approximate mean: 1.973783
 True mean: 2.000000
 </pre></div>
 </div>
@@ -1380,18 +1384,18 @@ var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} \cdot p \cdot (1 - p) = \fra
 <p>When we derived the probability for a realization <span class="math notranslate nohighlight">\(A\)</span> of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which could be characterized using the <em>a priori</em> Stochasic Block Model, we obtained that:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(A) &amp;= \prod_{k, k' \in [K]}b_{k'k}^{m_{k'k}} \cdot (1 - b_{k'k})^{n_{k'k - m_{k'k}}},
+    Pr_\theta(A) &amp;= \prod_{k, k' \in [K]}b_{k'k}^{m_{k'k}} \cdot (1 - b_{k'k})^{n_{k'k - m_{k'k}}},
 \end{align*}\]</div>
 <p>where <span class="math notranslate nohighlight">\(n_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}\)</span> was the number of possible edges between nodes in community <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>, and <span class="math notranslate nohighlight">\(m_{k'k} = \sum_{i &lt; j}\mathbb 1_{\tau_i = k}\mathbb 1_{\tau_j = k'}a_{ij}\)</span> was the number of edges in the realization <span class="math notranslate nohighlight">\(A\)</span> between nodes within communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(k'\)</span>.</p>
 <p>Noting that the log of the product is the sum of the logs, or that <span class="math notranslate nohighlight">\(\log \prod_i x_i = \sum_i \log x_i\)</span>, the log of the probability is:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \log \mathbb P_\theta(A) &amp;= \sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}).
+    \log Pr_\theta(A) &amp;= \sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}).
 \end{align*}\]</div>
-<p>We notice a side-note that we mentioned briefly in the network models section: in a lot of ways, the probability (and consequently, the log probability) of a random network which is an <em>a priori</em> SBM behaves very similarly to that of a random network which is ER, with the caveat that the probability term <span class="math notranslate nohighlight">\(p\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(\binom n 2\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m\)</span> have been replaced with the probability term <span class="math notranslate nohighlight">\(b_{k'k}\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(n_{k'k}\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m_{k'k}\)</span> which <em>apply only to that particular pair of communities</em>. In this sense, the <em>a priori</em> SBM is kind of like a collection of communities of ER networks. Pretty neat right? Well, it doesn’t stop there. When we take the partial derivative of <span class="math notranslate nohighlight">\(\log \mathbb P_\theta(A)\)</span> with respect to any of the probability terms <span class="math notranslate nohighlight">\(b_{l'l}\)</span>, we see an even more direct consequence of this observation:</p>
+<p>We notice a side-note that we mentioned briefly in the network models section: in a lot of ways, the probability (and consequently, the log probability) of a random network which is an <em>a priori</em> SBM behaves very similarly to that of a random network which is ER, with the caveat that the probability term <span class="math notranslate nohighlight">\(p\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(\binom n 2\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m\)</span> have been replaced with the probability term <span class="math notranslate nohighlight">\(b_{k'k}\)</span>, the total number of possible edges <span class="math notranslate nohighlight">\(n_{k'k}\)</span>, and the total number of edges <span class="math notranslate nohighlight">\(m_{k'k}\)</span> which <em>apply only to that particular pair of communities</em>. In this sense, the <em>a priori</em> SBM is kind of like a collection of communities of ER networks. Pretty neat right? Well, it doesn’t stop there. When we take the partial derivative of <span class="math notranslate nohighlight">\(\log Pr_\theta(A)\)</span> with respect to any of the probability terms <span class="math notranslate nohighlight">\(b_{l'l}\)</span>, we see an even more direct consequence of this observation:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= \frac{\partial}{\partial b_{l'l}}\sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}), \\
+    \frac{\partial }{\partial b_{l' l}}\log Pr_\theta(A) &amp;= \frac{\partial}{\partial b_{l'l}}\sum_{k, k' \in [K]} m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k}), \\
     &amp;= \sum_{k, k' \in [K]} \frac{\partial}{\partial b_{l'l}}\left[m_{k'k}\log b_{k'k} + \left(n_{k'k} - m_{k'k}\right)\log(1 - b_{k'k})\right].
 \end{align*}\]</div>
 <p>Now what? Notice that any of the summands in which <span class="math notranslate nohighlight">\(k \neq l\)</span> and <span class="math notranslate nohighlight">\(k' \neq l'\)</span>, the partial derivative with respect to <span class="math notranslate nohighlight">\(b_{l'l}\)</span> is in fact exactly <span class="math notranslate nohighlight">\(0\)</span>! Why is this? Well, let’s consider a <span class="math notranslate nohighlight">\(k\)</span> which is different from <span class="math notranslate nohighlight">\(l\)</span>, and a <span class="math notranslate nohighlight">\(k'\)</span> which is different from <span class="math notranslate nohighlight">\(l'\)</span>. Notice that:</p>
@@ -1402,7 +1406,7 @@ var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} \cdot p \cdot (1 - p) = \fra
 <p>which simply follows since the quantity to the right of the partial derivative is not a funcion of <span class="math notranslate nohighlight">\(b_{l'l}\)</span> at all! Therefore:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \frac{\partial }{\partial b_{l' l}}\log \mathbb P_\theta(A) &amp;= 0 + \frac{\partial}{\partial b_{l'l}}\left[m_{l'l}\log b_{l'l} + \left(n_{l'l} - m_{l'l}\right)\log(1 - b_{l'l})\right] \\
+    \frac{\partial }{\partial b_{l' l}}\log Pr_\theta(A) &amp;= 0 + \frac{\partial}{\partial b_{l'l}}\left[m_{l'l}\log b_{l'l} + \left(n_{l'l} - m_{l'l}\right)\log(1 - b_{l'l})\right] \\
     &amp;= \frac{m_{l'l}}{b_{l'l}} - \frac{n_{l'l} - m_{l'l}}{1 - b_{l'l}} = 0, \\
 \Rightarrow b_{l'l}^* &amp;= \frac{m_{l'l}}{n_{l'l}}.
 \end{align*}\]</div>
@@ -1436,13 +1440,13 @@ var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} \cdot p \cdot (1 - p) = \fra
 <p>The a posteriori Stochastic Block Model has a pair of parameters, the block matrix, <span class="math notranslate nohighlight">\(B\)</span>, and the community probability vector, <span class="math notranslate nohighlight">\(\vec \pi\)</span>. If you are keeping up with the log-likelihood derivations in the single network models section, you will recall that the log-likelihood for an a posteriori Stochastic Block Model, we obtain that:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
-    \mathbb P_\theta(A) &amp;= \sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]
+    Pr_\theta(A) &amp;= \sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]
 \end{align*}\]</div>
 <p>That expression, it turns out, is a lot more complicated than what we had to deal with for the <em>a priori</em> Stochastic Block Model. Taking the log gives us that:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
 \log 
-    \mathbb P_\theta(A) &amp;= \log\left(\sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]\right)
+    Pr_\theta(A) &amp;= \log\left(\sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]\right)
 \end{align*}\]</div>
 <p>Whereas the log of a product of terms is the sum of the logs of the terms, no such easy simplification exists for the log of a <em>sum</em> of terms. Without any useful tricks, this expression is extremely complicated, if not impossible, to find a closed form expression for an MLE for (if you can solve this expression with a closed-form solution, please publish a paper and send us the link so we can check it out!).</p>
 <p>There are various strategies under which we could use <em>approximation</em> techniques to find the maximum likelihood estimate here, such as the popular technique of expectation maximization (EM). However, we instead turn to what are known as <em>spectral methods</em>, which you learned about in <a class="reference external" href="#link?">Chapter 6</a>, for the reasons we will cover in the next section.</p>
