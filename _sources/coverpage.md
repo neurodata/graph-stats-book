@@ -1,7 +1,5 @@
 # Hands-on Network Machine Learning with Scikit-Learn and Graspologic
 
-### Eric W. Bridgeford, Alex Loftus, Joshua T. Vogelstein
-
 ```{figure} Images/umap_pedigo_small.jpg
 ---
 height: 700px
