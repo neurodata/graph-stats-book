@@ -814,6 +814,22 @@ title="Print to PDF"
      4.1.3.1. The Normalized Laplacian
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-dad-laplacian">
+     4.1.3.2. The
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DAD
+      </span>
+     </code>
+     Laplacian
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-regularized-laplacian">
+     4.1.3.3. The regularized Laplacian
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -853,6 +869,22 @@ title="Print to PDF"
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-normalized-laplacian">
      4.1.3.1. The Normalized Laplacian
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-dad-laplacian">
+     4.1.3.2. The
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       DAD
+      </span>
+     </code>
+     Laplacian
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-regularized-laplacian">
+     4.1.3.3. The regularized Laplacian
     </a>
    </li>
   </ul>
@@ -1128,6 +1160,85 @@ title="Print to PDF"
 \end{align*}\]</div>
 <p>The <span class="math notranslate nohighlight">\(D^{-1/2} D D^{-1/2}\)</span> term is spiritually the same as what you’d think of <span class="math notranslate nohighlight">\(\frac{D}{D}\)</span> (if that was defined!), since it just works out to be the identity matrix. The <span class="math notranslate nohighlight">\(D^{-1/2} A D^{-1/2}\)</span> is just doing the same thing to <span class="math notranslate nohighlight">\(A\)</span> that you did to <span class="math notranslate nohighlight">\(L\)</span>. So you’re normalizing the entries of the adjacency matrix by the degrees of the incident nodes; that is, <span class="math notranslate nohighlight">\(\frac{a_{ij}}{\sqrt{d_i}\sqrt{d_j}}\)</span>.</p>
 <p>One useful property of the normalized Laplacian is that its eigenvalues are bounded between 0 and 2. This normalization tends to be useful, because the Laplacian is a thing called a <em>positive semi-definite matrix</em>. This means that a suite of linear algebra techniques, which may <em>not</em> run successfully on the adjacency matrix (which is <em>not</em> positive semi-definite in its most raw form for <em>simple networks</em>, which you will learn about in the next chapter), can be executed on the network Laplacian.</p>
+</section>
+<section id="the-dad-laplacian">
+<span id="ch4-mtx-rep-dad-laplacian"></span><h3><span class="section-number">4.1.3.2. </span>The <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian<a class="headerlink" href="#the-dad-laplacian" title="Permalink to this headline">#</a></h3>
+<p>In this book, a lot of what we will cover will be something called a <em>spectral embedding</em> of the Laplacian. While you will learn all about this in <span class="xref std std-ref">ch6:lse</span>, there are some fine points we want to cover here. As it turns out, there is another, <em>related</em>, definition of a Laplacian, which we call the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    L^{DAD} &amp;= D^{-\frac{1}{2}}A D^{-\frac{1}{2}}
+\end{align*}\]</div>
+<p><span class="math notranslate nohighlight">\(L^{DAD}\)</span> and <span class="math notranslate nohighlight">\(L^{normalized}\)</span> share some major similarities which are important to note here. Later in the book, you will learn about the importance of the singular value decomposition for spectral embedding of Laplacians. Basically, what the singular value decomposition will allow you to do is look at the laplacian as a sum of much <em>simpler</em> matrices. By “simple”, what we mean here is that they can be represented as the product of two vectors, which the Laplacian, in general, cannot. By looking only at the first few of these “simple” matrices, you can learn about the Laplacian and reduce a lot of the noise in the Laplacian itself.</p>
+<p>The important connection is that these “simple” matrices will be <em>identical</em> for <span class="math notranslate nohighlight">\(L^{normalized}\)</span> and <span class="math notranslate nohighlight">\(L^{DAD}\)</span>, except for one important fact: they will be in <em>reverse</em> order from one another. In <span class="math notranslate nohighlight">\(L^{normalized}\)</span>, the matrices you will want to use will be the last few, and in <span class="math notranslate nohighlight">\(L^{DAD}\)</span>, the matrices you will want to use will be the first few. When you compute the singular value decomposition, there are ways to only compute the first few matrices without having to go through the trouble of computing <em>all</em> of them, whereas the reverse is not true! To get the last few simple matrices, you would have to compute all of the preceding ones first. This means that to get the simple matrices you want, you can get much better computational performance using <span class="math notranslate nohighlight">\(L^{DAD}\)</span> instead of <span class="math notranslate nohighlight">\(L^{normalized}\)</span>.</p>
+<p>You can compute the <span class="math notranslate nohighlight">\(L^{DAD}\)</span> in <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> similarly to above, but with <code class="docutils literal notranslate"><span class="pre">form=&quot;DAD&quot;</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">L_dad</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;DAD&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">L_sym_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L_sym</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Normalized Laplacian $L^</span><span class="si">{normalized}</span><span class="s2">$&quot;</span><span class="p">,</span> 
+               <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="n">L_sym_ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+
+
+<span class="n">L_dad_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L_dad</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;DAD Laplacian $L^</span><span class="si">{DAD}</span><span class="s2">$&quot;</span><span class="p">,</span> 
+               <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">L_dad_ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/matrix-representations_23_0.png" src="../../_images/matrix-representations_23_0.png" />
+</div>
+</div>
+</section>
+<section id="the-regularized-laplacian">
+<span id="ch4-mtx-rep-reg-laplacian"></span><h3><span class="section-number">4.1.3.3. </span>The regularized Laplacian<a class="headerlink" href="#the-regularized-laplacian" title="Permalink to this headline">#</a></h3>
+<p>The regularized Laplacian is an adaptation of the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian you learned about in the previous section. As it turns out, when networks have degree matrices where some of the degrees are really, really small, the <em>spectral clustering</em> approach you will learn about in <span class="xref std std-ref">ch6:lse</span> is simply not going to perform very well. When we say it is not going to perform very well, what we mean is that the spectral clusterings are going to be extremely influenced by these nodes with really small node degrees. To overcome this hurdle, instead of using the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian, you can use the regularized Laplacian, defined extremely similarly to the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian, as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    L^{rDAD}(\tau) &amp;= D_\tau^{-\frac{1}{2}}A D_\tau^{-\frac{1}{2}}
+\end{align*}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(\tau\)</span> is a regularization constant which is greater than or equal to zero, and <span class="math notranslate nohighlight">\(D_\tau = D + \tau I\)</span>. When we put <span class="math notranslate nohighlight">\(\tau\)</span> in parentheses here (that is, <span class="math notranslate nohighlight">\((\tau)\)</span>), all that we mean is that <span class="math notranslate nohighlight">\(L^{rDAD}\)</span> is a function of the particular regularization constant that you choose. Basically, what this is going to do is just “inflate” the diagonal elements of the degree matrix. So, if the degree for some of the nodes is extremely small, when we add a constant <span class="math notranslate nohighlight">\(\tau\)</span> to them, we can increase the degrees by <span class="math notranslate nohighlight">\(\tau\)</span>. In effect, what this will do is make the nodes with really small degrees (which, like we said, might cause issues in the spectral clustering) a lot less impactful on the results that you obtain. Also, as you can see, if <span class="math notranslate nohighlight">\(\tau = 0\)</span>, then <span class="math notranslate nohighlight">\(L^{rDAD}(\tau) = L^{DAD}\)</span>.</p>
+<p>Let’s take a look at what <span class="math notranslate nohighlight">\(L^{rDAD}(\tau)\)</span> and <span class="math notranslate nohighlight">\(L^{DAD}\)</span> look like when we pick <span class="math notranslate nohighlight">\(\tau\)</span> to be <span class="math notranslate nohighlight">\(1\)</span>. You can do this in <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> using <code class="docutils literal notranslate"><span class="pre">form=&quot;R-DAD&quot;</span></code>, and then setting <code class="docutils literal notranslate"><span class="pre">regularizer</span></code> appropriately:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tau</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">L_rdad</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">,</span> <span class="n">regularizer</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+
+<span class="n">L_dad_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L_dad</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;DAD Laplacian $L^</span><span class="si">{DAD}</span><span class="s2">$&quot;</span><span class="p">,</span> 
+               <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="n">L_dad_ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+
+
+<span class="n">L_dad_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L_rdad</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;regularized DAD Laplacian $L^</span><span class="si">{rDAD}</span><span class="s2">(1)$&quot;</span><span class="p">,</span> 
+               <span class="n">xticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="n">L_dad_ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">labelrotation</span><span class="o">=</span><span class="mi">360</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/matrix-representations_26_0.png" src="../../_images/matrix-representations_26_0.png" />
+</div>
+</div>
 </section>
 </section>
 </section>
