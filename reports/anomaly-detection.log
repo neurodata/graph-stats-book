@@ -17,36 +17,46 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import numpy as np
-from graspologic.simulations import rdpg
-    
-T = 12  # number of timepoints
-n = 100  # number of nodes
-# non-anomalous latent positions
-X = np.random.uniform(.2, .8, size=(nodes, 1))
-# array of latent positions for each time point
-Xts = []
-for time in range(T):
-    if time > 4 and time < 7:
-        Xt = np.copy(X)
-        Xt[0:20,:] = np.random.uniform(.6, 1.0, size=(20, 1))
-        Xts.append(Xt)
-    else:
-        Xts.append(X)
-networks = [rdpg(X) for X in Xts]
+import matplotlib.pyplot as plt
+from graphbook_code import heatmap, cmaps
+import seaborn as sns
 
-networks = np.array(networks)
+def rm_ticks(ax, x=False, y=False, **kwargs):
+    if x is not None:
+        ax.axes.xaxis.set_visible(x)
+    if y is not None:
+        ax.axes.yaxis.set_visible(y)
+    sns.despine(ax=ax, **kwargs)
+
+fig = plt.figure();
+
+# adjacency matrices
+perturbed_points = {5, 6}
+for i in range(time_points):
+    if i not in perturbed_points:
+        ax = fig.add_axes([.02*i, -.02*i, .8, .8])
+    else:
+        ax = fig.add_axes([.02*i+.8, -.02*i, .8, .8])
+    ax = heatmap(networks[i], ax=ax, cbar=False)
+    if i == 0:
+        ax.set_title("Ten Normal Time Points", loc="left", fontsize=16)
+    if i == 5:
+        ax.set_title("Two Perturbed Time Points", loc="left", fontsize=16)
+    rm_ticks(ax, top=False, right=False)
+    
+plt.figtext(1, -.3, "Figure 8.1")
+fig.suptitle("Network Timeseries Data", fontsize=24, x=1);
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
 [0;31mNameError[0m                                 Traceback (most recent call last)
-Input [0;32mIn [1][0m, in [0;36m<cell line: 7>[0;34m()[0m
-[1;32m      5[0m n [38;5;241m=[39m [38;5;241m100[39m  [38;5;66;03m# number of nodes[39;00m
-[1;32m      6[0m [38;5;66;03m# non-anomalous latent positions[39;00m
-[0;32m----> 7[0m X [38;5;241m=[39m np[38;5;241m.[39mrandom[38;5;241m.[39muniform([38;5;241m.2[39m, [38;5;241m.8[39m, size[38;5;241m=[39m([43mnodes[49m, [38;5;241m1[39m))
-[1;32m      8[0m [38;5;66;03m# array of latent positions for each time point[39;00m
-[1;32m      9[0m Xts [38;5;241m=[39m []
+Input [0;32mIn [2][0m, in [0;36m<cell line: 16>[0;34m()[0m
+[1;32m     14[0m [38;5;66;03m# adjacency matrices[39;00m
+[1;32m     15[0m perturbed_points [38;5;241m=[39m {[38;5;241m5[39m, [38;5;241m6[39m}
+[0;32m---> 16[0m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m([43mtime_points[49m):
+[1;32m     17[0m     [38;5;28;01mif[39;00m i [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m perturbed_points:
+[1;32m     18[0m         ax [38;5;241m=[39m fig[38;5;241m.[39madd_axes([[38;5;241m.02[39m[38;5;241m*[39mi, [38;5;241m-[39m[38;5;241m.02[39m[38;5;241m*[39mi, [38;5;241m.8[39m, [38;5;241m.8[39m])
 
-[0;31mNameError[0m: name 'nodes' is not defined
-NameError: name 'nodes' is not defined
+[0;31mNameError[0m: name 'time_points' is not defined
+NameError: name 'time_points' is not defined
 
