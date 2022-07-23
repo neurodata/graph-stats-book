@@ -829,13 +829,6 @@ title="Print to PDF"
   <a class="reference internal nav-link" href="#data-cleaning">
    2.3.1. Data cleaning
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#handling-categorical-variables">
-     2.3.1.1. Handling categorical variables
-    </a>
-   </li>
-  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#edge-weight-transformations">
@@ -877,13 +870,6 @@ title="Print to PDF"
   <a class="reference internal nav-link" href="#data-cleaning">
    2.3.1. Data cleaning
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#handling-categorical-variables">
-     2.3.1.1. Handling categorical variables
-    </a>
-   </li>
-  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#edge-weight-transformations">
@@ -926,49 +912,29 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">graspologic</span> <span class="k">as</span> <span class="nn">gp</span>
 
+<span class="n">AWSND_ROOT</span> <span class="o">=</span> <span class="s2">&quot;https://open-neurodata.s3.amazonaws.com/m2g/Diffusion/BNU1-8-27-20-m2g-native-csa-det/&quot;</span>
+<span class="n">DWI_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AWSND_ROOT</span><span class="p">,</span> 
+                       <span class="s2">&quot;sub-0025864/ses-1/connectomes/AAL_space-MNI152NLin6_res-2x2x2/&quot;</span><span class="p">)</span>
+<span class="n">DWI_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;dwi&quot;</span><span class="p">)</span>
+<span class="n">DWI_NAME</span> <span class="o">=</span> <span class="s2">&quot;sub-0025864_ses-1_dwi_AAL_space-MNI152NLin6_res-2x2x2_connectome.csv&quot;</span>
 
-<span class="n">MSR_ROOT</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/microsoft/graspologic/dev/&quot;</span>
-<span class="n">DROS_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;drosophila&quot;</span><span class="p">)</span>
-<span class="n">DROS_URL</span> <span class="o">=</span> <span class="n">MSR_ROOT</span> <span class="o">+</span> <span class="s2">&quot;graspologic/datasets/drosophila&quot;</span>
-
-<span class="n">DROS_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;left_adjacency.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;left_cell_labels.csv&quot;</span><span class="p">},</span>
-              <span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;right_adjacency.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;right_cell_labels.csv&quot;</span><span class="p">}}</span>
-
-<span class="k">def</span> <span class="nf">fetch_drosophila_data</span><span class="p">(</span><span class="n">dros_url</span><span class="o">=</span><span class="n">DROS_URL</span><span class="p">,</span> <span class="n">dros_path</span><span class="o">=</span><span class="n">DROS_PATH</span><span class="p">,</span>
-                         <span class="n">dros_names</span><span class="o">=</span><span class="n">DROS_NAMES</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dros_path</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dros_path</span><span class="p">)</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dros_names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">objtype</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dros_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_path</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-            <span class="n">csv_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_url</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-            <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">csv_url</span><span class="p">,</span> <span class="n">csv_path</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">load_drosophila_data</span><span class="p">(</span><span class="n">dros_path</span><span class="o">=</span><span class="n">DROS_PATH</span><span class="p">,</span> <span class="n">dros_names</span><span class="o">=</span><span class="n">DROS_NAMES</span><span class="p">,</span>
-                        <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="n">adj_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># make the return object</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dros_names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">adj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary for each adjacency matrix with labels</span>
-        
-        <span class="n">adj_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_path</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">])</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">adj_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">adjfile</span><span class="p">:</span>
-            <span class="n">adj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">adjfile</span><span class="p">)</span>
-        
-        <span class="n">labels_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_path</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">labels_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">labelfile</span><span class="p">:</span>
-            <span class="n">adj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">labelfile</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">adj_dict</span>
+<span class="k">def</span> <span class="nf">fetch_dwi_data</span><span class="p">(</span><span class="n">dwi_url</span><span class="o">=</span><span class="n">DWI_URL</span><span class="p">,</span> <span class="n">dwi_path</span><span class="o">=</span><span class="n">DWI_PATH</span><span class="p">,</span> <span class="n">dwi_name</span><span class="o">=</span><span class="n">DWI_NAME</span><span class="p">):</span>
+    <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">,</span> <span class="n">dwi_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">)</span>
+    <span class="n">csv_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_url</span><span class="p">,</span> <span class="n">dwi_name</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">csv_url</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">local_path</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_drosophila_data</span><span class="p">()</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_drosophila_data</span><span class="p">()</span>
-<span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">][</span><span class="s2">&quot;A&quot;</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_path</span> <span class="o">=</span> <span class="n">fetch_dwi_data</span><span class="p">()</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -977,33 +943,31 @@ title="Print to PDF"
 <h2><span class="section-number">2.3.1. </span>Data cleaning<a class="headerlink" href="#data-cleaning" title="Permalink to this headline">#</a></h2>
 <p>Most network machine learning algorithms cannot work with a node which is <em>isolated</em>, a term we will learn in <a class="reference external" href="#link?">Chapter 4</a> which means that the node has no edges. Let’s start with fixing this. We can remove isolated nodes from the network as follows:</p>
 <ol class="simple">
-<li><p>Compute the number of nodes each node connects to. This consists of summing the matrix along the rows and along the columns.</p></li>
+<li><p>Compute the number of nodes each node connects to. This consists of summing the matrix along the rows (or columns). The network is <em>undirected</em>, a property you will learn in <a class="reference internal" href="../../representations/ch4/properties-of-networks.html#ch4-prop-net"><span class="std std-ref">properties of networks</span></a>, which means that if a node can communicate with another node, that other node can also communicate with that node</p></li>
 <li><p>Identify any nodes which are connected to zero nodes along either the rows or columns. These are the <em>isolated</em> nodes.</p></li>
-<li><p>Remove the isolated nodes from both the adjacency matrix and the labels.</p></li>
+<li><p>Remove the isolated nodes from the adjacency matrix.</p></li>
 </ol>
-<p>Let’s see how this works in practice. We begin by first taking the row and column sums of each node, and then finding the sum across the rows and the columns. Next, we remove all nodes with are not connected to any other nodes (the row and column sum are both zero) from both the adjacency matrix and the labels:</p>
+<p>Let’s see how this works in practice. We begin by first taking the row sums of each node, which tells us how many nodes that each node is connected to. Next, we remove all nodes with are not connected to any other nodes (the row and column sum are both zero) from both the adjacency matrix and the labels:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function which removes isolated nodes from the </span>
 <span class="sd">    adjacency matrix A and the labels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">in_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># sum along the rows</span>
-    <span class="n">out_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># sum along the columns</span>
-    <span class="n">cum_degree</span> <span class="o">=</span> <span class="n">in_degree</span> <span class="o">+</span> <span class="n">out_degree</span>
-    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),:]</span>
-    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A_purged</span><span class="p">[:,</span><span class="o">~</span><span class="p">(</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
-    <span class="n">labels_purged</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Purging </span><span class="si">{:d}</span><span class="s2"> nodes...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">A_purged</span><span class="p">,</span> <span class="n">labels_purged</span><span class="p">)</span>
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># sum along the rows to obtain the node degree</span>
+    <span class="n">out_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),:]</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A_purged</span><span class="p">[:,</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Purging </span><span class="si">{:d}</span><span class="s2"> nodes...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">A_purged</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1014,39 +978,6 @@ title="Print to PDF"
 </div>
 </div>
 <p>So no isolated nodes were found, and consequently no nodes were purged. Great! What else can we do?</p>
-<section id="handling-categorical-variables">
-<h3><span class="section-number">2.3.1.1. </span>Handling categorical variables<a class="headerlink" href="#handling-categorical-variables" title="Permalink to this headline">#</a></h3>
-<p>If you remember, the <code class="docutils literal notranslate"><span class="pre">labels</span></code> variable is a list of characters which gives a unique cell type of each mushroom body node. Unfortunately, many network machine learning algorithms prefer to work with numbers of characters. For this reason, it is instead advantageous to us if we convert these node labels instead to a numerical vector of integers. We arbitrarily just decide a mapping for the different unique labels, numbering them 1, 2, 3, or 4:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">remap_labels</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
-    <span class="n">labs</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">}</span>
-    <span class="c1"># initialize empty numerical vector and dictionary</span>
-    <span class="c1"># to keep track of the mapping you produce</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">numerical_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">labs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">numerical_labels</span><span class="p">[</span><span class="n">labels</span> <span class="o">==</span> <span class="n">lab</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">mapping</span><span class="p">[</span><span class="n">lab</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">numerical_labels</span><span class="p">,</span> <span class="n">mapping</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_labsleft</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">remap_labels</span><span class="p">(</span><span class="n">labelsleft</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;K&#39;: 2, &#39;P&#39;: 3, &#39;O&#39;: 4, &#39;I&#39;: 5}
-</pre></div>
-</div>
-</div>
-</div>
-<p>So as you can see, I labels were replaced with the value 1, K labels were replaced with the value 2, O labels were replaced with the value 3, and P labels were replaced with the value 4.</p>
 <p>To streamline the process of cleaning up the raw data, you will often need to write custom data cleaners. You will want your cleaners to work seamlessly with <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s functions, such as pipelines, and will require you to only implement three class methods: <code class="docutils literal notranslate"><span class="pre">fit()</span></code>, <code class="docutils literal notranslate"><span class="pre">transform()</span></code>, <code class="docutils literal notranslate"><span class="pre">fit_transform()</span></code>. By adding <code class="docutils literal notranslate"><span class="pre">TransformerMixin</span></code> as a base class, we do not even have to implement the third one! If we use <code class="docutils literal notranslate"><span class="pre">BaseEstimator</span></code> as a base class, we will also obtain <code class="docutils literal notranslate"><span class="pre">get_params()</span></code> and <code class="docutils literal notranslate"><span class="pre">set_params()</span></code>, which will be useful for hyperparameter tuning steps later on. For example, here is an example cleaner class which purges the adjacency matrix of isolates and remaps the categorical labels to numbers. Note that a key step to implementing this all as cleanly as possible is that the inputs, an adjacency matrix and a vector of node labels, are passed in as a <em>single</em> tuple object. This is because <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> anticipates that the return arguments from calls of <code class="docutils literal notranslate"><span class="pre">transform()</span></code> can be passed sequentially to one another, which we will see later on when we try to string several of these transformers together into a single pipeline:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1059,16 +990,13 @@ title="Print to PDF"
         <span class="k">return</span> <span class="bp">self</span>
     
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="n">Acleaned</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-        <span class="n">labels_cleaned</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">remap_labels</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="n">Acleaned</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">Acleaned</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="n">labels_cleaned</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_</span> <span class="o">=</span> <span class="n">mapping</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
     
 <span class="n">data_cleaner</span> <span class="o">=</span> <span class="n">CleanData</span><span class="p">()</span>
-<span class="p">(</span><span class="n">Aleft_clean</span><span class="p">,</span> <span class="n">labelsleft_clean</span><span class="p">)</span> <span class="o">=</span> <span class="n">data_cleaner</span><span class="o">.</span><span class="n">transform</span><span class="p">((</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span><span class="p">))</span>
+<span class="n">A_clean</span> <span class="o">=</span> <span class="n">data_cleaner</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1079,20 +1007,17 @@ title="Print to PDF"
 </div>
 </div>
 </section>
-</section>
 <section id="edge-weight-transformations">
 <h2><span class="section-number">2.3.2. </span>Edge weight transformations<a class="headerlink" href="#edge-weight-transformations" title="Permalink to this headline">#</a></h2>
-<p>One of the most important transformations that we will come across in network machine learning is called <em>edge-weight transformation</em>. Many networks you enounter, such as the drosophila mushroom body, will have edge weights which do not just take values of 1 or 0 (edge or no edge, a <em>binary</em> network); rather, many of the networks you come across may have discrete-weighted edges (the edges take non-negative inter values, such as 0, 1, 2, 3, …), or decimal-weight edges (the edges take values like 0, 0.1234, 0.234, 2.4234, …). For a number of reasons icussed later in <a class="reference external" href="#link?">Chapter 4</a>, this is often not really a desirable characteristic.  The edges in a network might be error prone, and it might only be desirable to capture one (or a few) properties about the edge weights, rather than just leave them in their raw values. Further, a lot of the techniques we come across throughout this book might not even <em>work</em> on networks which are not binary. For this reason, we need to get accustomed to transforming the edge weights to take new sets of values.</p>
+<p>One of the most important transformations that we will come across in network machine learning is called <em>edge-weight transformation</em>. Many networks you enounter, such as the human diffusion connectome, will have edge weights which do not just take values of 1 or 0 (edge or no edge, a <em>binary</em> network); rather, many of the networks you come across may have discrete-weighted edges (the edges take non-negative inter values, such as 0, 1, 2, 3, …), or decimal-weight edges (the edges take values like 0, 0.1234, 0.234, 2.4234, …). For a number of reasons discussed later in <a class="reference internal" href="../../representations/ch4/regularization.html#ch4-regularization"><span class="std std-ref">Regularization</span></a>, this is often not really a desirable characteristic.  The edges in a network might be error prone, and it might only be desirable to capture one (or a few) properties about the edge weights, rather than just leave them in their raw values. Further, a lot of the techniques we come across throughout this book might not even <em>work</em> on networks which are not binary. For this reason, we need to get accustomed to transforming the edge weights to take new sets of values.</p>
 <p>There are two common approaches to transform edge weights: the first is called binarization (set all of the edges to take a value of 0 or 1), and the second is called an ordinal transformation.</p>
 <section id="binarization-of-edges">
 <h3><span class="section-number">2.3.2.1. </span>Binarization of edges<a class="headerlink" href="#binarization-of-edges" title="Permalink to this headline">#</a></h3>
-<p>Binarization is quite simple: the edges in the raw network take non-binary values (0s and 1s), and you need them to for your algorithm. How do you solve this?</p>
+<p>Binarization is quite simple: the edges in the raw network take non-binary values (values other than just 0s and 1s), and you need them to be 0s and 1s for your algorithm. How do you solve this?</p>
 <p>The simplest thing to do is usually to just look at which edges take a value of zero, and keep them as zero, and then look at all of the edges which take a non-zero value, and set them to one. In effect, what this does is it just takes the original non-binary network, and converts it to a binary one. Let’s take a look at how we can implement this using <code class="docutils literal notranslate"><span class="pre">graspologic</span></code>. We first look at the network before binarization, and then after:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graspologic</span> <span class="k">as</span> <span class="nn">gp</span>
-
-<span class="n">Aleft_bin</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">Aleft_clean</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A_bin</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">A_clean</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1100,22 +1025,23 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Aleft_clean</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labelsleft</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Weighted Drosophila Mushroom Body&quot;</span><span class="p">)</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Aleft_bin</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labelsleft</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Binary Drosophila Mushroom Body&quot;</span><span class="p">);</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_clean</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Weighted Human Connectome&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_bin</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Binary Human Connectome&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/prepare-the-data_14_0.png" src="../../_images/prepare-the-data_14_0.png" />
+<img alt="../../_images/prepare-the-data_12_0.png" src="../../_images/prepare-the-data_12_0.png" />
 </div>
 </div>
-<p>Woah! That heatmap looks a whole lot different, particularly in the top left corner. What happened was that edges in the weighted drosophila mushroom body have very small edge weights in the upper left corner, which <em>almost</em> look like they are zero. But when we binarize the network, we see that this is no longer the case: all of the edge weights which are non-zero took a value of one (and are dark red) and all of the edge weights which are zero stay at zero (and are white).</p>
+<p>Woah! That heatmap looks a whole lot different, particularly in the top left. What happened was that edges in the weighted human connectome have very small edge weights in the upper left corner, which <em>almost</em> look like they are zero. But when we binarize the network, we see that this is no longer the case: all of the edge weights which are non-zero took a value of one (and are dark purple) and all of the edge weights which are zero stay at zero (and are white).</p>
 <p>Another way we could have normalized these edge weights is through something called a <em>pass to ranks</em>. Through a pass to ranks, the edge weights are discarded entirely, with one exception: the edges which are non-zero are first ranked, from smallest to largest, with the largest item having a rank of one, and the smallest item having a rank of <span class="math notranslate nohighlight">\(\frac{1}{\text{number of non-zero edges}}\)</span>. This is called an <em>ordinal transformation</em>, in that it preserves the <em>orders</em> of the edge-weights, but discards all other information.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Aleft_ptr</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">Aleft_clean</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A_ptr</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1123,14 +1049,15 @@ title="Print to PDF"
 <p>Again, we plot the resulting connectome, before and after passing to ranks, as heatmaps:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Aleft_clean</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labelsleft</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Weighted Drosophila Mushroom Body&quot;</span><span class="p">)</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Aleft_ptr</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labelsleft</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Drosophila Mushroom Body, Passed to Ranks&quot;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_clean</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Weighted human connectome&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_bin</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Binary human connectome&quot;</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ranked human connectome&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/prepare-the-data_18_0.png" src="../../_images/prepare-the-data_18_0.png" />
+<img alt="../../_images/prepare-the-data_16_0.png" src="../../_images/prepare-the-data_16_0.png" />
 </div>
 </div>
 <p>This has shifted the histogram of edge-weights, as we can see below:</p>
@@ -1140,18 +1067,18 @@ title="Print to PDF"
 
 
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">Aleft_clean</span><span class="p">[</span><span class="n">Aleft_clean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">A_clean</span><span class="p">[</span><span class="n">A_clean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge weight&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of left mushroom body non-zero edge weights&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of human connectome non-zero edge weights&quot;</span><span class="p">);</span>
 
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">Aleft_ptr</span><span class="p">[</span><span class="n">Aleft_ptr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">A_ptr</span><span class="p">[</span><span class="n">A_ptr</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;ptr(Edge weight)&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of left mushroom body, passed-to-ranks&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of human connectome, passed-to-ranks&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/prepare-the-data_20_0.png" src="../../_images/prepare-the-data_20_0.png" />
+<img alt="../../_images/prepare-the-data_18_0.png" src="../../_images/prepare-the-data_18_0.png" />
 </div>
 </div>
 <p>This has the desirable property that it bounds the network’s edge weights to be between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>, as we can see above, which is often crucial if we seek to compare two or more networks and the edge weights are relative in magnitude (an edge’s weight might mean something in relation to another edge’s weight in that same network, but an edge’s weight means nothing in relation to another edge’s weight in a separate network). Further, passing to ranks is not very susceptible to outliers, as we will see in later chapters.</p>
@@ -1166,12 +1093,12 @@ title="Print to PDF"
         <span class="k">return</span> <span class="bp">self</span>
     
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="n">A_scaled</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">A_scaled</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="n">A_scaled</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">A_scaled</span><span class="p">)</span>
     
 <span class="n">feature_scaler</span> <span class="o">=</span> <span class="n">FeatureScaler</span><span class="p">()</span>
-<span class="n">A_cleaned_scaled</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">feature_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">((</span><span class="n">Aleft_clean</span><span class="p">,</span> <span class="n">labelsleft_clean</span><span class="p">))</span>
+<span class="n">A_cleaned_scaled</span> <span class="o">=</span> <span class="n">feature_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">A_clean</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1189,7 +1116,7 @@ title="Print to PDF"
     <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">FeatureScaler</span><span class="p">()),</span>
 <span class="p">])</span>
 
-<span class="n">left_tr</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">((</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span><span class="p">))</span>
+<span class="n">xfm_dat</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1201,17 +1128,25 @@ title="Print to PDF"
 </div>
 <p>The pipeline class takes a list of name/estimator pairs defining a sequence of steps. All but the last estimator must be transformers, which implement the <code class="docutils literal notranslate"><span class="pre">fit_transform()</span></code> method. In our case, this is handled directly by the <code class="docutils literal notranslate"><span class="pre">TransformerMixin</span></code> base class.</p>
 <p>When you call the <code class="docutils literal notranslate"><span class="pre">fit_transform()</span></code> method of the numerical pipeline, it calls the <code class="docutils literal notranslate"><span class="pre">fit_transform()</span></code> method on each of the transformers, and passes the output of each call as the parameter to the next call, until it reaches the final estimator, for which it just calls the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.</p>
-<p>Next, we’ll see the real handiness of the <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> module. The reason we went to lengths to define a pipeline was that we wanted to have an easily reproducible procedure that we could efficiently apply to new datasets. We’ll see how we can do that using both the left and right mushroom bodies of the drosophila, which we perform below:</p>
+<p>Next, we’ll see the real handiness of the <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> module. The reason we went to lengths to define a pipeline was that we wanted to have an easily reproducible procedure that we could efficiently apply to new datasets. We’ll see how we can do that using two human connectomes, the one we have been studying so far and an additional subject’s data, which we perform below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">left_tr</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">((</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span><span class="p">))</span>
-<span class="n">right_tr</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">((</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Right&quot;</span><span class="p">][</span><span class="s2">&quot;A&quot;</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Right&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A_xfm_dat1</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">DWI_URL2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AWSND_ROOT</span><span class="p">,</span> 
+                       <span class="s2">&quot;sub-0025865/ses-1/connectomes/AAL_space-MNI152NLin6_res-2x2x2/&quot;</span><span class="p">)</span>
+<span class="n">DWI_NAME2</span> <span class="o">=</span> <span class="s2">&quot;sub-0025865_ses-1_dwi_AAL_space-MNI152NLin6_res-2x2x2_connectome.csv&quot;</span>
+<span class="n">local_path2</span> <span class="o">=</span> <span class="n">fetch_dwi_data</span><span class="p">(</span><span class="n">dwi_url</span><span class="o">=</span><span class="n">DWI_URL2</span><span class="p">,</span> <span class="n">dwi_name</span><span class="o">=</span><span class="n">DWI_NAME2</span><span class="p">)</span>
+<span class="n">A_sub2</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">local_path2</span><span class="p">)</span>
+<span class="n">A_xfm_dat2</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A_sub2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Purging 0 nodes...
-Purging 0 nodes...
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Purging 0 nodes...
 </pre></div>
 </div>
 </div>
@@ -1220,13 +1155,13 @@ Purging 0 nodes...
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">left_tr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">left_tr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Left Mushroom Body, Preprocessed&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">right_tr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">right_tr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Right Mushroom Body, Preprocessed&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_xfm_dat1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Connectome 1, Preprocessed&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_xfm_dat2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Connectome 2, Preprocessed&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/prepare-the-data_28_0.png" src="../../_images/prepare-the-data_28_0.png" />
+<img alt="../../_images/prepare-the-data_26_0.png" src="../../_images/prepare-the-data_26_0.png" />
 </div>
 </div>
 </section>
