@@ -51,8 +51,6 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="3. End-to-end Business Network Machine Learning Project" href="../ch3/ch3.html" />
@@ -836,13 +834,8 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#choosing-an-appropriate-network-machine-learning-model">
-   2.6.1. Choosing an appropriate network machine learning model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#try-it-out">
-   2.6.2. Try it out!
+   2.6.1. Try it out!
   </a>
  </li>
 </ul>
@@ -865,13 +858,8 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#choosing-an-appropriate-network-machine-learning-model">
-   2.6.1. Choosing an appropriate network machine learning model
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#try-it-out">
-   2.6.2. Try it out!
+   2.6.1. Try it out!
   </a>
  </li>
 </ul>
@@ -886,103 +874,80 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="discover-and-visualize-the-data-to-gain-insights">
 <span id="ch2-discover"></span><h1><span class="section-number">2.6. </span>Discover and Visualize the Data to Gain Insights<a class="headerlink" href="#discover-and-visualize-the-data-to-gain-insights" title="Permalink to this headline">#</a></h1>
-<p>So, now we’ve got a codebase accumulated to read in the input data:</p>
+<p>So, now we’ve got a codebase accumulated to read in the input data, get it cleaned up, embed it while borrowing strength from all networks, and make some predictions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">import_edgelist</span><span class="p">,</span> <span class="n">pass_to_ranks</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 
+<span class="c1"># the AWS bucket the data is stored in</span>
+<span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
+<span class="c1"># the path to the data we are interested in</span>
+<span class="n">parcellation</span> <span class="o">=</span> <span class="s2">&quot;Schaefer400&quot;</span>
+<span class="n">FMRI_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;m2g/Functional/BNU1-11-12-20-m2g-func/Connectomes/&quot;</span> <span class="o">+</span> <span class="n">parcellation</span> <span class="o">+</span> <span class="s2">&quot;_space-MNI152NLin6_res-2x2x2.nii.gz/&quot;</span>
+<span class="n">FMRI_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;fmri&quot;</span><span class="p">)</span>  <span class="c1"># the output folder</span>
+<span class="n">DS_KEY</span> <span class="o">=</span> <span class="s2">&quot;abs_edgelist&quot;</span>  <span class="c1"># correlation matrices for the networks to exclude</span>
 
-<span class="n">MSR_ROOT</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/microsoft/graspologic/dev/&quot;</span>
-<span class="n">DROS_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;drosophila&quot;</span><span class="p">)</span>
-<span class="n">DROS_URL</span> <span class="o">=</span> <span class="n">MSR_ROOT</span> <span class="o">+</span> <span class="s2">&quot;graspologic/datasets/drosophila&quot;</span>
+<span class="k">def</span> <span class="nf">fetch_fmri_data</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">BUCKET_ROOT</span><span class="p">,</span> <span class="n">fmri_prefix</span><span class="o">=</span><span class="n">FMRI_PREFIX</span><span class="p">,</span>
+                    <span class="n">output</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">DS_KEY</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to fetch fMRI connectomes from AWS S3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check that output directory exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">)</span>
+    <span class="c1"># start boto3 session anonymously</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">))</span>
+    <span class="c1"># obtain the filenames</span>
+    <span class="n">bucket_conts</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> 
+                    <span class="n">Prefix</span><span class="o">=</span><span class="n">fmri_prefix</span><span class="p">)[</span><span class="s2">&quot;Contents&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">s3_key</span> <span class="ow">in</span> <span class="n">bucket_conts</span><span class="p">:</span>
+        <span class="c1"># get the filename</span>
+        <span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_key</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+        <span class="c1"># verify that we are grabbing the right file</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s3_object</span><span class="p">:</span>
+            <span class="n">op_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s3_object</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op_fname</span><span class="p">):</span>
+                <span class="n">s3</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">s3_object</span><span class="p">,</span> <span class="n">op_fname</span><span class="p">)</span>
 
-<span class="n">DROS_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;left_adjacency.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;left_cell_labels.csv&quot;</span><span class="p">},</span>
-              <span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;right_adjacency.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;right_cell_labels.csv&quot;</span><span class="p">}}</span>
+<span class="k">def</span> <span class="nf">read_fmri_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">fetch_drosophila_data</span><span class="p">(</span><span class="n">dros_url</span><span class="o">=</span><span class="n">DROS_URL</span><span class="p">,</span> <span class="n">dros_path</span><span class="o">=</span><span class="n">DROS_PATH</span><span class="p">,</span>
-                         <span class="n">dros_names</span><span class="o">=</span><span class="n">DROS_NAMES</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dros_path</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dros_path</span><span class="p">)</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dros_names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">objtype</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dros_names</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_path</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-            <span class="n">csv_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_url</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-            <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">csv_url</span><span class="p">,</span> <span class="n">csv_path</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">load_drosophila_data</span><span class="p">(</span><span class="n">dros_path</span><span class="o">=</span><span class="n">DROS_PATH</span><span class="p">,</span> <span class="n">dros_names</span><span class="o">=</span><span class="n">DROS_NAMES</span><span class="p">,</span>
-                        <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="n">adj_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># make the return object</span>
-    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dros_names</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">adj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dictionary for each adjacency matrix with labels</span>
-        
-        <span class="n">adj_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_path</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">])</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">adj_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">adjfile</span><span class="p">:</span>
-            <span class="n">adj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">adjfile</span><span class="p">)</span>
-        
-        <span class="n">labels_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dros_path</span><span class="p">,</span> <span class="n">dictobj</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">labels_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">labelfile</span><span class="p">:</span>
-            <span class="n">adj_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">labelfile</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">adj_dict</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_drosophila_data</span><span class="p">()</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_drosophila_data</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We’ve got some code to prepare the data for machine learning:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graspologic</span> <span class="k">as</span> <span class="nn">gp</span>
-
-<span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function which removes isolated nodes from the </span>
-<span class="sd">    adjacency matrix A and the labels.</span>
+<span class="sd">    adjacency matrix A.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">in_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># sum along the rows</span>
-    <span class="n">out_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># sum along the columns</span>
-    <span class="n">cum_degree</span> <span class="o">=</span> <span class="n">in_degree</span> <span class="o">+</span> <span class="n">out_degree</span>
-    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),:]</span>
-    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A_purged</span><span class="p">[:,</span><span class="o">~</span><span class="p">(</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
-    <span class="n">labels_purged</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Purging </span><span class="si">{:d}</span><span class="s2"> nodes...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">cum_degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">A_purged</span><span class="p">,</span> <span class="n">labels_purged</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">remap_labels</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
-    <span class="n">labs</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">}</span>
-    <span class="c1"># initialize empty numerical vector and dictionary</span>
-    <span class="c1"># to keep track of the mapping you produce</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">numerical_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">lab</span> <span class="ow">in</span> <span class="n">labs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">numerical_labels</span><span class="p">[</span><span class="n">labels</span> <span class="o">==</span> <span class="n">lab</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">mapping</span><span class="p">[</span><span class="n">lab</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">numerical_labels</span><span class="p">,</span> <span class="n">mapping</span>
-
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># sum along the rows to obtain the node degree</span>
+    <span class="n">out_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),:]</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A_purged</span><span class="p">[:,</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Purging </span><span class="si">{:d}</span><span class="s2"> nodes...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">A_purged</span>
 
 <span class="k">class</span> <span class="nc">CleanData</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
-    
+
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="n">Acleaned</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-        <span class="n">labels_cleaned</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">remap_labels</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">Acleaned</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="n">labels_cleaned</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_</span> <span class="o">=</span> <span class="n">mapping</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning data...&quot;</span><span class="p">)</span>
+        <span class="n">Acleaned</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">A_abs_cl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Acleaned</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">A_abs_cl</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
     
 <span class="k">class</span> <span class="nc">FeatureScaler</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -992,11 +957,9 @@ title="Print to PDF"
         <span class="k">return</span> <span class="bp">self</span>
     
     <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">A</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="n">A_scaled</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">A_scaled</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scaling edge-weights...&quot;</span><span class="p">)</span>
+        <span class="n">A_scaled</span> <span class="o">=</span> <span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">A_scaled</span><span class="p">)</span>
 
 <span class="n">num_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
     <span class="p">(</span><span class="s1">&#39;cleaner&#39;</span><span class="p">,</span> <span class="n">CleanData</span><span class="p">()),</span>
@@ -1008,131 +971,122 @@ title="Print to PDF"
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span><span class="p">)</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">((</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">][</span><span class="s2">&quot;A&quot;</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]))</span>
-<span class="p">(</span><span class="n">Aright</span><span class="p">,</span> <span class="n">labelsright</span><span class="p">)</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">((</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Right&quot;</span><span class="p">][</span><span class="s2">&quot;A&quot;</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;Right&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="n">fetch_fmri_data</span><span class="p">()</span>
+
+<span class="n">As_raw</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">As</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">As_raw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span>
+<span class="kn">from</span> <span class="nn">graspologic.cluster</span> <span class="kn">import</span> <span class="n">AutoGMMCluster</span>
+
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">MultipleASE</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">As</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">AutoGMMCluster</span><span class="p">(</span><span class="n">max_components</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">embedding</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, now you’re finished, right?</p>
+<p>Wrong! The end of a computational analysis typically means the fun is just beginning: it’s now time to <em>make sense</em> of whatever, exactly, it is that you just did!</p>
+<p>How could we visualize the node clusters (or, more formally, called <em>communities</em>) that we just made? We already know about the pairplot:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicted Community&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;MASE of connectomes&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Purging 0 nodes...
-Purging 0 nodes...
+<img alt="../../_images/discover-and-visualize_5_0.png" src="../../_images/discover-and-visualize_5_0.png" />
+</div>
+</div>
+<p>What if we take a look at the nodes, which if we remember were areas of the brain, how they <em>really</em> look in the brain’s natural space?</p>
+<p>It turns out that the areas of the brain for your network are, in fact, <em>known</em> 3D points in the brain. This means that, with some minor work, we can figure out the coordinates of the individual nodes for the brain. Let’s use the <a class="reference external" href="https://github.com/neurodata/neuroparc">neuroparc repository</a> to grab the 3D coordinates of each node in the network:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">coord_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="s2">&quot;coordinates.json&quot;</span><span class="p">)</span>
+<span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">&quot;https://github.com/neurodata/neuroparc/raw/master/atlases/label/Human/Metadata-json/&quot;</span> <span class="o">+</span> <span class="n">parcellation</span> <span class="o">+</span> <span class="s2">&quot;_space-MNI152NLin6_res-2x2x2.json&quot;</span><span class="p">,</span>
+                    <span class="n">coord_dest</span><span class="p">);</span>
+<span class="n">coord_f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">coord_dest</span><span class="p">)</span>
+
+<span class="n">coords</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">roiname</span><span class="p">,</span> <span class="n">contents</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">coord_f</span><span class="p">)[</span><span class="s2">&quot;rois&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">roiname</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+        <span class="n">coord_roi</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span> <span class="p">:</span> <span class="n">contents</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span> <span class="p">:</span> <span class="n">contents</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span> <span class="p">:</span> <span class="n">contents</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]}</span>
+        <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coord_roi</span><span class="p">)</span>
+<span class="n">coords_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>And you are left with two adjacency matrices and node labels:</p>
+<p>Now that we have the coordinates, let’s try plotting the nodes, but in their native spatial orientation. Here, the color will indicate the predicted label, from our clustering. The slices we’ll show will be a saggital slice through the brain. A saggital slice shows the brain nodes oriented from back (right of the plot) of the brain to front (left of the plot), and from bottom (bottom of the plot) to top (top of the plot). On the left, we show the brain with the lobe annotations, and on the right, the predicted labels of each node in color, where each node is shown in its true physical location:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
 
+<span class="n">coords_df</span><span class="p">[</span><span class="s2">&quot;Community&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+<span class="n">coords_df</span><span class="p">[</span><span class="s1">&#39;Community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_df</span><span class="p">[</span><span class="s1">&#39;Community&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labelsleft</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Left Mushroom Body, Preprocessed&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">Aright</span><span class="p">,</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labelsright</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Right Mushroom Body, Preprocessed&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;./Images/lobes.png&#39;</span><span class="p">))</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">coords_df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/discover-and-visualize_7_0.png" src="../../_images/discover-and-visualize_7_0.png" />
-</div>
-</div>
-<p>What’s next? Now is where the fun starts: you are ready to tackle some network machine learning algorithms.</p>
-<section id="choosing-an-appropriate-network-machine-learning-model">
-<h2><span class="section-number">2.6.1. </span>Choosing an appropriate network machine learning model<a class="headerlink" href="#choosing-an-appropriate-network-machine-learning-model" title="Permalink to this headline">#</a></h2>
-<p>The most crucial step in network machine learning is figuring out an appropriate <em>model</em> for your data. A <em>statistical model</em>, which we will become more accustomed to in <a class="reference external" href="#link?">Chapter 5</a>, are sets of assumptions that describe how we think the data behaves.</p>
-<p>In the above plot, what we immediately notice is that in general, nodes with a label of 2 tend to show similar behavior to one another: they are well connected with nodes labeled 2, 3, or 1 in the top right of the heatmap, or nodes labelled 4 and 1 in the bottom left of the heatmap. This applies to both the left and right mushroom bodies. As we keep going down the groups of nodes, we see this pattern continue: nodes labelled 4 tend to be completely unconnected to any nodes except for nodes labelled 2 in the bottom left of the heatmap, and are not connected to any other nodes in the entire network. This pattern continues for the other nodes in the network. If we were being naive, we might just say that the left mushroom body and the right mushroom body look the same, end of story. However, do they <em>actually</em>? As it turns out, there are some pretty big differences!</p>
-<p>As it turns out, this pattern of nodes having similar patterns as other nodes in the same group is a statistical model you will learn about later on: the <a class="reference external" href="#link?">stochastic block model</a> (SBM). You will first fit an SBM to the left and right mushroom bodies, using <code class="docutils literal notranslate"><span class="pre">graspologic</span></code>’s <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class. The <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code> class takes an adjacency matrix and the node labels as leading arguments:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.models</span> <span class="kn">import</span> <span class="n">SBMEstimator</span>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="nn">Input In [6],</span> in <span class="ni">&lt;cell line: 8&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">coords_df</span><span class="p">[</span><span class="s1">&#39;Community&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_df</span><span class="p">[</span><span class="s1">&#39;Community&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="ne">----&gt; </span><span class="mi">8</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;./Images/lobes.png&#39;</span><span class="p">))</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">coords_df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-<span class="n">left_sbm</span> <span class="o">=</span> <span class="n">SBMEstimator</span><span class="p">()</span>
-<span class="n">left_sbm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Aleft</span><span class="p">,</span> <span class="n">labelsleft</span><span class="p">);</span>
-<span class="n">right_sbm</span> <span class="o">=</span> <span class="n">SBMEstimator</span><span class="p">()</span>
-<span class="n">right_sbm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Aright</span><span class="p">,</span> <span class="n">labelsright</span><span class="p">);</span>
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/matplotlib/image.py:1560,</span> in <span class="ni">imread</span><span class="nt">(fname, format)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1558</span>                 <span class="n">response</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="g g-Whitespace">   </span><span class="mi">1559</span>             <span class="k">return</span> <span class="n">imread</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+<span class="ne">-&gt; </span><span class="mi">1560</span> <span class="k">with</span> <span class="n">img_open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">image</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1561</span>     <span class="k">return</span> <span class="p">(</span><span class="n">_pil_png_to_float_array</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1562</span>             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">PIL</span><span class="o">.</span><span class="n">PngImagePlugin</span><span class="o">.</span><span class="n">PngImageFile</span><span class="p">)</span> <span class="k">else</span>
+<span class="g g-Whitespace">   </span><span class="mi">1563</span>             <span class="n">pil_to_array</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/PIL/ImageFile.py:104,</span> in <span class="ni">ImageFile.__init__</span><span class="nt">(self, fp, filename)</span>
+<span class="g g-Whitespace">    </span><span class="mi">100</span> <span class="bp">self</span><span class="o">.</span><span class="n">decodermaxblock</span> <span class="o">=</span> <span class="n">MAXBLOCK</span>
+<span class="g g-Whitespace">    </span><span class="mi">102</span> <span class="k">if</span> <span class="n">is_path</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">103</span>     <span class="c1"># filename</span>
+<span class="ne">--&gt; </span><span class="mi">104</span>     <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">105</span>     <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">fp</span>
+<span class="g g-Whitespace">    </span><span class="mi">106</span>     <span class="bp">self</span><span class="o">.</span><span class="n">_exclusive_fp</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;./Images/lobes.png&#39;
 </pre></div>
 </div>
+<img alt="../../_images/discover-and-visualize_9_1.png" src="../../_images/discover-and-visualize_9_1.png" />
 </div>
 </div>
-<p>What the SBM does is basically, for each block of edges in the adjacency matrix, it computes the fraction of the edges which exist (an estimate of the “probability” of an edge). This is organized into what is called the block matrix, which is the <code class="docutils literal notranslate"><span class="pre">block_p_</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">SBMEstimator</span></code>. We visualize these block probability matrices also as heatmaps:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-
-<span class="k">def</span> <span class="nf">plot_block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">blockname</span><span class="o">=</span><span class="s2">&quot;Node Group&quot;</span><span class="p">,</span> <span class="n">blocktix</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">],</span>
-               <span class="n">blocklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-    
-    <span class="k">with</span> <span class="n">sns</span><span class="o">.</span><span class="n">plotting_context</span><span class="p">(</span><span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Purples&quot;</span><span class="p">,</span>
-                        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cbar_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">shrink</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">yticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                        <span class="n">xticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-        <span class="n">cbar</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">colorbar</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="n">blockname</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="n">blockname</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">blocktix</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">blocklabs</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">blocktix</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">blocklabs</span><span class="p">)</span>
-        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_frame_on</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">left_sbm</span><span class="o">.</span><span class="n">block_p_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Left Block Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">right_sbm</span><span class="o">.</span><span class="n">block_p_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Right Block Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">left_sbm</span><span class="o">.</span><span class="n">block_p_</span> <span class="o">-</span> <span class="n">right_sbm</span><span class="o">.</span><span class="n">block_p_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Left - Right&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/discover-and-visualize_11_0.png" src="../../_images/discover-and-visualize_11_0.png" />
-</div>
-</div>
-<p>The block matrices look quite similar, at first glance. However, as you can see, some of the blocks are pretty different in the right-most plot, such as the block (node group 4, node group 3). Network machine learning is all about cleaning up this ambiguous language here. Can we be a bit more precise about what we mean by “pretty different”?</p>
-<p>As we will see in <a class="reference external" href="#link?">Chapter 9</a>, there are many ways in which we can, in fact, be ultra precise! In fact, using some machine learning techniques, we can even put a probability on the chances we are wrong if we say the matrices are “different”! Putting some precision on the words “same” or “different” (how similar? how dissimilar?) is called hypothesis testing, which you will learn all about in the <a class="reference external" href="#link?">Applications</a> section of the book. In the next code block, we will perform a simple test of how similar or different the left and right mushroom bodies are:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pkg.stats</span> <span class="kn">import</span> <span class="n">stochastic_block_test</span>
-
-<span class="n">nl</span> <span class="o">=</span> <span class="n">Aleft</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">nr</span> <span class="o">=</span> <span class="n">Aright</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">density_left</span> <span class="o">=</span> <span class="n">Aleft</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">nl</span><span class="o">*</span><span class="p">(</span><span class="n">nl</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">density_right</span> <span class="o">=</span> <span class="n">Aright</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">nr</span><span class="o">*</span><span class="p">(</span><span class="n">nr</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-
-<span class="n">null_odds</span> <span class="o">=</span> <span class="n">density_left</span><span class="o">/</span><span class="n">density_right</span>
-<span class="n">stat</span><span class="p">,</span> <span class="n">pvalue</span><span class="p">,</span> <span class="n">misc</span> <span class="o">=</span> <span class="n">stochastic_block_test</span><span class="p">(</span>
-    <span class="n">Aleft</span><span class="p">,</span> <span class="n">Aright</span><span class="p">,</span> <span class="n">labels1</span><span class="o">=</span><span class="n">labelsleft</span><span class="p">,</span> <span class="n">labels2</span><span class="o">=</span><span class="n">labelsright</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;fisher&quot;</span><span class="p">,</span>
-    <span class="n">null_odds</span><span class="o">=</span><span class="n">null_odds</span>
-<span class="p">)</span>
-<span class="n">Pval_mtx</span> <span class="o">=</span> <span class="n">misc</span><span class="p">[</span><span class="s2">&quot;uncorrected_pvalues&quot;</span><span class="p">]</span>
-
-<span class="n">right_sbm</span><span class="o">.</span><span class="n">block_p_adj_</span> <span class="o">=</span> <span class="n">right_sbm</span><span class="o">.</span><span class="n">block_p_</span><span class="o">*</span><span class="n">null_odds</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Next, we show the left and right blocks again, and we also include the probability that we would be <em>wrong</em> to say that the two blocks are different, the <span class="math notranslate nohighlight">\(p\)</span>-values:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">left_sbm</span><span class="o">.</span><span class="n">block_p_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Left Block Matrix&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">right_sbm</span><span class="o">.</span><span class="n">block_p_adj_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Right Block Matrix, Adjusted&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">plot_block</span><span class="p">(</span><span class="n">Pval_mtx</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;p-values per-block&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/discover-and-visualize_15_0.png" src="../../_images/discover-and-visualize_15_0.png" />
-</div>
-</div>
-<p>So it turns out that four of the blocks are pretty radically different: we can see that we have <span class="math notranslate nohighlight">\(p\)</span>-values of <span class="math notranslate nohighlight">\(0.0064\)</span>, <span class="math notranslate nohighlight">\(9.1 \times 10^{-6}\)</span>, <span class="math notranslate nohighlight">\(1.6 \times 10^{-9}\)</span>, and <span class="math notranslate nohighlight">\(1.4 \times 10^{-23}\)</span>! Remember that these are the probabilities that we would be <em>wrong</em> to say that the two blocks are different, so this means that with a <em>very</em> high probability, four of the blocks are different!</p>
-<p>We have now discovered a new neurobiological insight, that the left and right mushroom bodies of the drosophila are not similar! This provides us with evidence that the fly mushroom body, and consequently, its <em>brain</em>, are bilaterally <em>asymmetric</em>: the left and right sides of the brain have unique functionality. We know that human beings’ have asymmetrical brains, but it is incredible to think that with a few snippets of code, we can show that fruit flies share this property too. At the time of the writing of this textbook, this result hasn’t even been discovered yet!</p>
-</section>
+<p>So this is rather striking: without knowing <em>anything</em> about the nodes of the brain, and <em>only</em> using the connectivity patterns in the brain, it turns out that what we found somewhat resembles the lobe orientation of the brain. Notice that the nodes in the back of the brain tend to all be a similar color, which are the nodes that fall into the occipital lobe. Next, we can see there is another relatively homogeneous group of nodes in the  middle/top of the brain, which represents the nodes in the parietal lobe.</p>
+<p>Now, back to what we actually found. As you will learn in the section on <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-mase"><span class="std std-ref">mase embedding</span></a>, the mase embedding followed by clustering tends to find groups of nodes that have similar connectivity patterns in the connectomes. This means that the nodes tend to behave “as a unit”, if you will, in that they tend to be active/inactive together.</p>
+<p>Taking these conclusions together, we find that some areas of the brain (such as the occipital and parietal areas) feature nodes which are both functionally <em>and</em> spatially similar: they tend to show similar connectivity patterns with respect to other groups of nodes in the network, <em>and</em> are in similar spatial positions in the brain. On the other hand, for other areas of the brain, while the nodes may be functionally similar, they might not necessarily be spatially similar. This is where the domain expertise kicks in: we don’t know how to interpret this particular aspect of our finding, but maybe you or your colleagues do!</p>
+<p>And this is where the fun of network machine learning comes into play: it is a tool not only to <em>apply</em> algorithms to data, but to facilitate <em>learning new things</em> about that data as well. Your ability to understand network machine learning, while crucial, is going to go <em>hand in hand</em> with your ability to understand the intricacies of the domain you want to apply network machine learning to. We hope that we can help with the former part; we’ll leave the latter to you!</p>
 <section id="try-it-out">
-<h2><span class="section-number">2.6.2. </span>Try it out!<a class="headerlink" href="#try-it-out" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">2.6.1. </span>Try it out!<a class="headerlink" href="#try-it-out" title="Permalink to this headline">#</a></h2>
 <p>Hopefully this chapter gave you a small scale peek at what a network machine learning project looks like, and showed you a brief introduction to some tools you can use to gain novel insights from your network data. While what we did in this chapter was relatively straightforward, the process from obtaining your data to choosing appropriate network machine learning problems can be extremely arduous! In fact, as a network machine learning scientist, you might find that just obtaining your data in a useful form (a network) and cleaning the data to be usable might take an <em>enormous</em> chunk of your time!</p>
-<p>If you haven’t already done so, now is a fantastic time to grab your laptop, select a network dataset you are interested in, and try to work through the whole process from A to Z. If you need some pointers, the <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> package <a class="reference external" href="#https://microsoft.github.io/graspologic/latest/reference/reference/datasets.html">makes several datasets available to you</a>. We’d recommend working through the contents of this book by first using the example data that is presented in the chapter, and then try to apply the techniques to a network dataset of your choosing.</p>
+<p>If you haven’t already done so, now is a fantastic time to grab your laptop, select a network dataset you are interested in, and start trying to work through the whole process from A to Z. If you need some pointers, the <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> package <a class="reference external" href="#https://microsoft.github.io/graspologic/latest/reference/reference/datasets.html">makes several datasets available to you</a>. We’d recommend working through the contents of this book by first using the example data that is presented in the chapter, and then try to apply the techniques to a network dataset of your choosing.</p>
 </section>
 </section>
 

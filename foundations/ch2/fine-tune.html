@@ -837,6 +837,286 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="fine-tune-your-model">
 <span id="ch2-finetune"></span><h1><span class="section-number">2.5. </span>Fine-Tune your Model<a class="headerlink" href="#fine-tune-your-model" title="Permalink to this headline">#</a></h1>
+<p>Now that you have figured out an appropriate way to represent your network to learn from it, and you have learned how to train an algorithm to learn from it, it’s time to tune things up a little bit. Let’s start with the code we’ve gotten together so far:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">import_edgelist</span><span class="p">,</span> <span class="n">pass_to_ranks</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># the AWS bucket the data is stored in</span>
+<span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
+<span class="n">parcellation</span> <span class="o">=</span> <span class="s2">&quot;Schaefer400&quot;</span>
+<span class="n">FMRI_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;m2g/Functional/BNU1-11-12-20-m2g-func/Connectomes/&quot;</span> <span class="o">+</span> <span class="n">parcellation</span> <span class="o">+</span> <span class="s2">&quot;_space-MNI152NLin6_res-2x2x2.nii.gz/&quot;</span>
+<span class="n">FMRI_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;fmri&quot;</span><span class="p">)</span>  <span class="c1"># the output folder</span>
+<span class="n">DS_KEY</span> <span class="o">=</span> <span class="s2">&quot;abs_edgelist&quot;</span>  <span class="c1"># correlation matrices for the networks to exclude</span>
+
+<span class="k">def</span> <span class="nf">fetch_fmri_data</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">BUCKET_ROOT</span><span class="p">,</span> <span class="n">fmri_prefix</span><span class="o">=</span><span class="n">FMRI_PREFIX</span><span class="p">,</span>
+                    <span class="n">output</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">DS_KEY</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to fetch fMRI connectomes from AWS S3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check that output directory exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">)</span>
+    <span class="c1"># start boto3 session anonymously</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">))</span>
+    <span class="c1"># obtain the filenames</span>
+    <span class="n">bucket_conts</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> 
+                    <span class="n">Prefix</span><span class="o">=</span><span class="n">fmri_prefix</span><span class="p">)[</span><span class="s2">&quot;Contents&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">s3_key</span> <span class="ow">in</span> <span class="n">bucket_conts</span><span class="p">:</span>
+        <span class="c1"># get the filename</span>
+        <span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_key</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+        <span class="c1"># verify that we are grabbing the right file</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s3_object</span><span class="p">:</span>
+            <span class="n">op_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s3_object</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op_fname</span><span class="p">):</span>
+                <span class="n">s3</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">s3_object</span><span class="p">,</span> <span class="n">op_fname</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">read_fmri_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function which removes isolated nodes from the </span>
+<span class="sd">    adjacency matrix A.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># sum along the rows to obtain the node degree</span>
+    <span class="n">out_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),:]</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A_purged</span><span class="p">[:,</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Purging </span><span class="si">{:d}</span><span class="s2"> nodes...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">A_purged</span>
+
+<span class="k">class</span> <span class="nc">CleanData</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning data...&quot;</span><span class="p">)</span>
+        <span class="n">Acleaned</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">A_abs_cl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Acleaned</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">A_abs_cl</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
+    
+<span class="k">class</span> <span class="nc">FeatureScaler</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scaling edge-weights...&quot;</span><span class="p">)</span>
+        <span class="n">A_scaled</span> <span class="o">=</span> <span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">A_scaled</span><span class="p">)</span>
+
+<span class="n">num_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;cleaner&#39;</span><span class="p">,</span> <span class="n">CleanData</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">FeatureScaler</span><span class="p">()),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="n">fetch_fmri_data</span><span class="p">()</span>
+
+<span class="n">As_raw</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">As</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">As_raw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/networkx/readwrite/edgelist.py:257,</span> in <span class="ni">parse_edgelist</span><span class="nt">(lines, comments, delimiter, create_using, nodetype, data)</span>
+<span class="g g-Whitespace">    </span><span class="mi">256</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">257</span>     <span class="n">u</span> <span class="o">=</span> <span class="n">nodetype</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>     <span class="n">v</span> <span class="o">=</span> <span class="n">nodetype</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="ne">ValueError</span>: invalid literal for int() with base 10: &#39;&quot;MetaData&quot;:&#39;
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [2],</span> in <span class="ni">&lt;cell line: 5&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">fetch_fmri_data</span><span class="p">()</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">As_raw</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">As</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">As_raw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nn">Input In [1],</span> in <span class="ni">read_fmri_data</span><span class="nt">(path)</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="k">def</span> <span class="nf">read_fmri_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">41</span>     <span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span><span class="sd">     A function which loads the connectomes as adjacency matrices.</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">44</span>     <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+<span class="g g-Whitespace">     </span><span class="mi">45</span>     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nn">Input In [1],</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">     </span><span class="mi">40</span> <span class="k">def</span> <span class="nf">read_fmri_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+<span class="g g-Whitespace">     </span><span class="mi">41</span>     <span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">42</span><span class="sd">     A function which loads the connectomes as adjacency matrices.</span>
+<span class="g g-Whitespace">     </span><span class="mi">43</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">44</span>     <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+<span class="g g-Whitespace">     </span><span class="mi">45</span>     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/graspologic/utils/utils.py:178,</span> in <span class="ni">import_edgelist</span><span class="nt">(path, extension, delimiter, nodetype, return_vertices)</span>
+<span class="g g-Whitespace">    </span><span class="mi">175</span>     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No files found with &#39;</span><span class="si">{}</span><span class="s2">&#39; extension found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">178</span> <span class="n">graphs</span> <span class="o">=</span> <span class="p">[</span>
+<span class="g g-Whitespace">    </span><span class="mi">179</span>     <span class="n">nx</span><span class="o">.</span><span class="n">read_weighted_edgelist</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">nodetype</span><span class="o">=</span><span class="n">nodetype</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span> <span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">G</span> <span class="ow">in</span> <span class="n">graphs</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">184</span>     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;All graphs have 0 vertices. Please double check if proper &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="o">+</span> <span class="s2">&quot;&#39;delimiter&#39; is given.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/graspologic/utils/utils.py:179,</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
+<span class="g g-Whitespace">    </span><span class="mi">175</span>     <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No files found with &#39;</span><span class="si">{}</span><span class="s2">&#39; extension found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">176</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">178</span> <span class="n">graphs</span> <span class="o">=</span> <span class="p">[</span>
+<span class="ne">--&gt; </span><span class="mi">179</span>     <span class="n">nx</span><span class="o">.</span><span class="n">read_weighted_edgelist</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">nodetype</span><span class="o">=</span><span class="n">nodetype</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">180</span>     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span>
+<span class="g g-Whitespace">    </span><span class="mi">181</span> <span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">183</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">G</span> <span class="ow">in</span> <span class="n">graphs</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">184</span>     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">185</span>         <span class="s2">&quot;All graphs have 0 vertices. Please double check if proper &quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">186</span>         <span class="o">+</span> <span class="s2">&quot;&#39;delimiter&#39; is given.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">187</span>     <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/networkx/readwrite/edgelist.py:478,</span> in <span class="ni">read_weighted_edgelist</span><span class="nt">(path, comments, delimiter, create_using, nodetype, encoding)</span>
+<span class="g g-Whitespace">    </span><span class="mi">426</span> <span class="k">def</span> <span class="nf">read_weighted_edgelist</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">427</span>     <span class="n">path</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">428</span>     <span class="n">comments</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">432</span>     <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">433</span> <span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">434</span>     <span class="sd">&quot;&quot;&quot;Read a graph as list of edges with numeric weights.</span>
+<span class="g g-Whitespace">    </span><span class="mi">435</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">436</span><span class="sd">     Parameters</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">476</span><span class="sd">     write_weighted_edgelist</span>
+<span class="g g-Whitespace">    </span><span class="mi">477</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">478</span>     <span class="k">return</span> <span class="n">read_edgelist</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">479</span>         <span class="n">path</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">480</span>         <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">481</span>         <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">482</span>         <span class="n">create_using</span><span class="o">=</span><span class="n">create_using</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">483</span>         <span class="n">nodetype</span><span class="o">=</span><span class="n">nodetype</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">484</span>         <span class="n">data</span><span class="o">=</span><span class="p">((</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),),</span>
+<span class="g g-Whitespace">    </span><span class="mi">485</span>         <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">486</span>     <span class="p">)</span>
+
+<span class="nn">File &lt;class &#39;networkx.utils.decorators.argmap&#39;&gt; compilation 5:5,</span> in <span class="ni">argmap_read_edgelist_1</span><span class="nt">(path, comments, delimiter, create_using, nodetype, data, edgetype, encoding)</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">import</span> <span class="nn">gzip</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="ne">----&gt; </span><span class="mi">5</span> <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">import</span> <span class="nn">re</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/networkx/readwrite/edgelist.py:376,</span> in <span class="ni">read_edgelist</span><span class="nt">(path, comments, delimiter, create_using, nodetype, data, edgetype, encoding)</span>
+<span class="g g-Whitespace">    </span><span class="mi">310</span> <span class="sd">&quot;&quot;&quot;Read a graph from a list of edges.</span>
+<span class="g g-Whitespace">    </span><span class="mi">311</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">312</span><span class="sd"> Parameters</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">373</span><span class="sd"> types (e.g. int, float, str, frozenset - or tuples of those, etc.)</span>
+<span class="g g-Whitespace">    </span><span class="mi">374</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">375</span> <span class="n">lines</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">path</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">376</span> <span class="k">return</span> <span class="n">parse_edgelist</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">377</span>     <span class="n">lines</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">378</span>     <span class="n">comments</span><span class="o">=</span><span class="n">comments</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">379</span>     <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">380</span>     <span class="n">create_using</span><span class="o">=</span><span class="n">create_using</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">381</span>     <span class="n">nodetype</span><span class="o">=</span><span class="n">nodetype</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">382</span>     <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">383</span> <span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/networkx/readwrite/edgelist.py:260,</span> in <span class="ni">parse_edgelist</span><span class="nt">(lines, comments, delimiter, create_using, nodetype, data)</span>
+<span class="g g-Whitespace">    </span><span class="mi">258</span>         <span class="n">v</span> <span class="o">=</span> <span class="n">nodetype</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">259</span>     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">260</span>         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">261</span>             <span class="sa">f</span><span class="s2">&quot;Failed to convert nodes </span><span class="si">{</span><span class="n">u</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> to type </span><span class="si">{</span><span class="n">nodetype</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">262</span>         <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+<span class="g g-Whitespace">    </span><span class="mi">264</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">265</span>     <span class="c1"># no data or data type specified</span>
+<span class="g g-Whitespace">    </span><span class="mi">266</span>     <span class="n">edgedata</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="ne">TypeError</span>: Failed to convert nodes &quot;MetaData&quot;:,{ to type &lt;class &#39;int&#39;&gt;.
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the last section, you learned how you can take one of the networks, and use embeddings combined with various clustering techniques to learn about latent structure in your data.</p>
+<p>However, there’s a big caveat: your colleague sent you over a hundred networks, and you ignored all but one of them! Surely, there’s something that you can learn from all of them, right?</p>
+<p>Fortunately, when you have a multiple network problem, there are plenty of approaches that you can use to learn from all of them simultaneously. Let’s break down how we can approach this now.</p>
+<p>So, you know that you want to produce a representation of all of your networks. These networks all have the same nodes, which are the different areas of the brain. For all intents and purposes, you can assume that these different nodes mean the same thing across all of the different people, even if they are different based on each individual. What you want to learn is whether there is some <em>shared</em> structure across all of the different networks present in the nodes. To do this, you are going to want to be able to take <em>all</em> of your networks, and produce an embedding in which you can look at each <em>node</em> as its own object. Does anything exist to help you?</p>
+<p>Sure does. As you will learn, a particular representation called <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-mase"><span class="std std-ref">MASE</span></a> does just this. It allows you to take many networks, and learn a single representation for the nodes across all of the networks. This representation, in particular, is going to effectively <em>borrow strength</em> from all of the networks you pass in, so you won’t have to worry about whether you are just ignoring all of the networks but one like you did before. Let’s see what MASE can do for us here:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span>
+
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">MultipleASE</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">As</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+
+<span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Multiple spectral embedding of all connectomes&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/fine-tune_5_0.png" src="../../_images/fine-tune_5_0.png" />
+</div>
+</div>
+<p>Well, that looks pretty different! In particular, many of the plots look quite a bit more “blobby” than they did when we only looked at a single network. Let’s take a look at what happens when we apply our clustering to this embedding instead:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.cluster</span> <span class="kn">import</span> <span class="n">AutoGMMCluster</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">AutoGMMCluster</span><span class="p">(</span><span class="n">max_components</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">embedding</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Multiple spectral embedding of all connectomes&quot;</span><span class="p">,</span> 
+         <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicted Clusters&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/fine-tune_8_0.png" src="../../_images/fine-tune_8_0.png" />
+</div>
+</div>
+<p>So, what do these predicted clusters mean?</p>
+<p>Let’s see if we can find out!</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -848,16 +1128,16 @@ title="Print to PDF"
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "graph-book"
+            mode: "python"
         },
         kernelOptions: {
-            kernelName: "graph-book",
+            kernelName: "python3",
             path: "./foundations/ch2"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'graph-book'</script>
+    <script>kernelName = 'python3'</script>
 
               </div>
               
