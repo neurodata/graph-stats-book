@@ -51,6 +51,8 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -799,12 +801,36 @@ title="Print to PDF"
     </ul>
   </div>
 </div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
 
     </div>
 </div>
 
 <!-- Table of contents -->
 <div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#generating-new-representations-from-your-data">
+   Generating new representations from your data
+  </a>
+ </li>
+</ul>
+
+    </nav>
 </div>
     </div>
     <div class="article row">
@@ -816,6 +842,19 @@ title="Print to PDF"
                 <div id="print-main-content">
                     <div id="jb-print-toc">
                         
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#generating-new-representations-from-your-data">
+   Generating new representations from your data
+  </a>
+ </li>
+</ul>
+
+                        </nav>
                     </div>
                 </div>
             </div>
@@ -825,6 +864,206 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="select-and-train-a-model">
 <span id="ch2-select"></span><h1>Select and Train a Model<a class="headerlink" href="#select-and-train-a-model" title="Permalink to this headline">#</a></h1>
+<p>So, now you’ve got your data loaded and pre-processed… what next? Let’s get all the code in that we’ve used so far:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">import_edgelist</span><span class="p">,</span> <span class="n">pass_to_ranks</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># the AWS bucket the data is stored in</span>
+<span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
+<span class="c1"># the path to the data we are interested in</span>
+<span class="n">FMRI_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;m2g/Functional/BNU1-11-12-20-m2g-func/Connectomes/Glasser_space-MNI152NLin6_res-2x2x2.nii.gz/&quot;</span>
+<span class="n">FMRI_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;fmri&quot;</span><span class="p">)</span>  <span class="c1"># the output folder</span>
+<span class="n">DS_KEY</span> <span class="o">=</span> <span class="s2">&quot;abs_edgelist&quot;</span>  <span class="c1"># correlation matrices for the networks to exclude</span>
+
+<span class="k">def</span> <span class="nf">fetch_fmri_data</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">BUCKET_ROOT</span><span class="p">,</span> <span class="n">fmri_prefix</span><span class="o">=</span><span class="n">FMRI_PREFIX</span><span class="p">,</span>
+                    <span class="n">output</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">DS_KEY</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to fetch fMRI connectomes from AWS S3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check that output directory exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">)</span>
+    <span class="c1"># start boto3 session anonymously</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">))</span>
+    <span class="c1"># obtain the filenames</span>
+    <span class="n">bucket_conts</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> 
+                    <span class="n">Prefix</span><span class="o">=</span><span class="n">fmri_prefix</span><span class="p">)[</span><span class="s2">&quot;Contents&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">s3_key</span> <span class="ow">in</span> <span class="n">bucket_conts</span><span class="p">:</span>
+        <span class="c1"># get the filename</span>
+        <span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_key</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+        <span class="c1"># verify that we are grabbing the right file</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s3_object</span><span class="p">:</span>
+            <span class="n">op_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s3_object</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op_fname</span><span class="p">):</span>
+                <span class="n">s3</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">s3_object</span><span class="p">,</span> <span class="n">op_fname</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">read_fmri_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function which removes isolated nodes from the </span>
+<span class="sd">    adjacency matrix A.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># sum along the rows to obtain the node degree</span>
+    <span class="n">out_degree</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">),:]</span>
+    <span class="n">A_purged</span> <span class="o">=</span> <span class="n">A_purged</span><span class="p">[:,</span><span class="o">~</span><span class="p">(</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Purging </span><span class="si">{:d}</span><span class="s2"> nodes...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">degree</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">A_purged</span>
+
+<span class="k">class</span> <span class="nc">CleanData</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cleaning data...&quot;</span><span class="p">)</span>
+        <span class="n">Acleaned</span> <span class="o">=</span> <span class="n">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">A_abs_cl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Acleaned</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">A_abs_cl</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
+    
+<span class="k">class</span> <span class="nc">FeatureScaler</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+    
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+    
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scaling edge-weights...&quot;</span><span class="p">)</span>
+        <span class="n">A_scaled</span> <span class="o">=</span> <span class="n">pass_to_ranks</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">A_scaled</span><span class="p">)</span>
+
+<span class="n">num_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="p">(</span><span class="s1">&#39;cleaner&#39;</span><span class="p">,</span> <span class="n">CleanData</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">FeatureScaler</span><span class="p">()),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_fmri_data</span><span class="p">()</span>
+<span class="n">As</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">A_xfm</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_cleaned</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Preprocessed connectome&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cleaning data...
+Purging 0 nodes...
+Scaling edge-weights...
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [2],</span> in <span class="ni">&lt;cell line: 6&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">A</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">A_xfm</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A_cleaned</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Preprocessed connectome&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;heatmap&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<section id="generating-new-representations-from-your-data">
+<h2>Generating new representations from your data<a class="headerlink" href="#generating-new-representations-from-your-data" title="Permalink to this headline">#</a></h2>
+<p>As you were briefly introduced to in <a class="reference internal" href="../ch1/what-is-a-network.html#ch1-whatis"><span class="std std-ref">what is network machine learning?</span></a> and will cover more thoroughly in <a class="reference internal" href="../../representations/ch6/ch6.html#ch6"><span class="std std-ref">learning network representations</span></a>, a major problem with learning from network data is that, inherently, networks in their rawest form are not tabular datasets. This means that if you want to apply any of the breadth of knowledge that has been acquired in general machine learning (which is typically designed for tabular datasets), you need to learn how to adapt your network to be compatible with tabular approaches, or learn how to adapt your general machine learning architecture for network layouts, such as adjacency matrices, which properly convey the dependences in network data.</p>
+<p>As you will learn, particularly in the end of this book in <span class="xref myst">chapter 10</span>, the former is possible, but generally a bit more involved. The latter approach tends to be, in our opinions, a bit more straightforward at first, and is usually fantastic for most applications. So, how do you obtain a tabular representation of your dataset?</p>
+<p>Well, one possible thing you can do is you can use something called a <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-ref">spectral embedding</span></a>, a technique that you will learn has a wide range of applications in network machine learning whether you are studying one network, pairs of networks, or multiple networks. Let’s see what happens when we spectrally embed our connectome:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">embedding</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">AdjacencySpectralEmbed</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A_xfm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>An <em>embedding</em> takes the adjacency matrix, which is a matrix representation of the entire network, and turns it into a tabular array. Each row is called an <em>estimated latent position</em> for a given node, and each column is called an <em>estimated latent dimension</em> of the network. This means that if there are <span class="math notranslate nohighlight">\(n\)</span> nodes, there are <span class="math notranslate nohighlight">\(n\)</span> rows of the spectral embedding, and if there are <span class="math notranslate nohighlight">\(d\)</span> estimated latent dimensions of the network, there are <span class="math notranslate nohighlight">\(d\)</span> columns. Overall, the spectral embedding has taken the <span class="math notranslate nohighlight">\(n \times n\)</span> adjacency matrix, which we <em>can’t</em> inherently use network machine learning algorithms on, and <em>transformed</em> it into a <span class="math notranslate nohighlight">\(n \times d\)</span> tabular array, which we <em>can</em> inherently use machine learning algorithms on. We’ll visualize this embedding using a <em>pairs plot</em>, which as you will learn later, is a scatter plot showing where each node is a single point in the plot, and the x and y axes are different <em>pairs</em> of latent dimensions for that particular node:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Spectral Embedding for connectome&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>As it turns out, this particular representation of the adjacency matrix through the <em>spectral embedding</em> can, optionally, be tied into a statistical model if you make some assumptions; particularly, those of the <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-ref">stochastic block model</span></a>, which you will learn about in chapter 5. Basically, what the stochastic block model says is that each node is a member of a subgroup, called a <em>community</em>, and its connectivity to other nodes in the network is dictated by which community it is a member of, and which community the other node is a member of. This sounds a <em>lot</em> like the question that your colleague wanted you to approach, since he wanted a way to take the nodes of the network and form “functionally similar” subgroups from them.</p>
+<p>Now that we have a tabular representation of the data, we can take attempt to use the intuition and assumptions of the stochastic block model to cluster our nodes. Let’s see what happens when we apply <span class="math notranslate nohighlight">\(k\)</span>-means to our data:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">embedding</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, it looks like the <span class="math notranslate nohighlight">\(k\)</span>-means was able to learn <span class="math notranslate nohighlight">\(2\)</span> clusters from our dataset. These clusters are indicated by the “blobs” of points that are red or blue, respectively.</p>
+<p>If you’re careful, you’ll notice we did something a little weird here. Why did we choose <span class="math notranslate nohighlight">\(2\)</span>? Why not <span class="math notranslate nohighlight">\(5\)</span>? Why not <span class="math notranslate nohighlight">\(8\)</span>? We chose <span class="math notranslate nohighlight">\(2\)</span> here somewhat arbitrarily. In general, when you don’t know what to expect from your data (we didn’t know what to expect here, other than that we wanted a modestly sized way to group the nodes up), it’s a good idea to use quantitative means to make these determinations for you.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">KMeans()</span></code>, we can use something called the silhouette score to do this for us. You choose the optimal number of clusters as the clustering with the highest silhouette score. You’ll learn a lot more about the silhouette score when you learn about <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-ref">community detection</span></a>. <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> makes this process pretty straightforward:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.cluster</span> <span class="kn">import</span> <span class="n">KMeansCluster</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">KMeansCluster</span><span class="p">(</span><span class="n">max_clusters</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">embedding</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Unlike the previous approach, it looks like with silhouette score selection, we ended up with <span class="math notranslate nohighlight">\(3\)</span> clusters being optimal, not <span class="math notranslate nohighlight">\(2\)</span>.</p>
+<p>So, what about other possible approaches? Unless you are pretty confident that the clusters you are looking for have “blobs” that are totally spherically symmetric (basically, they look like “balls” in the dataset), <span class="math notranslate nohighlight">\(k\)</span>-means can be a pretty bad idea. As you’ll learn later, another strategy called the gaussian mixture model, or GMM, handles this a bit more elegantly, and allows your cluster blobs to be pretty much any ellipse-like shape. We can use GMM and automatically select the number of clusters using the Bayesian Information Criterion, or BIC, with <code class="docutils literal notranslate"><span class="pre">AutoGMMCluster</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.cluster</span> <span class="kn">import</span> <span class="n">AutoGMMCluster</span>
+
+<span class="n">labels</span> <span class="o">=</span> <span class="n">AutoGMMCluster</span><span class="p">(</span><span class="n">max_components</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">embedding</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So, it looks like GMM actually found <span class="math notranslate nohighlight">\(4\)</span> clusters to be a bit more optimal than <span class="math notranslate nohighlight">\(3\)</span> clusters.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -836,16 +1075,16 @@ title="Print to PDF"
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: ""
+            mode: "python"
         },
         kernelOptions: {
-            kernelName: "",
+            kernelName: "python3",
             path: "./foundations/ch2"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = ''</script>
+    <script>kernelName = 'python3'</script>
 
               </div>
               
