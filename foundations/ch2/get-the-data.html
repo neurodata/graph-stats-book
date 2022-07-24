@@ -978,59 +978,95 @@ title="Print to PDF"
 <section id="downloading-the-data">
 <h2><span class="section-number">2.2.2. </span>Downloading the data<a class="headerlink" href="#downloading-the-data" title="Permalink to this headline">#</a></h2>
 <p>When you work with network data, it is rarely the case that the <em>raw data</em> that you will use is already a network. The <strong>raw data</strong> is the least processed version of the data for your project, and is the information upon which the rest of your data is <em>derived</em>. A <strong>derivative</strong> is a piece of data or information that is <em>derived</em> from the raw data. Consider, for instance, that you are investigating emailing trends for a company, and trying to see whether employees tend to email their team members more or less frequently than people outside of their team. In this case, your raw data might be a list of emails, coupled with the sender, and the recipient, of each email. You might be responsible for <em>preprocessing</em> this data to acquire a network derivative for your later analyses.</p>
-<p>In this section, you won’t worry just yet about preprocessing a raw dataset, and will instead start with some pre-prepared data. You will be working with a brain network from a human diffusion MRI connectome. You could navigate over to the <code class="docutils literal notranslate"><span class="pre">neurodata</span></code> website and download the file directly, but it tends to be useful to get used to how to do this programmatically. This is because if the data changes, you might want your analysis to automatically update and pertain to the latest and best version of the data at the time you execute your function. Further, if you intend your code to be reproducible, having a function which downloads and prepares the data in a way in which the computer can use greatly will simplify the process of disseminating your work.</p>
+<p>In this section, you won’t worry just yet about preprocessing a raw dataset, and will instead start with some pre-prepared data. You will be working with brain networks from a human functional MRI connectome. You could navigate over to the <code class="docutils literal notranslate"><span class="pre">neurodata</span></code> website and download the file directly, but it tends to be useful to get used to how to do this programmatically. This is because if the data changes, you might want your analysis to automatically update and pertain to the latest and best version of the data at the time you execute your function. Further, if you intend your code to be reproducible, having a function which downloads and prepares the data in a way in which the computer can use greatly will simplify the process of disseminating your work.</p>
 <p>To begin, we’ll start with a code snippet which fetches the required data for our analysis:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">import_edgelist</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="c1"># the AWS bucket the data is stored in</span>
+<span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
+<span class="c1"># the path to the data we are interested in</span>
+<span class="n">FMRI_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;m2g/Functional/BNU1-11-12-20-m2g-func/Connectomes/Glasser_space-MNI152NLin6_res-2x2x2.nii.gz/&quot;</span>
+<span class="n">FMRI_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;fmri&quot;</span><span class="p">)</span>  <span class="c1"># the output folder</span>
+<span class="n">DS_KEY</span> <span class="o">=</span> <span class="s2">&quot;abs_edgelist&quot;</span>  <span class="c1"># correlation matrices for the networks to exclude</span>
 
-<span class="n">AWSND_ROOT</span> <span class="o">=</span> <span class="s2">&quot;https://open-neurodata.s3.amazonaws.com/m2g/Diffusion/BNU1-8-27-20-m2g-native-csa-det/&quot;</span>
-<span class="n">DWI_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AWSND_ROOT</span><span class="p">,</span> 
-                       <span class="s2">&quot;sub-0025864/ses-1/connectomes/AAL_space-MNI152NLin6_res-2x2x2/&quot;</span><span class="p">)</span>
-<span class="n">DWI_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;dwi&quot;</span><span class="p">)</span>
-<span class="n">DWI_NAME</span> <span class="o">=</span> <span class="s2">&quot;sub-0025864_ses-1_dwi_AAL_space-MNI152NLin6_res-2x2x2_connectome.csv&quot;</span>
+<span class="k">def</span> <span class="nf">fetch_fmri_data</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="n">BUCKET_ROOT</span><span class="p">,</span> <span class="n">fmri_prefix</span><span class="o">=</span><span class="n">FMRI_PREFIX</span><span class="p">,</span>
+                    <span class="n">output</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">DS_KEY</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to fetch fMRI connectomes from AWS S3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check that output directory exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">)</span>
+    <span class="c1"># start boto3 session anonymously</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">signature_version</span><span class="o">=</span><span class="n">UNSIGNED</span><span class="p">))</span>
+    <span class="c1"># obtain the filenames</span>
+    <span class="n">bucket_conts</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">list_objects</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> 
+                    <span class="n">Prefix</span><span class="o">=</span><span class="n">fmri_prefix</span><span class="p">)[</span><span class="s2">&quot;Contents&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">s3_key</span> <span class="ow">in</span> <span class="n">bucket_conts</span><span class="p">:</span>
+        <span class="c1"># get the filename</span>
+        <span class="n">s3_object</span> <span class="o">=</span> <span class="n">s3_key</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+        <span class="c1"># verify that we are grabbing the right file</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s3_object</span><span class="p">:</span>
+            <span class="n">op_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FMRI_PATH</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">s3_object</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">op_fname</span><span class="p">):</span>
+                <span class="n">s3</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">s3_object</span><span class="p">,</span> <span class="n">op_fname</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">fetch_dwi_data</span><span class="p">(</span><span class="n">dwi_url</span><span class="o">=</span><span class="n">DWI_URL</span><span class="p">,</span> <span class="n">dwi_path</span><span class="o">=</span><span class="n">DWI_PATH</span><span class="p">,</span> <span class="n">dwi_name</span><span class="o">=</span><span class="n">DWI_NAME</span><span class="p">):</span>
-    <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">,</span> <span class="n">dwi_name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dwi_path</span><span class="p">)</span>
-    <span class="n">csv_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dwi_url</span><span class="p">,</span> <span class="n">dwi_name</span><span class="p">)</span>
-    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">csv_url</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">local_path</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Now when you call <code class="docutils literal notranslate"><span class="pre">fetch_dwi_data()</span></code>, it creates a new directory called <code class="docutils literal notranslate"><span class="pre">datasets/dwi</span></code> in your workspace, and downloads an adjacency matrix, the standard way to represent a graph as a mathematical object, into your local directory <code class="docutils literal notranslate"><span class="pre">datasets/dwi</span></code>.</p>
-<p>Next, we’ll try to load the dataset using the <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> utility, <code class="docutils literal notranslate"><span class="pre">import_edgelist()</span></code>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graspologic</span> <span class="k">as</span> <span class="nn">gp</span>
-
-<span class="n">local_path</span> <span class="o">=</span> <span class="n">fetch_dwi_data</span><span class="p">()</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Next, let’s learn some things about this adjacency matrix. You start by first breaking the dictionary into individual data objects so your code is a little more readable. In network machine learning, when dealing with a new dataset, your recommendation is to <em>always</em>, <em>always</em>, start with visualization. You typically visualize network data using a heatmap:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
-
-<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Heatmap of Diffusion Connectome&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">read_fmri_data</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">FMRI_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/get-the-data_5_0.png" src="../../_images/get-the-data_5_0.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="nn">Input In [1],</span> in <span class="ni">&lt;cell line: 3&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">os</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">import</span> <span class="nn">urllib</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">import</span> <span class="nn">boto3</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">botocore</span> <span class="kn">import</span> <span class="n">UNSIGNED</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;boto3&#39;
+</pre></div>
 </div>
 </div>
-<p>What this has done is it has plotted the adjacency matrix for the diffusion connectome of a human. A heatmap is a network visualization in which the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> coordinates of a given entry in the matrix indicate the pair of nodes an edge is connected to, and the color for the <span class="math notranslate nohighlight">\((x,y)\)</span> point in the figure indicates the weight of the edge between nodes <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>. The edge weight is stronger if the pair of voxels have more connections, and smaller if the pair of voxels have weaker connections.</p>
+</div>
+<p>Now when you call <code class="docutils literal notranslate"><span class="pre">fetch_dwi_data()</span></code>, it creates a new directory called <code class="docutils literal notranslate"><span class="pre">datasets/fmri</span></code> in your workspace, and downloads the adjacency matrices, the standard way to represent a graph as a mathematical object, into your local directory <code class="docutils literal notranslate"><span class="pre">datasets/fmri</span></code>.</p>
+<p>Next, we’ll try to load the dataset using the <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> utility, <code class="docutils literal notranslate"><span class="pre">import_edgelist()</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_fmri_data</span><span class="p">()</span>
+<span class="n">As</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, let’s learn some things about just one of the adjacency matrices. In network machine learning, when dealing with a new dataset, our recommendation is to <em>always</em>, <em>always</em>, start with visualization. You typically visualize network data using a heatmap:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Heatmap of Functional Connectome&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>What this has done is it has plotted the adjacency matrix for the functional connectome of a human. A heatmap is a network visualization in which the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> coordinates of a given entry in the matrix indicate the pair of nodes an edge is connected to, and the color for the <span class="math notranslate nohighlight">\((x,y)\)</span> point in the figure indicates the weight of the edge between nodes <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>. The edge weight is stronger if the pair of voxels have more connections, and smaller if the pair of voxels have weaker connections.</p>
 <p>One thing that we can notice from this plot is that a lot of these edges have really small weights! Let’s explore this a little bit further.</p>
-<p>A useful summary of the network is to look at a histogram for the edge-weights. A histogram shows the number of edges (on the vertical axis) which have a given edge weight range (on the horizontal axis). You can call this directly on the edges, and it will plot a histogram of the edge weights. You will do this using seaborn’s <code class="docutils literal notranslate"><span class="pre">distplot()</span></code>:</p>
+<p>A useful summary of the network is to look at a histogram for the edge-weights. A histogram shows the number of edges (on the vertical axis) which have a given edge weight range (indicated by the width of a particular bar on the horizontal axis). You can call this directly on the adjacency matrix (albeit flattened), and it will plot a histogram of the edge weights. You will do this using seaborn’s <code class="docutils literal notranslate"><span class="pre">histplot()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
@@ -1039,49 +1075,19 @@ title="Print to PDF"
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge weight&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of diffusion connectome edge-weights&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/get-the-data_8_0.png" src="../../_images/get-the-data_8_0.png" />
-</div>
-</div>
-<p>Wow; there’s quite a few really small edges! Let’s see how many of these nodes aren’t connected <em>at all</em>, and have an edge-weight of zero:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fraction of non-zero edge-weights: </span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">A</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>fraction of non-zero edge-weights: 0.387
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of functional connectome edge-weights&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>So as you can see, most of the edge-weights are, in fact, zero! Only <span class="math notranslate nohighlight">\(38.7\%\)</span> of the edge-weights are non-zero. An edge-weight of zero means the pair of nodes that the edge-weight represents are not actually connected at all! Let’s take a look at the histogram of edge-weights when we isolate out these zero edge-weights:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">A</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Edge weight&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Histogram of diffusion connectome non-zero edge weights&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/get-the-data_12_0.png" src="../../_images/get-the-data_12_0.png" />
-</div>
-</div>
-<p>So as you can see, most of the edge-weights are very small, and as the edge weight increases, fewer and fewer edges have the indicated edge weight. This is called a right-skewed histogram, which means that most of the “long tail” goes to the right (in the positive direction of the edge weights).</p>
+<p>A lot of the edge-weights tend to be right around the <span class="math notranslate nohighlight">\(0.1\)</span> to <span class="math notranslate nohighlight">\(0.5\)</span> range, which tells us that, in general, the nodes of the network are <em>slightly correlated</em>. This means that, in general, when some node tends to be active, other nodes also tend to be active. If this were not the case, the histogram would be a bit more centered around <span class="math notranslate nohighlight">\(0.0\)</span>.</p>
 </section>
 <section id="create-the-workspace">
 <span id="ch2-get-install"></span><h2><span class="section-number">2.2.3. </span>Create the workspace<a class="headerlink" href="#create-the-workspace" title="Permalink to this headline">#</a></h2>
 <section id="installing-the-latest-version-of-python">
 <h3><span class="section-number">2.2.3.1. </span>Installing the latest version of python<a class="headerlink" href="#installing-the-latest-version-of-python" title="Permalink to this headline">#</a></h3>
 <p>To begin, you will need a suitable instance of python installed. For this book, you used python 3.8, but the most advanced version of python 3 at the time you are reading should do the trick. You will assume that you are using a Linux or UNIX-like operating system, such as OSX. If you have a Windows computer, you would recommend that you use the <a class="reference external" href="#https://www.laptopmag.com/articles/use-bash-shell-windows-10">Linux subsystem module</a> to interact with the codebase. Once you have this set up and up and running, you can follow the instructions below for a Debian distribution of Linux.</p>
-<p>Once you have your computer handy, you can run the following command:</p>
+<p>Once you have your computer handy, you can run the following command, which should show (ideally) <code class="docutils literal notranslate"><span class="pre">python3</span></code> has a version <span class="math notranslate nohighlight">\(\geq\)</span><code class="docutils literal notranslate"><span class="pre">3.8.0</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -V
 Python 3.8.0
 </pre></div>
