@@ -830,8 +830,13 @@ title="Print to PDF"
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-you-obtain-a-probability-matrix-for-an-sbm-programmatically">
+     4.4.2.1. How do you obtain a probability matrix for an SBM programmatically?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#limitations-of-the-ier-model-when-you-have-one-network">
-     4.4.2.1. Limitations of the IER model when you have one network
+     4.4.2.2. Limitations of the IER model when you have one network
     </a>
    </li>
   </ul>
@@ -877,8 +882,13 @@ title="Print to PDF"
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-you-obtain-a-probability-matrix-for-an-sbm-programmatically">
+     4.4.2.1. How do you obtain a probability matrix for an SBM programmatically?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#limitations-of-the-ier-model-when-you-have-one-network">
-     4.4.2.1. Limitations of the IER model when you have one network
+     4.4.2.2. Limitations of the IER model when you have one network
     </a>
    </li>
   </ul>
@@ -1044,8 +1054,49 @@ title="Print to PDF"
 <p><span class="caption-number">Fig. 4.2 </span><span class="caption-text">The IER network unifies independent-edge random networks, as it is the most general independent-edge random network model. What this means is that all models discussed so far, and many not discussed but found in the appendix, can be conceptualized as special cases of the IER network. Stated in other words, a probability matrix is the fundamental unit necessary to describe an independent-edge random network model. For the models covered so far, all GRDPGs are IER networks (by taking <span class="math notranslate nohighlight">\(P\)</span> to be <span class="math notranslate nohighlight">\(XY^\top\)</span>), all RDPGs are GRDPGs (by taking the right latent positions <span class="math notranslate nohighlight">\(Y\)</span> to be equal to the left latent positions <span class="math notranslate nohighlight">\(X\)</span>), all SBMs are RDPGs, and all ERs are SBMs, whereas the converses in general are not true.</span><a class="headerlink" href="#ch5-unify-sn" title="Permalink to this image">#</a></p>
 </figcaption>
 </figure>
+<section id="how-do-you-obtain-a-probability-matrix-for-an-sbm-programmatically">
+<span id="ch5-ier-sbmprob"></span><h3><span class="section-number">4.4.2.1. </span>How do you obtain a probability matrix for an SBM programmatically?<a class="headerlink" href="#how-do-you-obtain-a-probability-matrix-for-an-sbm-programmatically" title="Permalink to this headline">#</a></h3>
+<p>One thing that will come up frequently over the course of this book is that we will need to sometimes programmatically generate the probability matrix directly (rather than just using the community assignment vector <span class="math notranslate nohighlight">\(\vec z\)</span> and the block probability matrix <span class="math notranslate nohighlight">\(B\)</span>). This isn’t too difficult to do.</p>
+<p>Basically, the idea is as follows. If <span class="math notranslate nohighlight">\(\vec z\)</span> is the community assignment vector and assigns the <span class="math notranslate nohighlight">\(n\)</span> nodes of the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities (taking values from <span class="math notranslate nohighlight">\(1\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, …, <span class="math notranslate nohighlight">\(K\)</span>), and <span class="math notranslate nohighlight">\(B\)</span> is the <span class="math notranslate nohighlight">\(K \times K\)</span> block probability matrix:</p>
+<ol class="simple">
+<li><p>You begin by constructing a matrix, <span class="math notranslate nohighlight">\(Z\)</span>, that has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(K\)</span> columns; one row for each node, and one column for each community.</p></li>
+<li><p>For each node in the network <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<ul class="simple">
+<li><p>For each community in the network <span class="math notranslate nohighlight">\(k\)</span>, if <span class="math notranslate nohighlight">\(z_i = k\)</span>, then let <span class="math notranslate nohighlight">\(z_{ik} = 1\)</span>. if <span class="math notranslate nohighlight">\(z_i \neq k\)</span>, then let <span class="math notranslate nohighlight">\(z_{ik} = 0\)</span>.</p></li>
+</ul>
+</li>
+<li><p>Let <span class="math notranslate nohighlight">\(P = ZBZ^\top\)</span>.</p></li>
+</ol>
+<p>The matrix produced, <span class="math notranslate nohighlight">\(P\)</span>, is the <em>full</em> probability matrix for the SBM, where entry <span class="math notranslate nohighlight">\(p_{ij}\)</span> is the probability that node <span class="math notranslate nohighlight">\(i\)</span> is connected to node <span class="math notranslate nohighlight">\(j\)</span>.</p>
+<p>Let’s work through this example programmatically, because it comes up a few times over the course of the book. Let’s imagine that we have <span class="math notranslate nohighlight">\(50\)</span> nodes, of which the first <span class="math notranslate nohighlight">\(25\)</span> are in community one and the second <span class="math notranslate nohighlight">\(25\)</span> are in community two. The code to do this conversion looks like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_community_mtx</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to generate the one-hot-encoded community</span>
+<span class="sd">    assignment matrix from a community assignment vector.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">K</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">zi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+        <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">zi</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">Z</span>
+
+<span class="c1"># the community assignment vector</span>
+<span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">25</span><span class="p">)]</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">make_community_mtx</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="c1"># block matrix</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])</span>
+<span class="c1"># probability matrix</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">Z</span> <span class="o">@</span> <span class="n">B</span> <span class="o">@</span> <span class="n">Z</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 <section id="limitations-of-the-ier-model-when-you-have-one-network">
-<h3><span class="section-number">4.4.2.1. </span>Limitations of the IER model when you have one network<a class="headerlink" href="#limitations-of-the-ier-model-when-you-have-one-network" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">4.4.2.2. </span>Limitations of the IER model when you have one network<a class="headerlink" href="#limitations-of-the-ier-model-when-you-have-one-network" title="Permalink to this headline">#</a></h3>
 <p>This construction is not entirely useful when you have one sample, because for each edge, you only get to see one sample (either the edge exists or doesn’t exist). This means that you won’t really be able to learn about the individual edge probabilities in practice when you only have a single sample of a network in a way which would differentiate them from other single networks. What we mean by this is, if you learn about other single networks, you are still <em>technically</em> learning about an IER random network, because like you saw in the last paragraph, all of these other single network models are just <em>special cases</em> of the IER random network. However, you can’t learn any random network with one sample that could <em>only</em> be described by an IER random network, so it almost feels a <em>little bit useless</em> from what you’ve covered so far. As you will learn shortly, the IER random network is, on the other hand, <em>extremely</em> useful when you have multiple networks. When you have multiple networks, with some limited assumptions, you <em>can</em> learn about networks that you would otherwise not be able to describe with more simple random networks like ER, SBM, or RDPG random netweorks. This will make the IER random network <em>extremely powerful</em> when you have multiple samples of network data.</p>
 </section>
 </section>
