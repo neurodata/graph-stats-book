@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>6.4. Single-Network Vertex Nomination &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>Single-Network Vertex Nomination &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -55,8 +55,6 @@ const thebe_selector_output = ".output, .cell_output"
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="6.5. Out-of-sample Embedding" href="out-of-sample.html" />
-    <link rel="prev" title="6.3. Model Selection" href="model-selection.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -167,11 +165,6 @@ const thebe_selector_output = ".output, .cell_output"
    <li class="toctree-l2">
     <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
      1.4. Examples of applications
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
-     1.5. Challenges of Network Machine Learning
     </a>
    </li>
   </ul>
@@ -342,17 +335,17 @@ const thebe_selector_output = ".output, .cell_output"
   Applications
  </span>
 </p>
-<ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active has-children">
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="ch7.html">
    6. Applications When You Have One Network
   </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
   <label for="toctree-checkbox-6">
    <i class="fas fa-chevron-down">
    </i>
   </label>
-  <ul class="current">
+  <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="community-detection.html">
      6.1. Community Detection
@@ -368,14 +361,9 @@ const thebe_selector_output = ".output, .cell_output"
      6.3. Model Selection
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     6.4. Single-Network Vertex Nomination
-    </a>
-   </li>
    <li class="toctree-l2">
     <a class="reference internal" href="out-of-sample.html">
-     6.5. Out-of-sample Embedding
+     6.4. Out-of-sample Embedding
     </a>
    </li>
   </ul>
@@ -810,19 +798,19 @@ title="Print to PDF"
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#spectral-vertex-nomination">
-   6.4.1. Spectral Vertex Nomination
+   Spectral Vertex Nomination
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#finding-a-single-set-of-nominations">
-     6.4.1.1. Finding a single set of nominations
+     Finding a single set of nominations
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#finding-nominations-for-each-node">
-   6.4.2. Finding Nominations for Each Node
+   Finding Nominations for Each Node
   </a>
  </li>
 </ul>
@@ -846,19 +834,19 @@ title="Print to PDF"
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#spectral-vertex-nomination">
-   6.4.1. Spectral Vertex Nomination
+   Spectral Vertex Nomination
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#finding-a-single-set-of-nominations">
-     6.4.1.1. Finding a single set of nominations
+     Finding a single set of nominations
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#finding-nominations-for-each-node">
-   6.4.2. Finding Nominations for Each Node
+   Finding Nominations for Each Node
   </a>
  </li>
 </ul>
@@ -872,12 +860,12 @@ title="Print to PDF"
               <div>
                 
   <section class="tex2jax_ignore mathjax_ignore" id="single-network-vertex-nomination">
-<span id="ch7-vn"></span><h1><span class="section-number">6.4. </span>Single-Network Vertex Nomination<a class="headerlink" href="#single-network-vertex-nomination" title="Permalink to this headline">#</a></h1>
+<span id="ch7-vn"></span><h1>Single-Network Vertex Nomination<a class="headerlink" href="#single-network-vertex-nomination" title="Permalink to this headline">#</a></h1>
 <p>Say you’re a criminal investigator trying to uncover a human trafficking ring. You build a network of potential suspects: some of the nodes in the network represent human traffickers, and some represent innocent people. The edges of the network represent a working relationship between a given pair of individuals.</p>
 <p>Your team has limited resources, and so it’s difficult to scrutinize everybody in the network directly to see if they are human traffickers. Ideally, you’d like to use your network to nominate potential suspects, so that you can prioritize your investigative efforts. You’ve already done some work: you have a list of a few nodes of the network who are known to be traffickers, and you have a list of a few who you know are not. Your goal, then, is to build an ordered list of nodes in the network that are most similar to the nodes you already know belong to human traffickers. Ideally, the first nodes in the list would be more likely to be traffickers, and the nodes would get less and less likely the further down in the list you go.</p>
 <p>This is the idea behind <em>single-network vertex nomination</em>. You have a group of “seed nodes” that you know have the right community membership, and then you take the rest of the nodes in your network and order them by their relationship to the seed nodes in terms of that community membership. A <strong>seed node</strong> is a node in a network for which we have information which we know to be true. The nomination task here isn’t just classification: it’s prioritization. You’re prioritizing how important the rest of your nodes are with respect to the seed nodes, with the most important nodes at the top.</p>
 <section id="spectral-vertex-nomination">
-<span id="ch7-vn-svn"></span><h2><span class="section-number">6.4.1. </span>Spectral Vertex Nomination<a class="headerlink" href="#spectral-vertex-nomination" title="Permalink to this headline">#</a></h2>
+<span id="ch7-vn-svn"></span><h2>Spectral Vertex Nomination<a class="headerlink" href="#spectral-vertex-nomination" title="Permalink to this headline">#</a></h2>
 <p>There are a few approaches to vertex nomination. You can take a maximum likelihood approach, or a bayes-optimal approach - but what we’ll focus on is <em>Spectral Vertex Nomination</em>. The general idea is that you embed your network, and then you just order the latent positions by how close they are to the seed node latent positions. There are a few ways of doing this: you could create a <em>separate</em> set of nominees for each seed node, for instance. This would correspond to finding the people closest to <em>each</em> human trafficker, rather than finding a single list of nominees.</p>
 <p>You could also just get a single list of nominees: you could first take the centroid of the latent positions of your seed nodes, and then find the closest nodes to that <em>centroid</em>. There are also a few different ways of defining what it means to be “close” to seed node latent positions. The obvious way is Euclidean distance, which is what you’d traditionally think of as the distance between two points.</p>
 <p>In any case, all forms of Spectral Vertex Nomination involve finding embeddings and then taking distances. In contrast to the other approaches, it scales well with very large networks (since you’re essentially just doing an embedding followed by a simple calculation) and doesn’t require any prior knowledge of community membership.</p>
@@ -957,7 +945,7 @@ title="Print to PDF"
 </div>
 <p>Now, we’d like to order the rest of the vertices in this network by their degree of similarity to the seed nodes. Remember that we talked about two ways of doing this: we could find a separate set of nominations for each seed node, or we could find a single set of nominations for all of the seed nodes. Let’s start by finding a single set, using the centroid.</p>
 <section id="finding-a-single-set-of-nominations">
-<h3><span class="section-number">6.4.1.1. </span>Finding a single set of nominations<a class="headerlink" href="#finding-a-single-set-of-nominations" title="Permalink to this headline">#</a></h3>
+<h3>Finding a single set of nominations<a class="headerlink" href="#finding-a-single-set-of-nominations" title="Permalink to this headline">#</a></h3>
 <p>Computing the centroid is as easy as just taking the mean value for the seed latent positions along each coordinate axis. Since our example is in 2 dimensions, we can just take our <span class="math notranslate nohighlight">\(m \times 2\)</span> matrix of seed latent positions and take the mean along the first axis to create a <span class="math notranslate nohighlight">\(1 \times 2\)</span> vector. That vector will be the centroid, and its location in Euclidean space will be right in the middle of the seeds. You can see the centroid (red star) along with the seed latent positions (red circles) below.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1057,7 +1045,7 @@ title="Print to PDF"
 </section>
 </section>
 <section id="finding-nominations-for-each-node">
-<h2><span class="section-number">6.4.2. </span>Finding Nominations for Each Node<a class="headerlink" href="#finding-nominations-for-each-node" title="Permalink to this headline">#</a></h2>
+<h2>Finding Nominations for Each Node<a class="headerlink" href="#finding-nominations-for-each-node" title="Permalink to this headline">#</a></h2>
 <p>Another approach, if we don’t want to combine the information from all of our seed nodes, is to create a different nomination list for each node. This would correspond to finding multiple sets of people close to <em>each</em> human trafficker, rather than finding a single set of people for the <em>group</em> of human traffickers. Graspologic does this natively; the only real difference between the two approaches is that we take the nearest neighbors of the centroid for the first method rather than for each individual. Because of this, we’ll just use graspologic directly, rather than showcasing the algorithm.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1082,10 +1070,10 @@ title="Print to PDF"
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 0,  1,  2,  3,  4],
-       [36, 48, 48, 20, 39],
-       [14,  2, 44, 36, 41],
-       [ 6, 44, 12, 17, 49],
-       [17, 12, 29, 16, 42]])
+       [34, 11,  1, 11, 22],
+       [46,  2, 42, 20, 15],
+       [25,  3, 11, 21, 18],
+       [15, 48, 15, 49, 20]])
 </pre></div>
 </div>
 </div>
@@ -1150,20 +1138,6 @@ title="Print to PDF"
                 
     <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="model-selection.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">6.3. </span>Model Selection</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="out-of-sample.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">6.5. </span>Out-of-sample Embedding</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
 </div>
             </footer>
         </div>
