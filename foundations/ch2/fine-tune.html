@@ -806,7 +806,7 @@ title="Print to PDF"
   <section class="tex2jax_ignore mathjax_ignore" id="fine-tune-your-model">
 <span id="ch2-finetune"></span><h1><span class="section-number">2.5. </span>Fine-Tune your Model<a class="headerlink" href="#fine-tune-your-model" title="Permalink to this headline">#</a></h1>
 <p>Now that you have figured out an appropriate way to represent your network to learn from it, and you have learned how to train an algorithm to learn from it, it’s time to tune things up a little bit. Let’s start with the code we’ve gotten together so far:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
@@ -817,6 +817,7 @@ title="Print to PDF"
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 
 <span class="c1"># the AWS bucket the data is stored in</span>
 <span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
@@ -851,8 +852,10 @@ title="Print to PDF"
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">if</span> <span class="s2">&quot;edgelist&quot;</span> <span class="ow">in</span> <span class="n">fname</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># import edgelists with graspologic</span>
+    <span class="c1"># edgelists will be all of the files that end in a csv</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;*.csv&quot;</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">networks</span>
 
 <span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -908,36 +911,6 @@ title="Print to PDF"
 <span class="n">As_raw</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
 <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">As</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">As_raw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="nn">Input In [2],</span> in <span class="ni">&lt;cell line: 5&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">fetch_fmri_data</span><span class="p">()</span>
-<span class="ne">----&gt; </span><span class="mi">5</span> <span class="n">As_raw</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="n">As</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="k">for</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">As_raw</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="nn">Input In [1],</span> in <span class="ni">read_fmri_data</span><span class="nt">(path)</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span> <span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span><span class="sd"> A function which loads the connectomes as adjacency matrices.</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">44</span> <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">if</span> <span class="s2">&quot;edgelist&quot;</span> <span class="ow">in</span> <span class="n">fname</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
-<span class="ne">---&gt; </span><span class="mi">45</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="nn">File &lt;__array_function__ internals&gt;:5,</span> in <span class="ni">stack</span><span class="nt">(*args, **kwargs)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/numpy/core/shape_base.py:426,</span> in <span class="ni">stack</span><span class="nt">(arrays, axis, out)</span>
-<span class="g g-Whitespace">    </span><span class="mi">424</span> <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">}</span>
-<span class="g g-Whitespace">    </span><span class="mi">425</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">426</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;all input arrays must have the same shape&#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">428</span> <span class="n">result_ndim</span> <span class="o">=</span> <span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="g g-Whitespace">    </span><span class="mi">429</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">normalize_axis_index</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">result_ndim</span><span class="p">)</span>
-
-<span class="ne">ValueError</span>: all input arrays must have the same shape
 </pre></div>
 </div>
 </div>

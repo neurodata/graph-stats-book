@@ -895,6 +895,7 @@ title="Print to PDF"
 <span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">import_edgelist</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 
 <span class="c1"># the AWS bucket the data is stored in</span>
 <span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
@@ -929,8 +930,10 @@ title="Print to PDF"
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">if</span> <span class="s2">&quot;edgelist&quot;</span> <span class="ow">in</span> <span class="n">fname</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># import edgelists with graspologic</span>
+    <span class="c1"># edgelists will be all of the files that end in a csv</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;*.csv&quot;</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">networks</span>
 </pre></div>
 </div>
 </div>
@@ -939,33 +942,6 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_fmri_data</span><span class="p">()</span>
 <span class="n">As</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="nn">Input In [2],</span> in <span class="ni">&lt;cell line: 2&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">fetch_fmri_data</span><span class="p">()</span>
-<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">As</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
-
-<span class="nn">Input In [1],</span> in <span class="ni">read_fmri_data</span><span class="nt">(path)</span>
-<span class="g g-Whitespace">     </span><span class="mi">39</span> <span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">40</span><span class="sd"> A function which loads the connectomes as adjacency matrices.</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span> <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">if</span> <span class="s2">&quot;edgelist&quot;</span> <span class="ow">in</span> <span class="n">fname</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
-<span class="ne">---&gt; </span><span class="mi">43</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="nn">File &lt;__array_function__ internals&gt;:5,</span> in <span class="ni">stack</span><span class="nt">(*args, **kwargs)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/numpy/core/shape_base.py:426,</span> in <span class="ni">stack</span><span class="nt">(arrays, axis, out)</span>
-<span class="g g-Whitespace">    </span><span class="mi">424</span> <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">}</span>
-<span class="g g-Whitespace">    </span><span class="mi">425</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">426</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;all input arrays must have the same shape&#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">428</span> <span class="n">result_ndim</span> <span class="o">=</span> <span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="g g-Whitespace">    </span><span class="mi">429</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">normalize_axis_index</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">result_ndim</span><span class="p">)</span>
-
-<span class="ne">ValueError</span>: all input arrays must have the same shape
 </pre></div>
 </div>
 </div>
@@ -1009,6 +985,11 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Purging 0 nodes...
+</pre></div>
+</div>
+</div>
 </div>
 <p>So no isolated nodes were found, and consequently no nodes were purged. Great! What else can we do?</p>
 <p>It turns out that a common thing to do with functional MRI connectomes is to, in fact, not look at the correlations themselves, but the <em>absolute correlations</em>. The intuition here is that, if one node is less active when another node is active, that <em>kind of</em> indicates that they are still operating together, right? Let’s take a look at how we can compute the absolute correlations:</p>
@@ -1024,6 +1005,12 @@ title="Print to PDF"
 <span class="n">heatmap</span><span class="p">(</span><span class="n">A_abs</span> <span class="o">-</span> <span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Difference(Absolute - Raw)&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:title={&#39;center&#39;:&#39;Difference(Absolute - Raw)&#39;}&gt;
+</pre></div>
+</div>
+<img alt="../../_images/prepare-the-data_9_1.png" src="../../_images/prepare-the-data_9_1.png" />
 </div>
 </div>
 <p>As you can see in the right-most plot, a good chunk of the values changed, which is indicated by larger differences from the raw to the real data.</p>
@@ -1050,6 +1037,12 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cleaning data...
+Purging 0 nodes...
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="edge-weight-transformations">
@@ -1066,6 +1059,18 @@ title="Print to PDF"
 
 <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.4</span>
 <span class="n">A_bin</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">A_clean</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [8],</span> in <span class="ni">&lt;cell line: 4&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">binarize</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">A_bin</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">binarize</span><span class="p">(</span><span class="n">A_clean</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;gp&#39; is not defined
 </pre></div>
 </div>
 </div>

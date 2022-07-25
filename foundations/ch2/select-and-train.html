@@ -845,7 +845,7 @@ title="Print to PDF"
   <section class="tex2jax_ignore mathjax_ignore" id="select-and-train-a-model">
 <span id="ch2-select"></span><h1><span class="section-number">2.4. </span>Select and Train a Model<a class="headerlink" href="#select-and-train-a-model" title="Permalink to this headline">#</a></h1>
 <p>So, now you’ve got your data loaded and pre-processed… what next? Let’s get all the code in that we’ve used so far:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">urllib</span>
@@ -856,6 +856,7 @@ title="Print to PDF"
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span><span class="p">,</span> <span class="n">BaseEstimator</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">import</span> <span class="nn">glob</span>
 
 <span class="c1"># the AWS bucket the data is stored in</span>
 <span class="n">BUCKET_ROOT</span> <span class="o">=</span> <span class="s2">&quot;open-neurodata&quot;</span>
@@ -890,8 +891,10 @@ title="Print to PDF"
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A function which loads the connectomes as adjacency matrices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">if</span> <span class="s2">&quot;edgelist&quot;</span> <span class="ow">in</span> <span class="n">fname</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># import edgelists with graspologic</span>
+    <span class="c1"># edgelists will be all of the files that end in a csv</span>
+    <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;*.csv&quot;</span><span class="p">))]</span>
+    <span class="k">return</span> <span class="n">networks</span>
 
 <span class="k">def</span> <span class="nf">remove_isolates</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -947,39 +950,17 @@ title="Print to PDF"
 <span class="n">A</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="n">A_xfm</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">A_cleaned</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Preprocessed connectome&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A_xfm</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Preprocessed connectome&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="nn">Input In [2],</span> in <span class="ni">&lt;cell line: 4&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">fetch_fmri_data</span><span class="p">()</span>
-<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">As</span> <span class="o">=</span> <span class="n">read_fmri_data</span><span class="p">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">A</span> <span class="o">=</span> <span class="n">As</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">A_xfm</span> <span class="o">=</span> <span class="n">num_pipeline</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-
-<span class="nn">Input In [1],</span> in <span class="ni">read_fmri_data</span><span class="nt">(path)</span>
-<span class="g g-Whitespace">     </span><span class="mi">41</span> <span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">42</span><span class="sd"> A function which loads the connectomes as adjacency matrices.</span>
-<span class="g g-Whitespace">     </span><span class="mi">43</span><span class="sd"> &quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">44</span> <span class="n">networks</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_edgelist</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">))</span> <span class="k">if</span> <span class="s2">&quot;edgelist&quot;</span> <span class="ow">in</span> <span class="n">fname</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span>
-<span class="ne">---&gt; </span><span class="mi">45</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="nn">File &lt;__array_function__ internals&gt;:5,</span> in <span class="ni">stack</span><span class="nt">(*args, **kwargs)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.13/x64/lib/python3.8/site-packages/numpy/core/shape_base.py:426,</span> in <span class="ni">stack</span><span class="nt">(arrays, axis, out)</span>
-<span class="g g-Whitespace">    </span><span class="mi">424</span> <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">}</span>
-<span class="g g-Whitespace">    </span><span class="mi">425</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">426</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;all input arrays must have the same shape&#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">428</span> <span class="n">result_ndim</span> <span class="o">=</span> <span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="g g-Whitespace">    </span><span class="mi">429</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">normalize_axis_index</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">result_ndim</span><span class="p">)</span>
-
-<span class="ne">ValueError</span>: all input arrays must have the same shape
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cleaning data...
+Purging 0 nodes...
+Scaling edge-weights...
 </pre></div>
 </div>
+<img alt="../../_images/select-and-train_2_1.png" src="../../_images/select-and-train_2_1.png" />
 </div>
 </div>
 <section id="generating-new-representations-from-your-data">
@@ -989,7 +970,9 @@ title="Print to PDF"
 <p>Well, one possible thing you can do is you can use something called a <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-ref">spectral embedding</span></a>, a technique that you will learn has a wide range of applications in network machine learning whether you are studying one network, pairs of networks, or multiple networks. Let’s see what happens when we spectrally embed our connectome:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">embedding</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">AdjacencySpectralEmbed</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A_xfm</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">AdjacencySpectralEmbed</span>
+
+<span class="n">embedding</span> <span class="o">=</span> <span class="n">AdjacencySpectralEmbed</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A_xfm</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -997,9 +980,14 @@ title="Print to PDF"
 <p>An <em>embedding</em> takes the adjacency matrix, which is a matrix representation of the entire network, and turns it into a tabular array. Each row is called an <em>estimated latent position</em> for a given node, and each column is called an <em>estimated latent dimension</em> of the network. This means that if there are <span class="math notranslate nohighlight">\(n\)</span> nodes, there are <span class="math notranslate nohighlight">\(n\)</span> rows of the spectral embedding, and if there are <span class="math notranslate nohighlight">\(d\)</span> estimated latent dimensions of the network, there are <span class="math notranslate nohighlight">\(d\)</span> columns. Overall, the spectral embedding has taken the <span class="math notranslate nohighlight">\(n \times n\)</span> adjacency matrix, which we <em>can’t</em> inherently use network machine learning algorithms on, and <em>transformed</em> it into a <span class="math notranslate nohighlight">\(n \times d\)</span> tabular array, which we <em>can</em> inherently use machine learning algorithms on. We’ll visualize this embedding using a <em>pairs plot</em>, which as you will learn later, is a scatter plot showing where each node is a single point in the plot, and the x and y axes are different <em>pairs</em> of latent dimensions for that particular node:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Spectral Embedding for connectome&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.plot</span> <span class="kn">import</span> <span class="n">pairplot</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Spectral Embedding for connectome&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/select-and-train_6_0.png" src="../../_images/select-and-train_6_0.png" />
 </div>
 </div>
 <p>As it turns out, this particular representation of the adjacency matrix through the <em>spectral embedding</em> can, optionally, be tied into a statistical model if you make some assumptions; particularly, those of the <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-ref">stochastic block model</span></a>, which you will learn about in chapter 5. Basically, what the stochastic block model says is that each node is a member of a subgroup, called a <em>community</em>, and its connectivity to other nodes in the network is dictated by which community it is a member of, and which community the other node is a member of. This sounds a <em>lot</em> like the question that your colleague wanted you to approach, since he wanted a way to take the nodes of the network and form “functionally similar” subgroups from them.</p>
@@ -1015,9 +1003,12 @@ title="Print to PDF"
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicter Clusters&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;KMeans clustering&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/select-and-train_9_0.png" src="../../_images/select-and-train_9_0.png" />
 </div>
 </div>
 <p>So, it looks like the <span class="math notranslate nohighlight">\(k\)</span>-means was able to learn <span class="math notranslate nohighlight">\(2\)</span> clusters from our dataset. These clusters are indicated by the “blobs” of points that are red or blue, respectively.</p>
@@ -1034,9 +1025,12 @@ title="Print to PDF"
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicted Clusters&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;KMeans clustering, automatic selection&quot;</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicted Clusters&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/select-and-train_12_0.png" src="../../_images/select-and-train_12_0.png" />
 </div>
 </div>
 <p>Unlike the previous approach, it looks like with silhouette score selection, we ended up with <span class="math notranslate nohighlight">\(3\)</span> clusters being optimal, not <span class="math notranslate nohighlight">\(2\)</span>.</p>
@@ -1052,9 +1046,12 @@ title="Print to PDF"
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Clustered embedding&quot;</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicted Clusters&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;AutoGMM Clustering&quot;</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Predicted Clusters&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/select-and-train_15_0.png" src="../../_images/select-and-train_15_0.png" />
 </div>
 </div>
 <p>So, it looks like GMM actually found <span class="math notranslate nohighlight">\(4\)</span> clusters to be a bit more optimal than <span class="math notranslate nohighlight">\(3\)</span> clusters.</p>
