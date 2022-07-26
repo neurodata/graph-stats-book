@@ -1,0 +1,1261 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>9.2. Graph classification &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="10. Representations (Extended)" href="../../appendix/ch11/ch11.html" />
+    <link rel="prev" title="9.1. Random walk and diffusion-based methods" href="random-walk-diffusion-methods.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../coverpage.html">
+                    Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What is network machine learning?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. Why do we study networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
+     1.3. Types of Network Machine Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.4. Examples of applications
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
+     1.5. Challenges of Network Machine Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/select-and-train.html">
+     2.4. Select and Train a Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/fine-tune.html">
+     2.5. Fine-Tune your Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
+     2.6. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch4/ch4.html">
+   3. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/matrix-representations.html">
+     3.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/properties-of-networks.html">
+     3.2. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/network-representations.html">
+     3.3. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch4/regularization.html">
+     3.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch5/ch5.html">
+   4. Why Use Statistical Models?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">
+     4.1. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">
+     4.2. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">
+     4.3. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">
+     4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/multi-network-models.html">
+     4.5. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
+     4.6. Network Models with Network Covariates
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../representations/ch6/ch6.html">
+   5. Learning Network Representations
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">
+     5.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/why-embed-networks.html">
+     5.2. Why embed networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/spectral-embedding.html">
+     5.3. Spectral embedding methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">
+     5.4. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">
+     5.5. Joint Representation Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch7/ch7.html">
+   6. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/community-detection.html">
+     6.1. Community Detection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/testing-differences.html">
+     6.2. Testing for Differences between Groups of Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/model-selection.html">
+     6.3. Model Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/vertex-nomination.html">
+     6.4. Single-Network Vertex Nomination
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/out-of-sample.html">
+     6.5. Out-of-sample Embedding
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch8/ch8.html">
+   7. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">
+     7.1. Latent Two-Sample Hypothesis Testing
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/significant-communities.html">
+     7.2. Two-sample hypothesis testing in SBMs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">
+     7.3. Graph Matching
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">
+     7.4. Vertex Nomination For Two Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch9/ch9.html">
+   8. Applications for Many Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/anomaly-detection.html">
+     8.1. Anomaly Detection For Timeseries of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/significant-edges.html">
+     8.2. Testing for Significant Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/significant-vertices.html">
+     8.3. Testing for Significant Vertices
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Next Steps
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="ch10.html">
+   9. Where do we go from here?
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="random-walk-diffusion-methods.html">
+     9.1. Random walk and diffusion-based methods
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     9.2. Graph classification
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Appendix
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch11/ch11.html">
+   10. Representations (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch11/alt-reps.html">
+     10.1. Alternative Network Representations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch12/ch12.html">
+   11. Network Model Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/background.html">
+     11.1. Background
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/foundation.html">
+     11.2. Foundation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/ers.html">
+     11.3. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/sbms.html">
+     11.4. Stochastic Block Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/rdpgs.html">
+     11.5. RDPGs and more general network models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch13/ch13.html">
+   12. Learning Representations Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/mle-theory.html">
+     12.1. Maximum Likelihood Estimate Theory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/lse.html">
+     12.2. Finding singular vectors With singular value decomposition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/spectral-theory.html">
+     12.7. Spectral Method Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch14/ch14.html">
+   13. Applications (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch14/hypothesis.html">
+     13.1. Hypothesis Testing with coin flips
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch14/unsupervised.html">
+     13.2. Unsupervised learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch14/bayes.html">
+     13.3. Bayes Plugin Classifier
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/next/ch10/gnn.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fnext/ch10/gnn.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/next/ch10/gnn.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/next/ch10/gnn.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-processing">
+   9.2.1. Data processing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#graph-neural-networks">
+   9.2.2. Graph Neural Networks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-training">
+   9.2.3. Model training
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Graph classification</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-processing">
+   9.2.1. Data processing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#graph-neural-networks">
+   9.2.2. Graph Neural Networks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-training">
+   9.2.3. Model training
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="graph-classification">
+<h1><span class="section-number">9.2. </span>Graph classification<a class="headerlink" href="#graph-classification" title="Permalink to this headline">#</a></h1>
+<p>A fundamental task in drug discovery is determining properties of molecules (on the order of millions) in search for promising molecules as drug candidates.
+However, running laboratory experiments to determine molecular properties are expensive. Instead, many drug companies utilize virtual screening methods in which computational methods are used to quickly search large libraries of molecules for one with the desirable properties – size, toxicity, and absorption to name a few.
+Success in virtual screening is determined by the accuracy and speed of the computational method. For instance, molecular dynamics simulates the physical movement of each atom and particle, thus providing the most accurate calculations of molecular properties, but requires an intractable number of numerical calculations that makes it infeasible to use in practice.
+Instead, methods have been built around succint 2D representations of molecules, further compressed in 1D <a class="reference external" href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system">SMILES</a> strings (Simplified molecular-input line-entry system), that summarize the structural relationships between different atoms through the chemical bonds connecting them.</p>
+<p><img alt="title" src="../../_images/molecule_repr.png" /></p>
+<p>Using SMILES, practioners have built statistical models to estimate correlations between SMILES and different molecular
+properties. These traditional methods have relied on building hand-crafted features derived from SMILES and optimizing simplistic statistical models to predict molecular properties from fingerprints. In machine learning, we prefer to avoid hardcoding features and instead algorithmically determine the optimal features – known as “learning”. Observe that a SMILES is simply a graph where atoms are nodes and bonds are edges. We can utilize graph neural networks, introduced in <a class="reference external" href="#link?">chapter 6</a>, as a method for learning a transformation from a fingerprint to a set of graph embeddings that can maximize the accuracy of predicting molecular properties.</p>
+<p>Our problem is one instance of graph classification: provided a graph, we wish to estimate some property of it. Our task will be to build a graph neural network and train it for classifying whether a molecule is toxic. We will make use of the Pytorch Geometric library to build our neural network and train it. The goal is to introduce basic techniques in geometric deep learning through graph neural networks which have undoubtedly become indispensible tools in many applications beyond just drug discovery.</p>
+<section id="data-processing">
+<h2><span class="section-number">9.2.1. </span>Data processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">#</a></h2>
+<p>We will be using one of the datasets packaged in <a class="reference external" href="https://moleculenet.org/">MoleculeNet</a>. Pytorch geometric (PYG) provides a convenient module to access it. We first import the module <code class="docutils literal notranslate"><span class="pre">MoleculeNet</span></code> then extract the <code class="docutils literal notranslate"><span class="pre">ClinTox</span></code> dataset. The dataset has a total of 1478 molecules labeled with their presence or absence of toxicity – determined from clinical trials done by the Food &amp; Drug association (FDA). Since this is a binary classification task, we observe there are two classes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_geometric.datasets</span> <span class="kn">import</span> <span class="n">MoleculeNet</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">MoleculeNet</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;data/clintox&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ClinTox&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dataset: </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="se">\n</span><span class="s1">Number of molecules/graphs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">Number of classes: </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downloading https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/clintox.csv.gz
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Extracting data/clintox/clintox/raw/clintox.csv.gz
+Processing...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:36:47] Explicit valence for atom # 0 N, 5, is greater than permitted
+[17:36:47] Can&#39;t kekulize mol.  Unkekulized atoms: 9
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:36:48] Explicit valence for atom # 10 N, 4, is greater than permitted
+[17:36:48] Explicit valence for atom # 10 N, 4, is greater than permitted
+[17:36:48] Can&#39;t kekulize mol.  Unkekulized atoms: 4
+[17:36:48] Can&#39;t kekulize mol.  Unkekulized atoms: 4
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset: ClinTox(1478)
+Number of molecules/graphs: 1478
+Number of classes: 2
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Done!
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s look at a few molecules to understand their graph structure. Each molecule has a known 3D structure and an associated SMILES string.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem.Draw</span> <span class="kn">import</span> <span class="n">rdMolDraw2D</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span>
+
+<span class="n">mols</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">26</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">83</span><span class="p">]</span>
+<span class="n">smiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">]</span>
+<span class="n">d2d</span> <span class="o">=</span> <span class="n">rdMolDraw2D</span><span class="o">.</span><span class="n">MolDraw2DSVG</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="mi">280</span><span class="p">,</span><span class="mi">300</span><span class="p">,</span><span class="mi">280</span><span class="p">)</span>
+<span class="n">d2d</span><span class="o">.</span><span class="n">drawOptions</span><span class="p">()</span><span class="o">.</span><span class="n">addAtomIndices</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">d2d</span><span class="o">.</span><span class="n">DrawMolecules</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+<span class="n">d2d</span><span class="o">.</span><span class="n">FinishDrawing</span><span class="p">()</span>
+<span class="n">SVG</span><span class="p">(</span><span class="n">d2d</span><span class="o">.</span><span class="n">GetDrawingText</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/gnn_6_0.svg" src="../../_images/gnn_6_0.svg" /></div>
+</div>
+<p>Additionally, each atom has been labelled with a numerical index and corresponds to a node in our graph. A quick inspection shows the molecules have 12 and 14 atoms respectively. Each nodes has been preprocessed with cheminformatics software, <a class="reference external" href="https://www.rdkit.org/">RDkit</a>, to obtain a initial set of node features including atom-type, valences, formal charges, and hybridization. The details of each starting feature are not important for this tutorial, but are crucial in real-world applications to maximize performance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">: Number of atoms=</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, Features per atom=</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Molecule 1: Number of atoms=12, Features per atom=9
+Molecule 2: Number of atoms=16, Features per atom=9
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s now inspect the connectivity of each molecule. We’ll render each molecule again but this time with the bond indices.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d2d</span> <span class="o">=</span> <span class="n">rdMolDraw2D</span><span class="o">.</span><span class="n">MolDraw2DSVG</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="mi">280</span><span class="p">,</span><span class="mi">300</span><span class="p">,</span><span class="mi">280</span><span class="p">)</span>
+<span class="n">d2d</span><span class="o">.</span><span class="n">drawOptions</span><span class="p">()</span><span class="o">.</span><span class="n">addBondIndices</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">d2d</span><span class="o">.</span><span class="n">DrawMolecules</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span>
+<span class="n">d2d</span><span class="o">.</span><span class="n">FinishDrawing</span><span class="p">()</span>
+<span class="n">SVG</span><span class="p">(</span><span class="n">d2d</span><span class="o">.</span><span class="n">GetDrawingText</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/gnn_10_0.svg" src="../../_images/gnn_10_0.svg" /></div>
+</div>
+<p>Bonds in the molecule correspond to edges in the graph. To verify this, let’s inspect the adjacency matrix of each molecule’s graph structure. PYG stores edges as adjacency lists to handle very large and sparse graphs. The following code converts the adjacency list into an adjacency matrix. We see the edge connectivity corresponds to the bond connectivity in the above images. For instance, atom 1 in the first molecule is bonded with atoms 0, 2, and 7 which agrees with the adjacency matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">_process</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">connectivity_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_atoms</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">])</span>
+    <span class="n">adj_list</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">e_i</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">_process</span><span class="p">(</span><span class="n">adj_list</span><span class="p">))):</span>
+        <span class="n">connectivity_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity_matrix</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">m_i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> adjacency matrix&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">))))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)))</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Atom index&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Atom index&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="nn">Input In [5],</span> in <span class="ni">&lt;cell line: 3&gt;</span><span class="nt">()</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">_process</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+
+<span class="ne">NameError</span>: name &#39;plt&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<p>We chose these two molecules because the first is nono-toxic while the second is toxic. This can be observed from the associated labels. However, this is impossible to discern on first glance of the molecules without any expertise. We will now use a graph neural network to learn a function for classifying molecules as toxic.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">long</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">m_i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> is toxic!&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">m_i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> is non-toxic.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Molecule 1 is non-toxic.
+Molecule 2 is toxic!
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="graph-neural-networks">
+<h2><span class="section-number">9.2.2. </span>Graph Neural Networks<a class="headerlink" href="#graph-neural-networks" title="Permalink to this headline">#</a></h2>
+<p>We now understand the underlying structure of our molecular data is a graph - nodes represent atoms and edges represent chemical bonds.
+Each molecule in our data is assigned a toxicity label obtained through experimental means, but the relationship between a molecular graph and toxicity is unknown.
+We can approximate this relationship with a statistical model. Chapter 5 introduced several statistical models that assumed knowledge into the true underlying structure of the network, but this rarely happens in practice, especially for high-dimensional networks. Even when the structure is known, it is unclear how to construct a statistical model that can be feasibly optimized or learned. A practical solution has been to use graph neural networks (GNNs) which have two desirable properties that solve our aforementioned issues.</p>
+<ol class="simple">
+<li><p>GNNs provide a framework for constructing universal function approximators on graphs. Informally, the right GNN model is <em>capable</em> of closely approximating any function over arbitrary network structure. This is appealing as it says we do not have to invest time in creatively designing a statistical model. Instead, our time can now be spent systematicaly optimizing a GNN to learn the optimal network representation under the guarantee our statistical model is capable of recovering the correct model. We caveat the universal approximator property relies on technical assumptions and regularities but these discussions are outside the scope of this book.</p></li>
+<li><p>GNNs are easy and efficient to optimize. A plethora of software libraries have been built to allow for neural network training and optimization. The success of neural networks is closely tied with the advent of special computer hardware, Graphical Processing Units (GPUs), that greatly accelerate and scale numerical calculations. GNNs are widely used in practice because they can scale to very large and high-dimensional datasets due to the tight coupling of engineering and mathematical theory.</p></li>
+</ol>
+<p>Let us formally write down a GNN. Our formalism follows the message passing framework introduced in <a class="reference external" href="http://proceedings.mlr.press/v70/gilmer17a/gilmer17a.pdf">Gilmer et al</a>. The graph <span class="math notranslate nohighlight">\(G = (V, E)\)</span> is parameterized by a set of nodes <span class="math notranslate nohighlight">\(V = \{v_i\}_{i=1}^{N_v}\)</span> where <span class="math notranslate nohighlight">\(N_v = |V|\)</span> and node attributes <span class="math notranslate nohighlight">\(v_i \in \mathbb{R}^{D_v}\)</span>. Edges in the graph are specified as <span class="math notranslate nohighlight">\(E = \{e_{ij}\}\)</span> where <span class="math notranslate nohighlight">\(N_e = |E|\)</span> and edge attributes <span class="math notranslate nohighlight">\(e_{ij} \in \mathbb{R}^{D_e}\)</span> exists if there is a connection between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. GNNs works in two phases:</p>
+<ol class="simple">
+<li><p><strong>Message passing phase</strong>. In this phase, the GNN sequentially updates node embeddings across <span class="math notranslate nohighlight">\(T\)</span> timesteps. Each node embedding, <span class="math notranslate nohighlight">\(h_i^{(t)} \in \mathbb{R}^h\)</span>, and referred to as the <em>hidden state</em> for node <span class="math notranslate nohighlight">\(i\)</span> and timestep <span class="math notranslate nohighlight">\(t\)</span>. Each node embedding is initialized with node attributes <span class="math notranslate nohighlight">\(h_i^{(0)} = v_i\)</span>. For a given time-step, <span class="math notranslate nohighlight">\(t \in [T]\)</span>, we calculate <em>messages</em> between every connected pair of nodes: <span class="math notranslate nohighlight">\(M_t(h_i^{(t-1)}, h_j^{(t-1)}, e_{ij})\)</span> if <span class="math notranslate nohighlight">\(j \in N(i)\)</span> where <span class="math notranslate nohighlight">\(N(i) = \{j : e_{ij} \in E\}\)</span> are the neighboring nodes of node <span class="math notranslate nohighlight">\(i\)</span>. Many choices exist for parameterizing <span class="math notranslate nohighlight">\(M_t\)</span> but it must be differentiable to make use of gradient-based optimization. A popular implementation for <span class="math notranslate nohighlight">\(M_t\)</span> is the graph convolution network (GCN) layer from <a class="reference external" href="https://arxiv.org/abs/1609.02907">Kipf et al</a> followed by a non-linear activation function, ReLU. This is what we will use in our implementation. We now perform the message passing step where each neighboring node will send their “messages” to a central node and then aggregate each message to construct a new hidden state. $<span class="math notranslate nohighlight">\(m_v^{(t)} = \sum_{j \in N(i)} M_{t-1}(h_i^{(t-1)}, h_j^{(t-1)}, e_{ij})\)</span><span class="math notranslate nohighlight">\( \)</span><span class="math notranslate nohighlight">\(h_i^{(t)} = U_{t-1}(h_i^{(t-1)}, m_v^{(t)})\)</span><span class="math notranslate nohighlight">\(
+\)</span>U_{t-1}<span class="math notranslate nohighlight">\( is the hidden-state update function. It also must be differentiable. Many papers are devoted to picking \)</span>U_{t-1}$, but for our purposes we will use the identity function to simplify our network.</p></li>
+<li><p><strong>Readout phase</strong>. After <span class="math notranslate nohighlight">\(T\)</span> steps, the hidden states are computed as <span class="math notranslate nohighlight">\(\{h_i^{(T)}\}_{i=1}^{N_v}\)</span>, representing our final node embeddings. The read-out function, <span class="math notranslate nohighlight">\(R(\cdot)\)</span>, is a graph-level aggregation function combining all node embeddings into a single vector <span class="math notranslate nohighlight">\(r \in \mathbb{R}^{D_r}\)</span>. $<span class="math notranslate nohighlight">\(r = R(\{h_i^{(T)}\}_{i=1}^{N_v})\)</span><span class="math notranslate nohighlight">\( We choose to do a final embedding of this single vector with a fully-connected perceptron (Lin) before outputing it as the graph-classification prediction.\)</span><span class="math notranslate nohighlight">\(\hat{y} = \text{Lin}(r)\)</span>$</p></li>
+</ol>
+<p>With the model specified, we need an algorithm to learn the optimal parameters. The canonical loss for classification is cross-entropy (CE) which for binary classification simplifes to $<span class="math notranslate nohighlight">\(\text{CE}(y, \hat{y}) = -y(\log{\hat{y}} + (1-y)\log{(1 - \hat{y})})\)</span><span class="math notranslate nohighlight">\(
+for prediction \)</span>\hat{y} \in \mathbb{R}<span class="math notranslate nohighlight">\( and label \)</span>y \in {0, 1}<span class="math notranslate nohighlight">\(. The full training objective can be written as \)</span><span class="math notranslate nohighlight">\(\mathbb{E}_{(G, y) \sim p}\left[\text{CE}(y, \text{GNN}(G)) \right] = \sum_{(G, y)}\text{CE}(y, \text{GNN}(G)) \approx \sum_{i=1}^N\text{CE}(y, \text{GNN}(G))\)</span><span class="math notranslate nohighlight">\(
+We would wish to optimize over all possible graphs and labels that can be sampled \)</span>(G, y) \sim p<span class="math notranslate nohighlight">\( where \)</span>p<span class="math notranslate nohighlight">\( is the true distribution capturing the relationship between graphs and labels. But one never has access to the true distribution and needs to approximate using the given training data of size \)</span>N<span class="math notranslate nohighlight">\(. Often \)</span>N$ is very large and optimizing over every example at once is not possible. A successful, practical technique is to train stochastically: sample the maximum number of examples that can fit on the GPU, optimize it, then repeat by resampling until convergence of the loss or a validation metric.</p>
+<p>Let us summarize what we’ve done so far. We specified our statistical model as a GNN that works by sequentially updating node embeddings to learn a function optimized according to a training objective. We hope minimizing this training objective will lead to a model that allows for accurate graph clasification. But this must be verified with a validation and test set. We brushed over many details regarding the rich topic of <strong>deep learning</strong>, of which</p>
+</section>
+<section id="model-training">
+<h2><span class="section-number">9.2.3. </span>Model training<a class="headerlink" href="#model-training" title="Permalink to this headline">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shuffle</span><span class="p">()</span>
+
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[:</span><span class="o">-</span><span class="mi">150</span><span class="p">]</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="o">-</span><span class="mi">150</span><span class="p">:]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of training graphs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of test graphs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of training graphs: 1328
+Number of test graphs: 150
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Step </span><span class="si">{</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=======&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of graphs in the current batch: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">num_graphs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Step 1:
+=======
+Number of graphs in the current batch: 64
+DataBatch(x=[1627, 9], edge_index=[2, 3458], edge_attr=[3458, 3], y=[64, 2], smiles=[64], batch=[1627], ptr=[65])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">GCNConv</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">global_mean_pool</span>
+
+
+<span class="k">class</span> <span class="nc">GCN</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GCN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">num_node_features</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+
+        <span class="c1"># 1. Obtain node embeddings </span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
+
+        <span class="c1"># 2. Readout layer</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">global_mean_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>  <span class="c1"># [batch_size, hidden_channels]</span>
+
+        <span class="c1"># 3. Apply a final classifier</span>
+<span class="c1">#         x = F.dropout(x, p=0.5, training=self.training)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">x</span>
+<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;mps&#39;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GCN(
+  (conv1): GCNConv(9, 64)
+  (conv2): GCNConv(64, 64)
+  (conv3): GCNConv(64, 64)
+  (lin): Linear(in_features=64, out_features=2, bias=False)
+)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from IPython.display import Javascript</span>
+<span class="c1"># display(Javascript(&#39;&#39;&#39;google.colab.output.setIframeHeight(0, true, {maxHeight: 300})&#39;&#39;&#39;))</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>  <span class="c1"># Iterate in batches over the training dataset.</span>
+        
+        <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  <span class="c1"># Perform a single forward pass.</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">())</span>  <span class="c1"># Compute the loss.</span>
+        
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># Derive gradients.</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># Update parameters based on gradients.</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>  <span class="c1"># Clear gradients.</span>
+
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>  <span class="c1"># Iterate in batches over the training/test dataset.</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Use the class with highest probability.</span>
+            <span class="n">correct</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pred</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>  <span class="c1"># Check against ground-truth labels.</span>
+        <span class="k">return</span> <span class="n">correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>  <span class="c1"># Derive ratio of correct predictions.</span>
+
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">171</span><span class="p">):</span>
+    <span class="n">train</span><span class="p">()</span>
+    <span class="n">train_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+    <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">epoch</span><span class="si">:</span><span class="s1">03d</span><span class="si">}</span><span class="s1">, Train Acc: </span><span class="si">{</span><span class="n">train_acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, Test Acc: </span><span class="si">{</span><span class="n">test_acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./next/ch10"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="random-walk-diffusion-methods.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">9.1. </span>Random walk and diffusion-based methods</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../../appendix/ch11/ch11.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>Representations (Extended)</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
