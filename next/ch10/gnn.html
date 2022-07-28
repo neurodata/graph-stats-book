@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>9.2. Graph classification &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    <title>9.2. Graph Neural Networks &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -463,7 +463,7 @@ const thebe_selector_output = ".output, .cell_output"
    </li>
    <li class="toctree-l2 current active">
     <a class="current reference internal" href="#">
-     9.2. Graph classification
+     9.2. Graph Neural Networks
     </a>
    </li>
   </ul>
@@ -819,18 +819,93 @@ title="Print to PDF"
     <nav id="bd-toc-nav" aria-label="Page">
         <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#data-processing">
-   9.2.1. Data processing
+  <a class="reference internal nav-link" href="#the-drug-discovery-problem">
+   9.2.1. The drug discovery problem
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#obtaining-a-network-from-a-molecule">
+     9.2.1.1. Obtaining a network from a molecule
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#our-network-learning-problem">
+     9.2.1.2. Our network learning problem
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#preprocessing-smiles-fingerprints">
+   9.2.2. Preprocessing SMILES fingerprints
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#graph-neural-networks">
-   9.2.2. Graph Neural Networks
+  <a class="reference internal nav-link" href="#graph-neural-networks-gnns">
+   9.2.3. Graph neural networks (GNNs)
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gnns-are-universal-approximators">
+     9.2.3.1. GNNs are universal approximators
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gnns-are-easy-and-efficient-to-optimize">
+     9.2.3.2. GNNs are easy and efficient to optimize
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#model-training">
-   9.2.3. Model training
+  <a class="reference internal nav-link" href="#how-do-gnns-work-for-drug-discovery">
+   9.2.4. How do GNNs work for drug discovery?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gnn-training">
+     9.2.4.1. GNN training
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-forward-pass">
+       9.2.4.1.1. The forward pass
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#message-passing-uses-local-neighborhoods-of-networks">
+         9.2.4.1.1.1. Message passing uses local neighborhoods of networks
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#readout-takes-the-node-embeddings-for-a-molecule-and-produces-a-molecule-embedding">
+         9.2.4.1.1.2. Readout takes the node embeddings for a molecule and produces a molecule embedding
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#the-percepteron-produces-prediction-labels">
+         9.2.4.1.1.3. The percepteron produces prediction labels
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-backwards-pass">
+       9.2.4.1.2. The backwards pass
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#putting-it-all-together">
+     9.2.4.2. Putting it all together
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-training-and-testing">
+   9.2.5. Model training and testing
   </a>
  </li>
 </ul>
@@ -842,7 +917,7 @@ title="Print to PDF"
         <div class="col pl-md-3 pl-lg-5 content-container">
             <!-- Table of contents that is only displayed when printing the page -->
             <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Graph classification</h1>
+                <h1>Graph Neural Networks</h1>
                 <!-- Table of contents -->
                 <div id="print-main-content">
                     <div id="jb-print-toc">
@@ -853,18 +928,93 @@ title="Print to PDF"
                         <nav aria-label="Page">
                             <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#data-processing">
-   9.2.1. Data processing
+  <a class="reference internal nav-link" href="#the-drug-discovery-problem">
+   9.2.1. The drug discovery problem
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#obtaining-a-network-from-a-molecule">
+     9.2.1.1. Obtaining a network from a molecule
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#our-network-learning-problem">
+     9.2.1.2. Our network learning problem
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#preprocessing-smiles-fingerprints">
+   9.2.2. Preprocessing SMILES fingerprints
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#graph-neural-networks">
-   9.2.2. Graph Neural Networks
+  <a class="reference internal nav-link" href="#graph-neural-networks-gnns">
+   9.2.3. Graph neural networks (GNNs)
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gnns-are-universal-approximators">
+     9.2.3.1. GNNs are universal approximators
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gnns-are-easy-and-efficient-to-optimize">
+     9.2.3.2. GNNs are easy and efficient to optimize
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#model-training">
-   9.2.3. Model training
+  <a class="reference internal nav-link" href="#how-do-gnns-work-for-drug-discovery">
+   9.2.4. How do GNNs work for drug discovery?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gnn-training">
+     9.2.4.1. GNN training
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-forward-pass">
+       9.2.4.1.1. The forward pass
+      </a>
+      <ul class="nav section-nav flex-column">
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#message-passing-uses-local-neighborhoods-of-networks">
+         9.2.4.1.1.1. Message passing uses local neighborhoods of networks
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#readout-takes-the-node-embeddings-for-a-molecule-and-produces-a-molecule-embedding">
+         9.2.4.1.1.2. Readout takes the node embeddings for a molecule and produces a molecule embedding
+        </a>
+       </li>
+       <li class="toc-h5 nav-item toc-entry">
+        <a class="reference internal nav-link" href="#the-percepteron-produces-prediction-labels">
+         9.2.4.1.1.3. The percepteron produces prediction labels
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#the-backwards-pass">
+       9.2.4.1.2. The backwards pass
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#putting-it-all-together">
+     9.2.4.2. Putting it all together
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#model-training-and-testing">
+   9.2.5. Model training and testing
   </a>
  </li>
 </ul>
@@ -877,22 +1027,53 @@ title="Print to PDF"
                 
               <div>
                 
-  <section class="tex2jax_ignore mathjax_ignore" id="graph-classification">
-<h1><span class="section-number">9.2. </span>Graph classification<a class="headerlink" href="#graph-classification" title="Permalink to this headline">#</a></h1>
-<p>A fundamental task in drug discovery is determining properties of molecules (on the order of millions) in search for promising molecules as drug candidates.
-However, running laboratory experiments to determine molecular properties are expensive. Instead, many drug companies utilize virtual screening methods in which computational methods are used to quickly search large libraries of molecules for one with the desirable properties – size, toxicity, and absorption to name a few.
-Success in virtual screening is determined by the accuracy and speed of the computational method. For instance, molecular dynamics simulates the physical movement of each atom and particle, thus providing the most accurate calculations of molecular properties, but requires an intractable number of numerical calculations that makes it infeasible to use in practice.
-Instead, methods have been built around succint 2D representations of molecules, further compressed in 1D <a class="reference external" href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system">SMILES</a> strings (Simplified molecular-input line-entry system), that summarize the structural relationships between different atoms through the chemical bonds connecting them.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="graph-neural-networks">
+<span id="ch10-gnns"></span><h1><span class="section-number">9.2. </span>Graph Neural Networks<a class="headerlink" href="#graph-neural-networks" title="Permalink to this headline">#</a></h1>
+<p>Throughout this book, we have focused on ways in which you can represent and, if desired <em>conceptualize</em>, network-valued data that place it in a context in which you can apply many of the algorithms you are used to.</p>
+<p>For instance, in the case of the <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-ref">spectral embedding</span></a>, we devised techniques which allow you to take a network of nodes and edges, and construct a tabular array with which you can learn about using traditional techniques like <span class="math notranslate nohighlight">\(k\)</span>-means for <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-ref">community detection</span></a>, or other tasks of interest you might have. We learned how this representation had underpinnings in the <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">rdpg</span></a>, and how you could use this as a conceptual basis to assign explicit assumptions you might make about your network in order for you to do downstream statistical inference, such as if you want to <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">compare two networks</span></a>.</p>
+<p>In this section and the next on <a class="reference internal" href="random-walk-diffusion-methods.html#ch10-diffusion"><span class="std std-ref">diffusion methods</span></a>, we are going to turn this approach somewhat on its head, and investigate approaches which, at face value, appear to fundamentally alter existing techniques which you already might know about, neural networks, to make them amenable to network-valued data directly. Let’s get down to it.</p>
+<section id="the-drug-discovery-problem">
+<h2><span class="section-number">9.2.1. </span>The drug discovery problem<a class="headerlink" href="#the-drug-discovery-problem" title="Permalink to this headline">#</a></h2>
+<p>In chemistry, a <em>molecule</em> is a group of atoms which are bonded together. If you haven’t taken a chemistry course, you can think of an atom as a <em>building block</em>, and a <em>bond</em> as the <em>glue</em> that holds the molecule together. Every interaction you have with the world occurs through molecules; the water you drink, for instance, is a molecule consisting of hydrogen and oxygen, <span class="math notranslate nohighlight">\(H_20\)</span>, and the air you breathe consists most of molecules of nitrogen <span class="math notranslate nohighlight">\(N_2\)</span>, small amounts of oxygen <span class="math notranslate nohighlight">\(O_2\)</span>, and trace amounts of argon <span class="math notranslate nohighlight">\(Ar\)</span> and carbon dioxide <span class="math notranslate nohighlight">\(CO_2\)</span>. In these formulas, the letters represent a particular atom, and the subscripts represent the number of these atoms in the molecule.</p>
+<p>Without getting too deep into the chemistry, a fundamental problem for many pharmaceutical and chemistry investigations involves the analysis of molecules that might be useful for clinical purposes. A <em>clinically useful molecule</em> is a molecule which has properties which, for one reason or another, might make it beneficial for humans. For instance, if you. have ever had a headache, you have probably become familiar with a molecule <span class="math notranslate nohighlight">\(C_{13}H_{18}O_2\)</span>, or Ibuprofen (Advil).</p>
+<p>Many of the drugs that we are familiar with on an everyday basis have, it turns out, been discovered totally by accident. For a laugh, we’d encourage you to check out the discovery of <a class="reference external" href="https://en.wikipedia.org/wiki/Alexander_Fleming#Discovery_of_penicillin">penicillin</a>, which is a family of molecules having a core structure of <span class="math notranslate nohighlight">\(C_9H_{11}N_2O_4S\)</span>.</p>
+<p>Unfortunately, coming across all of these “happy accident” molecules has become more and more infrequent as pharmaceuticals have progressed. When a given condition is identified that a pharmacologist decides to attempt to devise a treatment for, they often must proceed facing several enormous hurdles for candidate molecules. The molecules must be:</p>
+<ol class="simple">
+<li><p>non-toxic to humans,</p></li>
+<li><p>an appropriate size,</p></li>
+<li><p>be readily absorbed by humans, and</p></li>
+<li><p>able to address the condition of interest.</p></li>
+</ol>
+<p>Achieving all of these aims is extremely difficult, and extremely risky in terms of time, labor, and most of all potential risk to human participants in drug trials. Determining definitive, or at least suggestive, evidence that the molecule will achieve any or all of these conditions <em>before</em> running live human tests can save the company billions of dollars and can save participants in drug trials unnecessary exposure to harm.</p>
+<p>Running laboratory tests to screen these molecules is an expensive, time-consuming, and skilled labor-intensive process: what are the companies left to do?</p>
+<p>Many drug companies utilize virtual screening methods in which computational methods are used to quickly search large libraries of molecules to filter ones with the desirable properties. Success in virtual screening methods are determined by the accuracy and speed of the computational approach. For instance, molecular dynamics simulates the physical movement of each atom and particle, thus providing the most accurate calculations of molecular properties, but requires an intractable number of numerical calculations that makes it infeasible to use in practice. Instead, methods have been built around succint 2D representations of molecules, further compressed in 1D <a class="reference external" href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system">SMILES</a> strings (Simplified molecular-input line-entry system), that summarize the structural relationships between different atoms through the chemical bonds connecting them. These <span class="math notranslate nohighlight">\(1D\)</span> strings are known as <em>fingerprints</em> for the molecules.</p>
 <p><img alt="title" src="../../_images/molecule_repr.png" /></p>
-<p>Using SMILES, practioners have built statistical models to estimate correlations between SMILES and different molecular
-properties. These traditional methods have relied on building hand-crafted features derived from SMILES and optimizing simplistic statistical models to predict molecular properties from fingerprints. In machine learning, we prefer to avoid hardcoding features and instead algorithmically determine the optimal features – known as “learning”. Observe that a SMILES is simply a graph where atoms are nodes and bonds are edges. We can utilize graph neural networks, introduced in <a class="reference external" href="#link?">chapter 6</a>, as a method for learning a transformation from a fingerprint to a set of graph embeddings that can maximize the accuracy of predicting molecular properties.</p>
-<p>Our problem is one instance of graph classification: provided a graph, we wish to estimate some property of it. Our task will be to build a graph neural network and train it for classifying whether a molecule is toxic. We will make use of the Pytorch Geometric library to build our neural network and train it. The goal is to introduce basic techniques in geometric deep learning through graph neural networks which have undoubtedly become indispensible tools in many applications beyond just drug discovery.</p>
-<section id="data-processing">
-<h2><span class="section-number">9.2.1. </span>Data processing<a class="headerlink" href="#data-processing" title="Permalink to this headline">#</a></h2>
-<p>We will be using one of the datasets packaged in <a class="reference external" href="https://moleculenet.org/">MoleculeNet</a>. Pytorch geometric (PYG) provides a convenient module to access it. We first import the module <code class="docutils literal notranslate"><span class="pre">MoleculeNet</span></code> then extract the <code class="docutils literal notranslate"><span class="pre">ClinTox</span></code> dataset. The dataset has a total of 1478 molecules labeled with their presence or absence of toxicity – determined from clinical trials done by the Food &amp; Drug association (FDA). Since this is a binary classification task, we observe there are two classes.</p>
+<p>Using SMILES, practioners have built statistical models to estimate correlations between SMILES and different molecular properties. These traditional methods have relied on building hand-crafted features derived from SMILES and optimizing simplistic statistical models to predict molecular properties from fingerprints of the molecules.</p>
+<p>This too, however, is extremely labor intensive and, most importantly, requires direct human intervention to decipher the features used for statistical learning. With some clever manipulation, scientists have identified an ingenius approach to turn molecular screening into a network learning problem.</p>
+<section id="obtaining-a-network-from-a-molecule">
+<h3><span class="section-number">9.2.1.1. </span>Obtaining a network from a molecule<a class="headerlink" href="#obtaining-a-network-from-a-molecule" title="Permalink to this headline">#</a></h3>
+<p>In our initial description of a molecule, we described that a molecule was just a group of atoms which are bonded together. How can we conceptualize this as a network?</p>
+<p>If we think of the atoms of the molecule as the nodes of the network, and the bonds as the edges, this problem is extremely straightforward. Let’s see how this would work with a single molecule of water. Remember that water has the molecular formula <span class="math notranslate nohighlight">\(H_2O\)</span>, which means that it is two hydrogen atoms, and one oxygen atom. The molecular structure of water is that the oxygen atom basically sits in the middle, and the hydrogens hang off the side. We can turn this molecular structure into a network like this:</p>
+<figure class="align-center" id="water-molecule">
+<img alt="../../_images/water_molecule.png" src="../../_images/water_molecule.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 9.1 </span><span class="caption-text">(A) A water molecule’s molecular structure. This structure has been determined directly through experimentation. (B) The water molecule, but as a network with a layout view. The atoms (oxygen and two hydrogens) become the nodes of the network, and the bonds between the oxygen atom and the hydrogens become the edges. (C) The network as an adjacency matrix. The fingerprint for water is the string <span class="math notranslate nohighlight">\(O\)</span>.</span><a class="headerlink" href="#water-molecule" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Given a fingerprint (the SMILES string), this molecular structure, and consequently the network and the adjacency matrix, are fully determined. The inverse is also true: given a network and the other attributes of the atomic structure, the fingerprint can be determined. Implicitly, computational strategies which produce desirable representations of the fingerprints produce a desirable representation for the network itself.</p>
+</section>
+<section id="our-network-learning-problem">
+<h3><span class="section-number">9.2.1.2. </span>Our network learning problem<a class="headerlink" href="#our-network-learning-problem" title="Permalink to this headline">#</a></h3>
+<p>For this section, we will focus our attention on the first hurdle faced by pharmacoligists. Provided a SMILES fingerprint for a molecule, we would like to determine whether the molecule is toxic or non-toxic.</p>
+</section>
+</section>
+<section id="preprocessing-smiles-fingerprints">
+<h2><span class="section-number">9.2.2. </span>Preprocessing SMILES fingerprints<a class="headerlink" href="#preprocessing-smiles-fingerprints" title="Permalink to this headline">#</a></h2>
+<p>We will be using one of the datasets packaged in <a class="reference external" href="https://moleculenet.org/">MoleculeNet</a>. PyTorch Geometric (PyG) provides a convenient module to access it. We first import the module <code class="docutils literal notranslate"><span class="pre">MoleculeNet</span></code> then extract the <code class="docutils literal notranslate"><span class="pre">ClinTox</span></code> dataset. The dataset has a total of 1478 molecules labeled with their presence or absence of toxicity – determined from clinical trials done by the Food &amp; Drug association (FDA). Since this is a binary classification task, we observe there are two classes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_geometric.datasets</span> <span class="kn">import</span> <span class="n">MoleculeNet</span>
+
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">MoleculeNet</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;data/clintox&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;ClinTox&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dataset: </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="se">\n</span><span class="s1">Number of molecules/graphs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">Number of classes: </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
@@ -906,14 +1087,18 @@ properties. These traditional methods have relied on building hand-crafted featu
 Processing...
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:36:47] Explicit valence for atom # 0 N, 5, is greater than permitted
-[17:36:47] Can&#39;t kekulize mol.  Unkekulized atoms: 9
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:46:42] Explicit valence for atom # 0 N, 5, is greater than permitted
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:36:48] Explicit valence for atom # 10 N, 4, is greater than permitted
-[17:36:48] Explicit valence for atom # 10 N, 4, is greater than permitted
-[17:36:48] Can&#39;t kekulize mol.  Unkekulized atoms: 4
-[17:36:48] Can&#39;t kekulize mol.  Unkekulized atoms: 4
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:46:42] Can&#39;t kekulize mol.  Unkekulized atoms: 9
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:46:43] Explicit valence for atom # 10 N, 4, is greater than permitted
+[17:46:43] Explicit valence for atom # 10 N, 4, is greater than permitted
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[17:46:43] Can&#39;t kekulize mol.  Unkekulized atoms: 4
+[17:46:43] Can&#39;t kekulize mol.  Unkekulized atoms: 4
 </pre></div>
 </div>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset: ClinTox(1478)
@@ -926,14 +1111,28 @@ Number of classes: 2
 </div>
 </div>
 </div>
-<p>Let’s look at a few molecules to understand their graph structure. Each molecule has a known 3D structure and an associated SMILES string.</p>
+<p>Let’s look at a few molecules to understand their graph structure. Each molecule has a known 3D structure and an associated SMILES string. We pick out two arbitrary molecules from the dataset, and take a look first at their SMILES string:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mols</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">26</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">83</span><span class="p">]</span>
+<span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">];</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C([C@@H]1[C@H]([C@@H]([C@H](C(=O)O1)O)O)O)O
+C1[C@@H]([C@H](O[C@H]1N2C=NC(=NC2=O)N)CO)O
+</pre></div>
+</div>
+</div>
+</div>
+<p>Using these smiles, we can determine the molecular structure with <code class="docutils literal notranslate"><span class="pre">rdkit</span></code>, and can plot the resulting molecule as a graph. Remember that in the graph, individual atoms form the nodes of the network, and the bonds form the edges. While some of the specific edges have strange shapes (such as dotted lines, triangular structures, or “doubled bonds”), you can ignore these details for now as they require a bit more in-depth knowledge of organic chemistry to appreciate:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 <span class="kn">from</span> <span class="nn">rdkit.Chem.Draw</span> <span class="kn">import</span> <span class="n">rdMolDraw2D</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">SVG</span>
 
-<span class="n">mols</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">26</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="mi">83</span><span class="p">]</span>
 <span class="n">smiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">]</span>
 <span class="n">d2d</span> <span class="o">=</span> <span class="n">rdMolDraw2D</span><span class="o">.</span><span class="n">MolDraw2DSVG</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="mi">280</span><span class="p">,</span><span class="mi">300</span><span class="p">,</span><span class="mi">280</span><span class="p">)</span>
 <span class="n">d2d</span><span class="o">.</span><span class="n">drawOptions</span><span class="p">()</span><span class="o">.</span><span class="n">addAtomIndices</span> <span class="o">=</span> <span class="kc">True</span>
@@ -944,9 +1143,9 @@ Number of classes: 2
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/gnn_6_0.svg" src="../../_images/gnn_6_0.svg" /></div>
+<img alt="../../_images/gnn_5_0.svg" src="../../_images/gnn_5_0.svg" /></div>
 </div>
-<p>Additionally, each atom has been labelled with a numerical index and corresponds to a node in our graph. A quick inspection shows the molecules have 12 and 14 atoms respectively. Each nodes has been preprocessed with cheminformatics software, <a class="reference external" href="https://www.rdkit.org/">RDkit</a>, to obtain a initial set of node features including atom-type, valences, formal charges, and hybridization. The details of each starting feature are not important for this tutorial, but are crucial in real-world applications to maximize performance.</p>
+<p>The networks each have a different number of nodes (atoms). Further, each node has a number which uniquely identifies that node in the molecule. These molecules have been analyzed with cheminformatics software, <a class="reference external" href="https://www.rdkit.org/">RDkit</a>, and also come with a set of node attributes for descriptive characteristics of that node in the particular molecule. While these node attributes are not relevant for our tutorial, they have substantial real-world applications to optimize predictive accuracy. Let’s take a look at the number of atoms and the number of atomic features now:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
@@ -961,7 +1160,7 @@ Molecule 2: Number of atoms=16, Features per atom=9
 </div>
 </div>
 </div>
-<p>Let’s now inspect the connectivity of each molecule. We’ll render each molecule again but this time with the bond indices.</p>
+<p>As we discussed above, the edges of the network are the bonds between different pairs of atoms (the nodes). Using the SMILE fingerprint, we can also obtain information of the bonds of the network. Let’s take a look at the indices of the bonds, shown below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d2d</span> <span class="o">=</span> <span class="n">rdMolDraw2D</span><span class="o">.</span><span class="n">MolDraw2DSVG</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="mi">280</span><span class="p">,</span><span class="mi">300</span><span class="p">,</span><span class="mi">280</span><span class="p">)</span>
@@ -973,88 +1172,196 @@ Molecule 2: Number of atoms=16, Features per atom=9
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/gnn_10_0.svg" src="../../_images/gnn_10_0.svg" /></div>
+<img alt="../../_images/gnn_9_0.svg" src="../../_images/gnn_9_0.svg" /></div>
 </div>
-<p>Bonds in the molecule correspond to edges in the graph. To verify this, let’s inspect the adjacency matrix of each molecule’s graph structure. PYG stores edges as adjacency lists to handle very large and sparse graphs. The following code converts the adjacency list into an adjacency matrix. We see the edge connectivity corresponds to the bond connectivity in the above images. For instance, atom 1 in the first molecule is bonded with atoms 0, 2, and 7 which agrees with the adjacency matrix.</p>
+<p>Unlike many of the networks we have seen in examples so far, molecular networks tend to be, especially for larger molecules (molecules with more nodes, or atoms) extremely sparse. A <strong>sparse network</strong> is a network which has far fewer edges than the maximum number of possible edges. In smaller networks, this is a rather irrelevant consideration. Remember that the adjacency matrix has, for a simple network, <span class="math notranslate nohighlight">\(\binom n 2 = \frac{1}{2}n(n - 1)\)</span> possible edges. So, if we store the entire adjacency matrix, we need to keep track of <span class="math notranslate nohighlight">\(\frac{1}{2}n (n - 1)\)</span> entries.</p>
+<p>In a sparse network, the total number of edges might be considerably less than this. Remember that an edge is indexed by two nodes, so if two times the number of edges is less than <span class="math notranslate nohighlight">\(\binom n 2\)</span>, we can save a lot of space by exclusively saving the node pairs for each edge. This is the concept underlying an <em>edgelist</em>, which is as the name suggests, a list of edges. Instead of saving the <em>entire</em> adjacency matrix, what we do is we save <em>only</em> the edges, and then construct the adjacency matrix <em>only when we need it</em> from the edges!</p>
+<p>When you have a <em>sparse network</em>, and consequently a <em>sparse adjacency matrix</em>, you can even perform many matrix computations without ever having to construct the (potentially large) adjacency matrix in its entirety. This is the concept underlying <a class="reference external" href="https://en.wikipedia.org/wiki/Sparse_matrix">sparse matrices</a>, and many numerical libraries such as <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/sparse.html">scipy</a> and <a class="reference external" href="https://pytorch.org/docs/stable/sparse.html">torch sparse arrays</a> (which we are leveraging here) have special matrix routines which run a <em>lot</em> faster, and use a <em>lot</em> less space, when the network is extremely sparse.</p>
+<p>With this in mind, when we look through the dataset, we need to keep in mind that the network is stored using this sparse edgelist format. To build the adjacency matrix so that we can visualize it using the traditional heatmap, we need to first construct the adjacency matrix from the edgelist, which is what we do below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">_process</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
-<span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
-    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">connectivity_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_atoms</span><span class="p">,</span> <span class="n">num_atoms</span><span class="p">])</span>
-    <span class="n">adj_list</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">e_i</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">_process</span><span class="p">(</span><span class="n">adj_list</span><span class="p">))):</span>
-        <span class="n">connectivity_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">connectivity_matrix</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">m_i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> adjacency matrix&#39;</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">))))</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)))</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Atom index&#39;</span><span class="p">)</span>
-    <span class="n">axes</span><span class="p">[</span><span class="n">m_i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Atom index&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">A_from_edgelist</span><span class="p">(</span><span class="n">molecule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function that takes molecules, and produces an adjacency matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># the number of nodes is the number of atoms (rows of .x attribute)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># the adjacency matrix is n x n</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="n">edgelist</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="c1"># loop over the edges e_k, and for each edge, unpack the </span>
+    <span class="c1"># nodes that are incident it. for this corresponding pair of nodes, </span>
+    <span class="c1"># change the adjacency matrix entry to 1</span>
+    <span class="k">for</span> <span class="n">e_k</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">_process</span><span class="p">(</span><span class="n">edgelist</span><span class="p">))):</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">A</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="nn">Input In [5],</span> in <span class="ni">&lt;cell line: 3&gt;</span><span class="nt">()</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">_process</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+</div>
+<p>Now that we have a function that will produce the corresponding adjacency matrices, we can produce the heatmaps of the adjacency matrices:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">cairosvg</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
 
-<span class="ne">NameError</span>: name &#39;plt&#39; is not defined
-</pre></div>
-</div>
-</div>
-</div>
-<p>We chose these two molecules because the first is nono-toxic while the second is toxic. This can be observed from the associated labels. However, this is impossible to discern on first glance of the molecules without any expertise. We will now use a graph neural network to learn a function for classifying molecules as toxic.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">long</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">m_i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> is toxic!&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Molecule </span><span class="si">{</span><span class="n">m_i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> is non-toxic.&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mols</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width_ratios&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">m_i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mols</span><span class="p">):</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">A_from_edgelist</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="n">m_i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Adjacency matrix&#39;</span><span class="p">,</span>
+            <span class="n">xticklabels</span><span class="o">=</span><span class="n">atoms</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Node (Atom Index)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Node (Atom Index)&quot;</span><span class="p">)</span>
+    <span class="n">d2d</span> <span class="o">=</span> <span class="n">rdMolDraw2D</span><span class="o">.</span><span class="n">MolDraw2DSVG</span><span class="p">(</span><span class="mi">280</span><span class="p">,</span><span class="mi">280</span><span class="p">,</span><span class="mi">280</span><span class="p">,</span><span class="mi">280</span><span class="p">)</span>
+    <span class="n">d2d</span><span class="o">.</span><span class="n">drawOptions</span><span class="p">()</span><span class="o">.</span><span class="n">addAtomIndices</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">d2d</span><span class="o">.</span><span class="n">DrawMolecule</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">smiles</span><span class="p">))</span>
+    <span class="n">d2d</span><span class="o">.</span><span class="n">FinishDrawing</span><span class="p">()</span>
+    <span class="n">svg</span> <span class="o">=</span> <span class="n">d2d</span><span class="o">.</span><span class="n">GetDrawingText</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;svg:&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">cairosvg</span><span class="o">.</span><span class="n">svg2png</span><span class="p">(</span><span class="n">svg</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">m_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">m_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">m_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">([])</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">m_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Molecule </span><span class="si">{</span><span class="n">m_i</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">m_i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Molecular Structure&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Molecule 1 is non-toxic.
-Molecule 2 is toxic!
-</pre></div>
+<img alt="../../_images/gnn_13_0.png" src="../../_images/gnn_13_0.png" />
 </div>
 </div>
-</div>
+<p>Let’s take a look at this just to verify we can confirm what is going on. Notice that in Molecule <span class="math notranslate nohighlight">\(1\)</span>, that an Oxygen atom (index <span class="math notranslate nohighlight">\(7\)</span>) is bonded to two Carbon atoms (the “points” of the hexagon are Carbon atoms), which each have indices <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(5\)</span> respectively. When we look at the adjaceny matrix, looking at the row corresponding to atom index <span class="math notranslate nohighlight">\(7\)</span> shows that it is connected to atom indices <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(5\)</span>, as desired. As an exercise, you can continue this process for all of the atoms in the molecule until you are convinced that you understand what’s going on!</p>
+<p>So, now the take-home message; why did we choose these two molecules? Does anything look obvious to you, as a machine learning specialist with network expertise, about these two molecules?</p>
+<p>Well, quite simply, the first one is non-toxic, whereas the second one is quite toxic! To know this, you would probably need to be somewhat of an expert in organic chemistry, which for the majority of machine learning experts, probably isn’t the case!</p>
+<p>Despite the fact that you might not have background in organic chemistry, you can still be of <em>extreme</em> use to pharmacologists: it turns out that, even though you don’t know a heck of a lot about either of these two molecules, nor perhaps even the field, you do know a lot about classifying items! Let’s see if we can borrow some techniques from machine learning to learn about these molecules.</p>
 </section>
-<section id="graph-neural-networks">
-<h2><span class="section-number">9.2.2. </span>Graph Neural Networks<a class="headerlink" href="#graph-neural-networks" title="Permalink to this headline">#</a></h2>
-<p>We now understand the underlying structure of our molecular data is a graph - nodes represent atoms and edges represent chemical bonds.
-Each molecule in our data is assigned a toxicity label obtained through experimental means, but the relationship between a molecular graph and toxicity is unknown.
-We can approximate this relationship with a statistical model. Chapter 5 introduced several statistical models that assumed knowledge into the true underlying structure of the network, but this rarely happens in practice, especially for high-dimensional networks. Even when the structure is known, it is unclear how to construct a statistical model that can be feasibly optimized or learned. A practical solution has been to use graph neural networks (GNNs) which have two desirable properties that solve our aforementioned issues.</p>
-<ol class="simple">
-<li><p>GNNs provide a framework for constructing universal function approximators on graphs. Informally, the right GNN model is <em>capable</em> of closely approximating any function over arbitrary network structure. This is appealing as it says we do not have to invest time in creatively designing a statistical model. Instead, our time can now be spent systematicaly optimizing a GNN to learn the optimal network representation under the guarantee our statistical model is capable of recovering the correct model. We caveat the universal approximator property relies on technical assumptions and regularities but these discussions are outside the scope of this book.</p></li>
-<li><p>GNNs are easy and efficient to optimize. A plethora of software libraries have been built to allow for neural network training and optimization. The success of neural networks is closely tied with the advent of special computer hardware, Graphical Processing Units (GPUs), that greatly accelerate and scale numerical calculations. GNNs are widely used in practice because they can scale to very large and high-dimensional datasets due to the tight coupling of engineering and mathematical theory.</p></li>
-</ol>
-<p>Let us formally write down a GNN. Our formalism follows the message passing framework introduced in <a class="reference external" href="http://proceedings.mlr.press/v70/gilmer17a/gilmer17a.pdf">Gilmer et al</a>. The graph <span class="math notranslate nohighlight">\(G = (V, E)\)</span> is parameterized by a set of nodes <span class="math notranslate nohighlight">\(V = \{v_i\}_{i=1}^{N_v}\)</span> where <span class="math notranslate nohighlight">\(N_v = |V|\)</span> and node attributes <span class="math notranslate nohighlight">\(v_i \in \mathbb{R}^{D_v}\)</span>. Edges in the graph are specified as <span class="math notranslate nohighlight">\(E = \{e_{ij}\}\)</span> where <span class="math notranslate nohighlight">\(N_e = |E|\)</span> and edge attributes <span class="math notranslate nohighlight">\(e_{ij} \in \mathbb{R}^{D_e}\)</span> exists if there is a connection between nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. GNNs works in two phases:</p>
-<ol class="simple">
-<li><p><strong>Message passing phase</strong>. In this phase, the GNN sequentially updates node embeddings across <span class="math notranslate nohighlight">\(T\)</span> timesteps. Each node embedding, <span class="math notranslate nohighlight">\(h_i^{(t)} \in \mathbb{R}^h\)</span>, and referred to as the <em>hidden state</em> for node <span class="math notranslate nohighlight">\(i\)</span> and timestep <span class="math notranslate nohighlight">\(t\)</span>. Each node embedding is initialized with node attributes <span class="math notranslate nohighlight">\(h_i^{(0)} = v_i\)</span>. For a given time-step, <span class="math notranslate nohighlight">\(t \in [T]\)</span>, we calculate <em>messages</em> between every connected pair of nodes: <span class="math notranslate nohighlight">\(M_t(h_i^{(t-1)}, h_j^{(t-1)}, e_{ij})\)</span> if <span class="math notranslate nohighlight">\(j \in N(i)\)</span> where <span class="math notranslate nohighlight">\(N(i) = \{j : e_{ij} \in E\}\)</span> are the neighboring nodes of node <span class="math notranslate nohighlight">\(i\)</span>. Many choices exist for parameterizing <span class="math notranslate nohighlight">\(M_t\)</span> but it must be differentiable to make use of gradient-based optimization. A popular implementation for <span class="math notranslate nohighlight">\(M_t\)</span> is the graph convolution network (GCN) layer from <a class="reference external" href="https://arxiv.org/abs/1609.02907">Kipf et al</a> followed by a non-linear activation function, ReLU. This is what we will use in our implementation. We now perform the message passing step where each neighboring node will send their “messages” to a central node and then aggregate each message to construct a new hidden state. $<span class="math notranslate nohighlight">\(m_v^{(t)} = \sum_{j \in N(i)} M_{t-1}(h_i^{(t-1)}, h_j^{(t-1)}, e_{ij})\)</span><span class="math notranslate nohighlight">\( \)</span><span class="math notranslate nohighlight">\(h_i^{(t)} = U_{t-1}(h_i^{(t-1)}, m_v^{(t)})\)</span><span class="math notranslate nohighlight">\(
-\)</span>U_{t-1}<span class="math notranslate nohighlight">\( is the hidden-state update function. It also must be differentiable. Many papers are devoted to picking \)</span>U_{t-1}$, but for our purposes we will use the identity function to simplify our network.</p></li>
-<li><p><strong>Readout phase</strong>. After <span class="math notranslate nohighlight">\(T\)</span> steps, the hidden states are computed as <span class="math notranslate nohighlight">\(\{h_i^{(T)}\}_{i=1}^{N_v}\)</span>, representing our final node embeddings. The read-out function, <span class="math notranslate nohighlight">\(R(\cdot)\)</span>, is a graph-level aggregation function combining all node embeddings into a single vector <span class="math notranslate nohighlight">\(r \in \mathbb{R}^{D_r}\)</span>. $<span class="math notranslate nohighlight">\(r = R(\{h_i^{(T)}\}_{i=1}^{N_v})\)</span><span class="math notranslate nohighlight">\( We choose to do a final embedding of this single vector with a fully-connected perceptron (Lin) before outputing it as the graph-classification prediction.\)</span><span class="math notranslate nohighlight">\(\hat{y} = \text{Lin}(r)\)</span>$</p></li>
-</ol>
-<p>With the model specified, we need an algorithm to learn the optimal parameters. The canonical loss for classification is cross-entropy (CE) which for binary classification simplifes to $<span class="math notranslate nohighlight">\(\text{CE}(y, \hat{y}) = -y(\log{\hat{y}} + (1-y)\log{(1 - \hat{y})})\)</span><span class="math notranslate nohighlight">\(
-for prediction \)</span>\hat{y} \in \mathbb{R}<span class="math notranslate nohighlight">\( and label \)</span>y \in {0, 1}<span class="math notranslate nohighlight">\(. The full training objective can be written as \)</span><span class="math notranslate nohighlight">\(\mathbb{E}_{(G, y) \sim p}\left[\text{CE}(y, \text{GNN}(G)) \right] = \sum_{(G, y)}\text{CE}(y, \text{GNN}(G)) \approx \sum_{i=1}^N\text{CE}(y, \text{GNN}(G))\)</span><span class="math notranslate nohighlight">\(
-We would wish to optimize over all possible graphs and labels that can be sampled \)</span>(G, y) \sim p<span class="math notranslate nohighlight">\( where \)</span>p<span class="math notranslate nohighlight">\( is the true distribution capturing the relationship between graphs and labels. But one never has access to the true distribution and needs to approximate using the given training data of size \)</span>N<span class="math notranslate nohighlight">\(. Often \)</span>N$ is very large and optimizing over every example at once is not possible. A successful, practical technique is to train stochastically: sample the maximum number of examples that can fit on the GPU, optimize it, then repeat by resampling until convergence of the loss or a validation metric.</p>
-<p>Let us summarize what we’ve done so far. We specified our statistical model as a GNN that works by sequentially updating node embeddings to learn a function optimized according to a training objective. We hope minimizing this training objective will lead to a model that allows for accurate graph clasification. But this must be verified with a validation and test set. We brushed over many details regarding the rich topic of <strong>deep learning</strong>, of which</p>
+<section id="graph-neural-networks-gnns">
+<h2><span class="section-number">9.2.3. </span>Graph neural networks (GNNs)<a class="headerlink" href="#graph-neural-networks-gnns" title="Permalink to this headline">#</a></h2>
+<p>At this point, we’ve done a decent exploration into the SMILES strings, and hopefully we’ve convinced you that, given the SMILES string, we can recover either the molecular structure in its entirety or an underlying adjacency matrix. Now it’s time for the fun part. As it turns out, using <em>only</em> this adjacency matrix, you can do a pretty good job of identifying what, to my eyes anyways, is a completely opaque task: determining whether a molecule is toxic or non-toxic. We’ll show you how using an approach you may have come across before in machine learning, known as a <em>neural network</em>. If you are unfamiliar with neural networks and the basic mathematics which are used to describe them, or if you need a quick refresher, we would recommend you check out Aurelien Geron’s book, <a class="reference external" href="https://www.amazon.com/Hands-Machine-Learning-Scikit-Learn-TensorFlow/dp/1492032646/ref=asc_df_1492032646/?tag=hyprod-20&amp;linkCode=df0&amp;hvadid=385599638286&amp;hvpos=&amp;hvnetw=g&amp;hvrand=6554720435744381928&amp;hvpone=&amp;hvptwo=&amp;hvqmt=&amp;hvdev=c&amp;hvdvcmdl=&amp;hvlocint=&amp;hvlocphy=9007894&amp;hvtargid=pla-523968811896&amp;psc=1&amp;tag=&amp;ref=&amp;adgrpid=79288120515&amp;hvpone=&amp;hvptwo=&amp;hvadid=385599638286&amp;hvpos=&amp;hvnetw=g&amp;hvrand=6554720435744381928&amp;hvqmt=&amp;hvdev=c&amp;hvdvcmdl=&amp;hvlocint=&amp;hvlocphy=9007894&amp;hvtargid=pla-523968811896">Hands On Machine Learning</a>, which has an extensive discussion of them.</p>
+<p>In this task, we have several problems which fundamentally distinguish this task from many of the approaches we have seen before. When we learned representations for network-valued data previously, we assumed that, as the investigator, you probably had a decent knowledge of the structure of your data ahead of time, and which assumptions might be sensible to pick out. When this was the case, you could decipher <a class="reference internal" href="../../representations/ch5/ch5.html#ch5"><span class="std std-ref">statistical models</span></a> which might be reasonably sensible for your data (the assumptions might not be perfect, but good enough for the purposes of your investigation), and use these statistical models to facilitate downstream statistical inference tasks you want to learn about.</p>
+<p>When dealing with expansive molecular networks (the two molecules we picked out were rather tiny, but molecules related to drug discovery can be enormous, with dozens to thousands of atoms), we have a few problems that arise. In particular, it is often extremely unclear how to construct a direct statistical model that can be feasibly optimized or learned, as identifying the core features you want to capture with the statistical model for unseen molecules (or whatever your underlying networks represent) can be arduous, time consuming, and require domain expertise that you just might not have. A practical solution to this hurdle might be to use Graph Neural Networks (GNNs). A graph neural network is just a neural network, but modified for use with graph (or network)-valued data.</p>
+<p>GNNs have two desirable properties that can help us to overcome some of these hurdles:</p>
+<section id="gnns-are-universal-approximators">
+<h3><span class="section-number">9.2.3.1. </span>GNNs are universal approximators<a class="headerlink" href="#gnns-are-universal-approximators" title="Permalink to this headline">#</a></h3>
+<p>When you have a task of interest in mind, assuming that your data is informative for that task, there are features or aspects of your data (which might be extremely convoluted) that you can “tease out” which will give you the best possible information for your question of interest.</p>
+<p>These features might be simple; for instance, to classify a molecule, the presence of at most <span class="math notranslate nohighlight">\(5\)</span> bonds might be the definitive feature that makes a molecule toxic or non-toxic. Any molecule with more than <span class="math notranslate nohighlight">\(5\)</span> bonds could be toxic, and any molecule with less than <span class="math notranslate nohighlight">\(5\)</span> bonds could be non-toxic.</p>
+<p>However, in practice (and in this task), the features are not nearly that simple, nor completely understood even by the most pre-eminent experts in organic chemistry, and this problem permeates to many other fields other than just pharmacology.</p>
+<p>GNNs provide a framework for constructing universal approximators for network-valued data. A <em>universal approximator</em> has a fairly complicated definition, so we won’t define it formally here. But basically the idea is that, <em>whatever</em> the relationship between the data (the network) and the outcome of interest (in this case, toxic or non-toxic) happens to be, no matter how complicated or convoluted it is, a properly chosen GNN is <em>always capable</em> of closely finding the relationship. The caveat is that the meaning of “close” is contingent on the number of training samples. Although you probably have come across the term training data before, we’ll define it formally for you here: <strong>training data</strong> is data which you will use to train an algorithm to predict the outcome you intend to study. The idea is that, if the network has enough free parameters (a function of the number of <em>nodes</em> and <em>edges</em> in the neural network, not to be confused with the number of nodes/edges in the networks that we are studying)  This is extremely appealing in fields in which we domain expertise can’t help us too much, and where we have tons of training data.</p>
+<p>In this case, there are hundreds of thousands of molecules that have been extensively and exhaustively studied by pharmacologists for toxicity, so we have a substantial backlog of data where we know ahead of time whether the molecule is toxic or not. Further, even to trained scientists, as the molecule size grows, determining toxicity can be difficult and certainly not immediate as it can be for a properly trained neural network.</p>
 </section>
-<section id="model-training">
-<h2><span class="section-number">9.2.3. </span>Model training<a class="headerlink" href="#model-training" title="Permalink to this headline">#</a></h2>
+<section id="gnns-are-easy-and-efficient-to-optimize">
+<h3><span class="section-number">9.2.3.2. </span>GNNs are easy and efficient to optimize<a class="headerlink" href="#gnns-are-easy-and-efficient-to-optimize" title="Permalink to this headline">#</a></h3>
+<p>Once you have an enormous volume of training data, you might be extremely concerned about how well you might be able to actually train up this neural network. Fortunately, there is plenty of help out there. A plethora of software libraries have been built to allow for neural network training and optimization. The success of neural networks is closely tied with the advent of special computer hardware, Graphical Processing Units (GPUs), that greatly accelerate and scale numerical calculations. GNNs are widely used in practice because they can scale to very large and high-dimensional datasets due to the tight coupling of engineering progress/technical advances in GPU performance and mathematical theory.</p>
+</section>
+</section>
+<section id="how-do-gnns-work-for-drug-discovery">
+<h2><span class="section-number">9.2.4. </span>How do GNNs work for drug discovery?<a class="headerlink" href="#how-do-gnns-work-for-drug-discovery" title="Permalink to this headline">#</a></h2>
+<p>For drug discovery, a pre-eminent technique for the construction of neural networks is to construct a message passing neural network (MPNN). This approach leverages a <span class="xref myst">bag of nodes</span> type of approach, in which we search for a <em>latent</em> (unknown) embedding for each node in a given molecule network. In this investigation, we will assume that we have <span class="math notranslate nohighlight">\(M\)</span> total training networks and <span class="math notranslate nohighlight">\(M'\)</span> testing (validation) networks, where each network <span class="math notranslate nohighlight">\(m\)</span> (a single molecule) has <span class="math notranslate nohighlight">\(n_m\)</span> nodes in the network.</p>
+<p>You will notice that there is a caveat from many of the multi-network examples we have studied to date: the number of nodes, <span class="math notranslate nohighlight">\(n_m\)</span>, is <em>not</em> going to necessarily be constant across the networks: each molecule can, and <em>will</em> tend to have differing numbers of atoms of which they are comprised. The way that this hurdle is overcome for MPNNs is the message passing procedure.</p>
+<section id="gnn-training">
+<h3><span class="section-number">9.2.4.1. </span>GNN training<a class="headerlink" href="#gnn-training" title="Permalink to this headline">#</a></h3>
+<p>GNN training has a bit of a unique convention from other domains of machine learning. Rather than just separating the data into training and testing sets outright, the training set tends to be further segmented into a thing, called an <em>epoch</em>, which represents a random shuffling of the networks in the dataset.</p>
+<p>Within a single epoch, we will further segment the dataset into <span class="math notranslate nohighlight">\(B\)</span> batches. Each of the <span class="math notranslate nohighlight">\(B\)</span> batches are sampled, <em>uniformly</em> in size and <em>without</em> replacement (each training network appears in <em>exactly</em> one batch across an epoch), from the training set. We will assume that each batch has <span class="math notranslate nohighlight">\(M_b\)</span> networks, where <span class="math notranslate nohighlight">\(M_b = \frac{M}{B}\)</span> is the number of networks in each batch. For the purposes of this experiment, we will assume that <span class="math notranslate nohighlight">\(M\)</span> is divisible by the number of batches chosen, but this might not always necessarily be the case. However, it is fine to have one batch be slightly different in size from the others.</p>
+<section id="the-forward-pass">
+<h4><span class="section-number">9.2.4.1.1. </span>The forward pass<a class="headerlink" href="#the-forward-pass" title="Permalink to this headline">#</a></h4>
+<section id="message-passing-uses-local-neighborhoods-of-networks">
+<h5><span class="section-number">9.2.4.1.1.1. </span>Message passing uses local neighborhoods of networks<a class="headerlink" href="#message-passing-uses-local-neighborhoods-of-networks" title="Permalink to this headline">#</a></h5>
+<p>To define the message passing process, we will recall some earlier definitions you were introduced to in <a class="reference internal" href="../../representations/ch4/properties-of-networks.html#ch4-prop-net"><span class="std std-ref">properties of networks</span></a>. Remember that a node <span class="math notranslate nohighlight">\(j\)</span> is a neighbor of node <span class="math notranslate nohighlight">\(i\)</span> if an edge exists from node <span class="math notranslate nohighlight">\(i\)</span> to node <span class="math notranslate nohighlight">\(j\)</span>, and consequently, <span class="math notranslate nohighlight">\(a_{ij}^{(m)} = 1\)</span> in the adjacency matrix for the network <span class="math notranslate nohighlight">\(m\)</span>. So, the set of all neighbors of a node <span class="math notranslate nohighlight">\(i\)</span> in network <span class="math notranslate nohighlight">\(m\)</span> can be described as follows:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    N^{(m)}(i) \triangleq \left\{j : a_{ij}^{(m)} = 1\right\}
+\end{align*}\]</div>
+<p>So, <span class="math notranslate nohighlight">\(N^{(m)}(i)\)</span> is just the collection of nodes that node <span class="math notranslate nohighlight">\(i\)</span> is connected to in network <span class="math notranslate nohighlight">\(m\)</span>. Let’s consider a simple example that we’re going to work through here. It looks like this:</p>
+<figure class="align-default" id="id1">
+<img alt="../../_images/Images" src="../../_images/Images" />
+<figcaption>
+<p><span class="caption-number">Fig. 9.2 </span><span class="caption-text">We have <span class="math notranslate nohighlight">\(5\)</span> nodes in our simple molecular network here, which is the molecule ethylene. Notice that node <span class="math notranslate nohighlight">\(1\)</span> is connected to nodes <span class="math notranslate nohighlight">\(3\)</span>, so <span class="math notranslate nohighlight">\(N(1) = \{3\}\)</span>. Node <span class="math notranslate nohighlight">\(2\)</span> is connected to node <span class="math notranslate nohighlight">\(3\)</span>, so <span class="math notranslate nohighlight">\(N(2) = \{3\}\)</span>. Node <span class="math notranslate nohighlight">\(3\)</span> is connected to nodes <span class="math notranslate nohighlight">\(1, 2,\)</span> and 4<span class="math notranslate nohighlight">\(, so \)</span>N(3) = {1, 2, 4}$.</span><a class="headerlink" href="#id1" title="Permalink to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The network is for the molecule ethylene. For all of the nodes in the network <span class="math notranslate nohighlight">\(m\)</span>, we start by assuming that <span class="math notranslate nohighlight">\(\vec x_{i}^{(m)}(t)\)</span> is the <span class="math notranslate nohighlight">\(d\)</span>-dimensional node embedding for node <span class="math notranslate nohighlight">\(i\)</span> in network <span class="math notranslate nohighlight">\(m\)</span> on iteration <span class="math notranslate nohighlight">\(t\)</span>. This is directly analogous to the concept of a <em>latent position</em>, like oyu learned about <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">RDPGs</span></a>. We initialize <span class="math notranslate nohighlight">\(\vec x_i^{(m)}(t)\)</span> using the node attributes that we obtain with the molecule that we learned about previously.</p>
+<p>In the message passing phase of GNN training, the GNN sequentially updates node embeddings <span class="math notranslate nohighlight">\(\vec x_i^{(m)}(t)\)</span> across a pre-determined number of timesteps <span class="math notranslate nohighlight">\(T\)</span>. This number of timesteps will be the number of <em>messages</em> you pass around nodes within the network. At an extremely high level, what we will do is as follows. Let’s assume that for batch <span class="math notranslate nohighlight">\(b\)</span>, we are looking at network <span class="math notranslate nohighlight">\(m\)</span>.</p>
+<p>Starting at the node <span class="math notranslate nohighlight">\(i\)</span> in network <span class="math notranslate nohighlight">\(m\)</span>, we look at all of the neighbors <span class="math notranslate nohighlight">\(N^{(m)}(i)\)</span> of node <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<p>Then, we take these neighbors, and look at <em>their</em> embeddings from the preceding timestep (<span class="math notranslate nohighlight">\(\vec x_j^{(m)}(t - 1)\)</span>), as well as <em>how</em> they are connected to node <span class="math notranslate nohighlight">\(i\)</span> (the edge attributes for that particular edge, denoted <span class="math notranslate nohighlight">\(e_{ij}^{(m)}\)</span>). The edge attribute contains information about the type of bond connecting node <span class="math notranslate nohighlight">\(i\)</span> to node <span class="math notranslate nohighlight">\(j\)</span> (for instance, this is where the double bonds, or the other funky shapes you saw in some of the diagrams above, come into play). We feed all of that information into a convolutional neural network, which produces a message from node <span class="math notranslate nohighlight">\(j\)</span> to node <span class="math notranslate nohighlight">\(i\)</span> on the basis of this information. This convolutional neural network can be represented as a function <span class="math notranslate nohighlight">\(M_\theta\)</span>, which takes parameters <span class="math notranslate nohighlight">\(\theta\)</span>, and is input the node embeddings for the node <span class="math notranslate nohighlight">\(i\)</span> and its neighbor <span class="math notranslate nohighlight">\(j\)</span>, as well as the edge attributes for the node <span class="math notranslate nohighlight">\(i\)</span> and its neighbor <span class="math notranslate nohighlight">\(j\)</span>. Finally, we just sum over all of the messages from the neighbors of node <span class="math notranslate nohighlight">\(i\)</span>. In words, the message from node <span class="math notranslate nohighlight">\(i\)</span>’s neighbors is as follows:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \text{messages}_i^{(m)}(t) &amp;= \sum_{j \in N(i)} M_\theta\left(\vec x_j^{(m)}(t - 1), \vec x_j^{(m)}(t - 1), e_{ij}^{(m)}\right)
+\end{align*}\]</div>
+<p>This gives us the messages received by the node <span class="math notranslate nohighlight">\(i\)</span> from all of its neighbors. We repeat this process for every single node in the network <span class="math notranslate nohighlight">\(m\)</span>.</p>
+<p>Once we compute all of the messages received by the nodes in a given network, we recompute the node embeddings. We use the following equation to update the node embedding:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec x_i^{(m)}(t) &amp;= U_\phi\left(\vec x_i^{(m)}(t - 1), \text{messages}_i^{(m)}(t)\right)
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(U_\phi\)</span> is the node embedding update function. The node embedding update function is a function of the <em>previous</em> embedding of the node <span class="math notranslate nohighlight">\(i\)</span> at time <span class="math notranslate nohighlight">\(t - 1\)</span>, the messages that the node received on the current iteration <span class="math notranslate nohighlight">\(t\)</span>, and the parameters <span class="math notranslate nohighlight">\(\phi\)</span>.</p>
+<p>We repeat these two steps <span class="math notranslate nohighlight">\(T\)</span> times total for a given molecule in a particular batch: computing the messages for each node from its neighbors using the embeddings from the previous round and the edge attributes for the bond between the node and its neighbor. Then once we have done that for every node in a particular molecule <span class="math notranslate nohighlight">\(m\)</span>, update the corresponding node embeddings for that molecule.</p>
+<p>We repeat this procedure, for all <span class="math notranslate nohighlight">\(M_b\)</span> molecules in the batch.</p>
+</section>
+<section id="readout-takes-the-node-embeddings-for-a-molecule-and-produces-a-molecule-embedding">
+<h5><span class="section-number">9.2.4.1.1.2. </span>Readout takes the node embeddings for a molecule and produces a molecule embedding<a class="headerlink" href="#readout-takes-the-node-embeddings-for-a-molecule-and-produces-a-molecule-embedding" title="Permalink to this headline">#</a></h5>
+<p>Now that we have repeated this process, for each molecule <span class="math notranslate nohighlight">\(m\)</span> of the <span class="math notranslate nohighlight">\(M_b\)</span> molecules in our batch, we have <span class="math notranslate nohighlight">\(d\)</span>-dimensional node embeddings <span class="math notranslate nohighlight">\(\vec x_i^{(m)}(T)\)</span>, for each node <span class="math notranslate nohighlight">\(i\)</span> of the <span class="math notranslate nohighlight">\(N_m\)</span> total nodes in molecule <span class="math notranslate nohighlight">\(m\)</span>. Note that this node embedding is simply the node embedding from the final iteration of message passing. Now that we have the node embeddings, we then use a readout function <span class="math notranslate nohighlight">\(R_\rho\)</span>, which takes node embeddings and produces a graph embedding <span class="math notranslate nohighlight">\(\vec r^{(m)}\)</span> which has <span class="math notranslate nohighlight">\(k\)</span>-dimensions. It looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \vec r^{(m)} = R_\rho\left(\vec x_1^{(m)}(T), ..., \vec x_{N_m}^{(m)}(T)\right)
+\end{align*}\]</div>
+<p>We again repeat this procedure for all <span class="math notranslate nohighlight">\(M_b\)</span> molecules in the batch, giving us <span class="math notranslate nohighlight">\(M_b\)</span> molecule embeddings, which are each <span class="math notranslate nohighlight">\(f\)</span>-dimensional vectors <span class="math notranslate nohighlight">\(\vec r^{(m)}\)</span> for a molecule <span class="math notranslate nohighlight">\(m\)</span>.</p>
+</section>
+<section id="the-percepteron-produces-prediction-labels">
+<h5><span class="section-number">9.2.4.1.1.3. </span>The percepteron produces prediction labels<a class="headerlink" href="#the-percepteron-produces-prediction-labels" title="Permalink to this headline">#</a></h5>
+<p>Finally, we pass the molecule embeddings into a percepteron. With <span class="math notranslate nohighlight">\(\vec r^{(m)}\)</span> the molecule embedding for a given molecule <span class="math notranslate nohighlight">\(m\)</span>, and with the percepteron having weights <span class="math notranslate nohighlight">\(\beta_k\)</span> for <span class="math notranslate nohighlight">\(k\)</span> going from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(f\)</span>, the prediction of the class of molecule <span class="math notranslate nohighlight">\(m\)</span> is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \text{Lin}_\beta(\vec r^{(m)}) &amp;= \begin{cases}
+        1 &amp; \text{ if }\sum_{k = 1}^f\beta_k r_k^{(m)} + \beta_0 &gt; 0, \\
+        0 &amp; \text{otherwise}
+    \end{cases}
+\end{align*}\]</div>
+<p>For a particular molecule <span class="math notranslate nohighlight">\(m\)</span> in the current batch, we denote the prediction <span class="math notranslate nohighlight">\(\hat y^{(m)}(\theta, \phi, \rho, \beta)\)</span> to be the predicted class of item <span class="math notranslate nohighlight">\(m\)</span>, which is a function of the parameters for the message passing convolutional network, the node embedding update function, the readout function, and the percepteron. This is computed as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \hat y^{(m)}(\theta, \phi, \rho, \beta) &amp;= 
+    \text{Lin}_\beta(\vec r^{(m)})
+\end{align*}\]</div>
+</section>
+</section>
+<section id="the-backwards-pass">
+<h4><span class="section-number">9.2.4.1.2. </span>The backwards pass<a class="headerlink" href="#the-backwards-pass" title="Permalink to this headline">#</a></h4>
+<p>Finally, once we have prediction labels for all <span class="math notranslate nohighlight">\(M_b\)</span> molecules in the current batch, it is time to reflect what we learned during the forward pass. We compute the loss function, the cross-entropy loss, for all of the items in the batch. If the true label for an item is <span class="math notranslate nohighlight">\(y\)</span> and the prediction is <span class="math notranslate nohighlight">\(\hat y\)</span>, the cross-entropy loss is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \text{CE}(y, \hat y) &amp;= -\left(y\log \hat y + (1 - y)\log(1 - \hat y)\right)
+\end{align*}\]</div>
+<p>With <span class="math notranslate nohighlight">\(M_b\)</span> items in the batch, the estimated cross-entropy loss is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \sum_{m = 1}^{M_b} \text{CE}\left(y^{(m)}, \hat y^{(m)}(\theta, \phi, \rho, \beta)\right)
+\end{align*}\]</div>
+<p>Once we compute the estimated cross-entropy loss, we are ready to update the parameters for the network. We compute the partial derivatives of the estimated cross-entropy loss with respect to <em>all</em> of the parameters in the network (which, here, are the parameters <span class="math notranslate nohighlight">\(\theta\)</span> for the message passing convolutional network, the parameters <span class="math notranslate nohighlight">\(\phi\)</span> for the node embedding function, the parameters <span class="math notranslate nohighlight">\(\rho\)</span> for the readout function, and the parameters <span class="math notranslate nohighlight">\(\beta\)</span> for the percepteron), and then we update the parameters in a direction that will <em>reduce</em> the estimated cross-entropy loss.</p>
+</section>
+</section>
+<section id="putting-it-all-together">
+<h3><span class="section-number">9.2.4.2. </span>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">#</a></h3>
+<p>Once we have completed a forwards pass and a backwards pass for a single batch, we move on to the next batch, and just keep repeating for all batches in an epoch. Once we complete an entire epoch (and have learned from every example in the training set exactly <em>once</em>), we compute the prediction accuracy on the testing set.</p>
+<p>We then move to the next epoch, and repeat this whole process again, using the final parameters we ended up with on the preceding epoch for the initial parameters in the next epoch.</p>
+<p>We repeat for either a pre-determined number of epochs, or until our prediction accuracy on the testing set declines, depending on our preference.</p>
+</section>
+</section>
+<section id="model-training-and-testing">
+<h2><span class="section-number">9.2.5. </span>Model training and testing<a class="headerlink" href="#model-training-and-testing" title="Permalink to this headline">#</a></h2>
+<p>For our exploration, we will make use of PyTorch (<code class="docutils literal notranslate"><span class="pre">torch</span></code>), which is a machine learning framework that provides a wide variety of algorithms for deep learning. To get started, let’s import everything:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="c1"># for notebook reproducibility</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shuffle</span><span class="p">()</span>
 
 <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[:</span><span class="o">-</span><span class="mi">150</span><span class="p">]</span>
@@ -1072,6 +1379,7 @@ Number of test graphs: 150
 </div>
 </div>
 </div>
+<p>The manner in which neural networks are typically trained is to take the</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span class="n">DataLoader</span>
@@ -1092,99 +1400,7 @@ Number of test graphs: 150
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Step 1:
 =======
 Number of graphs in the current batch: 64
-DataBatch(x=[1627, 9], edge_index=[2, 3458], edge_attr=[3458, 3], y=[64, 2], smiles=[64], batch=[1627], ptr=[65])
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Linear</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">GCNConv</span>
-<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">global_mean_pool</span>
-
-
-<span class="k">class</span> <span class="nc">GCN</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GCN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">num_node_features</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span> <span class="o">=</span> <span class="n">GCNConv</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">hidden_channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lin</span> <span class="o">=</span> <span class="n">Linear</span><span class="p">(</span><span class="n">hidden_channels</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
-
-        <span class="c1"># 1. Obtain node embeddings </span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">relu</span><span class="p">()</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv3</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span>
-
-        <span class="c1"># 2. Readout layer</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">global_mean_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>  <span class="c1"># [batch_size, hidden_channels]</span>
-
-        <span class="c1"># 3. Apply a final classifier</span>
-<span class="c1">#         x = F.dropout(x, p=0.5, training=self.training)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">x</span>
-<span class="n">device</span> <span class="o">=</span> <span class="s1">&#39;mps&#39;</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GCN(
-  (conv1): GCNConv(9, 64)
-  (conv2): GCNConv(64, 64)
-  (conv3): GCNConv(64, 64)
-  (lin): Linear(in_features=64, out_features=2, bias=False)
-)
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># from IPython.display import Javascript</span>
-<span class="c1"># display(Javascript(&#39;&#39;&#39;google.colab.output.setIframeHeight(0, true, {maxHeight: 300})&#39;&#39;&#39;))</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span class="p">(</span><span class="n">hidden_channels</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">train</span><span class="p">():</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-
-    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>  <span class="c1"># Iterate in batches over the training dataset.</span>
-        
-        <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  <span class="c1"># Perform a single forward pass.</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">long</span><span class="p">())</span>  <span class="c1"># Compute the loss.</span>
-        
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>  <span class="c1"># Derive gradients.</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>  <span class="c1"># Update parameters based on gradients.</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>  <span class="c1"># Clear gradients.</span>
-
-<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">loader</span><span class="p">):</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-
-        <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>  <span class="c1"># Iterate in batches over the training/test dataset.</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">batch</span><span class="p">)</span>  
-            <span class="n">pred</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Use the class with highest probability.</span>
-            <span class="n">correct</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">((</span><span class="n">pred</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>  <span class="c1"># Check against ground-truth labels.</span>
-        <span class="k">return</span> <span class="n">correct</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>  <span class="c1"># Derive ratio of correct predictions.</span>
-
-
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">171</span><span class="p">):</span>
-    <span class="n">train</span><span class="p">()</span>
-    <span class="n">train_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
-    <span class="n">test_acc</span> <span class="o">=</span> <span class="n">test</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Epoch: </span><span class="si">{</span><span class="n">epoch</span><span class="si">:</span><span class="s1">03d</span><span class="si">}</span><span class="s1">, Train Acc: </span><span class="si">{</span><span class="n">train_acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">, Test Acc: </span><span class="si">{</span><span class="n">test_acc</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+DataBatch(x=[1678, 9], edge_index=[2, 3576], edge_attr=[3576, 3], y=[64, 2], smiles=[64], batch=[1678], ptr=[65])
 </pre></div>
 </div>
 </div>
