@@ -1,6 +1,8 @@
 FROM neurodata/graspologic:latest
 
 RUN pip install jupyterlab jupyter
+RUN pip install torch torch_geometric
+RUN pip install torch_sparse torch_scatter
 
 ARG NB_USER=book
 ARG NB_UID=1000
