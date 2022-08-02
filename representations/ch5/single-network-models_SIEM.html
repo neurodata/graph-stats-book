@@ -1,0 +1,1093 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>4.5. Structured Independent Edge Model (SIEM) &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="4.6. Multiple Network Models" href="multi-network-models.html" />
+    <link rel="prev" title="4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model" href="single-network-models_IER.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../../_static/logo.png" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../coverpage.html">
+                    Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/preface.html">
+   Preface
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../introduction/terminology.html">
+   Terminology
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Foundations
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch1/ch1.html">
+   1. The Network Machine Learning Landscape
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
+     1.1. What is network machine learning?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
+     1.2. Why do we study networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
+     1.3. Types of Network Machine Learning Problems
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
+     1.4. Examples of applications
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
+     1.5. Challenges of Network Machine Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../foundations/ch2/ch2.html">
+   2. End-to-end Biology Network Machine Learning Project
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
+     2.1. Look at the big picture
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
+     2.2. Get the Data
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
+     2.3. Prepare the Data for Network Algorithms
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/select-and-train.html">
+     2.4. Select and Train a Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/fine-tune.html">
+     2.5. Fine-Tune your Model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
+     2.6. Discover and Visualize the Data to Gain Insights
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Representations
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch4/ch4.html">
+   3. Properties of Networks as a Statistical Object
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/matrix-representations.html">
+     3.1. Matrix Representations Of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/properties-of-networks.html">
+     3.2. Properties of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/network-representations.html">
+     3.3. Representations of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch4/regularization.html">
+     3.4. Regularization
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="ch5.html">
+   4. Why Use Statistical Models?
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_ER.html">
+     4.1. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_SBM.html">
+     4.2. Stochastic Block Models (SBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_RDPG.html">
+     4.3. Random Dot Product Graphs (RDPG)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="single-network-models_IER.html">
+     4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     4.5. Structured Independent Edge Model (SIEM)
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multi-network-models.html">
+     4.6. Multiple Network Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="models-with-covariates.html">
+     4.7. Network Models with Network Covariates
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../ch6/ch6.html">
+   5. Learning Network Representations
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/estimating-parameters_mle.html">
+     5.1. Estimating Parameters in Network Models via MLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/why-embed-networks.html">
+     5.2. Why embed networks?
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/spectral-embedding.html">
+     5.3. Spectral embedding methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/multigraph-representation-learning.html">
+     5.4. Multiple-Network Representation Learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ch6/joint-representation-learning.html">
+     5.5. Joint Representation Learning
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Applications
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch7/ch7.html">
+   6. Applications When You Have One Network
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/community-detection.html">
+     6.1. Community Detection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/testing-differences.html">
+     6.2. Testing for Differences between Groups of Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/model-selection.html">
+     6.3. Model Selection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/vertex-nomination.html">
+     6.4. Single-Network Vertex Nomination
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch7/out-of-sample.html">
+     6.5. Out-of-sample Embedding
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch8/ch8.html">
+   7. Applications for Two Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">
+     7.1. Latent Two-Sample Hypothesis Testing
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/significant-communities.html">
+     7.2. Two-sample hypothesis testing in SBMs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">
+     7.3. Graph Matching
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">
+     7.4. Vertex Nomination For Two Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../applications/ch9/ch9.html">
+   8. Applications for Many Networks
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/anomaly-detection.html">
+     8.1. Anomaly Detection For Timeseries of Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/significant-edges.html">
+     8.2. Testing for Significant Edges
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../applications/ch9/significant-vertices.html">
+     8.3. Testing for Significant Vertices
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Next Steps
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../next/ch10/ch10.html">
+   9. Where do we go from here?
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../next/ch10/random-walk-diffusion-methods.html">
+     9.1. Random walk and diffusion-based methods
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../next/ch10/gnn.html">
+     9.2. Graph Neural Networks
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Appendix
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch11/ch11.html">
+   10. Representations (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch11/alt-reps.html">
+     10.1. Alternative Network Representations
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch12/ch12.html">
+   11. Network Model Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+  <label for="toctree-checkbox-11">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/background.html">
+     11.1. Background
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/foundation.html">
+     11.2. Foundation
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/ers.html">
+     11.3. Erdös-Rényi (ER) Random Networks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/sbms.html">
+     11.4. Stochastic Block Models
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch12/rdpgs.html">
+     11.5. RDPGs and more general network models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch13/ch13.html">
+   12. Learning Representations Theory
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+  <label for="toctree-checkbox-12">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/mle-theory.html">
+     12.1. Maximum Likelihood Estimate Theory
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/lse.html">
+     12.2. Finding singular vectors With singular value decomposition
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/spectral-theory.html">
+     12.7. Spectral Method Theory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../appendix/ch14/ch14.html">
+   13. Applications (Extended)
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+  <label for="toctree-checkbox-13">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch14/hypothesis.html">
+     13.1. Hypothesis Testing with coin flips
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch14/unsupervised.html">
+     13.2. Unsupervised learning
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch14/bayes.html">
+     13.3. Bayes Plugin Classifier
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Reference
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
+   Graspologic Documentation
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch5/single-network-models_SIEM.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="../../_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+<div class="menu-dropdown menu-dropdown-repository-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Source repositories">
+      <i class="fab fa-github"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="headerbtn__text-container">repository</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Frepresentations/ch5/single-network-models_SIEM.html&body=Your%20issue%20content%20here."
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Open an issue"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="headerbtn__text-container">open issue</span>
+</a>
+
+      </li>
+      
+      <li>
+        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/representations/ch5/single-network-models_SIEM.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Edit this page"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="headerbtn__text-container">suggest edit</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../../_sources/representations/ch5/single-network-models_SIEM.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector">
+   4.5.1. The Structured Independent Edge Model is parametrized by a Cluster-Assignment Matrix and a probability vector
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-cluster-assignment-matrix">
+     4.5.1.1. The Cluster-Assignment Matrix
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-probability-vector">
+     4.5.1.2. The Probability vector
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-we-simulate-samples-from-an-siem-n-z-vec-p-random-network">
+     4.5.1.3. How do we simulate samples from an
+     <span class="math notranslate nohighlight">
+      \(SIEM_n(Z, \vec p)\)
+     </span>
+     random network?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-do-we-care-about-the-siem">
+   4.5.2. Why do we care about the SIEM?
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Structured Independent Edge Model (SIEM)</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector">
+   4.5.1. The Structured Independent Edge Model is parametrized by a Cluster-Assignment Matrix and a probability vector
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-cluster-assignment-matrix">
+     4.5.1.1. The Cluster-Assignment Matrix
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#the-probability-vector">
+     4.5.1.2. The Probability vector
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-do-we-simulate-samples-from-an-siem-n-z-vec-p-random-network">
+     4.5.1.3. How do we simulate samples from an
+     <span class="math notranslate nohighlight">
+      \(SIEM_n(Z, \vec p)\)
+     </span>
+     random network?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#why-do-we-care-about-the-siem">
+   4.5.2. Why do we care about the SIEM?
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="structured-independent-edge-model-siem">
+<span id="ch5-siem"></span><h1><span class="section-number">4.5. </span>Structured Independent Edge Model (SIEM)<a class="headerlink" href="#structured-independent-edge-model-siem" title="Permalink to this headline">#</a></h1>
+<p>Next up, we’ll cover a statistical model for networks which generalizes the <a class="reference internal" href="single-network-models_SBM.html#ch5-sbm"><span class="std std-ref">SBM</span></a> a little differently than <a class="reference internal" href="single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">RDPG</span></a>. Sometimes in a network, there might particular pairs of nodes which, when those nodes are incident a particular edge, impart a different distribution for that edge. Let’s consider an example, which boils back to the example that we gave in the <span class="xref myst">end-to-end data science project</span>. Imagine we have a network, where the <span class="math notranslate nohighlight">\(n=100\)</span> nodes are different areas of the brain.  Each of these nodes are either in the left, or the right, side of the brain. An edge exists, or does not exist, if the two areas of the brain tend to be active together while a person iteracts with the world. A particular notion that scientists hypothesis is that, even though the left and right sides of the brain tend to have different functions, the nodes on the left and right sides still might tend to be active together, especially when it is the same region on both sides. For instance, even though the motor cortex (responsible for <em>motion</em> and <em>conscious movement</em>) in the left hemisphere has different jobs from the motor cortex in the right hemisphere, the jobs provided by each hemisphere tend to work in tandem, with the right motor cortex providing movement for the left side of the body, and the left motor cortex provides movement for the right side of the body. When someone is moving around, a lot of tasks will require them to use both sides of the body in tandem, so even though the two motor cortexes are doing different jobs, they still tend to be active together. This pattern, known as <em>bilateral homotopy</em>, tends might trickle down to many other nodes in the brain as well. Let’s turn this into a question: do bilateral node pairs have higher connectivity than non-bilateral node pairs?</p>
+<p>So, how do you actually study this property? As we have learned in this chapter so far, we want statistical models which capture what we understand about the system. What you understand is that, perhaps, the edges between pairs of nodes which are bilaterally symmetric tend to be more likely than the edges between pairs of nodes which are not bilaterally symmetric. Based on what we know so far, you could reflect this using a <span class="math notranslate nohighlight">\(SBM\)</span> as follows: for every node, find its bilateral pair, and place them in their own group. If there are <span class="math notranslate nohighlight">\(100\)</span> nodes each of which has a bilateral pair, this would give you <span class="math notranslate nohighlight">\(K=50\)</span> communities (one for each pair of nodes), and consequently, a <span class="math notranslate nohighlight">\(50 \times 50\)</span> block probability matrix which has <span class="math notranslate nohighlight">\(\frac{1}{2} \cdot 50 \cdot 49 = 1225\)</span> probability parameters. However, our overarching question is not about this particular arrangement of the nodes: our statement is about <em>node pairs</em> overall, not about any particular pair of nodes. If we were to use this grouping of the nodes in the network, we would only know about paritcular pairs of nodes (a community-by-community approach), which is <em>not</em> what we want to do!</p>
+<p>Instead, we will conceptualize this problem a little bit differently using the Structured Independent Edge Model (SIEM).</p>
+<section id="the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector">
+<h2><span class="section-number">4.5.1. </span>The Structured Independent Edge Model is parametrized by a Cluster-Assignment Matrix and a probability vector<a class="headerlink" href="#the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector" title="Permalink to this headline">#</a></h2>
+<p>To describe the Structured Independent Edge Model (SIEM), we will return to our old coin flipping example.</p>
+<section id="the-cluster-assignment-matrix">
+<h3><span class="section-number">4.5.1.1. </span>The Cluster-Assignment Matrix<a class="headerlink" href="#the-cluster-assignment-matrix" title="Permalink to this headline">#</a></h3>
+<p>The cluster assignment matrix <span class="math notranslate nohighlight">\(Z\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix which assigns potential edges in the random network to clusters. What do we mean by this?</p>
+<p>Remember that the adjacency matrix <span class="math notranslate nohighlight">\(\mathbf A\)</span> for a random network is <em>also</em> an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, where each entry <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> is a random variable which takes the value <span class="math notranslate nohighlight">\(0\)</span> or the value <span class="math notranslate nohighlight">\(1\)</span> with a particular probability. The cluster assignment matrix takes each of these <span class="math notranslate nohighlight">\(n^2\)</span> random variables, and uses a parameter <span class="math notranslate nohighlight">\(z_{ij}\)</span> to indicate which of <span class="math notranslate nohighlight">\(K\)</span> possible clusters this edge is part of. In the school example, for instance, the edges in the upper left and lower right are in cluster <span class="math notranslate nohighlight">\(1\)</span> (‘within-school’ edges), and the edges in the upper right and lower left are in cluster <span class="math notranslate nohighlight">\(2\)</span> (‘between-school’ edges). In the school example, <span class="math notranslate nohighlight">\(K=2\)</span>.</p>
+</section>
+<section id="the-probability-vector">
+<h3><span class="section-number">4.5.1.2. </span>The Probability vector<a class="headerlink" href="#the-probability-vector" title="Permalink to this headline">#</a></h3>
+<p>the second parameter for the SIEM is a probability vector, <span class="math notranslate nohighlight">\(\vec p\)</span>. If there are <span class="math notranslate nohighlight">\(K\)</span> edge clusters in the SIEM, then <span class="math notranslate nohighlight">\(\vec p\)</span> is a length-<span class="math notranslate nohighlight">\(K\)</span> vector. Each entry <span class="math notranslate nohighlight">\(p_k\)</span> indicates the probablity of an edge in the <span class="math notranslate nohighlight">\(k^{th}\)</span> cluster existing in the network. For example, <span class="math notranslate nohighlight">\(p_1\)</span> indicates the probability of an edge in the first edge cluster, <span class="math notranslate nohighlight">\(p_2\)</span> indicates the probability of an edge in the second edge cluster, so on and so-forth. In the school example, for instance, the probability <span class="math notranslate nohighlight">\(p_1\)</span> indicates the probability of a within-school edge, and the probability <span class="math notranslate nohighlight">\(p_2\)</span> indicates the probability of a between-school edge.</p>
+<p>Like usual, we will formulate the SIEM using our old coin flip example. We begin by obtaining <span class="math notranslate nohighlight">\(K\)</span> coins, where the <span class="math notranslate nohighlight">\(k^{th}\)</span> coin has a chance of landing on heads of <span class="math notranslate nohighlight">\(p_k\)</span>, and a chance of landing on tails of <span class="math notranslate nohighlight">\(1 - p_k\)</span>. For each entry <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, we identify the corresponding cluster <span class="math notranslate nohighlight">\(z_{ij}\)</span> that this edge is in. Remember that <span class="math notranslate nohighlight">\(z_{ij}\)</span> takes one of <span class="math notranslate nohighlight">\(K\)</span> possible values. We flip the <span class="math notranslate nohighlight">\(z_{ij}\)</span> coin, and if it lands on heads (with probability <span class="math notranslate nohighlight">\(p_{z_{ij}}\)</span>), the edge exists, and if it lands on tails (with probability <span class="math notranslate nohighlight">\(1 - p_{z_{ij}}\)</span>) the edge does not exist.</p>
+<p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an SIEM random network with <span class="math notranslate nohighlight">\(n\)</span> nodes, the cluster assignment matrix <span class="math notranslate nohighlight">\(Z\)</span>, and the probability vector <span class="math notranslate nohighlight">\(\vec p\)</span>, we say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network.</p>
+</section>
+<section id="how-do-we-simulate-samples-from-an-siem-n-z-vec-p-random-network">
+<h3><span class="section-number">4.5.1.3. </span>How do we simulate samples from an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network?<a class="headerlink" href="#how-do-we-simulate-samples-from-an-siem-n-z-vec-p-random-network" title="Permalink to this headline">#</a></h3>
+<p>The procedure below will produce for us a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network:</p>
+<div class="admonition-simulating-a-sample-from-an-siem-n-z-vec-p-random-network admonition">
+<p class="admonition-title">Simulating a sample from an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network</p>
+<ol class="simple">
+<li><p>Determine a cluster assignment matrix <span class="math notranslate nohighlight">\(Z\)</span> for each edge of the network. Each edge entry <span class="math notranslate nohighlight">\(z_{ij}\)</span> can take one of <span class="math notranslate nohighlight">\(K\)</span> possible values.</p></li>
+<li><p>Determine a length-<span class="math notranslate nohighlight">\(K\)</span> probability vector for each of the <span class="math notranslate nohighlight">\(K\)</span> edge clusters.</p></li>
+<li><p>For each of the <span class="math notranslate nohighlight">\(K\)</span> clusters, obtain <span class="math notranslate nohighlight">\(K\)</span> total weighted coins, where the <span class="math notranslate nohighlight">\(k^{th}\)</span> coin lands on heads with probability <span class="math notranslate nohighlight">\(p_k\)</span> and tails with probability <span class="math notranslate nohighlight">\(1 - p_k\)</span>.</p></li>
+<li><p>For each edge <span class="math notranslate nohighlight">\((i, j)\)</span>:</p>
+<ul class="simple">
+<li><p>Denote <span class="math notranslate nohighlight">\(z_{ij}\)</span> to be the cluster assignment of the potential edge between node <span class="math notranslate nohighlight">\(i\)</span> and node <span class="math notranslate nohighlight">\(j\)</span>.</p></li>
+<li><p>Flip the <span class="math notranslate nohighlight">\(z_{ij}\)</span> coin, and if it lands on heads, the corresponding entry in the adjacency matrix <span class="math notranslate nohighlight">\(a_{ij}\)</span> is <span class="math notranslate nohighlight">\(1\)</span>. If it lands on tails, the coresponding entry in the adjacency matrix <span class="math notranslate nohighlight">\(a_{ij}\)</span> is <span class="math notranslate nohighlight">\(0\)</span>.</p></li>
+</ul>
+</li>
+<li><p>The adjacency matrix we produce, <span class="math notranslate nohighlight">\(A\)</span>, is a sample of an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network.</p></li>
+</ol>
+</div>
+<p>Let’s turn back to our network example we looked at. The first fifty nodes will be the areas in the left hemisphere of the brain, and the second fifty nodes will be the areas of the right hemisphere of the brain. The nodes will be sequentially ordered, so that the first node of the left is the first node of the right, so on and so forth, for all <span class="math notranslate nohighlight">\(50\)</span> pairs of nodes. The cluster assignment matrix looks like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">siem</span><span class="p">,</span> <span class="n">heatmap</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)):</span>
+    <span class="n">Z</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;R&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Cluster assignment matrix&quot;</span><span class="p">,</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_SIEM_2_0.png" src="../../_images/single-network-models_SIEM_2_0.png" />
+</div>
+</div>
+<p>As we can see, there are several bands going across this matrix. We can see the white band is the diagonal entries. Since the networks we are dealing with are simple, they are undirected, so we do not need to worry about the diagonal entries.</p>
+<p>In the off-diagonal entries, we can see another band. This band consists of the bilateral pairs of nodes; remember that the first node of the left hemisphere was the same functional area of the brain, but just in the other hemisphere. Hence, these edges are “assigned” to cluster <span class="math notranslate nohighlight">\(2\)</span>.</p>
+<p>The remaining off-diagonal entries are not bilateral pairs of nodes. These entries are assigned to cluster <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>Next, we need a probability vector for the two clusters of off-diagonal entries. We will arbitrarily say that there is a <span class="math notranslate nohighlight">\(0.8\)</span> probability that an edge adjoining two bilateral pairs of nodes (cluster <span class="math notranslate nohighlight">\(2\)</span>) is connected, but a <span class="math notranslate nohighlight">\(0.1\)</span> probability that an edge adjoining two non-bilateral pairs of nodes (edge cluster <span class="math notranslate nohighlight">\(1\)</span>) is connected:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">siem</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Cluster assignment matrix&quot;</span><span class="p">,</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SIEM_n(Z, </span><span class="se">\\</span><span class="s2">vec p)$ sample&quot;</span><span class="p">,</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/single-network-models_SIEM_5_0.png" src="../../_images/single-network-models_SIEM_5_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="why-do-we-care-about-the-siem">
+<h2><span class="section-number">4.5.2. </span>Why do we care about the SIEM?<a class="headerlink" href="#why-do-we-care-about-the-siem" title="Permalink to this headline">#</a></h2>
+<p>If you recall from the <a class="reference internal" href="single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">Section on RDPGs</span></a>, we learned that for every <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network, there is a corresponding latent position matrix <span class="math notranslate nohighlight">\(X\)</span> such that the probability matrices of the <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network and an <span class="math notranslate nohighlight">\(RDPG_n(X)\)</span> random network are the same. In this sense, the RDPG random networks <em>generalize</em> the SBM random networks, in that all SBM random networks are RDPG random networks, but not all RDPG random networks are SBM random networks. We can find latent position matrices which produce networks which cannot be summarized with an SBM, such as the <a class="reference internal" href="single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">later example we saw in the RDPG section</span></a>. The SIEM has a similar relationship with the SBM: all SBM random networks are SIEM random networks, but not all SIEM random networks are SBM random networks. If you want the gorey details of how this works, check out the block below. If not, you can skip on to the next paragraph.</p>
+<div class="admonition-all-sbms-are-siems admonition">
+<p class="admonition-title">All SBMs are SIEMs</p>
+<p>What this means is that for any <span class="math notranslate nohighlight">\(SBM_n(\vec z', B)\)</span> random network, there is a corresponding <span class="math notranslate nohighlight">\(Z\)</span> and <span class="math notranslate nohighlight">\(\vec p\)</span> such that an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network has the same probability matrix. We can see this pretty easily: if <span class="math notranslate nohighlight">\(K\)</span> was the number of communities of the SBM, we can define an SIEM to have a single edge cluster for each <em>pair</em> of communities. We can see this as follows:</p>
+<ol class="simple">
+<li><p>Define the number of edge clusters: Edge cluster <span class="math notranslate nohighlight">\(1\)</span> consists of edges between nodes both in community <span class="math notranslate nohighlight">\(1\)</span>, edge cluster <span class="math notranslate nohighlight">\(2\)</span> consists of edges between a node in community <span class="math notranslate nohighlight">\(1\)</span> and a node in community <span class="math notranslate nohighlight">\(2\)</span>, so on and so forth up to edges between a node in community <span class="math notranslate nohighlight">\(1\)</span> and a node in community <span class="math notranslate nohighlight">\(K\)</span>. Edge cluster <span class="math notranslate nohighlight">\(K+1\)</span> consists of edges between a node in community <span class="math notranslate nohighlight">\(2\)</span> and a node in community <span class="math notranslate nohighlight">\(1\)</span>, and again we repeat this up to edge cluster <span class="math notranslate nohighlight">\(2K\)</span> which delineates edges between a node in community <span class="math notranslate nohighlight">\(2\)</span> and a node in community <span class="math notranslate nohighlight">\(K\)</span>. We continue this procedure up to edge cluster <span class="math notranslate nohighlight">\(K^2\)</span> which is between two nodes in community <span class="math notranslate nohighlight">\(K\)</span>. This gives us a map, where for each pair of communities <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(l'\)</span>, we have an edge cluster <span class="math notranslate nohighlight">\(k\)</span> whch corresponds to this pair of communities.</p></li>
+<li><p>Define the edge cluster matrix: Proceed edge-by-edge through the network looking at the community asignment vector <span class="math notranslate nohighlight">\(\vec z'\)</span>. The edge cluster for an edge <span class="math notranslate nohighlight">\((i, j)\)</span> is the edge cluster we identified above between the communities for node <span class="math notranslate nohighlight">\(i\)</span> and node <span class="math notranslate nohighlight">\(j\)</span>, <span class="math notranslate nohighlight">\(z_i'\)</span> and <span class="math notranslate nohighlight">\(z_j'\)</span> respectively.</p></li>
+<li><p>Define the edge cluster probability vector: Let the probability vector <span class="math notranslate nohighlight">\(\vec p\)</span> be defined such that, iff the <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(l'\)</span> communities correspond to edge cluster <span class="math notranslate nohighlight">\(k\)</span>, then <span class="math notranslate nohighlight">\(p_k\)</span> has the same value as <span class="math notranslate nohighlight">\(b_{ll'}\)</span> in the block matrix.
+This produces an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\)</span> random network with the same probability matrix as an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network.</p></li>
+</ol>
+</div>
+<p>For this reason, in later sections such as <a class="reference internal" href="../../applications/ch7/testing-differences.html#ch7-testing"><span class="std std-ref">testing differences</span></a>, we will develop statistical tools for the SIEM, but it is important to note that they apply equally well to an SBM random network. The statistical tools afforded to the SIEM will allow you to capture more general questions than just those you could ask with the SBM, in which you can look for differences between pairs of groups of edges, rather than just looking for differences between pairs of groups of nodes, since there can be complicated arrangements of edges which are not easily capturable with the SBM.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./representations/ch5"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="single-network-models_IER.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title"><span class="section-number">4.4. </span>Inhomogeneous Erdos Renyi (IER) Random Network Model</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="multi-network-models.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4.6. </span>Multiple Network Models</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
