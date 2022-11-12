@@ -17,42 +17,29 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-retained_nodes = [i for i in range(0, 10)]
-node_names_retained = [node_names[i] for i in retained_nodes]
-node_pos_retained = {i : node_pos[j] for i, j in enumerate(retained_nodes)}
+import warnings
+warnings.filterwarnings('ignore')
+import seaborn as sns
 
-G_bus_retained = nx.from_numpy_matrix(A_bus_pruned)
+xs = np.linspace(0.001, 100, num=1000)
+logxs = np.log10(xs)
 
-fig, axs = plt.subplots(1,2, figsize=(15, 6))
-
-node_names = [i for i in range(1, 11)]
-heatmap(A_bus_pruned, ax=axs[0], title="Business Network Adjacency Matrix after pruning", xticklabels=node_names_retained,
-        yticklabels=node_names_retained);
-axs[0].set_xlabel("Business"); axs[0].set_ylabel("Business");
-
-nx.draw(G_bus_retained, pos=node_pos_retained, ax=axs[1])
-axs[1].set_title("Business Network Layout Plot after pruning");
+fig, ax = plt.subplots(1,1, figsize=(8, 6))
+sns.lineplot(xs, logxs, ax=ax)
+ax.axhline(0, color="red")
+ax.set_xlabel("x")
+ax.set_ylabel("$log_{10}(x)$");
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mValueError[0m                                Traceback (most recent call last)
-Cell [0;32mIn [13], line 10[0m
-[1;32m      7[0m fig, axs [38;5;241m=[39m plt[38;5;241m.[39msubplots([38;5;241m1[39m,[38;5;241m2[39m, figsize[38;5;241m=[39m([38;5;241m15[39m, [38;5;241m6[39m))
-[1;32m      9[0m node_names [38;5;241m=[39m [i [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m([38;5;241m1[39m, [38;5;241m11[39m)]
-[0;32m---> 10[0m [43mheatmap[49m[43m([49m[43mA_bus_pruned[49m[43m,[49m[43m [49m[43max[49m[38;5;241;43m=[39;49m[43maxs[49m[43m[[49m[38;5;241;43m0[39;49m[43m][49m[43m,[49m[43m [49m[43mtitle[49m[38;5;241;43m=[39;49m[38;5;124;43m"[39;49m[38;5;124;43mBusiness Network Adjacency Matrix after pruning[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mxticklabels[49m[38;5;241;43m=[39;49m[43mnode_names_retained[49m[43m,[49m
-[1;32m     11[0m [43m        [49m[43myticklabels[49m[38;5;241;43m=[39;49m[43mnode_names_retained[49m[43m)[49m;
-[1;32m     12[0m axs[[38;5;241m0[39m][38;5;241m.[39mset_xlabel([38;5;124m"[39m[38;5;124mBusiness[39m[38;5;124m"[39m); axs[[38;5;241m0[39m][38;5;241m.[39mset_ylabel([38;5;124m"[39m[38;5;124mBusiness[39m[38;5;124m"[39m);
-[1;32m     14[0m nx[38;5;241m.[39mdraw(G_bus_retained, pos[38;5;241m=[39mnode_pos_retained, ax[38;5;241m=[39maxs[[38;5;241m1[39m])
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn [42], line 9[0m
+[1;32m      6[0m logxs [38;5;241m=[39m np[38;5;241m.[39mlog10(xs)
+[1;32m      8[0m fig, ax [38;5;241m=[39m plt[38;5;241m.[39msubplots([38;5;241m1[39m,[38;5;241m1[39m, figsize[38;5;241m=[39m([38;5;241m8[39m, [38;5;241m6[39m))
+[0;32m----> 9[0m [43msns[49m[38;5;241;43m.[39;49m[43mlineplot[49m[43m([49m[43mxs[49m[43m,[49m[43m [49m[43mlogxs[49m[43m,[49m[43m [49m[43max[49m[38;5;241;43m=[39;49m[43max[49m[43m)[49m
+[1;32m     10[0m ax[38;5;241m.[39maxhline([38;5;241m0[39m, color[38;5;241m=[39m[38;5;124m"[39m[38;5;124mred[39m[38;5;124m"[39m)
+[1;32m     11[0m ax[38;5;241m.[39mset_xlabel([38;5;124m"[39m[38;5;124mx[39m[38;5;124m"[39m)
 
-File [0;32m/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/graphbook_code/plotting.py:773[0m, in [0;36mheatmap[0;34m(X, transform, figsize, title, context, font_scale, xticklabels, yticklabels, color, vmin, vmax, center, cbar, inner_hier_labels, outer_hier_labels, hier_label_fontsize, ax, title_pad, sort_nodes, n_colors, **kwargs)[0m
-[1;32m    771[0m     [38;5;28;01mif[39;00m [38;5;28mlen[39m(xticklabels) [38;5;241m!=[39m X[38;5;241m.[39mshape[[38;5;241m1[39m]:
-[1;32m    772[0m         msg [38;5;241m=[39m [38;5;124m"[39m[38;5;124mxticklabels must have same length [39m[38;5;132;01m{}[39;00m[38;5;124m.[39m[38;5;124m"[39m[38;5;241m.[39mformat(X[38;5;241m.[39mshape[[38;5;241m1[39m])
-[0;32m--> 773[0m         [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(msg)
-[1;32m    775[0m [38;5;28;01melif[39;00m [38;5;129;01mnot[39;00m [38;5;28misinstance[39m(xticklabels, ([38;5;28mbool[39m, [38;5;28mint[39m, [38;5;28mlist[39m)):
-[1;32m    776[0m     msg [38;5;241m=[39m [38;5;124m"[39m[38;5;124mxticklabels must be a bool, int, or a list, not [39m[38;5;132;01m{}[39;00m[38;5;124m"[39m[38;5;241m.[39mformat(
-[1;32m    777[0m         [38;5;28mtype[39m(xticklabels)
-[1;32m    778[0m     )
-
-[0;31mValueError[0m: xticklabels must have same length 9.
-ValueError: xticklabels must have same length 9.
+[0;31mTypeError[0m: lineplot() takes from 0 to 1 positional arguments but 2 positional arguments (and 1 keyword-only argument) were given
+TypeError: lineplot() takes from 0 to 1 positional arguments but 2 positional arguments (and 1 keyword-only argument) were given
 
