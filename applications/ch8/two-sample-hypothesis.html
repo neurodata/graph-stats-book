@@ -550,13 +550,18 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../../appendix/ch13/ase.html">
+     12.2. Estimating Parameters for the RDPG
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../../appendix/ch13/lse.html">
-     12.2. Finding singular vectors With singular value decomposition
+     12.3. Finding singular vectors With singular value decomposition
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../appendix/ch13/spectral-theory.html">
-     12.7. Spectral Method Theory
+     12.4. Spectral Method Theory
     </a>
    </li>
   </ul>
@@ -1012,11 +1017,7 @@ title="Print to PDF"
 \[\begin{align*}
     \text{find $W$ where }||X^{(p)} - X^{(r)}W||_{F}\text{ is minimized}
 \end{align*}\]</div>
-<p>The term <span class="math notranslate nohighlight">\(||A - B||_F\)</span> is the Frobenius norm of the difference, which here, is just going to give you a sense of how different the two matrices are. It will be relatively big if <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are not very similar, and relatively small if <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are similar. For two adjacency matrices for <span class="math notranslate nohighlight">\(n\)</span>-node networks, this quantity can be described as:</p>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{align*}
-    ||A - B||_F &amp;= \sqrt*{\sum_{i = 1}^n \sum_{j = 1}^n (a_{ij} - b_{ij})^2}
-\end{align*}\]</div>
+<p>The term <span class="math notranslate nohighlight">\(||A - B||_F\)</span> is the Frobenius distance, which you learned about in <code class="xref std std-numref docutils literal notranslate"><span class="pre">ch6:se:frob_dist</span></code>.</p>
 <p>Basically, the idea is that if <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span> are rotations of one another (or close to it), then if you can find the right rotation <span class="math notranslate nohighlight">\(W\)</span>, then <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}W\)</span> will be identical (and <span class="math notranslate nohighlight">\(||X^{(p)} - X^{(r)}W||_{F}\)</span> will be zero) or nearly identical (and <span class="math notranslate nohighlight">\(||X^{(p)} - X^{(r)}W||_{F}\)</span> will be small). If they are not rotations of one another, then this equation <span class="math notranslate nohighlight">\(||X^{(p)} - X^{(r)}W||_{F}\)</span> is going to have a comparatively high value, no matter what value of <span class="math notranslate nohighlight">\(W\)</span> you could choose. This is called the <a class="reference external" href="https://en.wikipedia.org/wiki/Orthogonal_Procrustes_problem"><em>orthogonal procrustes problem</em></a>, and there are a variety of ways you can come up with a pretty good guess at what <span class="math notranslate nohighlight">\(W\)</span> is, but we won’t need to go into details for our purposes.</p>
 <p>Next, you need to figure out how to actually use this to implement a statitical test <span class="math notranslate nohighlight">\(H_0 : X^{(p)} = X^{(r)}W\)</span> against <span class="math notranslate nohighlight">\(H_A: X^{(p)} \neq X^{(r)}W\)</span>. You can estimate starting values for <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span>, by just using <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-ref">Adjacency Spectral Embedding</span></a>. This gives you <span class="math notranslate nohighlight">\(\hat X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(r)}\)</span>, respectively, which are your estimates of the latent position matrices.</p>
 <p>Next, you do your best to find a rotation of <span class="math notranslate nohighlight">\(X^{(r)}\)</span> onto <span class="math notranslate nohighlight">\(X^{(p)}\)</span> by solving the orthogonal procrustes problem, by plugging in your estimates <span class="math notranslate nohighlight">\(\hat X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(r)}\)</span> for <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span>. Unfortunately, you’re not going to find a matrix <span class="math notranslate nohighlight">\(W\)</span> where <span class="math notranslate nohighlight">\(|| \hat X^{(p)} - \hat X^{(r)}W||_{F} = 0\)</span>, even if <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span> really are equal. This is because you are just using estimates of latent positions, so even if <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span> are identical up to a rotation in reality, your estimates probably won’t be. This means that <span class="math notranslate nohighlight">\(|| \hat X^{(p)} - \hat X^{(r)}W||_{F}\)</span> is, if <span class="math notranslate nohighlight">\(\hat X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(r)}\)</span> are <em>close</em> up to a rotation, going to take a <em>relatively</em> small value:</p>
@@ -1183,7 +1184,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.020
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.010
 </pre></div>
 </div>
 </div>
@@ -1201,7 +1202,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.00200
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.00100
 </pre></div>
 </div>
 </div>
@@ -1221,7 +1222,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.54146
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.41059
 </pre></div>
 </div>
 </div>
@@ -1291,7 +1292,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value of H0 against HA: 0.0210
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value of H0 against HA: 0.0360
 </pre></div>
 </div>
 </div>
