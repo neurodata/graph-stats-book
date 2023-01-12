@@ -1,30 +1,145 @@
 Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
     executenb(
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/nbclient/client.py", line 1204, in execute
     return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/nbclient/util.py", line 84, in wrapped
     return just_run(coro(*args, **kwargs))
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/nbclient/util.py", line 62, in just_run
     return loop.run_until_complete(coro)
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/asyncio/base_events.py", line 616, in run_until_complete
     return future.result()
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/nbclient/client.py", line 663, in async_execute
     await self.async_execute_cell(
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/nbclient/client.py", line 965, in async_execute_cell
     await self._check_raise_for_error(cell, cell_index, exec_reply)
-  File "/opt/hostedtoolcache/Python/3.8.14/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+  File "/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-A_ptr = gp.utils.pass_to_ranks(A_clean)
+import os
+import urllib
+import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
+from graspologic.utils import import_edgelist
+import numpy as np
+import glob
+
+# the AWS bucket the data is stored in
+BUCKET_ROOT = "open-neurodata"
+parcellation = "Schaefer400"
+FMRI_PREFIX = "m2g/Functional/BNU1-11-12-20-m2g-func/Connectomes/" + parcellation + "_space-MNI152NLin6_res-2x2x2.nii.gz/"
+FMRI_PATH = os.path.join("datasets", "fmri")  # the output folder
+DS_KEY = "abs_edgelist"  # correlation matrices for the networks to exclude
+
+def fetch_fmri_data(bucket=BUCKET_ROOT, fmri_prefix=FMRI_PREFIX,
+                    output=FMRI_PATH, name=DS_KEY):
+    """
+    A function to fetch fMRI connectomes from AWS S3.
+    """
+    # check that output directory exists
+    if not os.path.isdir(FMRI_PATH):
+        os.makedirs(FMRI_PATH)
+    # start boto3 session anonymously
+    s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
+    # obtain the filenames
+    bucket_conts = s3.list_objects(Bucket=bucket, 
+                    Prefix=fmri_prefix)["Contents"]
+    for s3_key in bucket_conts:
+        # get the filename
+        s3_object = s3_key['Key']
+        # verify that we are grabbing the right file
+        if name not in s3_object:
+            op_fname = os.path.join(FMRI_PATH, str(s3_object.split('/')[-1]))
+            if not os.path.exists(op_fname):
+                s3.download_file(bucket, s3_object, op_fname)
+
+def read_fmri_data(path=FMRI_PATH):
+    """
+    A function which loads the connectomes as adjacency matrices.
+    """
+    # import edgelists with graspologic
+    # edgelists will be all of the files that end in a csv
+    networks = [import_edgelist(fname) for fname in glob.glob(os.path.join(path, "*.csv"))]
+    return networks
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-Cell [0;32mIn [10], line 1[0m
-[0;32m----> 1[0m A_ptr [38;5;241m=[39m [43mgp[49m[38;5;241m.[39mutils[38;5;241m.[39mpass_to_ranks(A_clean)
+[0;31mValueError[0m                                Traceback (most recent call last)
+Cell [0;32mIn[1], line 6[0m
+[1;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01mbotocore[39;00m [38;5;28;01mimport[39;00m UNSIGNED
+[1;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mbotocore[39;00m[38;5;21;01m.[39;00m[38;5;21;01mclient[39;00m [38;5;28;01mimport[39;00m Config
+[0;32m----> 6[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mutils[39;00m [38;5;28;01mimport[39;00m import_edgelist
+[1;32m      7[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[1;32m      8[0m [38;5;28;01mimport[39;00m [38;5;21;01mglob[39;00m
 
-[0;31mNameError[0m: name 'gp' is not defined
-NameError: name 'gp' is not defined
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/graspologic/__init__.py:7[0m
+[1;32m      5[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mcluster[39;00m
+[1;32m      6[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mdatasets[39;00m
+[0;32m----> 7[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01membed[39;00m
+[1;32m      8[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01minference[39;00m
+[1;32m      9[0m [38;5;28;01mimport[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mlayouts[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/graspologic/embed/__init__.py:11[0m
+[1;32m      9[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mmds[39;00m [38;5;28;01mimport[39;00m ClassicalMDS
+[1;32m     10[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mmug2vec[39;00m [38;5;28;01mimport[39;00m mug2vec
+[0;32m---> 11[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mn2v[39;00m [38;5;28;01mimport[39;00m node2vec_embed
+[1;32m     12[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01momni[39;00m [38;5;28;01mimport[39;00m OmnibusEmbed
+[1;32m     13[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01msvd[39;00m [38;5;28;01mimport[39;00m select_dimension, select_svd
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/graspologic/embed/n2v.py:11[0m
+[1;32m      9[0m [38;5;28;01mimport[39;00m [38;5;21;01mnetworkx[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnx[39;00m
+[1;32m     10[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m---> 11[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgensim[39;00m[38;5;21;01m.[39;00m[38;5;21;01mmodels[39;00m [38;5;28;01mimport[39;00m Word2Vec
+[1;32m     13[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgraspologic[39;00m[38;5;21;01m.[39;00m[38;5;21;01mtypes[39;00m [38;5;28;01mimport[39;00m List, Tuple
+[1;32m     15[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m.[39;00m[38;5;21;01mutils[39;00m [38;5;28;01mimport[39;00m remap_node_ids
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/gensim/__init__.py:11[0m
+[1;32m      7[0m __version__ [38;5;241m=[39m [38;5;124m'[39m[38;5;124m4.3.0[39m[38;5;124m'[39m
+[1;32m      9[0m [38;5;28;01mimport[39;00m [38;5;21;01mlogging[39;00m
+[0;32m---> 11[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgensim[39;00m [38;5;28;01mimport[39;00m parsing, corpora, matutils, interfaces, models, similarities, utils  [38;5;66;03m# noqa:F401[39;00m
+[1;32m     14[0m logger [38;5;241m=[39m logging[38;5;241m.[39mgetLogger([38;5;124m'[39m[38;5;124mgensim[39m[38;5;124m'[39m)
+[1;32m     15[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m logger[38;5;241m.[39mhandlers:  [38;5;66;03m# To ensure reload() doesn't add another one[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/gensim/corpora/__init__.py:6[0m
+[1;32m      1[0m [38;5;124;03m"""[39;00m
+[1;32m      2[0m [38;5;124;03mThis package contains implementations of various streaming corpus I/O format.[39;00m
+[1;32m      3[0m [38;5;124;03m"""[39;00m
+[1;32m      5[0m [38;5;66;03m# bring corpus classes directly into package namespace, to save some typing[39;00m
+[0;32m----> 6[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mindexedcorpus[39;00m [38;5;28;01mimport[39;00m IndexedCorpus  [38;5;66;03m# noqa:F401 must appear before the other classes[39;00m
+[1;32m      8[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mmmcorpus[39;00m [38;5;28;01mimport[39;00m MmCorpus  [38;5;66;03m# noqa:F401[39;00m
+[1;32m      9[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mbleicorpus[39;00m [38;5;28;01mimport[39;00m BleiCorpus  [38;5;66;03m# noqa:F401[39;00m
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/gensim/corpora/indexedcorpus.py:14[0m
+[1;32m     10[0m [38;5;28;01mimport[39;00m [38;5;21;01mlogging[39;00m
+[1;32m     12[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m
+[0;32m---> 14[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgensim[39;00m [38;5;28;01mimport[39;00m interfaces, utils
+[1;32m     16[0m logger [38;5;241m=[39m logging[38;5;241m.[39mgetLogger([38;5;18m__name__[39m)
+[1;32m     19[0m [38;5;28;01mclass[39;00m [38;5;21;01mIndexedCorpus[39;00m(interfaces[38;5;241m.[39mCorpusABC):
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/gensim/interfaces.py:19[0m
+[1;32m      7[0m [38;5;124;03m"""Basic interfaces used across the whole Gensim package.[39;00m
+[1;32m      8[0m 
+[1;32m      9[0m [38;5;124;03mThese interfaces are used for building corpora, model transformation and similarity queries.[39;00m
+[0;32m   (...)[0m
+[1;32m     14[0m 
+[1;32m     15[0m [38;5;124;03m"""[39;00m
+[1;32m     17[0m [38;5;28;01mimport[39;00m [38;5;21;01mlogging[39;00m
+[0;32m---> 19[0m [38;5;28;01mfrom[39;00m [38;5;21;01mgensim[39;00m [38;5;28;01mimport[39;00m utils, matutils
+[1;32m     22[0m logger [38;5;241m=[39m logging[38;5;241m.[39mgetLogger([38;5;18m__name__[39m)
+[1;32m     25[0m [38;5;28;01mclass[39;00m [38;5;21;01mCorpusABC[39;00m(utils[38;5;241m.[39mSaveLoad):
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/gensim/matutils.py:1030[0m
+[1;32m   1025[0m     [38;5;28;01mreturn[39;00m [38;5;241m1.[39m [38;5;241m-[39m [38;5;28mfloat[39m([38;5;28mlen[39m(set1 [38;5;241m&[39m set2)) [38;5;241m/[39m [38;5;28mfloat[39m(union_cardinality)
+[1;32m   1028[0m [38;5;28;01mtry[39;00m:
+[1;32m   1029[0m     [38;5;66;03m# try to load fast, cythonized code if possible[39;00m
+[0;32m-> 1030[0m     [38;5;28;01mfrom[39;00m [38;5;21;01mgensim[39;00m[38;5;21;01m.[39;00m[38;5;21;01m_matutils[39;00m [38;5;28;01mimport[39;00m logsumexp, mean_absolute_difference, dirichlet_expectation
+[1;32m   1032[0m [38;5;28;01mexcept[39;00m [38;5;167;01mImportError[39;00m:
+[1;32m   1033[0m     [38;5;28;01mdef[39;00m [38;5;21mlogsumexp[39m(x):
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.15/x64/lib/python3.8/site-packages/gensim/_matutils.pyx:1[0m, in [0;36minit gensim._matutils[0;34m()[0m
+
+[0;31mValueError[0m: numpy.ndarray size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
+ValueError: numpy.ndarray size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
 
