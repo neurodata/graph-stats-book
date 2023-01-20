@@ -836,6 +836,11 @@ title="Print to PDF"
    2.1.2. Check the assumptions
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   2.1.3. References
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -865,6 +870,11 @@ title="Print to PDF"
    2.1.2. Check the assumptions
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   2.1.3. References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -886,7 +896,7 @@ title="Print to PDF"
 <p><span class="caption-number">Fig. 2.1 </span><span class="caption-text">(A) A hiker out on the trails sees a bird pirched in a tree in his field of view (faint red triangle). (B) The occipital lobe, which is responsible for sight, sits in the back of the brain (star). The presence of the bird in the field of view causes neurons to be electrically stimulated (blue line). The activity of the neurons causes the brain to send blood to the area as the neurons are stimulated (red line). While individual neurons are too small to see, the blood flow of many neurons in the brain can be picked up by the fMRI scanner.</span><a class="headerlink" href="#fmri-bold" title="Permalink to this image">#</a></p>
 </figcaption>
 </figure>
-<p>This imaging technology, known as functional MRI (fMRI, <em>functional</em> because it images brain regions as they <em>function</em>) has proven to be extremely interesting to neuroscientists. Basically, people sit in a big fMRI machine, and the scanner simply looks at this blood signal over time in different areas of the brain. For a given pair of brain areas, the researchers look at whether the two areas tend to be active together. Stated another way, they look for <em>correlations</em> that arise between different brain areas. The idea is that, perhaps, different combinations of brain areas tend to work together as a unit, allowing the complicated thought patterns that humans are capable of. By viewing the different areas of the brain as nodes of a network, and the correlations as the edges, scientists have constructed graphs from this line of thinking. This area of study, called connectomics, presents an extremely network-centric area of research.</p>
+<p>This imaging technology, known as functional MRI (fMRI, <em>functional</em> because it images brain regions as they <em>function</em>) has proven to be extremely interesting to neuroscientists <span id="id1">[<a class="reference internal" href="#id12" title="Russell A. Poldrack, Jeanette A. Mumford, and Thomas E. Nichols. Handbook of Functional MRI Data Analysis. Cambridge University Press, Cambridge, England, UK, August 2011. ISBN 978-1-13949836-4. URL: https://books.google.com/books/about/Handbook_of_Functional_MRI_Data_Analysis.html?id=VjwBnVRwuD8C&amp;source=kp_book_description.">1</a>]</span>. Basically, people sit in a big fMRI machine, and the scanner simply looks at this blood signal over time in different areas of the brain. For a given pair of brain areas, the researchers look at whether the two areas tend to be active together. Stated another way, they look for <em>correlations</em> that arise between different brain areas. The idea is that, perhaps, different combinations of brain areas tend to work together as a unit, allowing the complicated thought patterns that humans are capable of. By viewing the different areas of the brain as nodes of a network, and the correlations as the edges, scientists have constructed graphs from this line of thinking. This area of study, called connectomics, presents an extremely network-centric area of research <span id="id2">[<a class="reference internal" href="#id13" title="Brent C. Munsell, Guorong Wu, Leonardo Bonilha, and Paul Laurienti. Connectomics: Applications to Neuroimaging (The MICCAI Society book Series). Academic Press, Cambridge, MA, USA, September 2018. ISBN 978-0-12813838-0. URL: https://www.amazon.com/Connectomics-Applications-Neuroimaging-Brent-Munsell/dp/0128138386.">2</a>]</span>.</p>
 <p>One of your colleagues has come to you with an interesting question. He has a bunch of networks from an fMRI session, and he wants to know whether there are any higher level groups of brain areas that tend to have similar activity. He comes to you with a question: can you, as a network scientist, take his network of nodes and edges, and figure out a way to break the nodes into groups of nodes which are functionally similar?</p>
 <p>If these are the types of questions you have when you see new network data, then this is the right book for you.</p>
 <section id="framing-the-problem">
@@ -895,12 +905,25 @@ title="Print to PDF"
 <p>Your colleague replies that he will give you a bunch of networks. The networks will be the functional brain network from human beings, where nodes will be regions of the brain from an MRI scan. The edge weights in the network will represent how correlated the brain activity is for each pair of brain areas. Your colleague wants to know whether there are any sub-groups of areas that tend to behave similarly. By “behave similarly”, what your colleague means is, are there sub-groups of brain areas that tend to work together in conjunction with other sub-groups of brain areas?</p>
 <p>The next question to ask is what the current solution looks like. This will help you to understand where to start approaching the problem, and give you a reference for the performance of your techniques. Your colleague answers that he thinks that some people use a thing called spectral embedding methods, and he wants to know whether you might be able to do something similar.</p>
 <p>Next, you need to determine what type of network machine learning problem you have. What type of data do you have? Do you have any covariates associated with that data? What type of question do you want to answer? Do you want to test a hypothesis, or make predictions? What characteristics will your model need to reflect to be able to answer the question appropriately? Before you progress further, you should try to think and answer these questions for yourself.</p>
-<p>Remembering back to <a class="reference internal" href="../ch1/types-nml-problems.html#ch1-types"><span class="std std-ref">types of network machine learning problems</span></a>, you immediately conclude that this is a multiple network learning problem. Your networks are non-attributed, since you only know the nodes and edges of the network. The question asks about groups of nodes and edges, and you hope to use network modelling approaches to study your problem. You are going to need to come up with a definition of what it means for pairs of areas to be similar, and you are going to want to be able to group areas in a way that is meaningful for your colleague.</p>
+<p>Remembering back to the types of network machine learning problems in <a class="reference internal" href="../ch1/types-nml-problems.html#ch1-types"><span class="std std-numref">Section 1.3</span></a>, you immediately conclude that this is a multiple network learning problem. Your networks are non-attributed, since you only know the nodes and edges of the network. The question asks about groups of nodes and edges, and you hope to use network modelling approaches to study your problem. You are going to need to come up with a definition of what it means for pairs of areas to be similar, and you are going to want to be able to group areas in a way that is meaningful for your colleague.</p>
 </section>
 <section id="check-the-assumptions">
 <h2><span class="section-number">2.1.2. </span>Check the assumptions<a class="headerlink" href="#check-the-assumptions" title="Permalink to this headline">#</a></h2>
-<p>Throughout the course of this book, we will try to keep in direct focus the assumptions being made by the techniques we might pick. You want to choose the simplest set of assumptions that can reasonably reflect the data. This means that you want to use the simplest statistical model that can answer the question you want to address. In this case, we don’t care about individual brain area-to-brain area connections at all: we only care about how groups of brain areas behave in relation to other groups of brain areas. This means that we want to choose models which will allow us to learn about pairs of brain area groups, which is a very different problem from learning about individual brain areas themselves. You don’t want to find out after developing an analysis which produces results on pairs of brain area groups that your boss actually wanted you to compare individual brain areas themselves!</p>
+<p>Throughout the course of this book, we will try to keep in direct focus the assumptions being made by the techniques you might pick. You want to choose the simplest set of assumptions that can reasonably reflect the data. This means that you want to use the simplest statistical model that can answer the question you want to address. In this case, we don’t care about individual brain area-to-brain area connections at all: we only care about how groups of brain areas behave in relation to other groups of brain areas. This means that we want to choose models which will allow us to learn about pairs of brain area groups, which is a very different problem from learning about individual brain areas themselves. You don’t want to find out after developing an analysis which produces results on pairs of brain area groups that your boss actually wanted you to compare individual brain areas themselves!</p>
 <p>After talking over your understanding of the problem with your research colleague, you are confident that he wants a way to be able to group brain areas together based on how similar they are, and he gives you freedom to define that however you choose. You now have the green light to get coding!</p>
+</section>
+<section id="references">
+<h2><span class="section-number">2.1.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<div class="docutils container" id="id3">
+<dl class="citation">
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Russell A. Poldrack, Jeanette A. Mumford, and Thomas E. Nichols. <em>Handbook of Functional MRI Data Analysis</em>. Cambridge University Press, Cambridge, England, UK, August 2011. ISBN 978-1-13949836-4. URL: <a class="reference external" href="https://books.google.com/books/about/Handbook_of_Functional_MRI_Data_Analysis.html?id=VjwBnVRwuD8C&amp;source=kp_book_description">https://books.google.com/books/about/Handbook_of_Functional_MRI_Data_Analysis.html?id=VjwBnVRwuD8C&amp;source=kp_book_description</a>.</p>
+</dd>
+<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Brent C. Munsell, Guorong Wu, Leonardo Bonilha, and Paul Laurienti. <em>Connectomics: Applications to Neuroimaging (The MICCAI Society book Series)</em>. Academic Press, Cambridge, MA, USA, September 2018. ISBN 978-0-12813838-0. URL: <a class="reference external" href="https://www.amazon.com/Connectomics-Applications-Neuroimaging-Brent-Munsell/dp/0128138386">https://www.amazon.com/Connectomics-Applications-Neuroimaging-Brent-Munsell/dp/0128138386</a>.</p>
+</dd>
+</dl>
+</div>
 </section>
 </section>
 
