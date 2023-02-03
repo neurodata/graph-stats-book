@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/proof.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -550,18 +551,8 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch13/ase.html">
-     12.2. Estimating Parameters for the RDPG
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch13/lse.html">
-     12.3. Finding singular vectors With singular value decomposition
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../appendix/ch13/spectral-theory.html">
-     12.4. Spectral Method Theory
+     12.2. Spectral Method Theory
     </a>
    </li>
   </ul>
@@ -864,6 +855,11 @@ title="Print to PDF"
    4.2.2. ER random networks are special cases of SBM random networks
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   4.2.3. References
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -919,6 +915,11 @@ title="Print to PDF"
    4.2.2. ER random networks are special cases of SBM random networks
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   4.2.3. References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -932,7 +933,7 @@ title="Print to PDF"
   <section class="tex2jax_ignore mathjax_ignore" id="stochastic-block-models-sbm">
 <span id="ch5-sbm"></span><h1><span class="section-number">4.2. </span>Stochastic Block Models (SBM)<a class="headerlink" href="#stochastic-block-models-sbm" title="Permalink to this headline">#</a></h1>
 <p>Let’s imagine that you have <span class="math notranslate nohighlight">\(100\)</span> students, each of whom can go to one of two possible schools: school one or school two. Your network has <span class="math notranslate nohighlight">\(100\)</span> nodes, and each node represents a single student. The edges of this network represent whether a pair of students are friends. Intuitively, if two students go to the same school, the probably have a higher chance of being friends than if they do not go to the same school. If you were to try to characterize this using an ER random network, you would run into a problem: you have no way to capture the impact that school has on friendships. To do this, you need to build upon your ER model to make things a little more complicated.</p>
-<p>The Stochastic Block Model, or SBM, captures this idea by assigning each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities. A <strong>community</strong> is a group of nodes within the network. In your example case, the communities would represent the schools that students are able to attend. We use <span class="math notranslate nohighlight">\(K\)</span> here to just denote an integer greater than <span class="math notranslate nohighlight">\(1\)</span> (for example, in the school example we gave above, <span class="math notranslate nohighlight">\(K\)</span> is <span class="math notranslate nohighlight">\(2\)</span>) for the number of <em>possible</em> communities that nodes could be members of. In an SBM, instead of describing all pairs of nodes with a fixed probability like with the ER model, you instead describe properties that hold for edges between <em>pairs of communities</em>. In your example, what this means is that if two students go to school one, the probability that they are friends might be different than if the two students went to school two, or if one student went to school one and the other to school two. Let’s take a look at what a sample of this setup we have described might look like:</p>
+<p>The Stochastic Block Model, or SBM, captures this idea by assigning each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities, and was first introduced by <span id="id1">[]</span>. A <strong>community</strong> is a group of nodes within the network. In your example case, the communities would represent the schools that students are able to attend. We use <span class="math notranslate nohighlight">\(K\)</span> here to just denote an integer greater than <span class="math notranslate nohighlight">\(1\)</span> (for example, in the school example we gave above, <span class="math notranslate nohighlight">\(K\)</span> is <span class="math notranslate nohighlight">\(2\)</span>) for the number of <em>possible</em> communities that nodes could be members of. In an SBM, instead of describing all pairs of nodes with a fixed probability like with the ER model, you instead describe properties that hold for edges between <em>pairs of communities</em>. In your example, what this means is that if two students go to school one, the probability that they are friends might be different than if the two students went to school two, or if one student went to school one and the other to school two. Let’s take a look at what a sample of this setup we have described might look like:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
@@ -1132,7 +1133,7 @@ title="Print to PDF"
 </div>
 </div>
 <p>Now, the students are <em>not</em> organized according to school, because they have been randomly reordered. It becomes pretty tough to figure out whether there are communities just by looking at an adjacency matrix, unless you are looking at a network in which the nodes are <em>already arranged</em> in an order which respects the community structure. By an <em>order that respects the community structure</em>, we mean that the community assignment vector <span class="math notranslate nohighlight">\(\vec z\)</span> is arranged so that all of the nodes in the first community come first, followed by all of the nodes in the second community, followed by all of the nodes in the third community, so on and so forth up to the nodes of the community <span class="math notranslate nohighlight">\(K\)</span>.</p>
-<p>In practice, this means that if you know ahead of time what natural groupings of the nodes might be (such as knowing which school each student goes to) by way of your node attributes, you can visualize your data according to that grouping. If you don’t know anything about natural groupings of nodes, however, you are left with the problem of <em>estimating community structure</em>. A later method, called the <em>spectral embedding</em>, will be paired with clustering techniques to allow you to estimate node assignment vectors.</p>
+<p>In practice, this means that if you know ahead of time what natural groupings of the nodes might be (such as knowing which school each student goes to) by way of your node attributes, you can visualize your data according to that grouping. This property is covered more in depth by <span id="id2">[]</span>. If you don’t know anything about natural groupings of nodes, however, you are left with the problem of <em>estimating community structure</em>. A later method, called the <em>spectral embedding</em> in <a class="reference internal" href="../ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>, will be paired with clustering techniques to allow you to estimate node assignment vectors.</p>
 <p>We’ll conclude off this section by showing that the previous random network model you saw, the ER random networks, are special cases of SBM random networks. These properties will become useful as you build more and more complex random network models, because when you develop techniques for more complex random network models in later chapters, they will extend directly to any network model which is a special case of that random network model.</p>
 </section>
 </section>
@@ -1142,6 +1143,10 @@ title="Print to PDF"
 <p>The answer is <em>always</em> a yes! This is extremely easy. Take the number of edge communities for the corresponding SBM to be <span class="math notranslate nohighlight">\(1\)</span>, and assign every node to the first community. Next, take the block matrix to have a single entry, <span class="math notranslate nohighlight">\(b_{11} = p\)</span>. And you are done! <span class="math notranslate nohighlight">\(\mathbf A\)</span> is also an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network, where <span class="math notranslate nohighlight">\(\vec z\)</span> is a vector of ones, and <span class="math notranslate nohighlight">\(B\)</span> is a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix (really, just a scalar) whose only entry is <span class="math notranslate nohighlight">\(p\)</span>.</p>
 <p>We are finished! To see that the edge-existence probabilities are the same, you’ll back up to your coin flips. In the ER random network, you performed a coin flip for each edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> with a coin that landed on heads with probability <span class="math notranslate nohighlight">\(p\)</span>. In the SBM random network, you performed a coin flip for each edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> with a coin that landed on heads with probability <span class="math notranslate nohighlight">\(b_{z_i z_j}\)</span>. Here, there is only one possible value that <span class="math notranslate nohighlight">\(z_i\)</span> or <span class="math notranslate nohighlight">\(z_j\)</span> could take; they both must be one, since there is only one community. Therefore you flip a coin that lands on heads with probabaility <span class="math notranslate nohighlight">\(b_{11}\)</span>. But when you built the block matrix, we said that <span class="math notranslate nohighlight">\(b_{11}\)</span> was just <span class="math notranslate nohighlight">\(p\)</span>, so the coin flip is occurring with a coin that lands on heads with probability <span class="math notranslate nohighlight">\(p\)</span>. This is obviously the same procedure you took with the ER random network at all possible edges, so the edge-existence probabilities are all identical. Therefore, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network is also an <span class="math notranslate nohighlight">\(SBM_n([1, 1, ..., 1], B = [p])\)</span> random network.</p>
 </section>
+<section id="references">
+<h2><span class="section-number">4.2.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<p>If you want a deeper level of technical depth, please see the appendix <a class="reference internal" href="../../appendix/ch12/sbms.html#app-ch12-sbms"><span class="std std-numref">Section 11.4</span></a>.</p>
+<span class="target" id="id3"></span></section>
 </section>
 
     <script type="text/x-thebe-config">

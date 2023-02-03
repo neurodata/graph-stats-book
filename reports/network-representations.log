@@ -17,16 +17,38 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-W = np.array([[0, 1], [1, 0]])
-Yhat = Xhat @ W
+from graspologic.simulations import sample_edges
+
+P1 = np.array([[.5, .5, .5],
+               [.5, .5, .5],
+               [.5, .5, .5]])
+
+P2 = np.array([[.5, .9, .5],
+               [.9, .5, .5],
+               [.5, .5, .5]])
+
+# First group
+n_networks = 20
+neteworks = np.empty((2*n_networks, 3, 3))
+for i in range(n_networks):
+    networks[i,:,:] = sample_edges(P1)
+
+# Second group
+for i in range(n_networks, 2*n_networks):
+    networks[i,:,:] = sample_edges(P2)
+
+ys = np.array([1 for i in range(0, n_networks)] + [2 for i in range(0, n_networks)])
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mValueError[0m                                Traceback (most recent call last)
-Cell [0;32mIn[17], line 2[0m
-[1;32m      1[0m W [38;5;241m=[39m np[38;5;241m.[39marray([[[38;5;241m0[39m, [38;5;241m1[39m], [[38;5;241m1[39m, [38;5;241m0[39m]])
-[0;32m----> 2[0m Yhat [38;5;241m=[39m [43mXhat[49m[43m [49m[38;5;241;43m@[39;49m[43m [49m[43mW[49m
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[6], line 15[0m
+[1;32m     13[0m neteworks [38;5;241m=[39m np[38;5;241m.[39mempty(([38;5;241m2[39m[38;5;241m*[39mn_networks, [38;5;241m3[39m, [38;5;241m3[39m))
+[1;32m     14[0m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m(n_networks):
+[0;32m---> 15[0m     [43mnetworks[49m[43m[[49m[43mi[49m[43m,[49m[43m:[49m[43m,[49m[43m:[49m[43m][49m [38;5;241m=[39m sample_edges(P1)
+[1;32m     17[0m [38;5;66;03m# Second group[39;00m
+[1;32m     18[0m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m(n_networks, [38;5;241m2[39m[38;5;241m*[39mn_networks):
 
-[0;31mValueError[0m: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 2 is different from 3)
-ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 2 is different from 3)
+[0;31mTypeError[0m: list indices must be integers or slices, not tuple
+TypeError: list indices must be integers or slices, not tuple
 

@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/proof.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -550,18 +551,8 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch13/ase.html">
-     12.2. Estimating Parameters for the RDPG
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch13/lse.html">
-     12.3. Finding singular vectors With singular value decomposition
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../appendix/ch13/spectral-theory.html">
-     12.4. Spectral Method Theory
+     12.2. Spectral Method Theory
     </a>
    </li>
   </ul>
@@ -859,6 +850,11 @@ title="Print to PDF"
    4.5.2. Why do we care about the SIEM?
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   4.5.3. References
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -909,6 +905,11 @@ title="Print to PDF"
    4.5.2. Why do we care about the SIEM?
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   4.5.3. References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -921,7 +922,7 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="structured-independent-edge-model-siem">
 <span id="ch5-siem"></span><h1><span class="section-number">4.5. </span>Structured Independent Edge Model (SIEM)<a class="headerlink" href="#structured-independent-edge-model-siem" title="Permalink to this headline">#</a></h1>
-<p>Next up, we’ll cover a statistical model for networks which generalizes the <a class="reference internal" href="single-network-models_SBM.html#ch5-sbm"><span class="std std-ref">SBM</span></a> a little differently than <a class="reference internal" href="single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">RDPG</span></a>. Sometimes in a network, there might particular pairs of nodes which, when those nodes are incident a particular edge, impart a different distribution for that edge. Let’s consider an example, which boils back to the example that we gave in the <span class="xref myst">end-to-end data science project</span>. Imagine we have a network, where the <span class="math notranslate nohighlight">\(n=100\)</span> nodes are different areas of the brain.  Each of these nodes are either in the left, or the right, side of the brain. An edge exists, or does not exist, if the two areas of the brain tend to be active together while a person iteracts with the world. A particular notion that scientists hypothesis is that, even though the left and right sides of the brain tend to have different functions, the nodes on the left and right sides still might tend to be active together, especially when it is the same region on both sides. For instance, even though the motor cortex (responsible for <em>motion</em> and <em>conscious movement</em>) in the left hemisphere has different jobs from the motor cortex in the right hemisphere, the jobs provided by each hemisphere tend to work in tandem, with the right motor cortex providing movement for the left side of the body, and the left motor cortex provides movement for the right side of the body. When someone is moving around, a lot of tasks will require them to use both sides of the body in tandem, so even though the two motor cortexes are doing different jobs, they still tend to be active together. This pattern, known as <em>bilateral homotopy</em>, tends might trickle down to many other nodes in the brain as well. Let’s turn this into a question: do bilateral node pairs have higher connectivity than non-bilateral node pairs?</p>
+<p>Next up, we’ll cover a statistical model for networks which generalizes the SBM from <a class="reference internal" href="single-network-models_SBM.html#ch5-sbm"><span class="std std-numref">Section 4.2</span></a> a little differently than RDPG from <a class="reference internal" href="single-network-models_RDPG.html#ch5-rdpg"><span class="std std-numref">Section 4.3</span></a>. Sometimes in a network, there might particular pairs of nodes which, when those nodes are incident a particular edge, impart a different distribution for that edge. Let’s consider an example, which boils back to the example that we gave in <code class="xref std std-numref docutils literal notranslate"><span class="pre">ch2</span></code>. Imagine we have a network, where the <span class="math notranslate nohighlight">\(n=100\)</span> nodes are different areas of the brain.  Each of these nodes are either in the left, or the right, side of the brain. An edge exists, or does not exist, if the two areas of the brain tend to be active together while a person iteracts with the world. A particular notion that scientists hypothesis is that, even though the left and right sides of the brain tend to have different functions, the nodes on the left and right sides still might tend to be active together, especially when it is the same region on both sides. For instance, even though the motor cortex (responsible for <em>motion</em> and <em>conscious movement</em>) in the left hemisphere has different jobs from the motor cortex in the right hemisphere, the jobs provided by each hemisphere tend to work in tandem, with the right motor cortex providing movement for the left side of the body, and the left motor cortex provides movement for the right side of the body. When someone is moving around, a lot of tasks will require them to use both sides of the body in tandem, so even though the two motor cortexes are doing different jobs, they still tend to be active together. This pattern, known as <em>bilateral homotopy</em>, tends might trickle down to many other nodes in the brain as well. Let’s turn this into a question: do bilateral node pairs have higher connectivity than non-bilateral node pairs?</p>
 <p>So, how do you actually study this property? As we have learned in this chapter so far, we want statistical models which capture what we understand about the system. What you understand is that, perhaps, the edges between pairs of nodes which are bilaterally symmetric tend to be more likely than the edges between pairs of nodes which are not bilaterally symmetric. Based on what we know so far, you could reflect this using a <span class="math notranslate nohighlight">\(SBM\)</span> as follows: for every node, find its bilateral pair, and place them in their own group. If there are <span class="math notranslate nohighlight">\(100\)</span> nodes each of which has a bilateral pair, this would give you <span class="math notranslate nohighlight">\(K=50\)</span> communities (one for each pair of nodes), and consequently, a <span class="math notranslate nohighlight">\(50 \times 50\)</span> block probability matrix which has <span class="math notranslate nohighlight">\(\frac{1}{2} \cdot 50 \cdot 49 = 1225\)</span> probability parameters. However, our overarching question is not about this particular arrangement of the nodes: our statement is about <em>node pairs</em> overall, not about any particular pair of nodes. If we were to use this grouping of the nodes in the network, we would only know about paritcular pairs of nodes (a community-by-community approach), which is <em>not</em> what we want to do!</p>
 <p>Instead, we will conceptualize this problem a little bit differently using the Structured Independent Edge Model (SIEM).</p>
 <section id="the-structured-independent-edge-model-is-parametrized-by-a-cluster-assignment-matrix-and-a-probability-vector">
@@ -1027,6 +1028,9 @@ This produces an <span class="math notranslate nohighlight">\(SIEM_n(Z, \vec p)\
 </div>
 <p>For this reason, in later sections such as <a class="reference internal" href="../../applications/ch7/testing-differences.html#ch7-testing"><span class="std std-ref">testing differences</span></a>, we will develop statistical tools for the SIEM, but it is important to note that they apply equally well to an SBM random network. The statistical tools afforded to the SIEM will allow you to capture more general questions than just those you could ask with the SBM, in which you can look for differences between pairs of groups of edges, rather than just looking for differences between pairs of groups of nodes, since there can be complicated arrangements of edges which are not easily capturable with the SBM.</p>
 </section>
+<section id="references">
+<h2><span class="section-number">4.5.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<span class="target" id="id1"></span></section>
 </section>
 
     <script type="text/x-thebe-config">
