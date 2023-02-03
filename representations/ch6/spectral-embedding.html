@@ -896,7 +896,7 @@ title="Print to PDF"
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id2">
+    <a class="reference internal nav-link" href="#id9">
      5.3.7.1. Adjacency Spectral Embedding
     </a>
    </li>
@@ -910,6 +910,11 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#want-more-linear-algebra">
    5.3.8. Want more linear algebra?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   5.3.9. References
   </a>
  </li>
 </ul>
@@ -1008,7 +1013,7 @@ title="Print to PDF"
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#id2">
+    <a class="reference internal nav-link" href="#id9">
      5.3.7.1. Adjacency Spectral Embedding
     </a>
    </li>
@@ -1024,6 +1029,11 @@ title="Print to PDF"
    5.3.8. Want more linear algebra?
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   5.3.9. References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -1036,13 +1046,13 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="spectral-embedding-methods">
 <span id="ch6-spectral"></span><h1><span class="section-number">5.3. </span>Spectral embedding methods<a class="headerlink" href="#spectral-embedding-methods" title="Permalink to this headline">#</a></h1>
-<p>One of the primary embedding tools you’ll use in this book is a set of methods called <em>spectral embedding</em> <span id="id1"></span>. You’ll see spectral embedding and variations on it repeatedly, both throughout this section and when you get into applications, so it’s worth taking the time to understand spectral embedding deeply. If you’re familiar with Principal Component Analysis (PCA), this method has a lot of similarities. You’ll need to get into a bit of linear algebra to understand how it works.</p>
+<p>Now that we know some of the basics of <em>why</em> we embed networks, it’s time to learn some about the <em>spectral embedding</em> <span id="id1">von Luxburg [<a class="reference internal" href="#id15" title="Ulrike von Luxburg. A tutorial on spectral clustering. Statistics and Computing, 2007.">3</a>]</span>. You’ll see spectral embedding and variations on it repeatedly, both throughout this section and when you get into applications, so it’s worth taking the time to understand spectral embedding deeply. If you’re familiar with Principal Component Analysis (PCA) <span id="id2">[]</span>, this method has a lot of similarities. If you want to learn a bit about PCA, we’d recommend you check out the Geron book <span id="id3">[<a class="reference internal" href="#id16" title="Aurelien Geron. Hands-On Machine Learning with Scikit-Learn and TensorFlow. O'Reilly Media, Inc., Sebastopol, CA, USA, March 2017. ISBN 978-1-49196229-9. URL: https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282.">1</a>]</span>. We’ll need to get into a bit of linear algebra to understand how it works.</p>
 <p>Remember that the basic idea behind any network embedding method is to take the network and put it into Euclidean space - meaning, a nice data table with rows as observations and columns as features (or dimensions), which you can then plot on an x-y axis. In this section, you’ll see the linear algebra-centric approach that spectral embedding uses to do this.</p>
-<p>Spectral methods are based on a bit of linear algebra, but hopefully a small enough amount to still be understandable. The overall idea has to do with taking a function of the adjacency matrix, and finding a simpler representation of it. This simpler representation is computed by identifying the singular values and vectors of a function of the adjacency matrix, which is a process known as the <a class="reference external" href="#https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition</a>. In essence, the singular values and singular vectors allow you to take a matrix, and represent it as a product of “simple” matrices (in linear algebra speak, they are <em>rank-1</em> matrices). For our purposes, what this does is it makes patterns in the adjacency matrix “jump out” at us. Remember the example we gave back in <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm-modularity"><span class="std std-ref">Modularity is not a pre-requisite for SBMs</span></a> at the bottom? To recap, when a sample of an SBM was ordered by community label, the modularity, and hence the communities of the nodes, were apparent. But, when we shuffled around the adjacency matrix, this nice pattern disappeared. While the adjacency matrix itself won’t have this nice pattern anymore, simple ways of reorganizing the singular values and vectors, called the <em>spectrum</em> of the function of the adjacency matrix that you pick, just might! Because we’re finding a structure that is “hidden” in the adjacency matrix and uncovered by looking at the matrix’s <em>spectrum</em>, we’ll call this procedure a spectral embedding.</p>
+<p>Spectral methods are based on a bit of linear algebra, but hopefully a small enough amount to still be understandable. The overall idea has to do with taking a function of the adjacency matrix, and finding a simpler representation of it. This simpler representation is computed by identifying the singular values and vectors of a function of the adjacency matrix, which is a process known as the <em>singular value decomposition</em>, covered in <span id="id4">[<a class="reference internal" href="#id36">4</a>]</span> or <span id="id5">[]</span>. In essence, the singular values and singular vectors allow you to take a matrix, and represent it as a sum of “simple” matrices (in linear algebra speak, they are <em>rank-1</em> matrices). For our purposes, what this does is it makes patterns in the adjacency matrix “jump out” at us. Remember the example we gave back in <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm-modularity"><span class="std std-numref">Section 4.2.1.4</span></a> at the bottom? To recap, when a sample of an SBM was ordered by community label, the modularity, and hence the communities of the nodes, were apparent. But, when we shuffled around the adjacency matrix, this nice pattern disappeared. While the adjacency matrix itself won’t have this nice pattern anymore, simple ways of reorganizing the singular values and vectors, called the <em>spectrum</em> of the function of the adjacency matrix that you pick, just might! Because we’re finding a structure that is “hidden” in the adjacency matrix and uncovered by looking at the matrix’s <em>spectrum</em>, we’ll call this procedure a spectral embedding.</p>
 <div class="admonition-singular-values-and-singular-vectors admonition">
 <p class="admonition-title">Singular Values and Singular Vectors</p>
 <p>If you don’t know what singular values and singular vectors are, don’t worry about it. You can think of them as a generalization of eigenvalues/vectors (it’s also ok if you don’t know what those are): all matrices have singular values and singular vectors, but not all matrices have eigenvalues and eigenvectors. In the case of square, symmetric matrices with positive eigenvalues, a singular value decomposition is <em>also</em> an eigendecomposition of the matrix.</p>
-<p>If you want some more background information on the eigenvalue or singular value decompositions, there are some decent explanations in numerous undergraduate linear algebra textbooks, of which the book by Trefethan et al. is our favorite. They’re an important set of vectors associated with matrices with a bunch of interesting properties. A lot of linear algebra is built around exploring those properties.</p>
+<p>If you want some more background information on the eigenvalue or singular value decompositions, there are some decent explanations in numerous undergraduate linear algebra textbooks, of which the books <span id="id6">[]</span> or <span id="id7">[<a class="reference internal" href="#id36">4</a>]</span> are our favorite. The singular vectors an important set of vectors associated with matrices with a bunch of interesting properties. A lot of linear algebra is built around exploring those properties.</p>
 </div>
 <p>You can see visually how spectral embedding works below. We start with a 20-node Stochastic Block Model with two communities, and then found its singular values and vectors. It turns out that because there are only two communities, only the first two singular vectors contain information – the rest are just noise! (you can see this if you look carefully at the first two columns of the singular vector matrix). So, you took these two columns and scaled them by the first two singular vectors of the singular value matrix <span class="math notranslate nohighlight">\(D\)</span>. The final embedding is that scaled matrix, and the plot you see takes the rows of that matrix and puts them into Euclidean space (an x-y axis) as points. This matrix is called the <em>estimated latent position matrix</em>, and the embeddings for the nodes are called the <em>estimated latent positions</em>. Underneath the figure is a list that explains how the algorithm works, step-by-step.</p>
 <div class="cell tag_hide-input docutils container">
@@ -1181,12 +1191,13 @@ title="Print to PDF"
 <section id="the-laplacian-matrix">
 <h2><span class="section-number">5.3.2. </span>The Laplacian matrix<a class="headerlink" href="#the-laplacian-matrix" title="Permalink to this headline">#</a></h2>
 <p>With spectral embedding, you’ll either find the singular vectors of the Laplacian or the singular vectors of the Adjacency Matrix itself. Since you already have the adjacency matrix, let’s take the Laplacian just to see what that looks like.</p>
-<p>Remember from chapter four that there are a few different types of Laplacian matrices. By default, for undirected networks, Graspologic uses the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian <span class="math notranslate nohighlight">\(L^{DAD} = D^{-1/2} A D^{-1/2}\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the degree matrix. Remember that the degree matrix has the degree, or number of edges, of each node along the diagonals. For brevity for the remainder of this section, we’ll just use the term <span class="math notranslate nohighlight">\(L\)</span> in place of <span class="math notranslate nohighlight">\(L^{DAD}\)</span>. There is no restriction for spectral embedding to using the <code class="docutils literal notranslate"><span class="pre">DAD</span></code>, regularized, or normalized Laplacian. It works with any of them, with an important caveat we’ll point out later.</p>
-<p>Let’s take a look at the Laplacian for <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<p>Remember from chapter four that there are a few different types of Laplacian matrices. By default, for undirected networks, Graspologic uses the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian <span class="math notranslate nohighlight">\(L^{DAD} = D^{-1/2} A D^{-1/2}\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the degree matrix. Remember that the degree matrix has the degree, or number of edges, of each node along the diagonals, which you learned about in <code class="xref std std-numref docutils literal notranslate"><span class="pre">ch4:matrix-rep</span></code>. For brevity for the remainder of this section, we’ll just use the term <span class="math notranslate nohighlight">\(L\)</span> in place of <span class="math notranslate nohighlight">\(L^{DAD}\)</span>. There is no restriction for spectral embedding to using the <code class="docutils literal notranslate"><span class="pre">DAD</span></code>, regularized, or normalized Laplacian. It works with any of them, with an important caveat we’ll point out later.</p>
+<p>Let’s take a look at the Laplacian for the diagonal augmentation of the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span>, and was discussed in <a class="reference internal" href="../ch4/properties-of-networks.html#ch4-prop-net"><span class="std std-numref">Section 3.2</span></a>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
 
+<span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span>
 <span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1245,7 +1256,7 @@ title="Print to PDF"
         \downarrow &amp; &amp; \downarrow
     \end{bmatrix}
 \end{align*}\]</div>
-<p>You can compute the <code class="docutils literal notranslate"><span class="pre">svd</span></code> using any numerical linear algebra package, such as <code class="docutils literal notranslate"><span class="pre">numpy</span></code>:</p>
+<p>The indices <span class="math notranslate nohighlight">\(i\)</span> of a given set of singular vectors with their corresponding singular value, the triple <span class="math notranslate nohighlight">\((\vec u_i, \sigma_i, \vec v_i)\)</span>, will correspond to the dimensionality that a particular triple is associated with. You can compute the <code class="docutils literal notranslate"><span class="pre">svd</span></code> using any numerical linear algebra package, such as <code class="docutils literal notranslate"><span class="pre">numpy</span></code>:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">svd</span>
@@ -1257,7 +1268,7 @@ title="Print to PDF"
 <p>Next up, we need to start thinking about the space that we are embedding into. What we are doing is attempting to find a <em>latent</em> space in which we can embed the Laplacian. This embedding of the Laplacian is called a <em>latent representation</em> of the Laplacian because the representation is <em>hidden</em> when you first compute the Laplacian. Next, let’s think about how this latent representation is comprised.</p>
 <section id="looking-at-the-singular-values-of-l-with-the-scree-plot">
 <span id="ch6-spectral-scree"></span><h3><span class="section-number">5.3.3.1. </span>Looking at the singular values of <span class="math notranslate nohighlight">\(L\)</span> with the scree plot<a class="headerlink" href="#looking-at-the-singular-values-of-l-with-the-scree-plot" title="Permalink to this headline">#</a></h3>
-<p>The first place to start whenever you need a singular value decomposition of a matrix, such as when you compute any spectral embedding, is with something called a scree plot. The <strong>scree plot</strong> just plots the singular values (the diagonal entries of <span class="math notranslate nohighlight">\(\Sigma\)</span>) by their indices: the first (biggest) singular value is in the beginning, and the last (smallest) singular value is at the end. The indices for the singular values index the <em>latent dimensions</em> of the latent representation for the Laplacian. Let’s take a look at what this looks like:</p>
+<p>The first place to start whenever you need a singular value decomposition of a matrix, such as when you compute any spectral embedding, is something called a scree plot. The <strong>scree plot</strong> just plots the singular values (the diagonal entries of <span class="math notranslate nohighlight">\(\Sigma\)</span>) by their indices: the first (biggest) singular value is in the beginning, and the last (smallest) singular value is at the end. The indices for the singular values index the <em>latent dimensions</em> of the latent representation for the Laplacian. Let’s take a look at what this looks like:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
@@ -1283,12 +1294,12 @@ title="Print to PDF"
 <img alt="../../_images/spectral-embedding_17_0.png" src="../../_images/spectral-embedding_17_0.png" />
 </div>
 </div>
-<p>The first property you will notice is that the singular values are non-increasing: the singular value can never go up as the dimension index increases. This is because by definition of the <code class="docutils literal notranslate"><span class="pre">svd</span></code>, <span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2 \geq ... \geq \sigma_n\)</span>.</p>
+<p>The first property you will notice is that the singular values are non-increasing: the singular value can never go up as the dimension index increases. This is because by definition of the <code class="docutils literal notranslate"><span class="pre">svd</span></code>, <span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2 \geq ... \geq \sigma_n \geq 0\)</span>.</p>
 <p>Next, we come to the crucial property of an embedding: it <em>reduces</em> the number of dimensions for your original data. However, to do so, you need some insight as to what a suitable number of dimensions might be.</p>
 <section id="figuring-out-how-many-dimensions-to-embed-your-network-into">
 <span id="ch6-spectral-elbow"></span><h4><span class="section-number">5.3.3.1.1. </span>Figuring Out How Many Dimensions To Embed Your Network Into<a class="headerlink" href="#figuring-out-how-many-dimensions-to-embed-your-network-into" title="Permalink to this headline">#</a></h4>
-<p>If you don’t have any prior information about the “true” dimensionality of the latent representation you want, by default you’d just be stuck guessing. Fortunately, there are some rules-of-thumb to make your guess better, and some methods people have developed to make fairly decent guesses automatically.</p>
-<p>The most common way to pick the number of embedding dimensions is with the same scree plot you looked at earlier. Essentially, the intuition is this: the top singular vectors of a matrix contain the most useful information (in terms of the mean-squared error), and as the singular vectors have smaller and smaller singular values, they contain less important and so are less important.</p>
+<p>If you don’t have any prior information about the “true” dimensionality of the latent representation you want, by default you’d just be stuck guessing. Fortunately, there are some rules-of-thumb to make your guess better, and some methods people have developed to make fairly decent guesses automatically. In the case when you are using the spectral embedding to infer community labels for a network you suppose is a SBM, there are some strategies for picking <span class="math notranslate nohighlight">\(d\)</span>, but most of the time it is advantageous to just do it automatically.</p>
+<p>The most common way to pick the number of embedding dimensions is with the same scree plot you looked at earlier. Essentially, the intuition is this: the singular values correspond to the relative amount of “information” for each singular vector in describing the matrix. Since the singular values are decreasing (<span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2 \geq ... \geq \sigma_n \geq 0\)</span>, as we discussed above) each sequential singular value is less and less important for describing the network that you have embedded.</p>
 <p>You can see the scree plot for the Laplacian you made earlier below with a line instead of a bunch of dots. We’re only plotting the first ten singular values for demonstration purposes.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1329,15 +1340,15 @@ title="Print to PDF"
 </div>
 </div>
 <p>You’ll notice that there’s a marked area called the “elbow”. This is an area where singular values stop changing in magnitude as much when they get smaller: before the elbow, singular values change rapidly, and after the elbow, singular values barely change at all. (It’s called an elbow because the plot kind of looks like an arm, viewed from the side!)</p>
-<p>The location of this elbow gives you a rough indication for how many “true” dimensions your latent representation has. The singular values after the elbow are quite close to each other and have singular vectors which are largely noise, and don’t tell you very much about your data. It looks from the scree plot that you should be embedding down to two dimensions, and that adding more dimensions would probably just mean adding noise to your embedding.</p>
+<p>The location of this elbow gives you a rough indication for how many “true” dimensions your latent representation has. The singular values after the elbow are quite close to each other and have singular vectors which are largely noise, and don’t tell you very much about your data. It looks from the scree plot that you should be embedding down to two dimensions, as the smaller dimensions tend to be more “noisy” than the first few. The first few will tend to do a good job of describing the overall structure of the matrix that you have embedded, whereas successive dimensions tend to</p>
 <p>One drawback to this method is that a lot of the time, the elbow location is pretty subjective - real data will rarely have a nice, pretty elbow like the one you see above. The advantage is that it still generally works pretty well; embedding into a few more dimensions than you need isn’t too bad, since you’ll only have a few noise dimensions and there still may be <em>some</em> signal there.</p>
-<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2000 by Dr. Thomas Minka at MIT (called <code class="docutils literal notranslate"><span class="pre">minka</span></code>). We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
+<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2000 by Dr. Thomas Minka at MIT (called <code class="docutils literal notranslate"><span class="pre">minka</span></code>, from <span id="id8">[]</span>). We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
 </section>
 </section>
 </section>
 <section id="identifying-the-latent-representation-of-the-laplacian">
 <h2><span class="section-number">5.3.4. </span>Identifying the latent representation of the Laplacian<a class="headerlink" href="#identifying-the-latent-representation-of-the-laplacian" title="Permalink to this headline">#</a></h2>
-<p>Finally, we get to the exciting part: it’s time to actually find this latent representation of the Laplacian. Once you have your number of embedding dimensions, which we’ll call <span class="math notranslate nohighlight">\(\hat d\)</span> (an <em>estimate</em> of the optimal number of embedding dimensions; the <span class="math notranslate nohighlight">\(\hat \cdot\)</span> symbol just means estimate), what you’re going to do is as follows:</p>
+<p>Finally, we get to the exciting part: it’s time to actually find this latent representation of the Laplacian. Once you have your number of embedding dimensions, which we’ll call <span class="math notranslate nohighlight">\(\hat d\)</span> (an <em>estimate</em> of the optimal number of embedding dimensions; the <span class="math notranslate nohighlight">\(\hat \cdot\)</span> symbol just means estimate, like it did for the MLE), what you’re going to do is as follows:</p>
 <ol class="simple">
 <li><p>Take the first <span class="math notranslate nohighlight">\(\hat d\)</span> columns of the left singular vectors matrix, <span class="math notranslate nohighlight">\(U\)</span>, and put them in a rectangular matrix which is <span class="math notranslate nohighlight">\(n \times \hat d\)</span> dimensions. Remember that each left singular vector <span class="math notranslate nohighlight">\(\vec u_i\)</span> is <span class="math notranslate nohighlight">\(n\)</span>-dimensional, so there is one entry for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network. The resulting matrix will look like this:</p></li>
 </ol>
@@ -1362,7 +1373,7 @@ title="Print to PDF"
     \end{bmatrix}
 \end{align*}\]</div>
 <ol class="simple">
-<li><p>Take the product of <span class="math notranslate nohighlight">\(U_{\hat d}\)</span> and <span class="math notranslate nohighlight">\(\Sigma_{\hat d}\)</span>, and call this an <em>estimate</em> of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Since this matrix is the product of a <span class="math notranslate nohighlight">\(n \times \hat d\)</span> matrix and a <span class="math notranslate nohighlight">\(\hat d \times \hat d\)</span> matrix, it will be <span class="math notranslate nohighlight">\(n \times \hat d\)</span> as well. The resulting matrix will look like this:</p></li>
+<li><p>Take the product of <span class="math notranslate nohighlight">\(U_{\hat d}\)</span> and <span class="math notranslate nohighlight">\(\sqrt{\Sigma_{\hat d}}\)</span>, and call this an <em>estimate</em> of the latent position matrix <span class="math notranslate nohighlight">\(X\)</span>. Since this matrix is the product of a <span class="math notranslate nohighlight">\(n \times \hat d\)</span> matrix and a <span class="math notranslate nohighlight">\(\hat d \times \hat d\)</span> matrix, it will be <span class="math notranslate nohighlight">\(n \times \hat d\)</span> as well. The resulting matrix will look like this:</p></li>
 </ol>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -1372,11 +1383,11 @@ title="Print to PDF"
     \downarrow &amp; &amp; \downarrow
     \end{bmatrix}
 \end{align*}\]</div>
-<p>With some assumptions, this <em>estimate</em> of a latent position matrix can be shown to be <em>reasonable</em>, in that if you were to assume that the network underlying your sample were random and that the assumptions that you learned in <a class="reference internal" href="../ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">Random Dot Product Graphs (RDPG)</span></a> might be suitable for your network sample, this particular way of finding a latent representation <span class="math notranslate nohighlight">\(\hat X\)</span> for your network would serve as a pretty good estimate for the latent position matrix of the corresponding random network. If you are a statistician, we would encourage you to check out the Appendix sections <a class="reference internal" href="../../appendix/ch13/lse.html#app-ch13-lse"><span class="std std-ref">Finding singular vectors With singular value decomposition</span></a> and <a class="reference internal" href="../../appendix/ch13/ase.html#app-ch13-ase"><span class="std std-ref">Estimating Parameters for the RDPG</span></a> for more details on the justifications and intuition behind Laplacian or Adjacency Spectral Embeddings.</p>
+<p>With some assumptions, this <em>estimate</em> of a latent position matrix can be shown to be <em>reasonable</em>, in that if you were to assume that the network underlying your sample were random and that the assumptions that you learned in <a class="reference internal" href="../ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-numref">Section 4.3</span></a> might be suitable for your network sample, this particular way of finding a latent representation <span class="math notranslate nohighlight">\(\hat X\)</span> for your network would serve as a pretty good estimate for the latent position matrix of the corresponding random network. If you are a statistician, we would encourage you to check out the Appendix sections <code class="xref std std-numref docutils literal notranslate"><span class="pre">app:ch13:spectral</span></code> for more details on the justifications and intuition behind spectral embeddings.</p>
 <p>So now, let’s take a look at how we can visualize the resulting estimate of the latent position matrix, <span class="math notranslate nohighlight">\(\hat X\)</span>.</p>
 <section id="heatmaps">
 <span id="ch5-spectral-heatmap"></span><h3><span class="section-number">5.3.4.1. </span>Heatmaps<a class="headerlink" href="#heatmaps" title="Permalink to this headline">#</a></h3>
-<p>The first, and most basic, way to visualize <span class="math notranslate nohighlight">\(\hat X\)</span> would be through a heatmap, which you have learned about previously in the context of adjacency matrices. Here, the heatmap will have rows which are the rows of <span class="math notranslate nohighlight">\(\hat X\)</span> (there are <span class="math notranslate nohighlight">\(n\)</span> of them in total), and the columns will be the <em>estimates of the latent dimensions</em> <span class="math notranslate nohighlight">\(\sqrt{\sigma_k} \vec u_k\)</span>. A heatmap of <span class="math notranslate nohighlight">\(\hat X\)</span> looks like this:</p>
+<p>The first, and most basic, way to visualize <span class="math notranslate nohighlight">\(\hat X\)</span> would be through a heatmap, which you have learned about previously in the context of adjacency matrices. Here, the heatmap will have rows which are the rows of <span class="math notranslate nohighlight">\(\hat X\)</span> (there are <span class="math notranslate nohighlight">\(n\)</span> of them in total, one for each node), and the columns will be the <em>estimates of the latent dimensions</em> <span class="math notranslate nohighlight">\(\sqrt{\sigma_k} \vec u_k\)</span>. A heatmap of <span class="math notranslate nohighlight">\(\hat X\)</span> looks like this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed.svd</span> <span class="kn">import</span> <span class="n">select_dimension</span>
@@ -1475,7 +1486,7 @@ title="Print to PDF"
 <img alt="../../_images/spectral-embedding_31_0.png" src="../../_images/spectral-embedding_31_0.png" />
 </div>
 </div>
-<p>Now we’re getting somewhere!</p>
+<p>Now we’re getting somewhere! It looks like there are different “blobs” of latent positions, and each blob corresponds to a single community in the underlying SBM. This will be extremely useful to us in <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-numref">Section 6.1</span></a> when we attempt to guess the underlying community structure from an SBM.</p>
 </section>
 </section>
 <section id="adjacency-spectral-embedding">
@@ -1519,12 +1530,11 @@ title="Print to PDF"
 </div>
 </div>
 <p>And the Euclidean distance <span class="math notranslate nohighlight">\(||\vec x - \vec y||_2\)</span> simply measures the “length” of this green arrow, giving us an idea of how “far” <span class="math notranslate nohighlight">\(\vec x\)</span> and <span class="math notranslate nohighlight">\(\vec y\)</span> are apart. In the exact same way, for two matrices <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>, we have the Frobenius distance:</p>
-<p>So, when we say “close” here, what we mean is that with high probability, <span class="math notranslate nohighlight">\(||P - \hat P||_F\)</span> will be small. We discuss this more and show some examples in the Appendix, in <code class="xref std std-numref docutils literal notranslate"><span class="pre">app:ch13:lse</span></code> and <code class="xref std std-numref docutils literal notranslate"><span class="pre">app:ch13:ase</span></code>.</p>
+<p>So, when we say “close” here, what we mean is that with high probability, <span class="math notranslate nohighlight">\(||P - \hat P||_F\)</span> will be small. We discuss this more and show some examples in the Appendix, in <code class="xref std std-numref docutils literal notranslate"><span class="pre">app:ch13:spectral</span></code>.</p>
 <p>However, we have a slight issue when we try to interpret <span class="math notranslate nohighlight">\(\hat X\)</span> by itself: <em>non-identifiability</em>.</p>
 <section id="spectral-embeddings-are-rotationally-non-identifiable">
 <span id="ch6-spectral-nonidentifiable"></span><h3><span class="section-number">5.3.6.1. </span>Spectral embeddings are rotationally non-identifiable<a class="headerlink" href="#spectral-embeddings-are-rotationally-non-identifiable" title="Permalink to this headline">#</a></h3>
-<p>As it turns out, there are many “reasonable” embeddings that can be produced, which will share the same computational niceties as the one you learned about above. In particular, there are <em>infinitely many</em> embeddings that are, for all intents and purposes, <em>identical</em> up to a rotation. What exactly does this mean?
-However, there is a slight problem here, and it comes down to the concept of a <em>rotation matrix</em>. A <strong>rotation matrix</strong> <span class="math notranslate nohighlight">\(W\)</span> is a matrix where <span class="math notranslate nohighlight">\(WW^\top = I\)</span>, the identity matrix. If we remember back to linear algebra, when we multiply a matrix by the identity matrix, we get the original matrix right back.</p>
+<p>As it turns out, there are many “reasonable” embeddings that can be produced, which will share the same computational niceties as the one you learned about above. In particular, there are <em>infinitely many</em> embeddings that are, for all intents and purposes, <em>identical</em> up to a rotation. What exactly does this mean? A <strong>rotation matrix</strong> <span class="math notranslate nohighlight">\(W\)</span> is a matrix where <span class="math notranslate nohighlight">\(WW^\top = I\)</span>, the identity matrix. If we remember back to linear algebra, when we multiply a matrix by the identity matrix, we get the original matrix right back.</p>
 <p>Let’s see what our original latent positions look like as a scatter plot (a plot of <span class="math notranslate nohighlight">\(\hat X\)</span> similar to the pairs plot you learned about above), and then when we apply a rotation matrix <span class="math notranslate nohighlight">\(W\)</span> to <span class="math notranslate nohighlight">\(\hat X\)</span>, such as if we rotate <span class="math notranslate nohighlight">\(\hat X\)</span> by 90 degrees:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1575,7 +1585,7 @@ However, there is a slight problem here, and it comes down to the concept of a <
     \hat Y \hat Y^\top &amp;= \hat X \hat X^\top = \hat P,
 \end{align*}\]</div>
 <p>giving us that if we assumed <span class="math notranslate nohighlight">\(\hat Y\)</span> to <em>also</em> be an estimate of the latent position matrix, we would obtain the same estimate of the probability matrix, <span class="math notranslate nohighlight">\(\hat P\)</span>, as we would if we used <span class="math notranslate nohighlight">\(\hat X\)</span>.</p>
-<p>This problem is referred to <strong>rotational non-identifiability</strong> of the latent position matrix, which means that we can estimate a latent position matrix, but we can only estimate it <em>up to a rotation</em>. <em>Any</em> of the possible ways we could rotate our estimate of a latent position matrix would, without more information, be <em>just as good</em>! Perhaps surprisingly, this isn’t really problematic when you spectrally embed a single network. It can, however, become an issue when you try to compare spectral embeddings for different networks or spectrally embed a bunch of networks simultaneously. You’ll learn more about this problem, and some work-arounds to it, in later sections, including <span class="xref myst">Multigraph Representation Learning</span> and <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">Two-Sample Testing</span></a>.</p>
+<p>This problem is referred to <strong>rotational non-identifiability</strong> of the latent position matrix, which means that we can estimate a latent position matrix, but we can only estimate it <em>up to a rotation</em>. <em>Any</em> of the possible ways we could rotate our estimate of a latent position matrix would, without more information, be <em>just as good</em>! Perhaps surprisingly, this isn’t really problematic when you spectrally embed a single network. It can, however, become an issue when you try to compare spectral embeddings for different networks or spectrally embed a bunch of networks simultaneously. You’ll learn more about this problem, and some work-arounds to it, in later sections, including <a class="reference internal" href="multigraph-representation-learning.html#ch6-multinet"><span class="std std-numref">Section 5.4</span></a> and <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a>.</p>
 </section>
 </section>
 <section id="using-graspologic-to-embed-networks">
@@ -1600,8 +1610,8 @@ However, there is a slight problem here, and it comes down to the concept of a <
 </div>
 </div>
 <p>We then embed the reordered adjacency matrix, using either adjacency spectral embedding or Laplacian spectral embedding.</p>
-<section id="id2">
-<h3><span class="section-number">5.3.7.1. </span>Adjacency Spectral Embedding<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h3>
+<section id="id9">
+<h3><span class="section-number">5.3.7.1. </span>Adjacency Spectral Embedding<a class="headerlink" href="#id9" title="Permalink to this headline">#</a></h3>
 <p>When you don’t specify <code class="docutils literal notranslate"><span class="pre">n_components</span></code> ahead of time, elbow selection is performed automatically:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1652,12 +1662,31 @@ However, there is a slight problem here, and it comes down to the concept of a <
 <img alt="../../_images/spectral-embedding_50_0.png" src="../../_images/spectral-embedding_50_0.png" />
 </div>
 </div>
-<p>In both cases, we can see that we have two pretty easily discernable blobs in the estimates of the latent positions. These blobs will be useful when we try to learn community assignments for the nodes in <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-ref">Community Detection</span></a>.</p>
+<p>In both cases, we can see that we have two pretty easily discernable blobs in the estimates of the latent positions. These blobs will be useful when we try to learn community assignments for the nodes in <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-numref">Section 6.1</span></a>.</p>
 </section>
 </section>
 <section id="want-more-linear-algebra">
 <h2><span class="section-number">5.3.8. </span>Want more linear algebra?<a class="headerlink" href="#want-more-linear-algebra" title="Permalink to this headline">#</a></h2>
-<p>Now that’s a question that is rarely asked! For network embeddings, however, if you have a more robust mathematical background, we would encourage you to check out the appendix sections for the results we have here. They can be found in <a class="reference internal" href="../../appendix/ch13/ase.html#app-ch13-ase"><span class="std std-ref">Estimating Parameters for the RDPG</span></a> and <a class="reference internal" href="../../appendix/ch13/lse.html#app-ch13-lse"><span class="std std-ref">Finding singular vectors With singular value decomposition</span></a>, respectively. While a bit more cumbersome mathematically, we think that some of this mathematical burden goes a long way to reinforcing the intuition of the processes and approaches chosen.</p>
+<p>Now that’s a question that is rarely asked! For network embeddings, however, if you have a more robust mathematical background, we would encourage you to check out the appendix sections for the results we have here. They can be found in <code class="xref std std-numref docutils literal notranslate"><span class="pre">app:ch13:spectral</span></code>. While a bit more cumbersome mathematically, we think that some of this mathematical burden goes a long way to reinforcing the intuition of the processes and approaches chosen. The appendix reflects a brief overview of the survey paper <span id="id10">[<a class="reference internal" href="#id27" title="Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. J. Mach. Learn. Res., 18(1):8393–8484, January 2017. doi:10.5555/3122009.3242083.">2</a>]</span> as they concern this book.</p>
+</section>
+<section id="references">
+<h2><span class="section-number">5.3.9. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<div class="docutils container" id="id11">
+<dl class="citation">
+<dt class="label" id="id16"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
+<dd><p>Aurelien Geron. <em>Hands-On Machine Learning with Scikit-Learn and TensorFlow</em>. O'Reilly Media, Inc., Sebastopol, CA, USA, March 2017. ISBN 978-1-49196229-9. URL: <a class="reference external" href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282">https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282</a>.</p>
+</dd>
+<dt class="label" id="id27"><span class="brackets"><a class="fn-backref" href="#id10">2</a></span></dt>
+<dd><p>Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. <em>J. Mach. Learn. Res.</em>, 18(1):8393–8484, January 2017. <a class="reference external" href="https://doi.org/10.5555/3122009.3242083">doi:10.5555/3122009.3242083</a>.</p>
+</dd>
+<dt class="label" id="id15"><span class="brackets"><a class="fn-backref" href="#id1">3</a></span></dt>
+<dd><p>Ulrike von Luxburg. A tutorial on spectral clustering. <em>Statistics and Computing</em>, 2007.</p>
+</dd>
+<dt class="label" id="id36"><span class="brackets">4</span><span class="fn-backref">(<a href="#id4">1</a>,<a href="#id7">2</a>)</span></dt>
+<dd><p><strong>missing year in Axler</strong></p>
+</dd>
+</dl>
+</div>
 </section>
 </section>
 
