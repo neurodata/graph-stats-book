@@ -844,29 +844,27 @@ title="Print to PDF"
      5.5.3.2. Finding a Reasonable Weight Automatically
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#using-graspologic">
+     5.5.3.3. Using Graspologic
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-graspologic">
-   5.5.4. Using Graspologic
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#omnibus-joint-embedding">
-   5.5.5. Omnibus Joint Embedding
+   5.5.4. Omnibus Joint Embedding
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#mase-joint-embedding">
-   5.5.6. MASE Joint Embedding
+   5.5.5. MASE Joint Embedding
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#references">
-     5.5.6.1. References
-    </a>
-   </li>
-  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   5.5.6. References
+  </a>
  </li>
 </ul>
 
@@ -912,29 +910,27 @@ title="Print to PDF"
      5.5.3.2. Finding a Reasonable Weight Automatically
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#using-graspologic">
+     5.5.3.3. Using Graspologic
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-graspologic">
-   5.5.4. Using Graspologic
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#omnibus-joint-embedding">
-   5.5.5. Omnibus Joint Embedding
+   5.5.4. Omnibus Joint Embedding
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#mase-joint-embedding">
-   5.5.6. MASE Joint Embedding
+   5.5.5. MASE Joint Embedding
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#references">
-     5.5.6.1. References
-    </a>
-   </li>
-  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   5.5.6. References
+  </a>
  </li>
 </ul>
 
@@ -948,13 +944,13 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="joint-representation-learning">
 <span id="ch6-joint"></span><h1><span class="section-number">5.5. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">#</a></h1>
-<p>In many problems, your network might be more than just the information contained in its adjacency matrix (called its <strong>network topology</strong>, or its collection of nodes and edges). If you were investigating a social network, you might have access to extra information about each person – their gender, for instance, or their age. If you were investigating a brain network, you might have information about the physical location of neurons, or the volume of a brain region. When you embed a network, it seems like you should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve your analysis. The techniques and tools that you’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of the network. Because they jointly use both the topology of the network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
+<p>In many problems, your network might be more than just the information contained in its adjacency matrix (called its <strong>network topology</strong>, or its collection of nodes and edges). If you were investigating a social network, you might have access to extra information about each person – their gender, for instance, or their age. If you were investigating a brain network, you might have information about the physical location of neurons, or some notion of how big a brain region is. When you embed a network, it seems like you should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve your analysis. The techniques and tools that you’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of the network. Because they jointly use both the topology of the network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that you might want to explore using node covariates in addition to topological structure. First, they might improve your standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then you might be able to reduce noise when you embed, even if the communities in your network don’t overlap perfectly with the communities in your covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in your network that you can explore. Covariate information in brain networks telling you where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
-<p>In this section, you’ll explore different ways to learn from your data when you have access to the covariates of a network in addition to its topological structure. You’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding developed by <a class="reference external" href="#https://arxiv.org/abs/1411.2158">Norbert Binkiewicz and a team of researchers</a>. In CASE, instead of embedding just the adjacency matrix or its regularized Laplacian, you’ll combine the Laplacian and your covariates into a new matrix and embed that.</p>
-<p>A good way to illustrate how using covariates might help us is to use a model in which some of your community information is in the covariates and some is in your topology. Using the <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-ref">Stochastic Block Model</span></a> which you learned about in chapter 5, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in its covariates. By combining the topology and the covariates, you’ll get a nice embedding that lets us find three distinct community clusters.</p>
+<p>In this section, you’ll explore different ways to learn from your data when you have access to the covariates of a network in addition to its topological structure. You’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding developed by <span id="id1">[]</span>. In CASE, instead of embedding just the adjacency matrix or its Laplacian, you’ll combine the Laplacian and your covariates into a new matrix and embed that.</p>
+<p>A good way to illustrate how using covariates might help us is to use a model in which some of your community information is in the covariates and some is in your topology. Using the Stochastic Block Model from <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-numref">Section 4.2</span></a>, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in the covariates. By combining the topology and the covariates, you’ll get a nice embedding that lets you find three distinct community clusters.</p>
 <section id="stochastic-block-model">
 <h2><span class="section-number">5.5.1. </span>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">#</a></h2>
-<p>To illustrate the value of this technique, we’ll turn to another social network example. Suppose that you have <span class="math notranslate nohighlight">\(300\)</span> nodes in your network representing students who attend one of three schools. The first <span class="math notranslate nohighlight">\(100\)</span> students attend school <span class="math notranslate nohighlight">\(1\)</span>, the second <span class="math notranslate nohighlight">\(100\)</span> students attend school <span class="math notranslate nohighlight">\(2\)</span>, and the third <span class="math notranslate nohighlight">\(100\)</span> students attend school <span class="math notranslate nohighlight">\(3\)</span>. Edges of your adjacency matrix represent whether a pair of individuals are friends or not. You want to be able to identify which school each individual is from, but you have a problem that differentiates this situation from the traditional stochastic block model setting.</p>
+<p>To illustrate the value of this technique, we’ll turn to another social network example. Suppose that you have <span class="math notranslate nohighlight">\(150\)</span> nodes in your network representing students who attend one of three schools. The first <span class="math notranslate nohighlight">\(50\)</span> students attend school <span class="math notranslate nohighlight">\(1\)</span>, the second <span class="math notranslate nohighlight">\(50\)</span> students attend school <span class="math notranslate nohighlight">\(2\)</span>, and the third <span class="math notranslate nohighlight">\(50\)</span> students attend school <span class="math notranslate nohighlight">\(3\)</span>. Edges of your adjacency matrix represent whether a pair of individuals are friends or not. You want to be able to identify which school each individual is from, but you have a problem that differentiates this situation from the traditional stochastic block model setting.</p>
 <p>As it turns out, the first two schools are located in the same area, but the students tend to keep to themselves between schools. In this sense, the probability that two students are friends if they are both from the same school will be relatively high, but the probability that two students are friends if they are from different schools is low. On the other hand, the second and third schools are not co-ed: they are religious schools which provide education for students who identify as male or female separately. These students have a “brother/sister” relationship: all of their social events and school functions are performed jointly. Pairs of students who attend these two schools, it turns out, have a relatively similar chance of being friends regardless of which school they attend.</p>
 <div class="cell tag_hide-input tag_hide-cell docutils container">
 <div class="cell_input docutils container">
@@ -987,7 +983,7 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<p>Here you can see what your adjacency matrix looks like. Notice the giant block in the top-left: this block contains both nodes in both of the first two communities, and they’re indistinguishable from each other.</p>
+<p>Here you can see what your adjacency matrix looks like. Notice the giant block in the bottom-right: this block contains nodes in both of the second two communities, and they don’t look too indistinguishable even though the adjacency matrix has been sorted by community.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -1002,14 +998,12 @@ title="Print to PDF"
 <img alt="../../_images/joint-representation-learning_8_0.png" src="../../_images/joint-representation-learning_8_0.png" />
 </div>
 </div>
-<p>If you wanted to embed this network using your Laplacian or Adjacency Spectral Embedding methods, you’d find the first and second communities layered on top of each other (though you wouldn’t be able to figure that out from your embedding if you didn’t cheat by knowing in advance which community each node is supposed to belong to). The python code below embeds your latent positions all the way down to two dimensions. Below it, you can see a plot of the latent positions, with each node color-coded by its true community (which is, as far as you know up to this point in your analysis, unknown).</p>
+<p>If you wanted to embed this network using your Laplacian or Adjacency Spectral Embedding methods, you’d find the second and third communities layered on top of each other (though you wouldn’t be able to figure that out from your embedding if you didn’t cheat by knowing in advance which community each node is supposed to belong to). The python code below embeds your latent positions all the way down to two dimensions. Below it, you can see a plot of the latent positions, with each node color-coded by its true community (which is, as far as you know up to this point in your analysis, unknown).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
-<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
 
-<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s2">&quot;R-DAD&quot;</span><span class="p">)</span>
-<span class="n">L_latents</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="n">L_latents</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1028,7 +1022,7 @@ title="Print to PDF"
 <img alt="../../_images/joint-representation-learning_11_0.png" src="../../_images/joint-representation-learning_11_0.png" />
 </div>
 </div>
-<p>As you can see, you’d have a tough time clustering this - the first and second community are completely indistinguishable. It would be nice if you could use extra information to more clearly distinguish between them. You don’t have this information in your adjacency matrix: it needs to come from somewhere else.</p>
+<p>As you can see, you’d have a tough time learning from this - the second and third community are completely indistinguishable. It would be nice if you could use extra information to more clearly distinguish between them. You don’t have this information in your adjacency matrix: it needs to come from somewhere else.</p>
 </section>
 <section id="covariates">
 <h2><span class="section-number">5.5.2. </span>Covariates<a class="headerlink" href="#covariates" title="Permalink to this headline">#</a></h2>
@@ -1076,31 +1070,42 @@ title="Print to PDF"
 <img alt="../../_images/joint-representation-learning_17_0.png" src="../../_images/joint-representation-learning_17_0.png" />
 </div>
 </div>
-<p>You can play almost the same game here as you did with the Laplacian. If you embed the information contained in this matrix of covariates into lower dimensions, you can see the reverse situation as before - the first community is separate, but the last two are overlayed on top of each other.</p>
+<p>You can play almost the same game here as you did with the Laplacian. If you embed the information contained in this matrix of covariates into lower dimensions, you can see the reverse situation as before - the third community is separate, but the first two are overlayed on top of each other.</p>
 <p>Below is Python code that embeds the covariates. You’ll use custom embedding code rather than graspologic’s LSE class, because it isn’t technically right to act as if you’re embedding a Laplacian (even though you’re doing essentially the same thing under the hood). Underneath it is a plot of the resulting embedding.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">randomized_svd</span>
 
 <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dimension</span><span class="p">):</span>
-    <span class="n">latents</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">randomized_svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">dimension</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">latents</span>
+    <span class="n">latents</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">randomized_svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">dimension</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">latents</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 
 <span class="n">Y_latents</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>As you can see, you’re in a similar situation as you were in with the adjacency matrix, but with different communities: instead of the first and second communities being indistinguishable, now the second and third are. You’d like to see full separation between all three communities, so you need some kind of representation of your network that allows you to use both the information in the topology and the information in the covariates. This is where CASE comes in.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">Y_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedded covariate matrix&quot;</span><span class="p">,</span> 
+                    <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_20_0.png" src="../../_images/joint-representation-learning_20_0.png" />
+</div>
+</div>
+<p>As you can see, you’re in a similar situation as you were in with the adjacency matrix, but with different communities: instead of the second and third communities being indistinguishable, now the first and second are. You’d like to see full separation between all three communities, so you need some kind of representation of your network that allows you to use both the information in the topology and the information in the covariates. This is where CASE comes in.</p>
 </section>
 <section id="covariate-assisted-spectral-embedding">
 <h2><span class="section-number">5.5.3. </span>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">#</a></h2>
-<p><i>Covariate-Assisted Spectral Embedding</i>, or CASE<sup>1</sup>, is a simple way of combining your network and your covariates into a single model. In the most straightforward version of CASE, you combine the network’s regularized Laplacian <span class="math notranslate nohighlight">\(L\)</span> and a function of your covariate matrix <span class="math notranslate nohighlight">\(YY^\top\)</span>. Here, <span class="math notranslate nohighlight">\(Y\)</span> is just your covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. Notice the word “regularized” - This means (from the Laplacian section earlier) that your Laplacian looks like <span class="math notranslate nohighlight">\(L = L_{\tau} = D_{\tau}^{-1/2} A D_{\tau}^{-1/2}\)</span> (remember, <span class="math notranslate nohighlight">\(D\)</span> is a diagonal matrix with <span class="math notranslate nohighlight">\(D_{ii}\)</span> telling you the degree of node <span class="math notranslate nohighlight">\(i\)</span>).</p>
+<p><em>Covariate-Assisted Spectral Embedding</em>, or CASE, is a simple way of combining your network and your covariates into a single model. In the most straightforward version of CASE, you combine the network’s Laplacian <span class="math notranslate nohighlight">\(L\)</span> and a function of your covariate matrix <span class="math notranslate nohighlight">\(YY^\top\)</span>. Here, <span class="math notranslate nohighlight">\(Y\)</span> is just your covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. You can go back to <code class="xref std std-numref docutils literal notranslate"><span class="pre">ch4:matrix-rep</span></code> to refamiliarize yourself with the Laplacian.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^T\)</span>, notice you’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when you take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-6109f77e-311c-4ac9-8ab3-b78549ce2b5d">
-<span class="eqno">(5.2)<a class="headerlink" href="#equation-6109f77e-311c-4ac9-8ab3-b78549ce2b5d" title="Permalink to this equation">#</a></span>\[\begin{align}
+<p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^top\)</span>, notice you’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when you take the dot product of two example vectors with only 0’s and 1’s in them:</p>
+<div class="amsmath math notranslate nohighlight" id="equation-93d793fe-5fd3-4e3d-9c5f-4a1d8d747a1a">
+<span class="eqno">(5.2)<a class="headerlink" href="#equation-93d793fe-5fd3-4e3d-9c5f-4a1d8d747a1a" title="Permalink to this equation">#</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1111,14 +1116,13 @@ title="Print to PDF"
 \end{bmatrix} = 1\times 0 + 1\times 1 + 1\times 1 = 2
 \end{align}\]</div>
 <p>If there are two overlapping 1’s in the same position of the left vector and the right vector, then there will be an additional 1 added to their weighted sum. So, in the case of a binary <span class="math notranslate nohighlight">\(YY^T\)</span>, when you matrix-multiply a row of <span class="math notranslate nohighlight">\(Y\)</span> by a column of <span class="math notranslate nohighlight">\(Y^T\)</span>, the resulting value, <span class="math notranslate nohighlight">\((YY^T)_{i, j}\)</span>, will be equal to the number of shared locations in which vectors <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> both have ones.</p>
+<p>This logic extends to when the matrix isn’t just ones and zeros too: the value of <span class="math notranslate nohighlight">\(YY^\top\)</span> will be greater for a pair of nodes <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> when they have similar values, and smaller when they have less similar values.</p>
 </div>
 <p>A particular value in <span class="math notranslate nohighlight">\(YY^\top\)</span>, <span class="math notranslate nohighlight">\((YY^\top)_{i, j}\)</span>, can be interpreted as measuring the “agreement” or “similarity” between row <span class="math notranslate nohighlight">\(i\)</span> and row <span class="math notranslate nohighlight">\(j\)</span> of your covariate matrix. Since each row represents the covariates for a particular node, the higher the value of <span class="math notranslate nohighlight">\((YY^\top)_{i, j}\)</span>, the more similar the covariates of the <span class="math notranslate nohighlight">\(i_{th}\)</span> and <span class="math notranslate nohighlight">\(j_{th}\)</span> nodes are. The overall result is a matrix that looks fairly similar to your Laplacian!</p>
 <p>The following Python code generates your covariate similarity matrix <span class="math notranslate nohighlight">\(YY^\top\)</span> Later, you’ll weight <span class="math notranslate nohighlight">\(YY^\top\)</span> to help with normalization issues.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
-
-<span class="n">YYt</span> <span class="o">=</span> <span class="n">Y</span><span class="nd">@Y</span><span class="o">.</span><span class="n">T</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">YYt</span> <span class="o">=</span> <span class="n">Y</span><span class="nd">@Y</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 </div>
 </div>
@@ -1128,13 +1132,24 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Regularized Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_27_0.png" src="../../_images/joint-representation-learning_27_0.png" />
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># plot</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="ne">NameError</span>: name &#39;L&#39; is not defined
+</pre></div>
+</div>
+<img alt="../../_images/joint-representation-learning_28_1.png" src="../../_images/joint-representation-learning_28_1.png" />
 </div>
 </div>
 <p>The way we’ll combine the two matrices will simply be a weighted sum of these two matrices - this is what CASE is doing under the hood. The weight (here called <span class="math notranslate nohighlight">\(\alpha\)</span>) is multiplied by <span class="math notranslate nohighlight">\(YY^\top\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding.</p>
@@ -1144,7 +1159,7 @@ L + \alpha YY^\top
 \]</div>
 <section id="exploring-possible-weights">
 <h3><span class="section-number">5.5.3.1. </span>Exploring Possible Weights<a class="headerlink" href="#exploring-possible-weights" title="Permalink to this headline">#</a></h3>
-<p>An obvios question here is how to weight the covariates. If you simply summed the two matrices by themselves, you’d unfortunately be in a situation where whichever matrix contained larger numbers would dominate over the other. In your current setup, without a weight on <span class="math notranslate nohighlight">\(YY^\top\)</span>, the covariates of your network would dominate over its topology.</p>
+<p>An obviuos question here is how to weight the covariates. If you simply summed the two matrices by themselves, you’d unfortunately be in a situation where whichever matrix contained larger numbers would dominate over the other. In your current setup, without a weight on <span class="math notranslate nohighlight">\(YY^\top\)</span>, the covariates of your network would dominate over its topology.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
@@ -1153,9 +1168,6 @@ L + \alpha YY^\top
              <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_31_0.png" src="../../_images/joint-representation-learning_31_0.png" />
 </div>
 </div>
 <p>What do different potential weights look like? Let’s do a comparison. Below you can see the embeddings for 9 possible weights on <span class="math notranslate nohighlight">\(YY^\top\)</span>, ranging between <span class="math notranslate nohighlight">\(10^{-5}\)</span> and 100.</p>
@@ -1171,9 +1183,6 @@ L + \alpha YY^\top
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_33_0.png" src="../../_images/joint-representation-learning_33_0.png" />
 </div>
 </div>
 <p>It looks like you’d probably want a weight somewhere between 0.003 and 0.018  - then, you’ll have three communities which are fairly distinct from each other, implying that you’re pulling good information from both your network’s topology and its covariates. You could just pick your weight manually, but it would be nice to have some kind of algorithm or equation which lets you pick a reasonable weight automatically.</p>
@@ -1220,9 +1229,6 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_39_0.png" src="../../_images/joint-representation-learning_39_0.png" />
-</div>
 </div>
 <p>Success! You’ve managed to achieve separation between all three communities. Below you can see (from left to right) a comparison of your network’s latent position when you only use its topological information, when you only use the information contained in its covariates, and finally your embedding using the weight you found.</p>
 <div class="cell tag_hide-input docutils container">
@@ -1243,18 +1249,14 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_41_0.png" src="../../_images/joint-representation-learning_41_0.png" />
 </div>
-</div>
-</section>
 </section>
 <section id="using-graspologic">
-<h2><span class="section-number">5.5.4. </span>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">#</a></h2>
-<p>Graspologic’s CovariateAssistedSpectralEmbedding class implements CASE directly. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aYY^T\)</span> down to two dimensions, and then plots the latent positions to show the clustering.</p>
+<h3><span class="section-number">5.5.3.3. </span>Using Graspologic<a class="headerlink" href="#using-graspologic" title="Permalink to this headline">#</a></h3>
+<p>Graspologic’s <code class="docutils literal notranslate"><span class="pre">CovariateAssistedSpectralEmbedding</span></code> class implements CASE directly. The following code applies CASE to reduce the dimensionality of <span class="math notranslate nohighlight">\(L + aYY^T\)</span> down to two dimensions, and then plots the latent positions to show the clustering.</p>
 <div class="admonition-non-assortative-networks admonition">
 <p class="admonition-title">Non-Assortative Networks </p>
-<p>You don’t always necessarily want to embed <span class="math notranslate nohighlight">\(L + \alpha YY^\top\)</span>. Using the regularized Laplacian by itself, for instance, isn’t always best. If your network is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square your Laplacian. This is because the adjacency matrices of non-assortative networks have a lot of negative eigenvalues; squaring the Laplacian gets rid of a lot of annoying negative eigenvalues, and you end up with a better embedding. In the non-assortative case, you end up embedding <span class="math notranslate nohighlight">\(LL + aYY^\top\)</span>. The <code class="docutils literal notranslate"><span class="pre">embedding_alg</span></code> parameter controls this: you can write <code class="docutils literal notranslate"><span class="pre">embedding_alg=&quot;non-assortative&quot;</span></code> if you’re in the non-assortative situation.</p>
+<p>You don’t always necessarily want to embed <span class="math notranslate nohighlight">\(L + \alpha YY^\top\)</span>. Using the Laplacian by itself might not always be ideal. If your network is <em>non-assortative</em> - meaning, the between-block probabilities are greater than the within-block probabilities - it’s better to square your Laplacian. This is because the adjacency matrices of non-assortative networks have a lot of negative eigenvalues; squaring the Laplacian gets rid of a lot of annoying negative eigenvalues, and you end up with a better embedding. In the non-assortative case, you end up embedding <span class="math notranslate nohighlight">\(LL + aYY^\top\)</span>. The <code class="docutils literal notranslate"><span class="pre">embedding_alg</span></code> parameter controls this: you can write <code class="docutils literal notranslate"><span class="pre">embedding_alg=&quot;non-assortative&quot;</span></code> if you’re in the non-assortative situation.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1266,18 +1268,16 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_45_0.png" src="../../_images/joint-representation-learning_45_0.png" />
-</div>
 </div>
 </section>
+</section>
 <section id="omnibus-joint-embedding">
-<h2><span class="section-number">5.5.5. </span>Omnibus Joint Embedding<a class="headerlink" href="#omnibus-joint-embedding" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">5.5.4. </span>Omnibus Joint Embedding<a class="headerlink" href="#omnibus-joint-embedding" title="Permalink to this headline">#</a></h2>
 <p>If you’ve read the Multiple-Network Representation Learning section, you’ve seen the Omnibus Embedding (if you haven’t read that section, you should go read it before reading this one!). To recap, the way the omnibus embedding works is:</p>
 <ol class="simple">
-<li><p>Have a bunch of networks</p></li>
-<li><p>Combine the adjacency matrices from all of those networks into a single, huge network</p></li>
-<li><p>Embed that huge network</p></li>
+<li><p>Take multiple networks,</p></li>
+<li><p>Combine the adjacency matrices from all of those networks into a single joint matrix, and</p></li>
+<li><p>Embed that joint matrix.</p></li>
 </ol>
 <p>Remember that the Omnibus Embedding is a way to bring all of your networks into the same space (meaning, you don’t run into any rotational nonidentifiability issues when you embed). Once you embed the Omnibus Matrix, it’ll produce a huge latent position matrix, which you can break apart along the rows to recover latent positions for your individual networks.</p>
 <p>You might be able to predict where this is going. What if you created an Omnibus embedding not with a set of networks, but with a network and covariates?</p>
@@ -1314,21 +1314,12 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_49_0.png" src="../../_images/joint-representation-learning_49_0.png" />
-</div>
 </div>
 <p>There’s a few things going on here. First, you had to normalize the covariates by dividing <span class="math notranslate nohighlight">\(YY^\top\)</span> by its maximum. This is because if you didn’t, the covariates and the adjacency matrix would contribute vastly different amounts of information to the omnibus matrix. You can see that by looking at the average value of <span class="math notranslate nohighlight">\(YY^\top\)</span> compared to the average value of <span class="math notranslate nohighlight">\(A\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of Y@Y.T:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Y</span><span class="nd">@Y</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of A:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean of Y@Y.T: 3.45
-Mean of A: 0.20
 </pre></div>
 </div>
 </div>
@@ -1340,25 +1331,19 @@ Mean of A: 0.20
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean of normalized Y@Y.T: 0.38
-Mean of A: 0.20
-</pre></div>
-</div>
-</div>
 </div>
 <p>Remember the way this data is set up: you can separate the first community from the last two with the topology, you can separate the last community from the first two with the covariates, but you need both data sources to separate all three.</p>
 <p>Here, you can see that <em>both embeddings</em> are able to separate all three communities. This is because the Omnibus Embedding induces dependence on the latent positions it outputs. Remember that the off-diagonals of the Omnibus Matrix contain the averages of pairs of networks fed into it. These off-diagonal elements are responsible for some “information leakage”: so the topology embedding contains information from the covariates, and the covariate embedding contains information from the topology.</p>
 </section>
 <section id="mase-joint-embedding">
-<h2><span class="section-number">5.5.6. </span>MASE Joint Embedding<a class="headerlink" href="#mase-joint-embedding" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">5.5.5. </span>MASE Joint Embedding<a class="headerlink" href="#mase-joint-embedding" title="Permalink to this headline">#</a></h2>
 <p>Just like you can use the OMNI to do a joint embedding, you can also use MASE to do a joint embedding. This fundamentally comes down to the fact that both embeddings fundamentally just eat matrices as their input - whether those matrices are the adjacency matrix or <span class="math notranslate nohighlight">\(YY^\top\)</span> doesn’t really matter.</p>
 <p>Just like OMNI, we’ll quickly recap how MASE works here:</p>
 <ol class="simple">
-<li><p>Have a bunch of networks</p></li>
-<li><p>Embed them all separately with ASE or LSE</p></li>
-<li><p>Concate those embeddings into a single latent position matrix with a lot more dimensions</p></li>
-<li><p>Embed that new matrix</p></li>
+<li><p>Take multiple networks,</p></li>
+<li><p>Embed them all separately with ASE or LSE,</p></li>
+<li><p>Concate the embeddings into a joint latent position matrix with a lot more dimensions, and</p></li>
+<li><p>Embed that joint matrix.</p></li>
 </ol>
 <p>The difference here is the same as with Omni – you have the adjacency matrix (topology) and its covariates for a single network. So instead of embedding a bunch of adjacency matrices or Laplacians, you embed the adjacency matrix (or Laplacian) and the similarity matrix for the covariates <span class="math notranslate nohighlight">\(YY^\top\)</span> separately, concatenate, and then embed again.</p>
 <div class="cell docutils container">
@@ -1380,19 +1365,12 @@ Mean of A: 0.20
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/joint-representation-learning_57_0.png" src="../../_images/joint-representation-learning_57_0.png" />
-</div>
 </div>
 <p>As you can see, MASE lets you get fairly clear separation between communities. The covariates are still normalized, as with OMNI, so that they can contribute the same amount to the embedding as the adjacency matrix.</p>
+</section>
 <section id="references">
-<h3><span class="section-number">5.5.6.1. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h3>
-<p>[1] N. Binkiewicz, J. T. Vogelstein, K. Rohe, Covariate-assisted spectral clustering, Biometrika, Volume 104, Issue 2, June 2017, Pages 361–377, https://doi.org/10.1093/biomet/asx008<br />
-[2] Lloyd, S. (1982). Least squares quantization in PCM. IEEE transactions on information theory, 28(2), 129-137.<br />
-[3] https://scikit-learn.org/stable/modules/clustering.html#k-means<br />
-[4] Hotelling, H. (1936). Relations between two sets of variates. Biometrika 28, 321–77.</p>
-</section>
-</section>
+<h2><span class="section-number">5.5.6. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<span class="target" id="id2"></span></section>
 </section>
 
     <script type="text/x-thebe-config">

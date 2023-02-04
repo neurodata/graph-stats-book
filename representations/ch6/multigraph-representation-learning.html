@@ -647,35 +647,6 @@ title="Toggle navigation"
         
     </div>
     <div class="header-article__right">
-<div class="menu-dropdown menu-dropdown-launch-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Launch interactive content">
-      <i class="fas fa-rocket"></i>
-  </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch6/multigraph-representation-learning.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Launch on Binder"
->
-  
-
-<span class="headerbtn__icon-container">
-  
-    <img src="../../_static/images/logo_binder.svg">
-  </span>
-<span class="headerbtn__text-container">Binder</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
 <button onclick="toggleFullScreen()"
   class="headerbtn"
   data-toggle="tooltip"
@@ -955,6 +926,11 @@ title="Print to PDF"
    </li>
   </ul>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   5.4.7. References
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -1110,6 +1086,11 @@ title="Print to PDF"
    </li>
   </ul>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   5.4.7. References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -1125,8 +1106,8 @@ title="Print to PDF"
 <section id="aliens-and-humans">
 <h2><span class="section-number">5.4.1. </span>Aliens and Humans<a class="headerlink" href="#aliens-and-humans" title="Permalink to this headline">#</a></h2>
 <p>Say you’re a brain researcher, and you have a bunch of scans of brains - some are scans of people, and some are scans of aliens. You have some code that estimates networks from your scans, so you turn all your scans into networks. The nodes represent the brain regions which are common to both humans and aliens (isn’t evolution amazing?), and the edges represent communication between these brain regions. You want to know if the human and alien networks share a common grouping of regions (your research topic is titled, “Do Alien Brains Have The Same Hemispheres That We Do?”). What do you do? How do you even deal with situations in which you have a lot of networks whose nodes all represent the same objects, but whose edges might come from totally different distributions?</p>
-<p>Well, if your goal is to find shared node structure between the humans and aliens, we learned in the previous section that <a class="reference internal" href="spectral-embedding.html#ch6-spectral"><span class="std std-ref">spectral embeddings</span></a> were a good starting point. However, we only learned how to embed one network. How, exactly, can we embed multiple networks?</p>
-<p>To make this example a little more concrete, let’s say you have four alien networks and four human networks. Since alien brain networks aren’t currently very accessible, we’ll simulate human and alien brain networks by assuming that they are samples of <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-ref">stochastic block models</span></a>. Unfortunately, human and alien brains are quite a bit different. As it turns out, human brains tend to exhibit within-hemisphere affinity: the connections between pairs of nodes in the same hemisphere are more probable than connections between pairs of nodes in different hemispheres. Alien brains do, too, but with a twist: the left and right hemispheres are also split into two more regions which also have within-region affinity!</p>
+<p>Well, if your goal is to find shared node structure between the humans and aliens, we learned in the previous section <a class="reference internal" href="spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a> that spectral embeddings might be a good starting point. However, we only learned how to embed one network. How, exactly, can we embed multiple networks?</p>
+<p>To make this example a little more concrete, let’s say you have four alien networks and four human networks. Since alien brain networks aren’t currently very accessible, we’ll simulate human and alien brain networks by assuming that they are samples of stochastic block models from <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-numref">Section 4.2</span></a>. Unfortunately, human and alien brains are quite a bit different. As it turns out, human brains tend to exhibit within-hemisphere affinity: the connections between pairs of nodes in the same hemisphere are more probable than connections between pairs of nodes in different hemispheres. Alien brains do, too, but with a twist: the left and right hemispheres are also split into two more regions which also have within-region affinity!</p>
 <p>We’ll use a relatively small number of nodes (<span class="math notranslate nohighlight">\(100\)</span>) and fairly small block probabilities. You can see the specific parameters in the code below.</p>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
@@ -1151,14 +1132,9 @@ title="Print to PDF"
 <span class="n">M</span> <span class="o">=</span> <span class="mi">8</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
 <span class="n">Phuman</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">pwithin</span><span class="p">,</span> <span class="n">pbtwn</span><span class="p">],</span> <span class="p">[</span><span class="n">pbtwn</span><span class="p">,</span> <span class="n">pwithin</span><span class="p">]])</span>
-<span class="n">Palien</span> <span class="o">=</span> <span class="n">pbtwn</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">Palien</span><span class="p">,</span> <span class="n">pwithin</span><span class="o">*</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">Palien</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pbtwn</span><span class="o">*</span><span class="mi">5</span>
-<span class="n">Palien</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pbtwn</span><span class="o">*</span><span class="mi">5</span>
-<span class="n">Palien</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pbtwn</span><span class="o">*</span><span class="mi">5</span>
-<span class="n">Palien</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pbtwn</span><span class="o">*</span><span class="mi">5</span>
+<span class="n">Palien</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">pbtwn</span><span class="p">,</span> <span class="n">pwithin</span><span class="p">],</span> <span class="p">[</span><span class="n">pwithin</span><span class="p">,</span> <span class="n">pbtwn</span><span class="p">]])</span>
 <span class="n">humans</span> <span class="o">=</span> <span class="p">[</span><span class="n">sbm</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span> <span class="n">Phuman</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span>
-<span class="n">aliens</span> <span class="o">=</span> <span class="p">[</span><span class="n">sbm</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)],</span> <span class="n">Palien</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span>
+<span class="n">aliens</span> <span class="o">=</span> <span class="p">[</span><span class="n">sbm</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span> <span class="n">Palien</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">M</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span>
 <span class="c1"># concatenate list of human and alien networks</span>
 <span class="n">networks</span> <span class="o">=</span> <span class="n">humans</span> <span class="o">+</span> <span class="n">aliens</span>
 </pre></div>
@@ -1168,12 +1144,12 @@ title="Print to PDF"
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">human_labs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;R&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">))]</span>
-<span class="n">alien_labs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;L1&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;L2&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;R1&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;R2&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span>
+<span class="n">alien_labs</span> <span class="o">=</span> <span class="n">human_labs</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>The human and alien networks come from very different distributions. As you can see from the Stochastic Block Model structure below, the regions in the human and the alien brains can both be separated into two communities. These communities represent the two hemispheres of the brain (who knew aliens also have bilateralized brains!). Although both humans and aliens have the same regions belonging to their respective hemispheres, as you planned, the alien networks have a strange property: their brain regions have more connections with regions in the opposite hemisphere than the same one.</p>
+<p>The human and alien networks come from very different distributions. As you can see from the Stochastic Block Model structure below, the regions in the human and the alien brains can both be separated into two communities. These communities represent the two hemispheres of the brain (who knew aliens also have two-hemisphere brains!). Although both humans and aliens have the same regions belonging to their respective hemispheres, as you planned, the alien networks have a strange property: their brain regions have more connections with regions in the opposite hemisphere than the same one.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -1285,7 +1261,7 @@ title="Print to PDF"
 <img alt="../../_images/multigraph-representation-learning_20_0.png" src="../../_images/multigraph-representation-learning_20_0.png" />
 </div>
 </div>
-<p>And again, with the four community labels:</p>
+<p>And again, with the two community labels:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">alien_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Pairs plot alien embedding&quot;</span><span class="p">,</span>
@@ -1299,7 +1275,7 @@ title="Print to PDF"
 </div>
 </div>
 <p>Now, when we compare the embeddings, we can see again Dimension 2 is extremely clearly separating the nodes into Left/Right groupings (all of the nodes in the left hemisphere are in one blob, and all of the nodes in the other hemisphere are in the other blob), and then  successive dimensions (coupled with dimension 2) give us extremely strong separation between the two sub-groups for each hemisphere.</p>
-<p>However, we have a problem, and it’s the big warning we brought up at the end of the spectral-embedding section: <a class="reference internal" href="spectral-embedding.html#ch6-spectral-nonidentifiable"><span class="std std-ref">non-identifiability</span></a>. The problem is as follows: we have shared structure between the alien and human brains. This means that, to be maximally efficient, we <em>should</em> be able to learn from the aliens and humans simultaneously, since the <em>shared</em> information from both (the left/right hemisphere separation) is <em>common</em> across the aliens and humans. However, the spectral embeddings from the humand and alien brains are not comparable, because we have no way of knowing ahead of time whether the human and alien brains are properly rotated with one another. In <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">two-sample testing</span></a>, we will cover a possible way to rectify this rotation issue, but let’s see for now if we could come up with other solutions first that don’t require us to try to un-rotate networks.</p>
+<p>However, we have a problem, and it’s the big warning we brought up at the end of the spectral-embedding section: the non-identifiability problem from <a class="reference internal" href="spectral-embedding.html#ch6-spectral-nonidentifiable"><span class="std std-numref">Section 5.3.6.1</span></a>. The problem is as follows: we have shared structure between the alien and human brains. This means that, to be maximally efficient, we <em>should</em> be able to learn from the aliens and humans simultaneously, since the <em>shared</em> information from both (the left/right hemisphere separation) is <em>common</em> across the aliens and humans. However, the spectral embeddings from the humand and alien brains are not comparable, because we have no way of knowing ahead of time whether the human and alien brains are properly rotated with one another. In two-sample testing in <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a>, we will cover a possible way to rectify this rotation issue, but let’s see for now if we could come up with other solutions first that don’t require us to try to un-rotate networks.</p>
 </section>
 <section id="averaging-together">
 <h3><span class="section-number">5.4.2.2. </span>Averaging Together<a class="headerlink" href="#averaging-together" title="Permalink to this headline">#</a></h3>
@@ -1357,37 +1333,22 @@ title="Print to PDF"
 <img alt="../../_images/multigraph-representation-learning_33_0.png" src="../../_images/multigraph-representation-learning_33_0.png" />
 </div>
 </div>
-<p>It looks like we still obtain discernable left/right community split. However, when we look at the embedded average with the alien communities, we can see that averaging destroyed the <em>differential</em> structure between the humans and aliens; that is, that the left and right each have two sub-communities:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">all_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Pairs plot average embedding&quot;</span><span class="p">,</span>
-               <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;L1&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span>
-               <span class="p">[</span><span class="s2">&quot;L2&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> 
-               <span class="p">[</span><span class="s2">&quot;R1&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span>
-               <span class="p">[</span><span class="s2">&quot;R2&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))],</span>
-               <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Alien Community (Unknown)&quot;</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_35_0.png" src="../../_images/multigraph-representation-learning_35_0.png" />
-</div>
-</div>
-<p>While the nodes are still separate into Left (L1 + L2) and Right (R1 + R2) communities, we lost some of the separation between L1/L2 and R1/R2, respectively. Further, we have no representation for the original networks themselves, which means we can no longer analyze the individual brain networks.</p>
+<p>We have no representation for the original networks themselves, which means we can no longer analyze the individual brain networks with information being shared across all of the networks, and we’ve destroyed the topological properties of the individual networks.</p>
 </section>
 <section id="why-does-averaging-fail">
 <h3><span class="section-number">5.4.2.3. </span>Why Does averaging fail?<a class="headerlink" href="#why-does-averaging-fail" title="Permalink to this headline">#</a></h3>
-<p>There are a variety of reasons why averaging, even when we conditionally average human and alien brain networks separately, fail. When you average the network unconditionally, you can destroy latent structure, like we learned right above. Even when you average the networks conditionally, if all human brain networks and all alien brain networks come from the same distribution, you still encounter problems. The networks end up, potentially disasterously, not being properly oriented in comparable latent spaces, due to the non-identifiability problem.</p>
-<p>Finally, and potentially most catastrophically, is the big assumption that we made to average the networks conditionally: that all human brain networks, or separately all alien brain networks, come from the same distribution. This assumption, when viewed through a statistical lens, makes little sense: individual to individual, or more generally network to network, it seems rather unreasonable to believe that numerous samples would come from exactly same distribution. In fact, in many cases where it would be desirable to analyze multiple networks, this is the <em>opposite</em> of the reason you might analyze multiple networks in the first place: while you think that there might be <em>shared</em> structure between them, more often than not, it’s going to make more sense to still believe that each network comes from a different distribution all together. This holds true with the example we gave back in <span class="xref myst">multiple network modelling</span> (where we discussed social networks from Facebook, Twitter, and Linkedin), it holds true in many cases where you look at brain networks like here, and it’s going to make sense in many other domains.</p>
+<p>There are a variety of reasons why averaging, even when we conditionally average human and alien brain networks separately, are unideal. When you average the network unconditionally, you can destroy latent structure, like we learned right above. Even when you average the networks conditionally, if all human brain networks and all alien brain networks come from the same distribution, you still encounter problems. The networks end up, potentially disasterously, not being properly oriented in comparable latent spaces, due to the non-identifiability problem. This means that while you could learn (with conditional averaging) about the humans and alien brain networks separately, you could not learn about them together. Your analysis would be restricted to each group of networks individually.</p>
+<p>Finally, and potentially most catastrophically, is the big assumption that we made to average the networks conditionally: that all human brain networks, or separately all alien brain networks, come from the same distribution. This assumption, when viewed through a statistical lens, makes little sense: individual to individual, or more generally network to network, it seems rather unreasonable to believe that numerous samples would come from exactly same distribution. In fact, in many cases where it would be desirable to analyze multiple networks, this is the <em>opposite</em> of the reason you might analyze multiple networks in the first place: while you think that there might be <em>shared</em> structure between them, more often than not, it’s going to make more sense to still believe that each network comes from a different distribution all together. This holds true with the example we gave back in multiple network modelling in <a class="reference internal" href="../ch5/multi-network-models.html#ch5-multi"><span class="std std-numref">Section 4.6</span></a> (where we discussed social networks from Facebook, Twitter, and Linkedin), it holds true in many cases where you look at brain networks like here, and it’s going to make sense in many other domains.</p>
 <p>In any case where you have reason to believe that each network comes from a unique distribution, you’re going to want a way to reflect that in your algorithm. Let’s see how we might approach the problem with these limitations of averaging in mind.</p>
 </section>
 </section>
 <section id="different-types-of-multiple-network-representation-learning">
 <h2><span class="section-number">5.4.3. </span>Different Types of Multiple-Network Representation Learning<a class="headerlink" href="#different-types-of-multiple-network-representation-learning" title="Permalink to this headline">#</a></h2>
-<p>Let’s take a moment to explore some of the possible general approaches you could take in multiple-network representation learning. At some point you need to combine the many individual representations of your networks into one, and there are at least three possible places where you could do this: combining the networks together, combining the networks separately, and combining the embeddings. Each of these eventually results in a latent position representation for your networks. It’s important to note that in all of these approaches, you’re simply learning representations for your groups of networks. You can do whatever you want with these representations; in our case, we’ll illustrate blobs of nodes that are created when we embed the networks, which could then be tied together with <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-ref">community detection</span></a> downstream for learning from your networks.</p>
+<p>Let’s take a moment to explore some of the possible general approaches you could take in multiple-network representation learning. At some point you need to combine the many individual representations of your networks into one, and there are at least three possible places where you could do this: combining the networks together, combining the networks separately, and combining the embeddings. Each of these eventually results in a latent position representation for your networks. It’s important to note that in all of these approaches, you’re simply learning representations for your groups of networks. You can do whatever you want with these representations; in our case, we’ll illustrate blobs of nodes that are created when we embed the networks, which could then be tied together with other algorithms like community detection in <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-numref">Section 6.1</span></a> downstream for learning from your networks.</p>
+<p>All types of multiple-network representation learning strategies that we describe in this section entail first constructing a <em>joint matrix</em>. A <strong>joint matrix</strong> is a matrix which is derived from multiple networks, and summarizes them in such a way that it facilitates downstream analysis. The specific way that the joint matrix is determined from the data depends on the specific multiple-netework representation learning technique.</p>
 <section id="combining-the-networks-together">
 <h3><span class="section-number">5.4.3.1. </span>Combining the Networks Together<a class="headerlink" href="#combining-the-networks-together" title="Permalink to this headline">#</a></h3>
-<p>With this approach, you’ll start with a set of networks, and then you’ll combine them all into a single network prior to doing anything else. You can then embed and classify this network directly. What you did before, averaging the human and alien networks, was an example of combining your networks – you just averaged all of your adjacency matrices, and then you embedded the result. This tends to be effective when you want to study a property which is common across all of the networks, and you believe network-to-network differences that do not relate to the property of interest to be effectively noise. Unfortunately, it suffers from many of the issues we just mentioned.</p>
+<p>With this approach, you’ll start with a set of networks, and then the joint matrix will represent the adjacency matrix of a new network (that summarizes information about all of the other networks that went into it). You can then embed and classify this joint matrix directly. What you did before, averaging the human and alien networks, was an example of combining your networks – you just averaged all of your adjacency matrices, and then you embedded the result. This tends to be effective when you want to study a property which is common across all of the networks, and you believe network-to-network differences that do not relate to the property of interest to be effectively noise. Unfortunately, it suffers from many of the issues we just mentioned.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -1443,13 +1404,13 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_42_0.png" src="../../_images/multigraph-representation-learning_42_0.png" />
+<img alt="../../_images/multigraph-representation-learning_40_0.png" src="../../_images/multigraph-representation-learning_40_0.png" />
 </div>
 </div>
 </section>
 <section id="combining-the-embeddings">
 <h3><span class="section-number">5.4.3.2. </span>Combining the embeddings<a class="headerlink" href="#combining-the-embeddings" title="Permalink to this headline">#</a></h3>
-<p>The final approach to multiple-network representation learning that you’ll learn about is combining the embeddings themselves. With this approach, you’re waiting until you’ve already embnedded all of your networks separately before you combine them, either with adjacency spectral embedding or with some other single-network embedding method. Multiple adjacency spectral embedding (MASE), which you’ll be learning about soon, is an example of this approach.</p>
+<p>The next approach to multiple-network representation learning that you’ll learn about is combining the embeddings themselves into the joint matrix. With this approach, you’re waiting until you’ve already embedded all of your networks separately before you combine them, either with adjacency spectral embedding or with some other single-network embedding method. Multiple adjacency spectral embedding (MASE), which you’ll be learning about soon, is an example of this approach.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">GraphColormap</span>
@@ -1509,13 +1470,13 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_45_0.png" src="../../_images/multigraph-representation-learning_45_0.png" />
+<img alt="../../_images/multigraph-representation-learning_43_0.png" src="../../_images/multigraph-representation-learning_43_0.png" />
 </div>
 </div>
 </section>
 <section id="combining-the-networks-separately">
 <h3><span class="section-number">5.4.3.3. </span>Combining The Networks Separately<a class="headerlink" href="#combining-the-networks-separately" title="Permalink to this headline">#</a></h3>
-<p>The above approach is nice for collapsing your information into a single embedding – with each point in your final embedding representing a single node of your network. However, there are situations in which you might want to keep your embeddings separate, but make sure that they’re in the same latent space – meaning, the embeddings aren’t rotations of each other. That way, you can directly compare the embeddings of your separate embeddings. An example of combining the networks separately is the Omnibus embedding (OMNI).</p>
+<p>The above approach is nice for collapsing your information into a single embedding – with each point in your final embedding representing a single node of your network. The joint embedding that you obtain tends to summarize information <em>across</em> the nodes, as you will learn soon. However, there are situations in which you might want to keep your embeddings separate, but make sure that they’re in the same latent space – meaning, the embeddings aren’t rotations of each other. This addresses the problem that we noticed in <a class="reference internal" href="spectral-embedding.html#ch6-spectral-nonidentifiable"><span class="std std-numref">Section 5.3.6.1</span></a>. When we approach multiple-network representation learning in this manner, you can directly compare the embeddings of the separate networks. An example of combining the networks separately is the Omnibus embedding (OMNI).</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -1572,18 +1533,19 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_48_0.png" src="../../_images/multigraph-representation-learning_48_0.png" />
+<img alt="../../_images/multigraph-representation-learning_46_0.png" src="../../_images/multigraph-representation-learning_46_0.png" />
 </div>
 </div>
-<p>For the rest of this section, we’ll explore the strengths and weaknesses of different techniques which use these last two approaches. The first we’ll look at combines the embeddings, like above. It’s called Multiple Adjacency Spectral Embedding, or MASE for short.</p>
+<p>For the rest of this section, we’ll explore the strengths and weaknesses of different techniques which use these last two approaches.</p>
+<p>The first we’ll look at combines the embeddings. It’s called Multiple Adjacency Spectral Embedding, or MASE for short.</p>
 </section>
 </section>
 <section id="multiple-adjacency-spectral-embedding-mase">
 <span id="ch6-multinet-mase"></span><h2><span class="section-number">5.4.4. </span>Multiple Adjacency Spectral Embedding (MASE)<a class="headerlink" href="#multiple-adjacency-spectral-embedding-mase" title="Permalink to this headline">#</a></h2>
 <p>MASE is a technique which combines embeddings by concatennating and re-embedding the separate latent positions into a single space. It’s nice because you don’t actually need each network to be generated from the same distribution - you only need the nodes of the different networks to be aligned and have similar “meaning” across the networks. What this means is that node <span class="math notranslate nohighlight">\(1\)</span> in network <span class="math notranslate nohighlight">\(1\)</span> has the same literal interpretation as node <span class="math notranslate nohighlight">\(1\)</span> in networks <span class="math notranslate nohighlight">\(2\)</span> through <span class="math notranslate nohighlight">\(M\)</span>, and so on for all <span class="math notranslate nohighlight">\(n\)</span> nodes of the network. In your brain network, for instance, node one is the first region, node two is the second region, … and this property applies to all of the nodes in the network.</p>
 <p>MASE is probably the easiest to understand if you know how adjacency spectral embeddings work. Say you have some number of networks, and (like we said above) their nodes are aligned. The goal of MASE is to embed the networks into a single space, with each point in that space representing a single node - but, unlike simply averaging, MASE lets you combine networks which aren’t necessarily drawn from the same distribution.</p>
-<p>MASE is based on the <a class="reference internal" href="../ch5/multi-network-models.html#ch5-multi-cosie"><span class="std std-ref">common subspace independent-edge (COSIE) model</span></a> from the multiple network models. If you recall, with the COSIE model, you learned that across your networks, there might be some underlying <em>homogeneity</em>: in your brain networks, for instance, there might be communities that are shared across <em>all</em> of the networks. Simultaneously, these networks are distinct for one reason or another in terms of the underlying probability matrix: for instance, a pair of humans might have different probabilities for particular edges being connected or disconnected, or a pair of individuals one of whom is human and the other is alien might have different patterns to their probability matrices all together. In this sense, the COSIE model allowed you to capture both the <em>homogeneity</em> and <em>heterogeneity</em> across different networks simultaneously.</p>
-<p>Let’s go back to your group of human and alien brains and try using MASE to embed them rather than averaging. Then, you’ll dive deeper into what’s going on under the hood. First, you’ll instantiate a MASE instance and embed the networks. Then you’ll create a combined list of the human and alien brains, and use MASE to find the latent positions.</p>
+<p>MASE is based on the common subspace independent-edge (COSIE) model that you learned about in <a class="reference internal" href="../ch5/multi-network-models.html#ch5-multi-cosie"><span class="std std-numref">Section 4.6.2</span></a>. If you recall, with the COSIE model, you learned that across your networks, there might be some underlying <em>homogeneity</em>: in your brain networks, for instance, there might be communities that are shared across <em>all</em> of the networks. Simultaneously, these networks are distinct for one reason or another in terms of the underlying probability matrix: for instance, a pair of humans might have different probabilities for particular edges being connected or disconnected, or a pair of individuals one of whom is human and the other is alien might have different patterns to their probability matrices all together. In this sense, the COSIE model allowed you to capture both the <em>homogeneity</em> and <em>heterogeneity</em> across different networks simultaneously.</p>
+<p>Let’s go back to your group of human and alien brains and try using MASE to embed them rather than averaging. Then, we’ll dive deeper into what’s going on under the hood. First, you’ll instantiate a MASE instance and embed the networks. Then you’ll create a combined list of the human and alien brains, and use MASE to find the latent positions.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">MultipleASE</span> <span class="k">as</span> <span class="n">MASE</span>
@@ -1605,10 +1567,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_53_0.png" src="../../_images/multigraph-representation-learning_53_0.png" />
+<img alt="../../_images/multigraph-representation-learning_51_0.png" src="../../_images/multigraph-representation-learning_51_0.png" />
 </div>
 </div>
-<p>Unlike the disastrous results from simply averaging all of your networks together, MASE manages to identify all of the different communities. As you can see, the second dimension tends to separate the Left from the Right (shared by humans and aliens), and successive dimensions tend to effectively separate sub-region one from two (unique to the aliens).</p>
+<p>Unlike the disastrous results from simply averaging all of your networks together, MASE manages to identify all of the different communities. As you can see, the second dimension tends to separate the Left from the Right (shared by humans and aliens), but as we will learn, it will still allow you to still recover the unique aspects of human and alien brains.</p>
 <section id="how-does-mase-work">
 <h3><span class="section-number">5.4.4.1. </span>How Does MASE Work?<a class="headerlink" href="#how-does-mase-work" title="Permalink to this headline">#</a></h3>
 <p>Below, you can see how MASE works. You start with networks, drawn as nodes in space connected to each other. You turn them into adjacency matrices, and then you embed the adjacency matrices of a bunch of networks separately, using your standard Adjacency spectral embedding. Then, you take all of those embeddings, concatenate horizontally into a single matrix, and embed the entire concatenated matrix. The colors are the true communities each node belongs to: there’s a red and an orange community. MASE is an unsupervised learning technique and so it doesn’t need any information about the true communities to embed, but they’re useful to see. We’ll illustrate what’s happening in the MASE algorithm by running through all of its steps ourselves, with the human and alien networks from above.</p>
@@ -1642,7 +1604,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_62_0.png" src="../../_images/multigraph-representation-learning_62_0.png" />
+<img alt="../../_images/multigraph-representation-learning_60_0.png" src="../../_images/multigraph-representation-learning_60_0.png" />
 </div>
 </div>
 <p>And next, at an embedding from an alien, again looking at the first four dimensions:</p>
@@ -1654,15 +1616,15 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_64_0.png" src="../../_images/multigraph-representation-learning_64_0.png" />
+<img alt="../../_images/multigraph-representation-learning_62_0.png" src="../../_images/multigraph-representation-learning_62_0.png" />
 </div>
 </div>
 <p>It’s important to keep in mind that these embeddings don’t live in the same <em>latent space</em> (yet!).</p>
 </section>
 <section id="combining-your-embeddings">
 <h4><span class="section-number">5.4.4.1.2. </span>Combining your embeddings<a class="headerlink" href="#combining-your-embeddings" title="Permalink to this headline">#</a></h4>
-<p>Now comes the interesting part. Our goal is to find some way to take each of these individual embeddings and combine them. You want to find a reasonable way of doing this.</p>
-<p>You can visualize each of your four embeddings a different way. Instead of the using the two latent position dimensions as the x-axis and the y-axis of your plot, you can just visualize your latent position matrices directly. Each latent position now corresponds to rows in one of these matrices. The two columns are the two latent position dimensions, and the colors in each row correspond to the latent position value. You’re essentially substituting location for color.</p>
+<p>Now comes the interesting part. Our goal is to find some way to take each of these individual embeddings and combine them. We want to find a reasonable way of doing this.</p>
+<p>You can visualize each of your four embeddings a different way. Instead of the using the two latent position dimensions as the x-axis and the y-axis of your plot, you can just visualize your latent position matrices directly. Each latent position now corresponds to rows in one of these matrices. The columns are the different latent dimensions, and the colors in each row correspond to the latent position value for that latent dimension. You’re essentially substituting location for color.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cm</span>
@@ -1691,11 +1653,11 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_68_0.png" src="../../_images/multigraph-representation-learning_68_0.png" />
+<img alt="../../_images/multigraph-representation-learning_66_0.png" src="../../_images/multigraph-representation-learning_66_0.png" />
 </div>
 </div>
 <p>Because the rows of these matrices are all aligned - meaning, row 1 corresponds to node 1 for all four matrices - you can actually think of each node as having (in this case) <span class="math notranslate nohighlight">\(Md\)</span> latent dimensions: there are <span class="math notranslate nohighlight">\(d\)</span> latent dimensions for each of your <span class="math notranslate nohighlight">\(M\)</span> networks. In this case, since <span class="math notranslate nohighlight">\(\hat d = 7\)</span> and <span class="math notranslate nohighlight">\(M = 8\)</span>, this means that each node has <span class="math notranslate nohighlight">\(7 \times 8 = 56\)</span> latent dimensions associated with it (<span class="math notranslate nohighlight">\(7\)</span> per network).</p>
-<p>You don’t actually need separate matrices to express this idea: the natural thing to do would be to just concatenate all of the matrices horizontally into a single <span class="math notranslate nohighlight">\(n \times Md\)</span> matrix, where <span class="math notranslate nohighlight">\(n\)</span> is the number of nodes (the <em>rows</em> of the resulting matrix), and <span class="math notranslate nohighlight">\(Md\)</span> is the number of latent dimensions associated with each node (the <em>columns</em> of the resulting matrix). This matrix is called a <strong>joint matrix</strong>, since it is a composition of <span class="math notranslate nohighlight">\(M\)</span> total matrices (one for each network).</p>
+<p>You don’t actually need separate matrices to express this idea: the natural thing to do would be to just concatenate all of the matrices horizontally into a single <span class="math notranslate nohighlight">\(n \times Md\)</span> matrix, where <span class="math notranslate nohighlight">\(n\)</span> is the number of nodes (the <em>rows</em> of the resulting matrix), and <span class="math notranslate nohighlight">\(Md\)</span> is the number of latent dimensions associated with each node (the <em>columns</em> of the resulting matrix). This matrix is called the <em>joint matrix</em>, since it is a composition of information from the <span class="math notranslate nohighlight">\(M\)</span> total networks.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Concatenate your four matrices horizontally into a single m by d matrix</span>
@@ -1719,15 +1681,15 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_71_0.png" src="../../_images/multigraph-representation-learning_71_0.png" />
+<img alt="../../_images/multigraph-representation-learning_69_0.png" src="../../_images/multigraph-representation-learning_69_0.png" />
 </div>
 </div>
-<p>When we look at the joint matrix oriented in this manner, we can see the property that we are going to exploit in our next step. Notice that there looks to be a lot of <em>redundant</em> information in this matrix. In particular, it looks like the first column of every embedding tends to be about near <span class="math notranslate nohighlight">\(0.2\)</span>. The second column of every embedding looks like it tends to separate the first <span class="math notranslate nohighlight">\(50\)</span> nodes (which were the left hemisphere) from the next <span class="math notranslate nohighlight">\(50\)</span> nodes (which were the right hemisphere). Successive dimensions either look like noise (in the case of humans) or further separate the first and last 25 nodes into sub-regions <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>, respectively.</p>
+<p>When we look at the joint matrix oriented in this manner, we can see the property that we are going to exploit in our next step. Notice that there looks to be a lot of <em>redundant</em> information in this matrix. In particular, it looks like the first column of every embedding tends to be about near <span class="math notranslate nohighlight">\(0.2\)</span>. The second column of every embedding looks like it tends to separate the first <span class="math notranslate nohighlight">\(50\)</span> nodes (which were the left hemisphere) from the next <span class="math notranslate nohighlight">\(50\)</span> nodes (which were the right hemisphere). Successive dimensions tend to look like noise.</p>
 <p>This sort of <em>redundancy</em> of some of the qualitative features of the columns is, in fact, <em>exploitable</em>. This is despite the fact that the columns aren’t exactly identical in their behavior (for instance, for some of the networks, the second embedding dimension has high values for the first 50 nodes and low values for the second 50 nodes, or low values for the first 50 nodes and high values for the second 50 nodes). The important idea is that there is some notion of similar information being conveyed that we can use to simplify this problem even further.</p>
 </section>
 <section id="embedding-your-joint-matrix-to-create-a-joint-embedding">
 <h4><span class="section-number">5.4.4.1.3. </span>Embedding your joint matrix To Create a joint embedding<a class="headerlink" href="#embedding-your-joint-matrix-to-create-a-joint-embedding" title="Permalink to this headline">#</a></h4>
-<p>So now you have a joint matrix, but you have a new issue you’d like to address: there’s a lot of redundant information which is common to many of these embeddings (such as the second dimension <em>tending</em> to separate the left from the right), and some information common only to a subset of these embeddings (such as the third and fourth dimensions <em>tending</em> to separate the first from the second subgroups in the aliens). The way in which this redundancy is conveyed is <em>not</em> consistent from embedding to embedding, which is an instance of the <a class="reference internal" href="spectral-embedding.html#ch6-spectral-nonidentifiable"><span class="std std-ref">rotational non-identifiability</span></a> problem we brought up previously. What are you left to do?</p>
+<p>So now you have a joint matrix, but you have a new issue you’d like to address: there’s a lot of redundant information which is common to many of these embeddings (such as the second dimension <em>tending</em> to separate the left from the right), and some information common only to a subset of these embeddings (such as that some of the networks have the second dimension having high values for the first group of nodes and low values for the second group of nodes, and vice versa for the other networks). The way in which this redundancy is conveyed is <em>not</em> consistent from embedding to embedding, which is an instance of the rotational non-identifiability from <code class="xref std std-numref docutils literal notranslate"><span class="pre">(ch6:spectral:nonidentifiable</span></code> problem we brought up previously. What are you left to do?</p>
 <p>Well, as it turns out, this problem is <em>exactly</em> the situation our <code class="docutils literal notranslate"><span class="pre">svd</span></code> (the same <code class="docutils literal notranslate"><span class="pre">svd</span></code> we used in spectral embedding) is useful for! it allows you to capture the redundancy of the qualitative aspects of these columns, and obtain the <em>general idea</em> of what they each convey numerically.</p>
 <p>Through this process, what you are effectively doing is now embedding your joint matrix, to obtain a <em>joint embedding</em>. Here, the dimensionality is selected using <a class="reference internal" href="spectral-embedding.html#ch6-spectral-elbow"><span class="std std-ref">elbow selection</span></a>:</p>
 <div class="cell docutils container">
@@ -1749,7 +1711,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_76_0.png" src="../../_images/multigraph-representation-learning_76_0.png" />
+<img alt="../../_images/multigraph-representation-learning_74_0.png" src="../../_images/multigraph-representation-learning_74_0.png" />
 </div>
 </div>
 <p>Excellent! Now, for each node, we have a <em>shared latent position</em>, the points in the pairplot above, associated with that node. This could also be visualized as a heatmap:</p>
@@ -1768,7 +1730,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_78_0.png" src="../../_images/multigraph-representation-learning_78_0.png" />
+<img alt="../../_images/multigraph-representation-learning_76_0.png" src="../../_images/multigraph-representation-learning_76_0.png" />
 </div>
 </div>
 <p>We’ll call the resulting embedding for the joint matrix an estimate of the shared latent positions, the matrix <span class="math notranslate nohighlight">\(\hat V\)</span>, which has a single row <span class="math notranslate nohighlight">\(i\)</span> for the shared latent position <span class="math notranslate nohighlight">\(\vec v_i\)</span> associated with each node <span class="math notranslate nohighlight">\(i\)</span>. This matrix will be <span class="math notranslate nohighlight">\(n \times d\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the number of nodes, and <span class="math notranslate nohighlight">\(d\)</span> is either a pre-selected dimensionality you wanted to embed into, or a value chosen through elbow selection.</p>
@@ -1778,15 +1740,15 @@ title="Print to PDF"
 <section id="relating-the-joint-embedding-to-the-shared-latent-positions">
 <h3><span class="section-number">5.4.4.2. </span>Relating the joint embedding to the shared latent positions<a class="headerlink" href="#relating-the-joint-embedding-to-the-shared-latent-positions" title="Permalink to this headline">#</a></h3>
 <p>Exactly how is the joint embedding you created related to all of your separate, original networks? Well, to understand this, you need to delve back to the concept of the probability matrix and the score matrix.</p>
-<p>Remember that under the <a class="reference internal" href="../ch5/multi-network-models.html#ch5-multi-cosie"><span class="std std-ref">COSIE model</span></a>, the probability matrix for the <span class="math notranslate nohighlight">\(i^{th}\)</span> network could be described as:</p>
+<p>Remember that under the COSIE model, the probability matrix for the <span class="math notranslate nohighlight">\(i^{th}\)</span> network could be described as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     P^{(i)} &amp;= VR^{(i)}V^\top
 \end{align*}\]</div>
 <p>where <span class="math notranslate nohighlight">\(V\)</span> conveyed the <em>homogeneity</em> across all <span class="math notranslate nohighlight">\(M\)</span> networks (the <em>shared latent space</em>), and <span class="math notranslate nohighlight">\(R^{(i)}\)</span> conveyed the unique aspects of the probability matrix for a particular network <span class="math notranslate nohighlight">\(i\)</span>.</p>
-<p>You want to be able to use a similar strategy with your set of networks, but like the problem you ran into with estimating parameters for your <a class="reference internal" href="../ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">Random Dot Product Graph</span></a>: you have no way to model the probability matrix, since you don’t <em>actually</em> know the probability matrix, you only see a network. What can you do?</p>
+<p>You want to be able to use a similar strategy with your set of networks, but like the problem you ran into with estimating parameters for your Random Dot Product Graph from <a class="reference internal" href="../ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-numref">Section 4.3</span></a>: you have no way to model the probability matrix, since you don’t <em>actually</em> know the probability matrix, you only see a network. What can you do?</p>
 <p>Just like with the Random Dot Product Graph, you can think of the adjacency matrices <span class="math notranslate nohighlight">\(A^{(i)}\)</span> as surrogates for the probability matrices <span class="math notranslate nohighlight">\(P^{(i)}\)</span>. This means that when you use MASE to produce estimated shared latent positions, what you are really doing is estimating <span class="math notranslate nohighlight">\(\hat V\)</span>, the shared latent positions across all <span class="math notranslate nohighlight">\(M\)</span> networks. When you looked at the latent positions a second ago, what you looked at was the estimate of the shared latent positions using the procedure we outlined above. As we clarified before, it is important to notice that this joint embedding can be useful <em>without</em> making an explicit statement about the COSIE model, but when you <em>do</em> assume that the COSIE model is a reasonable fit for your data, this interpretation is fairly clean and intuitive.</p>
-<p>Similar to <span class="math notranslate nohighlight">\(V\)</span> under the COSIE model, it turns out that the <span class="math notranslate nohighlight">\(\hat V\)</span> you found above is also going to be <em>orthonormal</em>. As you learned back in the section on the <a class="reference internal" href="../ch5/multi-network-models.html#ch5-multi-cosie-slpm"><span class="std std-ref">shared latent position matrix</span></a>, what this means is that <span class="math notranslate nohighlight">\(\hat V^\top \hat V = I\)</span>, the identity matrix. Remember that the identity matrix is analogous to multiplying by <span class="math notranslate nohighlight">\(1\)</span> for matrices. You will use this fact to uncover estimates of the score matrices for each network.</p>
+<p>Similar to <span class="math notranslate nohighlight">\(V\)</span> under the COSIE model, it turns out that the <span class="math notranslate nohighlight">\(\hat V\)</span> you found above is also going to be <em>orthonormal</em>. As you learned of the shared latent position matrix in <a class="reference internal" href="../ch5/multi-network-models.html#ch5-multi-cosie-slpm"><span class="std std-numref">Section 4.6.2.1.1</span></a>, what this means is that <span class="math notranslate nohighlight">\(\hat V^\top \hat V = I\)</span>, the identity matrix. Remember that the identity matrix is analogous to multiplying by <span class="math notranslate nohighlight">\(1\)</span> for matrices. You will use this fact to uncover estimates of the score matrices for each network.</p>
 <section id="finding-the-score-matrices">
 <h4><span class="section-number">5.4.4.2.1. </span>Finding the score matrices<a class="headerlink" href="#finding-the-score-matrices" title="Permalink to this headline">#</a></h4>
 <p>Any particular score matrix, <span class="math notranslate nohighlight">\(R^{(i)}\)</span>, is square and <span class="math notranslate nohighlight">\(d \times d\)</span>. The dimension, <span class="math notranslate nohighlight">\(d\)</span>, corresponds to the number of embedding dimensions – so if you wanted to embed down to two dimensions, each <span class="math notranslate nohighlight">\(R^{(i)}\)</span> would be a <span class="math notranslate nohighlight">\(2 \times 2\)</span> matrix.</p>
@@ -1798,10 +1760,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1., -0.,  0.,  0.],
-       [-0.,  1., -0., -0.],
-       [ 0., -0.,  1., -0.],
-       [ 0., -0., -0.,  1.]])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[ 1., -0., -0., -0.],
+       [-0.,  1., -0.,  0.],
+       [-0., -0.,  1.,  0.],
+       [-0.,  0.,  0.,  1.]])
 </pre></div>
 </div>
 </div>
@@ -1871,7 +1833,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_89_0.png" src="../../_images/multigraph-representation-learning_89_0.png" />
+<img alt="../../_images/multigraph-representation-learning_87_0.png" src="../../_images/multigraph-representation-learning_87_0.png" />
 </div>
 </div>
 <p>Finally, we can take a look at the estimated probability matrix for the first human network, and compare it against the true probability matrix for the first human network, using the equation we learned for <span class="math notranslate nohighlight">\(\hat P^{(i)}\)</span>, that <span class="math notranslate nohighlight">\(\hat P^{(i)} = \hat V \hat R^{(i)} \hat V^\top\)</span>:</p>
@@ -1901,7 +1863,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_92_0.png" src="../../_images/multigraph-representation-learning_92_0.png" />
+<img alt="../../_images/multigraph-representation-learning_90_0.png" src="../../_images/multigraph-representation-learning_90_0.png" />
 </div>
 </div>
 <p>Not bad! Now let’s take a look for the first alien network. We’ll again look at the adjacency matrix, the shared latent positions, and the estimated score matrix:</p>
@@ -1910,7 +1872,7 @@ title="Print to PDF"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 
 <span class="n">score_vmin</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">min</span><span class="p">();</span> <span class="n">score_vmax</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">aliens</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">alien_labs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjacency matrix for first human&quot;</span><span class="p">,</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">aliens</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inner_hier_labels</span><span class="o">=</span><span class="n">alien_labs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjacency matrix for first alien&quot;</span><span class="p">,</span>
                <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">hm</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">joint_embedding</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">yticklabels</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
@@ -1929,20 +1891,14 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_94_0.png" src="../../_images/multigraph-representation-learning_94_0.png" />
+<img alt="../../_images/multigraph-representation-learning_92_0.png" src="../../_images/multigraph-representation-learning_92_0.png" />
 </div>
 </div>
-<p>Notice that the estimated score matrix is drawing much more from the estimated shared latent dimensions three and four, which were the dimensions that were important for differentiating the subregions <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span>. This time, when we look at the estimated probability matrix against the true probability matrix:</p>
+<p>Notice that the estimated score matrix has a <em>negative</em> score for dimension <span class="math notranslate nohighlight">\(2\)</span>, which was the dimension associated with the left/right hemisphere separability, whereas for humans, this score was highly positive. This means that the the estimated shared latent dimension <span class="math notranslate nohighlight">\(2\)</span> (and its corresponding <em>score</em>) are conveying the homoegeneity (that there is left/right hemisphere separability across all of the networks) and concurrently the heterogeneity (as reflected in the different scores) between human and alien networks. This time, when we look at the estimated probability matrix against the true probability matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># take scores from first alien and use embedding to obtain Phat</span>
 <span class="n">Phat_alien1</span> <span class="o">=</span> <span class="n">joint_embedding</span> <span class="o">@</span> <span class="n">scores</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">@</span> <span class="n">joint_embedding</span><span class="o">.</span><span class="n">T</span>
-
-<span class="c1"># use equation to obtain the probability matrix from Ch5, RDPGs section</span>
-<span class="n">comm_assign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> 
-                       <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> 
-                       <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))]</span> <span class="o">+</span> 
-                       <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">4</span><span class="p">))])</span>
 
 <span class="n">Ptrue_alien1</span> <span class="o">=</span> <span class="n">comm_assign</span> <span class="o">@</span> <span class="n">Palien</span> <span class="o">@</span> <span class="n">comm_assign</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
@@ -1962,10 +1918,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_97_0.png" src="../../_images/multigraph-representation-learning_97_0.png" />
+<img alt="../../_images/multigraph-representation-learning_95_0.png" src="../../_images/multigraph-representation-learning_95_0.png" />
 </div>
 </div>
-<p>And we’ve successfully recovered a lot of the somewhat complicated structure from the alien probability matrix! In particular, as we can see, the left and right hemisphere nodes are clearly separated, and the sub-regions <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(2\)</span> are even further separated. Awesome!</p>
+<p>And we’ve successfully recovered a lot of the structure from the alien probability matrix! In particular, as we can see, the left and right hemisphere nodes are clearly separated. Awesome!</p>
 </section>
 </section>
 <section id="using-graspologic">
@@ -1988,7 +1944,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_101_0.png" src="../../_images/multigraph-representation-learning_101_0.png" />
+<img alt="../../_images/multigraph-representation-learning_99_0.png" src="../../_images/multigraph-representation-learning_99_0.png" />
 </div>
 </div>
 <p>You can recover the score matrices with similar ease, like we do below for the first human:</p>
@@ -1999,7 +1955,8 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<p>So you’ve learned that MASE is useful when you want a joint embedding that incorporates an element of <em>homogeneity</em> across all of your networks, but still allows your networks to have some unique aspects of <em>heterogeneity</em>. What if you wanted to keep your separate embeddings totally differentiated (you don’t necessarily want to assume there is <em>any</em> shared structure from network to network), but put them all in the same space? That’s what the Omnibus Embedding gives, and what you’ll explore now.</p>
+<p>So you’ve learned that MASE is useful when you want a joint embedding that incorporates an element of <em>homogeneity</em> across all of your networks, but still allows your networks to have some unique aspects of <em>heterogeneity</em>. For more details about MASE, check out the original paper from <span id="id1">[<a class="reference internal" href="#id29" title="Jes\ifmmode \acute u\else ú\fi s Arroyo, Avanti Athreya, Joshua Cape, Guodong Chen, Carey E. Priebe, and Joshua T. Vogelstein. Inference for Multiple Heterogeneous Networks with a Common Invariant Subspace. Journal of Machine Learning Research, 22(142):1–49, 2021. URL: https://jmlr.org/papers/v22/19-558.html.">3</a>]</span>.</p>
+<p>What if you wanted to keep your separate embeddings totally differentiated (you don’t necessarily want to assume there is <em>any</em> shared structure from network to network), but put them all in the same space? That’s what the Omnibus Embedding gives, and what you’ll explore now.</p>
 </section>
 </section>
 <section id="omnibus-embedding-omni">
@@ -2015,8 +1972,8 @@ title="Print to PDF"
 </ol>
 <p>The omnibus matrix itself just has every original adjacency or laplacian matrix along its diagonal, and the elementwise average of every pair of original matrices on the off-diagonals. This means that the Omnibus Matrix is <em>huge</em>: if you have <span class="math notranslate nohighlight">\(M\)</span> networks, each of which has <span class="math notranslate nohighlight">\(n\)</span> nodes, the Omnibus Matrix will be a <span class="math notranslate nohighlight">\(Mn \times Mn\)</span> matrix.</p>
 <p>For example, say you only have two networks. Let’s name their adjacency matrices <span class="math notranslate nohighlight">\(A^{(1)}\)</span> and <span class="math notranslate nohighlight">\(A^{(2)}\)</span>. Then, the omnibus matrix looks like this:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-9e715223-5705-4889-8cc7-7626e17fbfad">
-<span class="eqno">(5.1)<a class="headerlink" href="#equation-9e715223-5705-4889-8cc7-7626e17fbfad" title="Permalink to this equation">#</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-03e67313-5b52-4800-a8fe-0f3af5bb87f6">
+<span class="eqno">(5.1)<a class="headerlink" href="#equation-03e67313-5b52-4800-a8fe-0f3af5bb87f6" title="Permalink to this equation">#</a></span>\[\begin{align}
 \begin{bmatrix}
 A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 \frac{A^{(2)} + A^{(1)}}{2} &amp; A^{(2)} \\
@@ -2083,18 +2040,23 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_111_0.png" src="../../_images/multigraph-representation-learning_111_0.png" />
+<img alt="../../_images/multigraph-representation-learning_109_0.png" src="../../_images/multigraph-representation-learning_109_0.png" />
 </div>
 </div>
 <section id="creating-the-omnibus-matrix-for-all-eight-networks">
 <h4><span class="section-number">5.4.5.1.1. </span>Creating the Omnibus Matrix For All Eight Networks<a class="headerlink" href="#creating-the-omnibus-matrix-for-all-eight-networks" title="Permalink to this headline">#</a></h4>
 <p>Here’s the Omnibus Matrix for all eight of your networks. You can see adjacency matrices for the original four networks on the diagonal blocks, highlighted in blue, and all possible pairs of averages of adjacency matrices on the off-diagonal blocks, highlighted in orange.</p>
-<div class="cell tag_hide-input docutils container">
+<div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed.omni</span> <span class="kn">import</span> <span class="n">_get_omni_matrix</span>
 <span class="n">omni</span> <span class="o">=</span> <span class="n">_get_omni_matrix</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
-
-<span class="n">hm</span> <span class="o">=</span> <span class="n">lined_heatmap</span><span class="p">(</span><span class="n">omni</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">omni_cmap</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hm</span> <span class="o">=</span> <span class="n">lined_heatmap</span><span class="p">(</span><span class="n">omni</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">omni_cmap</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Full omnibus matrix for all eight networks&quot;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">hm</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="o">/</span><span class="mi">8</span><span class="p">:</span>
@@ -2119,7 +2081,7 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_114_0.png" src="../../_images/multigraph-representation-learning_114_0.png" />
+<img alt="../../_images/multigraph-representation-learning_113_0.png" src="../../_images/multigraph-representation-learning_113_0.png" />
 </div>
 </div>
 </section>
@@ -2138,7 +2100,7 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(800, 4)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(800, 3)
 </pre></div>
 </div>
 </div>
@@ -2159,7 +2121,7 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(8, 100, 4)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(8, 100, 3)
 </pre></div>
 </div>
 </div>
@@ -2213,7 +2175,7 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_122_0.png" src="../../_images/multigraph-representation-learning_122_0.png" />
+<img alt="../../_images/multigraph-representation-learning_121_0.png" src="../../_images/multigraph-representation-learning_121_0.png" />
 </div>
 </div>
 <p>Next, let’s take a look at the estimated latent position matrix for the first human as a pairs plot, with the true community labels:</p>
@@ -2224,10 +2186,10 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_124_0.png" src="../../_images/multigraph-representation-learning_124_0.png" />
+<img alt="../../_images/multigraph-representation-learning_123_0.png" src="../../_images/multigraph-representation-learning_123_0.png" />
 </div>
 </div>
-<p>Cool! The communities are very well separated by the second embedding dimension. Next, the estimated latent positions for the first alien brain network:</p>
+<p>Cool! The communities are very well separated by the third embedding dimension. Next, the estimated latent positions for the first alien brain network:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">pairplot</span><span class="p">(</span><span class="n">latent_networks</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">alien_labs</span><span class="p">,</span> <span class="n">legend_name</span><span class="o">=</span><span class="s2">&quot;Community (Unknown)&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Alien 1 estimated latent positions&quot;</span><span class="p">)</span>
@@ -2235,16 +2197,16 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_126_0.png" src="../../_images/multigraph-representation-learning_126_0.png" />
+<img alt="../../_images/multigraph-representation-learning_125_0.png" src="../../_images/multigraph-representation-learning_125_0.png" />
 </div>
 </div>
-<p>Awesome! shared latent dimension two cleaerly separates left from right communities, and dimensions three and four clearly differentiate sub-regions one and two.</p>
+<p>Awesome! shared latent dimension two clearly separates left from right communities.</p>
 </section>
 </section>
 </section>
 <section id="why-don-t-we-just-reorient-the-estimated-latent-positions-manually">
 <h2><span class="section-number">5.4.6. </span>Why don’t we just reorient the estimated latent positions manually?<a class="headerlink" href="#why-don-t-we-just-reorient-the-estimated-latent-positions-manually" title="Permalink to this headline">#</a></h2>
-<p>Remember when we talked about <a class="reference internal" href="spectral-embedding.html#ch6-spectral-nonidentifiable"><span class="std std-ref">non-identifiability</span></a>, the core issue was that we had no way of differentiating latent positions from rotations of a given latent position. For a set of networks, instead of embedding them into a space in which they are all rotated with one another, couldn’t we simply embed the networks, and <em>then</em> reorient the embeddings?</p>
+<p>Remember when we talked about non-identifiability in <a class="reference internal" href="spectral-embedding.html#ch6-spectral-nonidentifiable"><span class="std std-numref">Section 5.3.6.1</span></a>, the core issue was that we had no way of differentiating latent positions from rotations of a given latent position. For a set of networks, instead of embedding them into a space in which they are all rotated with one another, couldn’t we simply embed the networks, and <em>then</em> reorient the embeddings?</p>
 <p>We sure can! For instance, say you want to figure out if two networks are generated from the same distribution (This means that the matrix that contains edge probabilities, <span class="math notranslate nohighlight">\({P}\)</span>, is the same for both networks). Then, it’s reasonable to assume that their estimated latent positions will be pretty close to each other. Let’s structure this simple problem a little more formally. Basically, what we want to do is find a rotation matrix that will align the estimated latent positions as best as possible. Take a look at the equation below:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -2264,10 +2226,10 @@ A^{(1)} &amp; \frac{A^{(1)} + A^{(2)}}{2} \\
 <li><p>How, exactly, are we even going to solve this thing?</p></li>
 <li><p>Does this add compute power?</p></li>
 <li><p>Does it add noise?
-We don’t really have an answer to the first two questions, but the answers to the remaining questions tend to leave the outcome the same. There are algorithms that solve this particular problem, which you will learn about later in the section on <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">two-sample testing</span></a>. However, these algorithms are extremely computationally intensive, especially when you have to compute them again and again repeatedly for many different networks or pairs of networks. Further, this process adds noise when it is repeatedly applied, particularly because it is pretty unclear what the best frame of reference to orient against is.</p></li>
+We don’t really have an answer to the first two questions, but the answers to the remaining questions tend to leave the outcome the same. There are algorithms that solve this particular problem, which you will learn about later in the section on two-sample testing in <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a>. However, these algorithms are extremely computationally intensive, especially when you have to compute them again and again repeatedly for many different networks or pairs of networks. Further, this process adds noise when it is repeatedly applied, particularly because it is pretty unclear what the best frame of reference to orient against is.</p></li>
 </ol>
-<p>Finally, and most succinctly: the Omnibus Embedding is fundamentally a solution to this problem. Because the embeddings for all of your networks live in the same space, you don’t have to rotate them manually – and you cut out the noise that gets created when you have to <em>infer</em> a good rotation matrix. You’ll explore all the downstream use cases in future chapters, but below is a sneak peak.</p>
-<p>The figure below (adapted from Gopalakrishnan et al. 2021 <span id="id1">[]</span>,  is the omnibus embedding for 32 networks created from a bunch of mouse brains, some of which have been genetically modified. The nodes of these networks represent the regions of a mouse brain and the edges represent how well-connected the neurons in a given pair of regions are. The figure below actually only shows two nodes: the node representing one region in the left hemisphere, and the node representing its corresponding region in the right hemisphere.</p>
+<p>Finally, and most succinctly: the Omnibus Embedding is fundamentally a solution to this problem. Because the embeddings for all of your networks live in the same space, you don’t have to rotate them manually – and you cut out the noise that gets added when you have to <em>infer</em> a good rotation matrix. You’ll explore some the downstream use-cases in future chapters, but below is a sneak peak.</p>
+<p>The figure below (adapted from <span id="id2">[]</span>)  is the omnibus embedding for 32 networks created from a bunch of mouse brains, some of which have been genetically modified. The nodes of these networks represent the regions of a mouse brain and the edges represent how well-connected the neurons in a given pair of regions are. The figure below actually only shows two nodes: the node representing one region in the left hemisphere, and the node representing its corresponding region in the right hemisphere.</p>
 <p>So what you’re actually <em>plotting</em> in this embedding is a bit different than normal, because rather than being nodes, the points you plot are <em>networks</em>: one for each of your thirty-two mice. The only reason you’re able to get away with doing this is the omnibus embedding: each network lives in the same space!</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -2395,7 +2357,7 @@ We don’t really have an answer to the first two questions, but the answers to 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/multigraph-representation-learning_129_0.png" src="../../_images/multigraph-representation-learning_129_0.png" />
+<img alt="../../_images/multigraph-representation-learning_128_0.png" src="../../_images/multigraph-representation-learning_128_0.png" />
 </div>
 </div>
 <p>You can clearly see a difference between the genetically modified mice and the normal mice. The genetically modified mice are off in their own cluster; if you’re familiar with classical statistics, you could do a MANOVA here and find that the genetically modified mice are significantly different from the rest - if you wanted to, you could figure out which mice are genetically modified, even without having that information in advance!</p>
@@ -2414,8 +2376,24 @@ We don’t really have an answer to the first two questions, but the answers to 
     \end{bmatrix}
 \end{align*}\]</div>
 <p>where each of the <span class="math notranslate nohighlight">\(\hat X^{(i)}\)</span> was an <span class="math notranslate nohighlight">\(n \times d\)</span> matrix, so the full omnibus embedding was an <span class="math notranslate nohighlight">\(Mn \times d\)</span> matrix.</p>
-<p>When you produced an omnibus embedding, if you pull out the individual estimated latent positions for each network, you can then make statements about the corresponding <em>estimates of latent positions</em> and learn about how they impact the <em>probability matrix</em>, since you can estimate the probability matrix just using <span class="math notranslate nohighlight">\(\hat P^{(i)} = \hat X^{(i)}\hat X^{(i)\top}\)</span>. Again, we would emphasize that the omnibus embedding is a tool that can be used <em>outside</em> of assuming the heterogeneous random dot product graph model. The only impact that the assumption of the heterogeneous random dot product graph model gives you is the fact that you can use these embeddings to learn about the probability matrix <span class="math notranslate nohighlight">\(P^{(i)}\)</span>.</p>
+<p>When you produced an omnibus embedding, if you pull out the individual estimated latent positions for each network, you can then make statements about the corresponding <em>estimates of latent positions</em> and learn about how they impact the <em>probability matrix</em>, since you can estimate the probability matrix just using <span class="math notranslate nohighlight">\(\hat P^{(i)} = \hat X^{(i)}\hat X^{(i)\top}\)</span>. Again, we would emphasize that the omnibus embedding is a tool that can be used <em>outside</em> of assuming the heterogeneous random dot product graph model. The only impact that the assumption of the heterogeneous random dot product graph model gives you is the fact that you can use these embeddings to learn about the probability matrix <span class="math notranslate nohighlight">\(P^{(i)}\)</span>. For a full discussion on the implications of these results, check out the Appendix <code class="xref std std-numref docutils literal notranslate"><span class="pre">app:ch13:spectral</span></code> or <span id="id3">[<a class="reference internal" href="#id28" title="Keith Levin, A. Athreya, M. Tang, V. Lyzinski, and C. Priebe. A Central Limit Theorem for an Omnibus Embedding of Multiple Random Dot Product Graphs. 2017 IEEE International Conference on Data Mining Workshops (ICDMW), 2017. URL: https://www.semanticscholar.org/paper/A-Central-Limit-Theorem-for-an-Omnibus-Embedding-of-Levin-Athreya/fdc658ee1a25c511d7da405a9df7b30b613e8dc8.">2</a>]</span> and <span id="id4">[<a class="reference internal" href="spectral-embedding.html#id27" title="Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. J. Mach. Learn. Res., 18(1):8393–8484, January 2017. doi:10.5555/3122009.3242083.">2</a>]</span>.</p>
 </section>
+</section>
+<section id="references">
+<h2><span class="section-number">5.4.7. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<div class="docutils container" id="id5">
+<dl class="citation">
+<dt class="label" id="id21"><span class="brackets"><a class="fn-backref" href="#id4">1</a></span></dt>
+<dd><p>Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. <em>J. Mach. Learn. Res.</em>, 18(1):8393–8484, January 2017. <a class="reference external" href="https://doi.org/10.5555/3122009.3242083">doi:10.5555/3122009.3242083</a>.</p>
+</dd>
+<dt class="label" id="id28"><span class="brackets"><a class="fn-backref" href="#id3">2</a></span></dt>
+<dd><p>Keith Levin, A. Athreya, M. Tang, V. Lyzinski, and C. Priebe. A Central Limit Theorem for an Omnibus Embedding of Multiple Random Dot Product Graphs. <em>2017 IEEE International Conference on Data Mining Workshops (ICDMW)</em>, 2017. URL: <a class="reference external" href="https://www.semanticscholar.org/paper/A-Central-Limit-Theorem-for-an-Omnibus-Embedding-of-Levin-Athreya/fdc658ee1a25c511d7da405a9df7b30b613e8dc8">https://www.semanticscholar.org/paper/A-Central-Limit-Theorem-for-an-Omnibus-Embedding-of-Levin-Athreya/fdc658ee1a25c511d7da405a9df7b30b613e8dc8</a>.</p>
+</dd>
+<dt class="label" id="id29"><span class="brackets"><a class="fn-backref" href="#id1">3</a></span></dt>
+<dd><p>Jes\ifmmode \acute u\else ú\fi s Arroyo, Avanti Athreya, Joshua Cape, Guodong Chen, Carey E. Priebe, and Joshua T. Vogelstein. Inference for Multiple Heterogeneous Networks with a Common Invariant Subspace. <em>Journal of Machine Learning Research</em>, 22(142):1–49, 2021. URL: <a class="reference external" href="https://jmlr.org/papers/v22/19-558.html">https://jmlr.org/papers/v22/19-558.html</a>.</p>
+</dd>
+</dl>
+</div>
 </section>
 </section>
 
