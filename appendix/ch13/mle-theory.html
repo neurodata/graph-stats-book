@@ -510,27 +510,27 @@ const thebe_selector_output = ".output, .cell_output"
   <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch12/background.html">
-     11.1. Background
+     11.2. Background
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch12/foundation.html">
-     11.2. Foundation
+     11.3. Foundation
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch12/ers.html">
-     11.3. Erdös-Rényi (ER) Random Networks
+     11.4. Erdös-Rényi (ER) Random Networks
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch12/sbms.html">
-     11.4. Stochastic Block Models
+     11.5. Stochastic Block Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch12/rdpgs.html">
-     11.5. RDPGs and more general network models
+     11.6. RDPGs and more general network models
     </a>
    </li>
   </ul>
@@ -882,6 +882,11 @@ title="Print to PDF"
    12.1.5. Why don’t we just use MLE for Random Dot Product Graphs?
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   12.1.6. References
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -964,6 +969,11 @@ title="Print to PDF"
    12.1.5. Why don’t we just use MLE for Random Dot Product Graphs?
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   12.1.6. References
+  </a>
+ </li>
 </ul>
 
                         </nav>
@@ -977,7 +987,7 @@ title="Print to PDF"
   <section class="tex2jax_ignore mathjax_ignore" id="maximum-likelihood-estimate-theory">
 <span id="app-ch13-mle"></span><h1><span class="section-number">12.1. </span>Maximum Likelihood Estimate Theory<a class="headerlink" href="#maximum-likelihood-estimate-theory" title="Permalink to this headline">#</a></h1>
 <p>In this section, we will introduce a fundamental estimation technique, known as maximum likelihood estimation. To understand this section, we think that you should have a decent working knowledge of undergraduate probability and statistics, but we don’t think it will be too challenging beyond this. We will cover maximum likelihood estimation (MLE) and some basic results about why MLE is a strategy which gives us some desirable estimators we can use to learn about the underlying random networks for our network-valued data.</p>
-<p>Throughout <a class="reference external" href="#link?">Chapter 5</a>, we spent a lot of attention developing intuition for many of the network models that are essential to understanding random networks. Recall that the notation that we use for a random network (more specifically, a network-valued random variable), <span class="math notranslate nohighlight">\(\mathbf A\)</span>, does <em>not</em> refer to any network we could ever hope to see (or as we introduced in the previous chapter, <em>realize</em>) in the real world. This issue is extremely important in network machine learning, so we will try to drive it home one more time: no matter how much data we collected (unless we could get infinite data, which we <em>can’t</em>), we can never hope to understand the true distribution of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. As network scientists, this leaves us with a bit of a problem: what, then, can we do to make useful claims about <span class="math notranslate nohighlight">\(\mathbf A\)</span>, if we can’t actually see <span class="math notranslate nohighlight">\(\mathbf A\)</span> nor its distribution?</p>
+<p>Throughout <a class="reference internal" href="../../representations/ch5/ch5.html#ch5"><span class="std std-numref">Section 4</span></a>, we spent a lot of attention developing intuition for many of the network models that are essential to understanding random networks. Recall that the notation that we use for a random network (more specifically, a network-valued random variable), <span class="math notranslate nohighlight">\(\mathbf A\)</span>, does <em>not</em> refer to any network we could ever hope to see (or as we introduced in the previous chapter, <em>realize</em>) in the real world. This issue is extremely important in network machine learning, so we will try to drive it home one more time: no matter how much data we collected (unless we could get infinite data, which we <em>can’t</em>), we can never hope to understand the true distribution of <span class="math notranslate nohighlight">\(\mathbf A\)</span>. As network scientists, this leaves us with a bit of a problem: what, then, can we do to make useful claims about <span class="math notranslate nohighlight">\(\mathbf A\)</span>, if we can’t actually see <span class="math notranslate nohighlight">\(\mathbf A\)</span> nor its distribution?</p>
 <p>This is where statistics, particularly, <strong>estimation</strong>, comes into play. At a very high level, estimation is a procedure to calculate properties about a random variable (or a set of random variables) using <em>only</em> the data we are given: finitely many (in network statistics, often just <em>one</em>) samples which we assume are <em>realizations</em> of the random variable we want to learn about. The properties of the random variable that we seek to learn about are called <strong>estimands</strong>, and  In the case of our network models, in particular, we will attempt to obtain reasonable estimates of the parameters (our <em>estimands</em>) associated with random networks.</p>
 <p>The most useful property that we will leverage which was developed in Chapter <span class="math notranslate nohighlight">\(5\)</span> is the independent-edge assumption. As we discussed, when working with independent-edge random network models, we will assume that edges in our random network are <em>independent</em>. This means that the probability of observing a particular realization of a random network is, in fact, the product of the probabilities of observing each edge in the random network. Notationally, what this means is that if <span class="math notranslate nohighlight">\(\mathbf A\)</span> is a random network with <span class="math notranslate nohighlight">\(n\)</span> nodes and edges <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span>, and <span class="math notranslate nohighlight">\(A\)</span> is a realization of that random network with edges <span class="math notranslate nohighlight">\(a_{ij}\)</span>, then:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -1125,7 +1135,7 @@ title="Print to PDF"
 <section id="studying-sampling-distributions-of-estimators">
 <h3><span class="section-number">12.1.2.1. </span>Studying sampling distributions of estimators<a class="headerlink" href="#studying-sampling-distributions-of-estimators" title="Permalink to this headline">#</a></h3>
 <p>When discussing how “good” estimators do, there are a few nuances to consider. The first is that an estimator can only be studied for its “effectiveness” in the context of what it is “effective” at studying. Stated another way, an estimator can only be studied in the context of the <em>assumed statistical model</em>.</p>
-<p>What this means is that if we want to study the estimator we are interested in, such as the probability estimator we learned above, we have to take a big conceptual leap: we need to assume that the realization we are presented with, <span class="math notranslate nohighlight">\(A\)</span>, is <em>truly</em> a realization of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> that we can quantify properties about. It is important to realize that for all the reasons we listed in <a class="reference external" href="#link?">the preface to Chapter 5</a> (and potentially many reasons we didn’t even touch on), that this will almost never be the case. This means that statistical inference tends to proceed as follows:</p>
+<p>What this means is that if we want to study the estimator we are interested in, such as the probability estimator we learned above, we have to take a big conceptual leap: we need to assume that the realization we are presented with, <span class="math notranslate nohighlight">\(A\)</span>, is <em>truly</em> a realization of a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> that we can quantify properties about. This means that statistical inference tends to proceed as follows:</p>
 <ol class="simple">
 <li><p>Develop a statistical model, which the data can <em>reasonably</em> be assumed to follow,</p></li>
 <li><p>Produce an estimator of some useful quantity for that statistical model,</p></li>
@@ -1239,7 +1249,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Approximate mean: 1.832348
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Approximate mean: 1.928392
 True mean: 2.000000
 </pre></div>
 </div>
@@ -1348,7 +1358,7 @@ var(\mathbf a_{ij}) &amp;= p - p^2 = p\cdot (1 - p).
 \[\begin{align*}
 var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} \cdot p \cdot (1 - p) = \frac{p(1 - p)}{\binom n 2}
 \end{align*}\]</div>
-<p>We can turn to a thing called <a class="reference external" href="https://en.wikipedia.org/wiki/Chebyshev%27s_inequality"><em>Chebyshev’s Inequality</em></a>. <strong>Chebyshev’s Inequality</strong> states that, if <span class="math notranslate nohighlight">\(\mathbf x\)</span> is a random variable with a finite mean <span class="math notranslate nohighlight">\(\mathbb E[\mathbf x] = \mu\)</span> and a finite variance <span class="math notranslate nohighlight">\(\sigma^2\)</span>, that, for any value of <span class="math notranslate nohighlight">\(k\)</span> that is greater than <span class="math notranslate nohighlight">\(0\)</span>:</p>
+<p>We can turn to a thing called <em>Chebyshev’s Inequality</em>. <strong>Chebyshev’s Inequality</strong> states that, if <span class="math notranslate nohighlight">\(\mathbf x\)</span> is a random variable with a finite mean <span class="math notranslate nohighlight">\(\mathbb E[\mathbf x] = \mu\)</span> and a finite variance <span class="math notranslate nohighlight">\(\sigma^2\)</span>, that, for any value of <span class="math notranslate nohighlight">\(k\)</span> that is greater than <span class="math notranslate nohighlight">\(0\)</span>:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
     Pr(|\mathbf x - \mu| \geq k\sigma) \leq \frac{1}{k^2}.
@@ -1484,7 +1494,18 @@ var(\mathbf {\hat p}_n) &amp;= \frac{1}{\binom n 2} \cdot p \cdot (1 - p) = \fra
     Pr_\theta(A) &amp;= \log\left(\sum_{\vec \tau \in \mathcal T} \prod_{k = 1}^K \left[\pi_k^{n_k}\cdot \prod_{k'=1}^K b_{k' k}^{m_{k' k}}(1 - b_{k' k})^{n_{k' k} - m_{k' k}}\right]\right)
 \end{align*}\]</div>
 <p>Whereas the log of a product of terms is the sum of the logs of the terms, no such easy simplification exists for the log of a <em>sum</em> of terms. Without any useful tricks, this expression is extremely complicated, if not impossible, to find a closed form expression for an MLE for (if you can solve this expression with a closed-form solution, please publish a paper and send us the link so we can check it out!).</p>
-<p>There are various strategies under which we could use <em>approximation</em> techniques to find the maximum likelihood estimate here, such as the popular technique of expectation maximization (EM). However, we instead turn to what are known as <em>spectral methods</em>, which you learned about in <a class="reference external" href="#link?">Chapter 6</a>, for the reasons we will cover in the next section.</p>
+<p>There are various strategies under which we could use <em>approximation</em> techniques to find approximations maximum likelihood estimate here, such as the popular technique of expectation maximization (EM). However, we instead turn to what are known as <em>spectral methods</em>, which you learn about in <a class="reference internal" href="../../representations/ch6/ch6.html#ch6"><span class="std std-numref">Section 5</span></a>, for the reasons we will cover in the next section.</p>
+</section>
+<section id="references">
+<h2><span class="section-number">12.1.6. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<p>For a good overview of statistical inference, we’d recommend checking out <span id="id1">[<a class="reference internal" href="#id89" title="George Casella and Roger L. Berger. Statistical Inference. Cengage Learning, Boston, MA, USA, June 2001. ISBN 978-0-53424312-8.">1</a>]</span>.</p>
+<div class="docutils container" id="id2">
+<dl class="citation">
+<dt class="label" id="id89"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>George Casella and Roger L. Berger. <em>Statistical Inference</em>. Cengage Learning, Boston, MA, USA, June 2001. ISBN 978-0-53424312-8.</p>
+</dd>
+</dl>
+</div>
 </section>
 </section>
 
