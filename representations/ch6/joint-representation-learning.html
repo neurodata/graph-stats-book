@@ -1085,7 +1085,7 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span> <span class="o">=</span> <span class="n">plot_latents</span><span class="p">(</span><span class="n">Y_latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedded covariate matrix&quot;</span><span class="p">,</span> 
                     <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
@@ -1100,12 +1100,12 @@ title="Print to PDF"
 </section>
 <section id="covariate-assisted-spectral-embedding">
 <h2><span class="section-number">5.5.3. </span>Covariate-Assisted Spectral Embedding<a class="headerlink" href="#covariate-assisted-spectral-embedding" title="Permalink to this headline">#</a></h2>
-<p><em>Covariate-Assisted Spectral Embedding</em>, or CASE, is a simple way of combining your network and your covariates into a single model. In the most straightforward version of CASE, you combine the network’s Laplacian <span class="math notranslate nohighlight">\(L\)</span> and a function of your covariate matrix <span class="math notranslate nohighlight">\(YY^\top\)</span>. Here, <span class="math notranslate nohighlight">\(Y\)</span> is just your covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. You can go back to <code class="xref std std-numref docutils literal notranslate"><span class="pre">ch4:matrix-rep</span></code> to refamiliarize yourself with the Laplacian.</p>
+<p><em>Covariate-Assisted Spectral Embedding</em>, or CASE, is a simple way of combining your network and your covariates into a single model. In the most straightforward version of CASE, you combine the network’s Laplacian <span class="math notranslate nohighlight">\(L\)</span> and a function of your covariate matrix <span class="math notranslate nohighlight">\(YY^\top\)</span>. Here, <span class="math notranslate nohighlight">\(Y\)</span> is just your covariate matrix, in which row <span class="math notranslate nohighlight">\(i\)</span> contains the covariates associated with node <span class="math notranslate nohighlight">\(i\)</span>. You can go back to <a class="reference internal" href="../ch4/matrix-representations.html#ch4-mtx-rep"><span class="std std-numref">Section 3.1</span></a> to refamiliarize yourself with the Laplacian.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^top\)</span>, notice you’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when you take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-d89dd239-d67d-4ddb-911b-d1a8632b4057">
-<span class="eqno">(5.2)<a class="headerlink" href="#equation-d89dd239-d67d-4ddb-911b-d1a8632b4057" title="Permalink to this equation">#</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-f363ae8b-e22c-4d6c-b4e3-2ceef27e5ec5">
+<span class="eqno">(5.2)<a class="headerlink" href="#equation-f363ae8b-e22c-4d6c-b4e3-2ceef27e5ec5" title="Permalink to this equation">#</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1131,8 +1131,9 @@ title="Print to PDF"
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">to_laplacian</span><span class="p">(</span><span class="n">L</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
@@ -1140,11 +1141,11 @@ title="Print to PDF"
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># plot</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">to_laplacian</span><span class="p">(</span><span class="n">L</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 
 <span class="ne">NameError</span>: name &#39;L&#39; is not defined
 </pre></div>
@@ -1264,7 +1265,13 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 
 <span class="n">casc</span> <span class="o">=</span> <span class="n">CASE</span><span class="p">(</span><span class="n">assortative</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">latents</span> <span class="o">=</span> <span class="n">casc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">covariates</span><span class="o">=</span><span class="n">Y</span><span class="p">)</span>
-<span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding your model using graspologic&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding your model using graspologic&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
