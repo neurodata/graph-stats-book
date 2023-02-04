@@ -17,38 +17,54 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-from graspologic.simulations import rdpg
-def ohe(T):
-    K = len(np.unique(T))
-    ohe_dat = np.zeros((len(T), K))
-    for t in np.unique(T):
-        ohe_dat[:,t] = (T == t).astype(int)
-    return ohe_dat
-
-ns = [30, 100, 60]
-# strategy for sampling a DCSBM
-theta = np.hstack((np.linspace(0.5, 1.5, num=ns[0]), np.linspace(1, 1.2, num=ns[1]), np.linspace(0.8, 1.5, num=ns[2])))
-B = [[0.3, 0.25, 0.2], [0.25, 0.6, 0.2], [0.2, 0.2, 0.4]]
-z = [0 for i in range(0, ns[0])] + [1 for i in range(0, ns[1])] + [2 for i in range(0, ns[2])]
-Z = ohe(z)
-U, s, Vt = svd(B)
-Bsqrt = U @ np.diag(np.sqrt(s))
-X = np.diag(theta) @ Z @ Bsqrt
-A = rdpg(X)
-
-P_dcsbm = X @ X.transpose()
-A = rdpg(X)
+# compute the confusion matrix between the true labels z
+# and the predicted labels labels_kmeans
+cf_matrix = confusion_matrix(zs, labels_autogmm_erratic)[0:3,:]
+cfm_norm = np.divide(cf_matrix, cf_matrix.sum(axis=0))
 ------------------
 
 [0;31m---------------------------------------------------------------------------[0m
-[0;31mNameError[0m                                 Traceback (most recent call last)
-Cell [0;32mIn[30], line 15[0m
-[1;32m     13[0m z [38;5;241m=[39m [[38;5;241m0[39m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m([38;5;241m0[39m, ns[[38;5;241m0[39m])] [38;5;241m+[39m [[38;5;241m1[39m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m([38;5;241m0[39m, ns[[38;5;241m1[39m])] [38;5;241m+[39m [[38;5;241m2[39m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28mrange[39m([38;5;241m0[39m, ns[[38;5;241m2[39m])]
-[1;32m     14[0m Z [38;5;241m=[39m ohe(z)
-[0;32m---> 15[0m U, s, Vt [38;5;241m=[39m [43msvd[49m(B)
-[1;32m     16[0m Bsqrt [38;5;241m=[39m U [38;5;241m@[39m np[38;5;241m.[39mdiag(np[38;5;241m.[39msqrt(s))
-[1;32m     17[0m X [38;5;241m=[39m np[38;5;241m.[39mdiag(theta) [38;5;241m@[39m Z [38;5;241m@[39m Bsqrt
+[0;31mValueError[0m                                Traceback (most recent call last)
+Cell [0;32mIn[41], line 3[0m
+[1;32m      1[0m [38;5;66;03m# compute the confusion matrix between the true labels z[39;00m
+[1;32m      2[0m [38;5;66;03m# and the predicted labels labels_kmeans[39;00m
+[0;32m----> 3[0m cf_matrix [38;5;241m=[39m [43mconfusion_matrix[49m[43m([49m[43mzs[49m[43m,[49m[43m [49m[43mlabels_autogmm_erratic[49m[43m)[49m[[38;5;241m0[39m:[38;5;241m3[39m,:]
+[1;32m      4[0m cfm_norm [38;5;241m=[39m np[38;5;241m.[39mdivide(cf_matrix, cf_matrix[38;5;241m.[39msum(axis[38;5;241m=[39m[38;5;241m0[39m))
 
-[0;31mNameError[0m: name 'svd' is not defined
-NameError: name 'svd' is not defined
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/metrics/_classification.py:317[0m, in [0;36mconfusion_matrix[0;34m(y_true, y_pred, labels, sample_weight, normalize)[0m
+[1;32m    232[0m [38;5;28;01mdef[39;00m [38;5;21mconfusion_matrix[39m(
+[1;32m    233[0m     y_true, y_pred, [38;5;241m*[39m, labels[38;5;241m=[39m[38;5;28;01mNone[39;00m, sample_weight[38;5;241m=[39m[38;5;28;01mNone[39;00m, normalize[38;5;241m=[39m[38;5;28;01mNone[39;00m
+[1;32m    234[0m ):
+[1;32m    235[0m [38;5;250m    [39m[38;5;124;03m"""Compute confusion matrix to evaluate the accuracy of a classification.[39;00m
+[1;32m    236[0m 
+[1;32m    237[0m [38;5;124;03m    By definition a confusion matrix :math:`C` is such that :math:`C_{i, j}`[39;00m
+[0;32m   (...)[0m
+[1;32m    315[0m [38;5;124;03m    (0, 2, 1, 1)[39;00m
+[1;32m    316[0m [38;5;124;03m    """[39;00m
+[0;32m--> 317[0m     y_type, y_true, y_pred [38;5;241m=[39m [43m_check_targets[49m[43m([49m[43my_true[49m[43m,[49m[43m [49m[43my_pred[49m[43m)[49m
+[1;32m    318[0m     [38;5;28;01mif[39;00m y_type [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m ([38;5;124m"[39m[38;5;124mbinary[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mmulticlass[39m[38;5;124m"[39m):
+[1;32m    319[0m         [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m([38;5;124m"[39m[38;5;132;01m%s[39;00m[38;5;124m is not supported[39m[38;5;124m"[39m [38;5;241m%[39m y_type)
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/metrics/_classification.py:86[0m, in [0;36m_check_targets[0;34m(y_true, y_pred)[0m
+[1;32m     59[0m [38;5;28;01mdef[39;00m [38;5;21m_check_targets[39m(y_true, y_pred):
+[1;32m     60[0m [38;5;250m    [39m[38;5;124;03m"""Check that y_true and y_pred belong to the same classification task.[39;00m
+[1;32m     61[0m 
+[1;32m     62[0m [38;5;124;03m    This converts multiclass or binary types to a common shape, and raises a[39;00m
+[0;32m   (...)[0m
+[1;32m     84[0m [38;5;124;03m    y_pred : array or indicator matrix[39;00m
+[1;32m     85[0m [38;5;124;03m    """[39;00m
+[0;32m---> 86[0m     [43mcheck_consistent_length[49m[43m([49m[43my_true[49m[43m,[49m[43m [49m[43my_pred[49m[43m)[49m
+[1;32m     87[0m     type_true [38;5;241m=[39m type_of_target(y_true, input_name[38;5;241m=[39m[38;5;124m"[39m[38;5;124my_true[39m[38;5;124m"[39m)
+[1;32m     88[0m     type_pred [38;5;241m=[39m type_of_target(y_pred, input_name[38;5;241m=[39m[38;5;124m"[39m[38;5;124my_pred[39m[38;5;124m"[39m)
+
+File [0;32m/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/utils/validation.py:397[0m, in [0;36mcheck_consistent_length[0;34m(*arrays)[0m
+[1;32m    395[0m uniques [38;5;241m=[39m np[38;5;241m.[39munique(lengths)
+[1;32m    396[0m [38;5;28;01mif[39;00m [38;5;28mlen[39m(uniques) [38;5;241m>[39m [38;5;241m1[39m:
+[0;32m--> 397[0m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m(
+[1;32m    398[0m         [38;5;124m"[39m[38;5;124mFound input variables with inconsistent numbers of samples: [39m[38;5;132;01m%r[39;00m[38;5;124m"[39m
+[1;32m    399[0m         [38;5;241m%[39m [[38;5;28mint[39m(l) [38;5;28;01mfor[39;00m l [38;5;129;01min[39;00m lengths]
+[1;32m    400[0m     )
+
+[0;31mValueError[0m: Found input variables with inconsistent numbers of samples: [100, 190]
+ValueError: Found input variables with inconsistent numbers of samples: [100, 190]
 
