@@ -1056,16 +1056,13 @@ title="Print to PDF"
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;./Images/lobes.png&#39;</span><span class="p">))</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">coords_df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">fig</span>
+<span class="n">fig</span><span class="p">;</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../../_images/discover-and-visualize_10_0.png" src="../../_images/discover-and-visualize_10_0.png" />
-</div>
 </div>
 <p>So, the colors of the brain areas don’t quite perfectly align with the brain lobe, although as we can see above, nodes in the same community are often near nodes within that same community (notice, for instance, that a lot of nodes in the left side of the brain, the part marked “occipital lobe” in the plot, tend to be the same color).</p>
-<p>In neuroimaging, there tend to be “groups” of brain areas that work together, which are organized in files called “parcellations”. The idea is that they “parcellate” (segment) different areas of the brain baesd on two factors: whether the areas of the brain work together, and whether they are located near each other in the brain. Let’s see how well the labels we obtained align with these parcellations. We’ll do this by looking at the different parcellations (there are <span class="math notranslate nohighlight">\(7\)</span> of them in the one that we will use here), and count the number of nodes in a given community (the thing that you just estimated, indicated by color, above) that are assigned to a particular parcel as well. This means that we will end up with a <span class="math notranslate nohighlight">\(7 \times 6\)</span> matrix, where the entries are the counts of nodes in the network that are assigned to a given community <em>and</em> fall into a given parcel:</p>
+<p>In neuroimaging, there tend to be “groups” of brain areas that work together, which are organized in files called “parcellations”. The idea is that they “parcellate” (segment) different areas of the brain baesd on two factors: whether the areas of the brain work together, and whether they are located near each other in the brain. Let’s see how well the labels we obtained align with these parcellations. We’ll do this by looking at the different parcellations (there are <span class="math notranslate nohighlight">\(7\)</span> of them in the one that we will use here), and count the number of nodes in a given community (the thing that you just estimated, indicated by color, above) that are assigned to a particular parcel as well. This means that we will end up with a matrix where the number of rows are the number of true parcels in the brain, the number of columns is the number of predicted communities that you found above, and the entries of the matrix are the counts of nodes in the network that are assigned to a given community <em>and</em> fall into a given parcel:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">contextlib</span>
@@ -1079,7 +1076,7 @@ title="Print to PDF"
                     <span class="n">group_dest</span><span class="p">);</span>
 <span class="n">roi_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./datasets/&quot;</span><span class="p">,</span> <span class="s2">&quot;Schaefer200_space-MNI152NLin6_res-2x2x2.nii.gz&quot;</span><span class="p">)</span>
 <span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="s2">&quot;https://github.com/neurodata/neuroparc/blob/master/atlases/label/Human/&quot;</span> <span class="o">+</span>
-                    <span class="s2">&quot;Schaefer200_space-MNI152NLin6_res-2x2x2.nii.gz?raw=true&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Schaefer400_space-MNI152NLin6_res-2x2x2.nii.gz?raw=true&quot;</span><span class="p">,</span>
                     <span class="n">roi_dest</span><span class="p">);</span>
 
 <span class="n">dicemap</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dice</span><span class="o">.</span><span class="n">dice_roi</span><span class="p">(</span><span class="s2">&quot;./datasets/&quot;</span><span class="p">,</span> <span class="s2">&quot;./datasets&quot;</span><span class="p">,</span> <span class="s2">&quot;Yeo-7_space-MNI152NLin6_res-2x2x2.nii.gz&quot;</span><span class="p">,</span> 
@@ -1088,52 +1085,6 @@ title="Print to PDF"
 
 <span class="c1"># make confusion matrix</span>
 <span class="n">cf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">actual_cluster</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">line</span> <span class="mi">20</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span> <span class="n">actual_cluster</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dicemap</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="mi">1</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="c1"># make confusion matrix</span>
-<span class="ne">---&gt; </span><span class="mi">20</span> <span class="n">cf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">actual_cluster</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/metrics/_classification.py:317,</span> in <span class="ni">confusion_matrix</span><span class="nt">(y_true, y_pred, labels, sample_weight, normalize)</span>
-<span class="g g-Whitespace">    </span><span class="mi">232</span> <span class="k">def</span> <span class="nf">confusion_matrix</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">233</span>     <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">None</span>
-<span class="g g-Whitespace">    </span><span class="mi">234</span> <span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">235</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Compute confusion matrix to evaluate the accuracy of a classification.</span>
-<span class="g g-Whitespace">    </span><span class="mi">236</span><span class="sd"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">237</span><span class="sd">     By definition a confusion matrix :math:`C` is such that :math:`C_{i, j}`</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">315</span><span class="sd">     (0, 2, 1, 1)</span>
-<span class="g g-Whitespace">    </span><span class="mi">316</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">317</span>     <span class="n">y_type</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">_check_targets</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">318</span>     <span class="k">if</span> <span class="n">y_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="s2">&quot;multiclass&quot;</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">319</span>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not supported&quot;</span> <span class="o">%</span> <span class="n">y_type</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/metrics/_classification.py:86,</span> in <span class="ni">_check_targets</span><span class="nt">(y_true, y_pred)</span>
-<span class="g g-Whitespace">     </span><span class="mi">59</span> <span class="k">def</span> <span class="nf">_check_targets</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Check that y_true and y_pred belong to the same classification task.</span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span><span class="sd"> </span>
-<span class="g g-Whitespace">     </span><span class="mi">62</span><span class="sd">     This converts multiclass or binary types to a common shape, and raises a</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">     </span><span class="mi">84</span><span class="sd">     y_pred : array or indicator matrix</span>
-<span class="g g-Whitespace">     </span><span class="mi">85</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">---&gt; </span><span class="mi">86</span>     <span class="n">check_consistent_length</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">87</span>     <span class="n">type_true</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;y_true&quot;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">88</span>     <span class="n">type_pred</span> <span class="o">=</span> <span class="n">type_of_target</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">input_name</span><span class="o">=</span><span class="s2">&quot;y_pred&quot;</span><span class="p">)</span>
-
-<span class="nn">File /opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/sklearn/utils/validation.py:397,</span> in <span class="ni">check_consistent_length</span><span class="nt">(*arrays)</span>
-<span class="g g-Whitespace">    </span><span class="mi">395</span> <span class="n">uniques</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">396</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniques</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">397</span>     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">398</span>         <span class="s2">&quot;Found input variables with inconsistent numbers of samples: </span><span class="si">%r</span><span class="s2">&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">399</span>         <span class="o">%</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">]</span>
-<span class="g g-Whitespace">    </span><span class="mi">400</span>     <span class="p">)</span>
-
-<span class="ne">ValueError</span>: Found input variables with inconsistent numbers of samples: [200, 400]
 </pre></div>
 </div>
 </div>
@@ -1148,6 +1099,9 @@ title="Print to PDF"
 <span class="n">fig</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/discover-and-visualize_13_0.png" src="../../_images/discover-and-visualize_13_0.png" />
 </div>
 </div>
 <p>As you will learn in the section on mase embedding in <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-mase"><span class="std std-numref">Section 5.4.4</span></a>, the mase embedding followed by clustering tends to find groups of nodes that have similar connectivity patterns in the connectomes (it will do a good job at finding the nodes that work together). This means that the nodes in the same community tend to behave “as a unit”, if you will, in that they tend to be active/inactive together. Basically, what the plot above shows is that nodes that tend to have similar connectivity patterns (from the networks) tend to also be in the same parcel (the <em>true label</em>), which makes sense since the parcels are based on connectivity profiles from brains. The clustering isn’t <em>perfect</em>, in that it is never the case that a single predicted label corresponds to <em>exactly</em> one true label. If that were the case, we would expect for each column in the above “confusion matrix” to only have one possible true label that nodes within this predicted label are assigned to, which isn’t quite the case.</p>
