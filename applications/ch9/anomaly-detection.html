@@ -879,6 +879,11 @@ title="Print to PDF"
    8.1.5. The Distribution of the Bootstrapped Test Statistic
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   8.1.6. References
+  </a>
+ </li>
 </ul>
 
     </nav>
@@ -956,6 +961,11 @@ title="Print to PDF"
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-distribution-of-the-bootstrapped-test-statistic">
    8.1.5. The Distribution of the Bootstrapped Test Statistic
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   8.1.6. References
   </a>
  </li>
 </ul>
@@ -1067,15 +1077,15 @@ title="Print to PDF"
 <p>There’s an alternate problem where you restrict your view to <em>subsets of nodes</em> rather than entire adjacency matrices. The idea is that you’d find time-points which are anomalous for particular nodes or groups of nodes, rather than the entire network. The general idea is the same: you find latent positions, then test for how big the difference is between time point <span class="math notranslate nohighlight">\(t\)</span> and time point <span class="math notranslate nohighlight">\(t-1\)</span>. This time, however, your test is for particular nodes. We’ll be focusing on the problem for whole networks, but you can take a look at the original paper if you’re curious about how to apply it to nodes.</p>
 <section id="challenges-of-anomaly-detection">
 <h3><span class="section-number">8.1.2.1. </span>Challenges of anomaly detection<a class="headerlink" href="#challenges-of-anomaly-detection" title="Permalink to this headline">#</a></h3>
-<p>In practice, however, this is a bit more challenging than just looking for the consecutive time points with differences that exceed zero. Even in a perfect environment, such as under simulation, we run across two variations of problems that we have seen before. To perform timeseries anomaly detection, what you are first going to assume is that each network <span class="math notranslate nohighlight">\(A^{(t)}\)</span> you observe is a sample of an <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-ref">RDPG</span></a> with a latent position matrix <span class="math notranslate nohighlight">\(X^{(t)}\)</span>, for all timepoints <span class="math notranslate nohighlight">\(t\)</span> from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(T\)</span>. Further, we assume that the latent dimensionality <span class="math notranslate nohighlight">\(d\)</span> is known to be the same across all of the networks.</p>
+<p>In practice, however, this is a bit more challenging than just looking for the consecutive time points with differences that exceed zero. Even in a perfect environment, such as under simulation, we run across two variations of problems that we have seen before. To perform timeseries anomaly detection, what you are first going to assume is that each network <span class="math notranslate nohighlight">\(A^{(t)}\)</span> you observe is a sample of an RDPG from <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html#ch5-rdpg"><span class="std std-numref">Section 4.3</span></a> with a latent position matrix <span class="math notranslate nohighlight">\(X^{(t)}\)</span>, for all timepoints <span class="math notranslate nohighlight">\(t\)</span> from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(T\)</span>. Further, we assume that the latent dimensionality <span class="math notranslate nohighlight">\(d\)</span> is known to be the same across all of the networks.</p>
 <p>For each timepoint, we have the following question of interest: are the latent positions equal; that is, <span class="math notranslate nohighlight">\(H_0^{(t)} : X^{(t)} = X^{(t - 1)}W\)</span>, for some rotation matrix <span class="math notranslate nohighlight">\(W\)</span>? Or are the latent positions different; that is, <span class="math notranslate nohighlight">\(H_A^{(t)} : X^{(t)} \neq X^{(t - 1)}W\)</span>?</p>
 <section id="the-nonidentifiability-problem">
 <h4><span class="section-number">8.1.2.1.1. </span>The nonidentifiability problem<a class="headerlink" href="#the-nonidentifiability-problem" title="Permalink to this headline">#</a></h4>
-<p>When you observe the network <span class="math notranslate nohighlight">\(A^{(t)}\)</span>, you only observe the network itself: not the underlying latent position matrix <span class="math notranslate nohighlight">\(X^{(t)}\)</span>. Instead, you estimate the latent position matrix, <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span>, using <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-ref">spectral embeddings</span></a>. Unfortunately, latent position matrices are rotationally non-identifiable: that is, you cannot identify one latent position matrix <span class="math notranslate nohighlight">\(X^{(t)}\)</span> from another latent position matrix <span class="math notranslate nohighlight">\(Y^{(t)} = X^{(t)}W\)</span> where <span class="math notranslate nohighlight">\(W\)</span> is a rotation, and the same goes for estimates of these quantities <span class="math notranslate nohighlight">\(\hat Y{(t)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> as well. This means that you will need a strategy which “rotates” all of the latent position estimates into the same space. To overcome this hurdle, we need an approach which takes networks, and produces latent position estimates for each network which are rotationally aligned. Fortunately, you already know how to do this: you can use the <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-omni"><span class="std std-ref">OMNI embedding</span></a>. Once your estimates are all aligned in the same latent space, you can ignore the rotation matrix, <span class="math notranslate nohighlight">\(W\)</span>, for all practical purposes for the remainder of this section.</p>
+<p>When you observe the network <span class="math notranslate nohighlight">\(A^{(t)}\)</span>, you only observe the network itself: not the underlying latent position matrix <span class="math notranslate nohighlight">\(X^{(t)}\)</span>. Instead, you estimate the latent position matrix, <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span>, using spectral embeddings from <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>. Unfortunately, latent position matrices are rotationally non-identifiable: that is, you cannot identify one latent position matrix <span class="math notranslate nohighlight">\(X^{(t)}\)</span> from another latent position matrix <span class="math notranslate nohighlight">\(Y^{(t)} = X^{(t)}W\)</span> where <span class="math notranslate nohighlight">\(W\)</span> is a rotation, and the same goes for estimates of these quantities <span class="math notranslate nohighlight">\(\hat Y{(t)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> as well. This means that you will need a strategy which “rotates” all of the latent position estimates into the same space. To overcome this hurdle, we need an approach which takes networks, and produces latent position estimates for each network which are rotationally aligned. Fortunately, you already know how to do this: you can use the OMNI embedding in <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-omni"><span class="std std-numref">Section 5.4.5</span></a>. Once your estimates are all aligned in the same latent space, you can ignore the rotation matrix, <span class="math notranslate nohighlight">\(W\)</span>, for all practical purposes for the remainder of this section.</p>
 </section>
 <section id="we-only-get-to-obtain-estimates-of-latent-positions">
 <h4><span class="section-number">8.1.2.1.2. </span>We only get to obtain estimates of latent positions<a class="headerlink" href="#we-only-get-to-obtain-estimates-of-latent-positions" title="Permalink to this headline">#</a></h4>
-<p>Now that you have latent position estimates for each network <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> that are all rotated into the same space, you are presented with a new problem: the latent position estimates still won’t equal the true, underlying latent positions <span class="math notranslate nohighlight">\(X^{(t)}\)</span>. This means that even if <span class="math notranslate nohighlight">\(X^{(t)} = X^{(t - 1)}\)</span>, and you are able to orient <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> and <span class="math notranslate nohighlight">\(X^{(t - 1)}\)</span> so that they are rotationally aligned, your estimates <em>still</em> won’t be equal. Remember these quantities are only <em>estimates</em> of latent positions, which means they will be subject to random noise <em>even if</em> the underlying true latent positions are exactly equal. That means that we aren’t going to be able to just check whether two time points have estimated latent position matrices with a <span class="xref myst"><em>Frobenius distance</em></span> that differs from zero; rather, we’re going to need to figure out what <em>relatively large</em> and <em>relatively small</em> amount to in the context of our sample.</p>
+<p>Now that you have latent position estimates for each network <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> that are all rotated into the same space, you are presented with a new problem: the latent position estimates still won’t equal the true, underlying latent positions <span class="math notranslate nohighlight">\(X^{(t)}\)</span>. This means that even if <span class="math notranslate nohighlight">\(X^{(t)} = X^{(t - 1)}\)</span>, and you are able to orient <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> and <span class="math notranslate nohighlight">\(X^{(t - 1)}\)</span> so that they are rotationally aligned, your estimates <em>still</em> won’t be equal. Remember these quantities are only <em>estimates</em> of latent positions, which means they will be subject to random noise <em>even if</em> the underlying true latent positions are exactly equal. That means that we aren’t going to be able to just check whether two time points have estimated latent position matrices with a <em>Frobenius distance</em> <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6:se:frob_dist">Definition 5.2</a> that differs from zero; rather, we’re going to need to figure out what <em>relatively large</em> and <em>relatively small</em> amount to in the context of our sample.</p>
 </section>
 </section>
 </section>
@@ -1084,7 +1094,7 @@ title="Print to PDF"
 <p>We’ll start with the first time point, which (because we generated the data!) we know in advance is not an anomaly.</p>
 <p>So, here’s what’s going on in the code below:</p>
 <ol class="simple">
-<li><p>We embed the networks <span class="math notranslate nohighlight">\(\{A^{(1)}, ..., A^{(T)}\}\)</span> using <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-omni"><span class="std std-ref">OMNI embedding</span></a>, to produce estimates of the latent position matrices <span class="math notranslate nohighlight">\(\{X^{(1)}, ..., X^{(T)}\}\)</span> for all timepoints <span class="math notranslate nohighlight">\(t\)</span>, oriented in the same latent space.</p></li>
+<li><p>We embed the networks <span class="math notranslate nohighlight">\(\{A^{(1)}, ..., A^{(T)}\}\)</span> using OMNI embedding from <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html#ch6-multinet-omni"><span class="std std-numref">Section 5.4.5</span></a>, to produce estimates of the latent position matrices <span class="math notranslate nohighlight">\(\{X^{(1)}, ..., X^{(T)}\}\)</span> for all timepoints <span class="math notranslate nohighlight">\(t\)</span>, oriented in the same latent space.</p></li>
 <li><p>We compute the norm of the difference between each pair of samples, letting <span class="math notranslate nohighlight">\(s^{(t)} = ||\hat X^{(t)} - \hat X^{(t - 1)}||_2\)</span> with <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, for the timepoint <span class="math notranslate nohighlight">\(t\)</span>. We repeat this for all timepoints except for the first timepoint, so <span class="math notranslate nohighlight">\(t\)</span> goes from <span class="math notranslate nohighlight">\(2\)</span> to <span class="math notranslate nohighlight">\(T\)</span>. With <span class="math notranslate nohighlight">\(T=12\)</span> timepoints in our example, this means that we have <span class="math notranslate nohighlight">\(11\)</span> total test statistics.</p></li>
 </ol>
 <p>An important point to clarify is that there are a lot of different types of matrix norms: Frobenius norm, spectral norm, and so on. In our case, we’ll be using the <span class="math notranslate nohighlight">\(l_2\)</span> operator norm, which is simply the largest singular value of the matrix. The <code class="docutils literal notranslate"><span class="pre">ord</span></code> parameter argument in numpy determines which norm we use, and <code class="docutils literal notranslate"><span class="pre">ord=2</span></code> is the operator norm.</p>
@@ -1115,7 +1125,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.556
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.594
 </pre></div>
 </div>
 </div>
@@ -1144,10 +1154,10 @@ title="Print to PDF"
 <h2><span class="section-number">8.1.4. </span>Hypothesis Testing With our Test Statistic<a class="headerlink" href="#hypothesis-testing-with-our-test-statistic" title="Permalink to this headline">#</a></h2>
 <p>We observe the test statistic shown with the red line above, which has a value of . If the first two adjacency matrices have the same latent positions, we would hope that their latent position estimates (after adjusting for rotations) are reasonably similar and the statistic would be relatively small. On the other hand, if their latent positions are different, we would hope that their latent position estimates (even after adjusting for rotations) would be reasonably large and the statistic would also be relatively large. However, the word <em>relative</em> is the key word here: <em>relative</em> what? how should we determine whether it’s small enough to say that <span class="math notranslate nohighlight">\(X^{(t)}\)</span> and <span class="math notranslate nohighlight">\(X^{(t - 1)}\)</span> come from the same distribution, and aren’t anomalalous time points?</p>
 <p>Well, what if we could use our estimated latent positions <span class="math notranslate nohighlight">\(\hat{X}^{(t)}\)</span> at time <span class="math notranslate nohighlight">\(t\)</span> to generate networks, then make test statistics from those new networks? We’d know for a fact that any pair of those networks are drawn from the same set of latent positions, and we could get a sense for what our test statistic should look like if the latent positions actually were the same.</p>
-<p>Back in <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">two sample testing</span></a>, we came across this same fundamental problem when attempting to determine whether two latent position matrices were identical, and here we’re going to resort to virtually the same strategy: the parametric bootstrap.</p>
+<p>Back in two sample testing <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a>, we came across this same fundamental problem when attempting to determine whether two latent position matrices were identical, and here we’re going to resort to virtually the same strategy: the parametric bootstrap.</p>
 <section id="generating-the-null-distribution-of-each-pair-of-timepoints-using-the-parametric-bootstrap">
 <h3><span class="section-number">8.1.4.1. </span>Generating the null distribution of each pair of timepoints using the parametric bootstrap<a class="headerlink" href="#generating-the-null-distribution-of-each-pair-of-timepoints-using-the-parametric-bootstrap" title="Permalink to this headline">#</a></h3>
-<p>So: recall, our original question was to determine whether <span class="math notranslate nohighlight">\(H_0^{(t)} : X^{(t)} = X^{(t - 1)}W\)</span> or <span class="math notranslate nohighlight">\(H_A^{(t)} : X^{(t)} \neq X^{(t - 1)}W\)</span>, or that the latent positions are equal/unequal up to a rotation. This is clearly a two-sample test, so how could we adapt the approach we used in <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">two-sample testing</span></a> here?</p>
+<p>So: recall, our original question was to determine whether <span class="math notranslate nohighlight">\(H_0^{(t)} : X^{(t)} = X^{(t - 1)}W\)</span> or <span class="math notranslate nohighlight">\(H_A^{(t)} : X^{(t)} \neq X^{(t - 1)}W\)</span>, or that the latent positions are equal/unequal up to a rotation. This is clearly a two-sample test, so how could we adapt the approach we used in two-sample testing from <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a> here?</p>
 <p>Our approach is going to be as follows. Given a pair of (already-aligned) estimated latent position matrices <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(t - 1)}\)</span>, for a given repetition <span class="math notranslate nohighlight">\(r\)</span>:</p>
 <ol class="simple">
 <li><p>Generate two pairs of adjacency matrices, <span class="math notranslate nohighlight">\(A^{(t,2,r)}\)</span> and <span class="math notranslate nohighlight">\(A^{(t, 1, r)}\)</span> by sampling independently from an RDPG with latent position matrix <span class="math notranslate nohighlight">\(\hat X^{(t)}\)</span>, and the pair <span class="math notranslate nohighlight">\(A^{(t - 1, 2,r)}\)</span> and <span class="math notranslate nohighlight">\(A^{(t - 1, 1, r)}\)</span> by sampling independently from an RDPG with latent position matrix <span class="math notranslate nohighlight">\(\hat X^{(t - 1)}\)</span>. Notice that each pair of adjacency matrices have an identical underlying latent position matrix, which is the estimate of the latent position matrix we previously produced with OMNI.</p></li>
@@ -1194,7 +1204,7 @@ title="Print to PDF"
 </div>
 </div>
 </div>
-<p>Finally, we’ll do exactly what we did in <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">two sample testing</span></a>: we’ll compare the statistic we obtained directly from our data, <span class="math notranslate nohighlight">\(s^{(t)}\)</span>, to all of these <em>null replicates</em>. These are called <em>null replicates</em> because they give us a sense of the magnitude of the test statistic <em>if</em> the null hypothesis were true: they indicate the behavior
+<p>Finally, we’ll do exactly what we did in two sample testing <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a>: we’ll compare the statistic we obtained directly from our data, <span class="math notranslate nohighlight">\(s^{(t)}\)</span>, to all of these <em>null replicates</em>. These are called <em>null replicates</em> because they give us a sense of the magnitude of the test statistic <em>if</em> the null hypothesis were true: they indicate the behavior
 of the test statistic for two networks which have an identical underlying latent position matrix.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1214,7 +1224,7 @@ of the test statistic for two networks which have an identical underlying latent
 <img alt="../../_images/anomaly-detection_21_0.png" src="../../_images/anomaly-detection_21_0.png" />
 </div>
 </div>
-<p>Fortunately,  looks like it’s within a reasonable range under the assumption that the time-points share latent positions.</p>
+<p>Fortunately, <span class="math notranslate nohighlight">\(s^{(t)}\)</span> looks like it’s within a reasonable range under the assumption that the time-points share latent positions.</p>
 </section>
 <section id="estimating-the-p-value-using-the-bootstrapped-samples">
 <h3><span class="section-number">8.1.4.2. </span>Estimating the <span class="math notranslate nohighlight">\(p\)</span>-value using the bootstrapped samples<a class="headerlink" href="#estimating-the-p-value-using-the-bootstrapped-samples" title="Permalink to this headline">#</a></h3>
@@ -1223,7 +1233,7 @@ of the test statistic for two networks which have an identical underlying latent
 \[\begin{align*}
     p^{(t)} &amp;= \frac{\text{number of times that $s^{(t)}$ is smaller than $s^{(t)}_r$} + 1}{R \times 2 + 1}
 \end{align*}\]</div>
-<p>Just like we did for <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-ref">two-sample testing</span></a>, we add a <span class="math notranslate nohighlight">\(1\)</span> to the numerator (and denominator) since we already saw a test statistic at least as large as <span class="math notranslate nohighlight">\(s^{(t)}\)</span>: <span class="math notranslate nohighlight">\(s^{(t)}\)</span> itself. We can do this as follows:</p>
+<p>Just like we did for two-sample testing in <a class="reference internal" href="../ch8/two-sample-hypothesis.html#ch8-twosample"><span class="std std-numref">Section 7.1</span></a>, we add a <span class="math notranslate nohighlight">\(1\)</span> to the numerator (and denominator) since we already saw a test statistic at least as large as <span class="math notranslate nohighlight">\(s^{(t)}\)</span>: <span class="math notranslate nohighlight">\(s^{(t)}\)</span> itself. We can do this as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">distn_test_anomaly</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
@@ -1247,7 +1257,7 @@ of the test statistic for two networks which have an identical underlying latent
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test statistic: 0.555529, p-value: 0.757621
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Test statistic: 0.594112, p-value: 0.561219
 </pre></div>
 </div>
 </div>
@@ -1264,7 +1274,7 @@ of the test statistic for two networks which have an identical underlying latent
 </div>
 </div>
 </div>
-<p>Again, since we performed multiple comparisons, we adjust the <span class="math notranslate nohighlight">\(p\)</span>-values using <a class="reference internal" href="../ch7/model-selection.html#ch7-modelselect-multitest"><span class="std std-ref">Bonferroni-Holm adjustment</span></a>:</p>
+<p>Again, since we performed multiple comparisons, we adjust the <span class="math notranslate nohighlight">\(p\)</span>-values using Bonferroni-Holm adjustment in <a class="reference internal" href="../ch7/model-selection.html#ch7-modelselect-multitest"><span class="std std-numref">Section 6.3.3</span></a>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
@@ -1357,22 +1367,14 @@ of the test statistic for two networks which have an identical underlying latent
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/graspologic/embed/omni.py:267: UserWarning: Input graphs are not fully connected. Results may notbe optimal. You can compute the largest connected component byusing ``graspologic.utils.multigraph_lcc_union``.
-  warnings.warn(msg, UserWarning)
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/graspologic/embed/omni.py:267: UserWarning: Input graphs are not fully connected. Results may notbe optimal. You can compute the largest connected component byusing ``graspologic.utils.multigraph_lcc_union``.
-  warnings.warn(msg, UserWarning)
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/graspologic/embed/omni.py:267: UserWarning: Input graphs are not fully connected. Results may notbe optimal. You can compute the largest connected component byusing ``graspologic.utils.multigraph_lcc_union``.
-  warnings.warn(msg, UserWarning)
-</pre></div>
-</div>
-<img alt="../../_images/anomaly-detection_33_3.png" src="../../_images/anomaly-detection_33_3.png" />
+<img alt="../../_images/anomaly-detection_33_0.png" src="../../_images/anomaly-detection_33_0.png" />
 </div>
 </div>
 </section>
+<section id="references">
+<h2><span class="section-number">8.1.6. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<p>This strategy was first described in <span id="id1">[]</span>. Check it out for more details.</p>
+<span class="target" id="id2"></span></section>
 </section>
 
     <script type="text/x-thebe-config">

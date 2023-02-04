@@ -1018,7 +1018,7 @@ title="Print to PDF"
 \[\begin{align*}
     \text{find $W$ where }||X^{(p)} - X^{(r)}W||_{F}\text{ is minimized}
 \end{align*}\]</div>
-<p>The term <span class="math notranslate nohighlight">\(||A - B||_F\)</span> is the Frobenius distance, which you learned about in <code class="xref std std-numref docutils literal notranslate"><span class="pre">ch6:se:frob_dist</span></code> in <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>.</p>
+<p>The term <span class="math notranslate nohighlight">\(||A - B||_F\)</span> is the Frobenius distance, which you learned about in <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6:se:frob_dist">Definition 5.2</a> from <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>.</p>
 <p>Basically, the idea is that if <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span> are rotations of one another (or close to it), then if you can find the right rotation <span class="math notranslate nohighlight">\(W\)</span>, then <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}W\)</span> will be identical (and <span class="math notranslate nohighlight">\(||X^{(p)} - X^{(r)}W||_{F}\)</span> will be zero) or nearly identical (and <span class="math notranslate nohighlight">\(||X^{(p)} - X^{(r)}W||_{F}\)</span> will be small). If they are not rotations of one another, then this equation <span class="math notranslate nohighlight">\(||X^{(p)} - X^{(r)}W||_{F}\)</span> is going to have a comparatively high value, no matter what value of <span class="math notranslate nohighlight">\(W\)</span> you could choose. This is called the <em>orthogonal procrustes problem</em> <span id="id1">[]</span>, and there are a variety of ways you can come up with a pretty good guess at what <span class="math notranslate nohighlight">\(W\)</span> is, but we won’t need to go into details for our purposes.</p>
 <p>Next, you need to figure out how to actually use this to implement a statitical test <span class="math notranslate nohighlight">\(H_0 : X^{(p)} = X^{(r)}W\)</span> against <span class="math notranslate nohighlight">\(H_A: X^{(p)} \neq X^{(r)}W\)</span>. You can estimate starting values for <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span>, by just using adjacency spectral embedding in <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>. This gives you <span class="math notranslate nohighlight">\(\hat X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(r)}\)</span>, respectively, which are your estimates of the latent position matrices.</p>
 <p>Next, you do your best to find a rotation of <span class="math notranslate nohighlight">\(X^{(r)}\)</span> onto <span class="math notranslate nohighlight">\(X^{(p)}\)</span> by solving the orthogonal procrustes problem, by plugging in your estimates <span class="math notranslate nohighlight">\(\hat X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(r)}\)</span> for <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span>. Unfortunately, you’re not going to find a matrix <span class="math notranslate nohighlight">\(W\)</span> where <span class="math notranslate nohighlight">\(|| \hat X^{(p)} - \hat X^{(r)}W||_{F} = 0\)</span>, even if <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span> really are equal. This is because you are just using estimates of latent positions, so even if <span class="math notranslate nohighlight">\(X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(X^{(r)}\)</span> are identical up to a rotation in reality, your estimates probably won’t be. This means that <span class="math notranslate nohighlight">\(|| \hat X^{(p)} - \hat X^{(r)}W||_{F}\)</span> is, if <span class="math notranslate nohighlight">\(\hat X^{(p)}\)</span> and <span class="math notranslate nohighlight">\(\hat X^{(r)}\)</span> are <em>close</em> up to a rotation, going to take a <em>relatively</em> small value:</p>
@@ -1203,7 +1203,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.00200
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.00300
 </pre></div>
 </div>
 </div>
@@ -1223,12 +1223,12 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.60040
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>estimate of p-value: 0.62338
 </pre></div>
 </div>
 </div>
 </div>
-<p>The <span class="math notranslate nohighlight">\(p\)</span>-value is relatively large, so with <span class="math notranslate nohighlight">\(\alpha = 0.05\)</span>, you fail to be able to reject the null hypothesis that the two Moops have the same latent position matrices. This process is described in <span id="id2">[<a class="reference internal" href="#id20" title="Minh Tang, Avanti Athreya, Daniel L. Sussman, Vince Lyzinski, Youngser Park, and Carey E. Priebe. A Semiparametric Two-Sample Hypothesis Testing Problem for Random Graphs. J. Comput. Graph. Stat., 26(2):344–354, April 2017. doi:10.1080/10618600.2016.1193505.">1</a>]</span>.</p>
+<p>The <span class="math notranslate nohighlight">\(p\)</span>-value is relatively large, so with <span class="math notranslate nohighlight">\(\alpha = 0.05\)</span>, you fail to be able to reject the null hypothesis that the two Moops have the same latent position matrices. This process is described in <span id="id2">[]</span>.</p>
 </section>
 </section>
 <section id="latent-distribution-test">
@@ -1293,7 +1293,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value of H0 against HA: 0.1219
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>p-value of H0 against HA: 0.0280
 </pre></div>
 </div>
 </div>
@@ -1326,14 +1326,7 @@ title="Print to PDF"
 <section id="references">
 <h2><span class="section-number">7.1.5. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
 <p>The appendix section <a class="reference internal" href="../../appendix/ch13/spectral-theory.html#app-ch13-spectral"><span class="std std-numref">Section 12.2</span></a> discusses the implications of latent distribution testing with respect to spectral embeddings.</p>
-<div class="docutils container" id="id5">
-<dl class="citation">
-<dt class="label" id="id20"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
-<dd><p>Minh Tang, Avanti Athreya, Daniel L. Sussman, Vince Lyzinski, Youngser Park, and Carey E. Priebe. A Semiparametric Two-Sample Hypothesis Testing Problem for Random Graphs. <em>J. Comput. Graph. Stat.</em>, 26(2):344–354, April 2017. <a class="reference external" href="https://doi.org/10.1080/10618600.2016.1193505">doi:10.1080/10618600.2016.1193505</a>.</p>
-</dd>
-</dl>
-</div>
-</section>
+<span class="target" id="id5"></span></section>
 </section>
 
     <script type="text/x-thebe-config">
