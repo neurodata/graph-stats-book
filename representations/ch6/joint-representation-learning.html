@@ -1002,8 +1002,10 @@ title="Print to PDF"
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.embed</span> <span class="kn">import</span> <span class="n">LaplacianSpectralEmbed</span> <span class="k">as</span> <span class="n">LSE</span>
+<span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
 
 <span class="n">L_latents</span> <span class="o">=</span> <span class="n">LSE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1104,8 +1106,8 @@ title="Print to PDF"
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^top\)</span>, notice you’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when you take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-01faa188-e60c-449f-b334-b29a139abe42">
-<span class="eqno">(5.2)<a class="headerlink" href="#equation-01faa188-e60c-449f-b334-b29a139abe42" title="Permalink to this equation">#</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-a3cfe56d-2768-4872-9935-372e8d248716">
+<span class="eqno">(5.2)<a class="headerlink" href="#equation-a3cfe56d-2768-4872-9935-372e8d248716" title="Permalink to this equation">#</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1133,24 +1135,13 @@ title="Print to PDF"
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot</span>
 <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">to_laplacian</span><span class="p">(</span><span class="n">L</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">to_laplacian</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">L_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">to_laplacian</span><span class="p">(</span><span class="n">L</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Laplacian&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">X_ax</span> <span class="o">=</span> <span class="n">heatmap</span><span class="p">(</span><span class="n">YYt</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Covariate matrix times its transpose ($YY^\top$)&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-
-<span class="ne">NameError</span>: name &#39;L&#39; is not defined
-</pre></div>
-</div>
-<img alt="../../_images/joint-representation-learning_28_1.png" src="../../_images/joint-representation-learning_28_1.png" />
+<img alt="../../_images/joint-representation-learning_28_0.png" src="../../_images/joint-representation-learning_28_0.png" />
 </div>
 </div>
 <p>The way we’ll combine the two matrices will simply be a weighted sum of these two matrices - this is what CASE is doing under the hood. The weight (here called <span class="math notranslate nohighlight">\(\alpha\)</span>) is multiplied by <span class="math notranslate nohighlight">\(YY^\top\)</span> - that way, both matrices contribute an equal amount of useful information to the embedding.</p>
@@ -1170,6 +1161,9 @@ L + \alpha YY^\top
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_32_0.png" src="../../_images/joint-representation-learning_32_0.png" />
+</div>
 </div>
 <p>What do different potential weights look like? Let’s do a comparison. Below you can see the embeddings for 9 possible weights on <span class="math notranslate nohighlight">\(YY^\top\)</span>, ranging between <span class="math notranslate nohighlight">\(10^{-5}\)</span> and 100.</p>
 <div class="cell tag_hide-input docutils container">
@@ -1184,6 +1178,9 @@ L + \alpha YY^\top
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_34_0.png" src="../../_images/joint-representation-learning_34_0.png" />
 </div>
 </div>
 <p>It looks like you’d probably want a weight somewhere between 0.003 and 0.018  - then, you’ll have three communities which are fairly distinct from each other, implying that you’re pulling good information from both your network’s topology and its covariates. You could just pick your weight manually, but it would be nice to have some kind of algorithm or equation which lets you pick a reasonable weight automatically.</p>
@@ -1221,7 +1218,7 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-<span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Our Combined Laplacian and </span><span class="se">\n</span><span class="s2">covariates matrix with a weight of </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">heatmap</span><span class="p">(</span><span class="n">L_</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Our Combined Laplacian and </span><span class="se">\n</span><span class="s2">covariates matrix with a weight of </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">plot_latents</span><span class="p">(</span><span class="n">latents_</span><span class="p">,</span> 
              <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Embedding of the combined matrix&quot;</span><span class="p">,</span> 
              <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
@@ -1229,6 +1226,9 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_40_0.png" src="../../_images/joint-representation-learning_40_0.png" />
 </div>
 </div>
 <p>Success! You’ve managed to achieve separation between all three communities. Below you can see (from left to right) a comparison of your network’s latent position when you only use its topological information, when you only use the information contained in its covariates, and finally your embedding using the weight you found.</p>
@@ -1249,6 +1249,9 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_42_0.png" src="../../_images/joint-representation-learning_42_0.png" />
 </div>
 </div>
 </section>
@@ -1274,6 +1277,9 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_latents</span><span class="p">(</span><span class="n">latents</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Embedding your model using graspologic&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">);</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_47_0.png" src="../../_images/joint-representation-learning_47_0.png" />
 </div>
 </div>
 </section>
@@ -1321,6 +1327,9 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_51_0.png" src="../../_images/joint-representation-learning_51_0.png" />
+</div>
 </div>
 <p>There’s a few things going on here. First, you had to normalize the covariates by dividing <span class="math notranslate nohighlight">\(YY^\top\)</span> by its maximum. This is because if you didn’t, the covariates and the adjacency matrix would contribute vastly different amounts of information to the omnibus matrix. You can see that by looking at the average value of <span class="math notranslate nohighlight">\(YY^\top\)</span> compared to the average value of <span class="math notranslate nohighlight">\(A\)</span>:</p>
 <div class="cell docutils container">
@@ -1330,11 +1339,23 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean of Y@Y.T: 3.45
+Mean of A: 0.20
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of normalized Y@Y.T:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">YYt</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Mean of A:&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Mean of normalized Y@Y.T: 0.38
+Mean of A: 0.20
 </pre></div>
 </div>
 </div>
@@ -1371,6 +1392,9 @@ weight = \frac{\lambda_1 (L)}{\lambda_1 (YY^\top)}
                             <span class="n">title</span><span class="o">=</span><span class="s2">&quot;MASE embedding&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/joint-representation-learning_59_0.png" src="../../_images/joint-representation-learning_59_0.png" />
 </div>
 </div>
 <p>As you can see, MASE lets you get fairly clear separation between communities. The covariates are still normalized, as with OMNI, so that they can contribute the same amount to the embedding as the adjacency matrix.</p>
