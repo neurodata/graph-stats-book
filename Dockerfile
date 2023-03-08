@@ -4,7 +4,7 @@ RUN pip install jupyterlab jupyter
 RUN pip install torch==1.12.1 torch_geometric==2.1.0
 RUN apt-get update
 RUN apt-get install -y g++ gcc
-RUN pip install torch_sparse torch_scatter
+RUN pip install torch_sparse torch_scatter sphinx-proof
 
 ARG NB_USER=book
 ARG NB_UID=1000
