@@ -1,50 +1,61 @@
 
+
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>4.2. Stochastic Block Models (SBM) &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/proof.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
-    
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="../../_static/togglebutton.js"></script>
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="../../_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
@@ -54,61 +65,93 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'representations/ch5/single-network-models_SBM';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="4.3. Random Dot Product Graphs (RDPG)" href="single-network-models_RDPG.html" />
     <link rel="prev" title="4.1. Erdös-Rényi (ER) Random Networks" href="single-network-models_ER.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="../../index.html">
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../coverpage.html">
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="../../_static/logo.png" class="logo" alt="logo">
-      
-      
-      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
@@ -117,824 +160,360 @@ const thebe_selector_output = ".output, .cell_output"
                 </a>
             </li>
         </ul>
-        <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Introduction
- </span>
-</p>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../../introduction/preface.html">
-   Preface
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../../introduction/terminology.html">
-   Terminology
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/terminology.html">Terminology</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Foundations
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Foundations</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../foundations/ch1/ch1.html">
-   1. The Network Machine Learning Landscape
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
-     1.1. What is network machine learning?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
-     1.2. Why do we study networks?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
-     1.3. Types of Network Machine Learning Problems
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
-     1.4. Examples of applications
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
-     1.5. Challenges of Network Machine Learning
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../foundations/ch2/ch2.html">
-   2. End-to-end Biology Network Machine Learning Project
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
-     2.1. Look at the big picture
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
-     2.2. Get the Data
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
-     2.3. Prepare the Data for Network Algorithms
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/select-and-train.html">
-     2.4. Select and Train a Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/fine-tune.html">
-     2.5. Fine-Tune your Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
-     2.6. Discover and Visualize the Data to Gain Insights
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../foundations/ch1/ch1.html">1. The Network Machine Learning Landscape</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">1.1. What is network machine learning?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/why-study-networks.html">1.2. Why do we study networks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">1.3. Types of Network Machine Learning Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">1.4. Examples of applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">1.5. Challenges of Network Machine Learning</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Representations
- </span>
-</p>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../foundations/ch2/ch2.html">2. End-to-end Biology Network Machine Learning Project</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/big-picture.html">2.1. Look at the big picture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/get-the-data.html">2.2. Get the Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">2.3. Prepare the Data for Network Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/select-and-train.html">2.4. Select and Train a Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/fine-tune.html">2.5. Fine-Tune your Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">2.6. Discover and Visualize the Data to Gain Insights</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Representations</span></p>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../ch4/ch4.html">
-   3. Properties of Networks as a Statistical Object
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch4/matrix-representations.html">
-     3.1. Matrix Representations Of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch4/properties-of-networks.html">
-     3.2. Properties of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch4/network-representations.html">
-     3.3. Representations of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch4/regularization.html">
-     3.4. Regularization
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="ch5.html">
-   4. Why Use Statistical Models?
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models_ER.html">
-     4.1. Erdös-Rényi (ER) Random Networks
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     4.2. Stochastic Block Models (SBM)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models_RDPG.html">
-     4.3. Random Dot Product Graphs (RDPG)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models_IER.html">
-     4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="single-network-models_SIEM.html">
-     4.5. Structured Independent Edge Model (SIEM)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="multi-network-models.html">
-     4.6. Multiple Network Models
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="models-with-covariates.html">
-     4.7. Network Models with Network Covariates
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../ch6/ch6.html">
-   5. Learning Network Representations
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-  <label for="toctree-checkbox-5">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch6/estimating-parameters_mle.html">
-     5.1. Estimating Parameters in Network Models via MLE
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch6/why-embed-networks.html">
-     5.2. Why embed networks?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch6/spectral-embedding.html">
-     5.3. Spectral embedding methods
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch6/multigraph-representation-learning.html">
-     5.4. Multiple-Network Representation Learning
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch6/joint-representation-learning.html">
-     5.5. Joint Representation Learning
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ch4/ch4.html">3. Properties of Networks as a Statistical Object</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ch4/matrix-representations.html">3.1. Matrix Representations Of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch4/properties-of-networks.html">3.2. Properties of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch4/network-representations.html">3.3. Representations of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch4/regularization.html">3.4. Regularization</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Applications
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../applications/ch7/ch7.html">
-   6. Applications When You Have One Network
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-  <label for="toctree-checkbox-6">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/community-detection.html">
-     6.1. Community Detection
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/testing-differences.html">
-     6.2. Testing for Differences between Groups of Edges
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/model-selection.html">
-     6.3. Model Selection
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/vertex-nomination.html">
-     6.4. Single-Network Vertex Nomination
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/out-of-sample.html">
-     6.5. Out-of-sample Embedding
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../applications/ch8/ch8.html">
-   7. Applications for Two Networks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-  <label for="toctree-checkbox-7">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">
-     7.1. Latent Two-Sample Hypothesis Testing
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/significant-communities.html">
-     7.2. Two-sample hypothesis testing in SBMs
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">
-     7.3. Graph Matching
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">
-     7.4. Vertex Nomination For Two Networks
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../applications/ch9/ch9.html">
-   8. Applications for Many Networks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
-  <label for="toctree-checkbox-8">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch9/anomaly-detection.html">
-     8.1. Anomaly Detection For Timeseries of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch9/significant-edges.html">
-     8.2. Testing for Significant Edges
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch9/significant-vertices.html">
-     8.3. Testing for Significant Vertices
-    </a>
-   </li>
-  </ul>
- </li>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="ch5.html">4. Why Use Statistical Models?</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="single-network-models_ER.html">4.1. Erdös-Rényi (ER) Random Networks</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">4.2. Stochastic Block Models (SBM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single-network-models_RDPG.html">4.3. Random Dot Product Graphs (RDPG)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single-network-models_IER.html">4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="single-network-models_SIEM.html">4.5. Structured Independent Edge Model (SIEM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi-network-models.html">4.6. Multiple Network Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models-with-covariates.html">4.7. Network Models with Network Covariates</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Next Steps
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../next/ch10/ch10.html">
-   9. Where do we go from here?
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
-  <label for="toctree-checkbox-9">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../next/ch10/random-walk-diffusion-methods.html">
-     9.1. Random walk and diffusion-based methods
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../next/ch10/gnn.html">
-     9.2. Graph Neural Networks
-    </a>
-   </li>
-  </ul>
- </li>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ch6/ch6.html">5. Learning Network Representations</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ch6/estimating-parameters_mle.html">5.1. Estimating Parameters in Network Models via MLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch6/why-embed-networks.html">5.2. Why embed networks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch6/spectral-embedding.html">5.3. Spectral embedding methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch6/multigraph-representation-learning.html">5.4. Multiple-Network Representation Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch6/joint-representation-learning.html">5.5. Joint Representation Learning</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Appendix
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../appendix/ch11/ch11.html">
-   10. Representations (Extended)
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
-  <label for="toctree-checkbox-10">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch11/alt-reps.html">
-     10.1. Alternative Network Representations
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../appendix/ch12/ch12.html">
-   11. Network Model Theory
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
-  <label for="toctree-checkbox-11">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch12/background.html">
-     11.2. Background
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch12/foundation.html">
-     11.3. Foundation
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch12/ers.html">
-     11.4. Erdös-Rényi (ER) Random Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch12/sbms.html">
-     11.5. Stochastic Block Models
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch12/rdpgs.html">
-     11.6. RDPGs and more general network models
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../appendix/ch13/ch13.html">
-   12. Learning Representations Theory
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
-  <label for="toctree-checkbox-12">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch13/mle-theory.html">
-     12.1. Maximum Likelihood Estimate Theory
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch13/spectral-theory.html">
-     12.2. Spectral Method Theory
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../appendix/ch14/ch14.html">
-   13. Applications (Extended)
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
-  <label for="toctree-checkbox-13">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch14/hypothesis.html">
-     13.1. Hypothesis Testing with coin flips
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch14/unsupervised.html">
-     13.2. Unsupervised learning
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../appendix/ch14/bayes.html">
-     13.3. Bayes Plugin Classifier
-    </a>
-   </li>
-  </ul>
- </li>
+</li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Reference
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
-   Graspologic Documentation
-  </a>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch7/ch7.html">6. Applications When You Have One Network</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/community-detection.html">6.1. Community Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/testing-differences.html">6.2. Testing for Differences between Groups of Edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/model-selection.html">6.3. Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/vertex-nomination.html">6.4. Single-Network Vertex Nomination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/out-of-sample.html">6.5. Out-of-sample Embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch8/ch8.html">7. Applications for Two Networks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">7.1. Latent Two-Sample Hypothesis Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/significant-communities.html">7.2. Two-sample hypothesis testing in SBMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">7.3. Graph Matching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">7.4. Vertex Nomination For Two Networks</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch9/ch9.html">8. Applications for Many Networks</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/anomaly-detection.html">8.1. Anomaly Detection For Timeseries of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/significant-edges.html">8.2. Testing for Significant Edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/significant-vertices.html">8.3. Testing for Significant Vertices</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Steps</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../next/ch10/ch10.html">9. Where do we go from here?</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../next/ch10/random-walk-diffusion-methods.html">9.1. Random walk and diffusion-based methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../next/ch10/gnn.html">9.2. Graph Neural Networks</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch11/ch11.html">10. Representations (Extended)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch11/alt-reps.html">10.1. Alternative Network Representations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch12/ch12.html">11. Network Model Theory</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/background.html">11.2. Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/foundation.html">11.3. Foundation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/ers.html">11.4. Erdös-Rényi (ER) Random Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/sbms.html">11.5. Stochastic Block Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/rdpgs.html">11.6. RDPGs and more general network models</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch13/ch13.html">12. Learning Representations Theory</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch13/mle-theory.html">12.1. Maximum Likelihood Estimate Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch13/spectral-theory.html">12.2. Spectral Method Theory</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch14/ch14.html">13. Applications (Extended)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch14/hypothesis.html">13.1. Hypothesis Testing with coin flips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch14/unsupervised.html">13.2. Unsupervised learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch14/bayes.html">13.3. Bayes Plugin Classifier</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">Graspologic Documentation</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
-</div>
-
-
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
-
-
-
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
->
   
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
-  </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<div class="menu-dropdown menu-dropdown-launch-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Launch interactive content">
-      <i class="fas fa-rocket"></i>
-  </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://mybinder.org/v2/gh/neurodata/graph-stats-book/master?urlpath=tree/network_machine_learning_in_python/representations/ch5/single-network-models_SBM.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Launch on Binder"
->
   
-
-<span class="headerbtn__icon-container">
-  
-    <img src="../../_static/images/logo_binder.svg">
-  </span>
-<span class="headerbtn__text-container">Binder</span>
-</a>
-
-      </li>
-      
-    </ul>
+  <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/representations/ch5/single-network-models_SBM.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Frepresentations/ch5/single-network-models_SBM.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/representations/ch5/single-network-models_SBM.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
 
 <button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/neurodata/graph-stats-book"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Frepresentations/ch5/single-network-models_SBM.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/representations/ch5/single-network-models_SBM.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Edit this page"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-pencil-alt"></i>
-  </span>
-<span class="headerbtn__text-container">suggest edit</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="../../_sources/representations/ch5/single-network-models_SBM.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.ipynb</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#defining-the-paramaters-of-an-sbm-random-network">
-   4.2.1. Defining the paramaters of an SBM random network
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">
-     4.2.1.1. The community assignment vector assigns nodes in the random network to communities
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">
-     4.2.1.2. The block matrix defines the edge existence probabilities between communities in the random network
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks">
-     4.2.1.3. How do you simulate samples of
-     <span class="math notranslate nohighlight">
-      \(SBM_n(\vec z, B)\)
-     </span>
-     random networks?
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#modularity-is-not-a-pre-requisite-for-sbms">
-     4.2.1.4. Modularity is not a pre-requisite for SBMs
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#er-random-networks-are-special-cases-of-sbm-random-networks">
-   4.2.2. ER random networks are special cases of SBM random networks
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#references">
-   4.2.3. References
-  </a>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Stochastic Block Models (SBM)</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#defining-the-paramaters-of-an-sbm-random-network">
-   4.2.1. Defining the paramaters of an SBM random network
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">
-     4.2.1.1. The community assignment vector assigns nodes in the random network to communities
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">
-     4.2.1.2. The block matrix defines the edge existence probabilities between communities in the random network
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks">
-     4.2.1.3. How do you simulate samples of
-     <span class="math notranslate nohighlight">
-      \(SBM_n(\vec z, B)\)
-     </span>
-     random networks?
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#modularity-is-not-a-pre-requisite-for-sbms">
-     4.2.1.4. Modularity is not a pre-requisite for SBMs
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#er-random-networks-are-special-cases-of-sbm-random-networks">
-   4.2.2. ER random networks are special cases of SBM random networks
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#references">
-   4.2.3. References
-  </a>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Stochastic Block Models (SBM)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-paramaters-of-an-sbm-random-network">4.2.1. Defining the paramaters of an SBM random network</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">4.2.1.1. The community assignment vector assigns nodes in the random network to communities</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">4.2.1.2. The block matrix defines the edge existence probabilities between communities in the random network</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks">4.2.1.3. How do you simulate samples of <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random networks?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modularity-is-not-a-pre-requisite-for-sbms">4.2.1.4. Modularity is not a pre-requisite for SBMs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#er-random-networks-are-special-cases-of-sbm-random-networks">4.2.2. ER random networks are special cases of SBM random networks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">4.2.3. References</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section class="tex2jax_ignore mathjax_ignore" id="stochastic-block-models-sbm">
-<span id="ch5-sbm"></span><h1><span class="section-number">4.2. </span>Stochastic Block Models (SBM)<a class="headerlink" href="#stochastic-block-models-sbm" title="Permalink to this headline">#</a></h1>
+<span id="ch5-sbm"></span><h1><span class="section-number">4.2. </span>Stochastic Block Models (SBM)<a class="headerlink" href="#stochastic-block-models-sbm" title="Permalink to this heading">#</a></h1>
 <p>Let’s imagine that you have <span class="math notranslate nohighlight">\(100\)</span> students, each of whom can go to one of two possible schools: school one or school two. Your network has <span class="math notranslate nohighlight">\(100\)</span> nodes, and each node represents a single student. The edges of this network represent whether a pair of students are friends. Intuitively, if two students go to the same school, the probably have a higher chance of being friends than if they do not go to the same school. If you were to try to characterize this using an ER random network, you would run into a problem: you have no way to capture the impact that school has on friendships. To do this, you need to build upon your ER model to make things a little more complicated.</p>
 <p>The Stochastic Block Model, or SBM, captures this idea by assigning each of the <span class="math notranslate nohighlight">\(n\)</span> nodes in the network to one of <span class="math notranslate nohighlight">\(K\)</span> communities, and was first introduced by <span id="id1">[<a class="reference internal" href="#id42" title="Paul W. Holland, Kathryn Blackmond Laskey, and Samuel Leinhardt. Stochastic blockmodels: First steps. Social Networks, 5(2):109–137, June 1983. doi:10.1016/0378-8733(83)90021-7.">1</a>]</span>. A <strong>community</strong> is a group of nodes within the network. In your example case, the communities would represent the schools that students are able to attend. We use <span class="math notranslate nohighlight">\(K\)</span> here to just denote an integer greater than <span class="math notranslate nohighlight">\(1\)</span> (for example, in the school example we gave above, <span class="math notranslate nohighlight">\(K\)</span> is <span class="math notranslate nohighlight">\(2\)</span>) for the number of <em>possible</em> communities that nodes could be members of. In an SBM, instead of describing all pairs of nodes with a fixed probability like with the ER model, you instead describe properties that hold for edges between <em>pairs of communities</em>. In your example, what this means is that if two students go to school one, the probability that they are friends might be different than if the two students went to school two, or if one student went to school one and the other to school two. Let’s take a look at what a sample of this setup we have described might look like:</p>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
 
@@ -947,22 +526,35 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+</details>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">zs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$SBM_n(z, B)$ Simulation&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_3_0.png" src="../../_images/single-network-models_SBM_3_0.png" />
+<img alt="../../_images/18d8519aec07162d35af20167ca577465fa7d6471249b235dc0063e206807ef5.png" src="../../_images/18d8519aec07162d35af20167ca577465fa7d6471249b235dc0063e206807ef5.png" />
 </div>
 </div>
 <section id="defining-the-paramaters-of-an-sbm-random-network">
-<h2><span class="section-number">4.2.1. </span>Defining the paramaters of an SBM random network<a class="headerlink" href="#defining-the-paramaters-of-an-sbm-random-network" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">4.2.1. </span>Defining the paramaters of an SBM random network<a class="headerlink" href="#defining-the-paramaters-of-an-sbm-random-network" title="Permalink to this heading">#</a></h2>
 <section id="the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">
-<h3><span class="section-number">4.2.1.1. </span>The community assignment vector assigns nodes in the random network to communities<a class="headerlink" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">4.2.1.1. </span>The community assignment vector assigns nodes in the random network to communities<a class="headerlink" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities" title="Permalink to this heading">#</a></h3>
 <p>To describe an SBM random network, we proceed very similarly to an ER random network, with a twist. An SBM random network has a parameter, <span class="math notranslate nohighlight">\(\vec z\)</span>, which has a single element for each of the node. We call <span class="math notranslate nohighlight">\(\vec z\)</span> the <strong>community assignment vector</strong>, which means that for each node of your random network, <span class="math notranslate nohighlight">\(z_i\)</span> tells you which community the node is in. To state this another way, <span class="math notranslate nohighlight">\(\vec z\)</span> is a vector where each element <span class="math notranslate nohighlight">\(z_i\)</span> can take one of <span class="math notranslate nohighlight">\(K\)</span> possible values, where <span class="math notranslate nohighlight">\(K\)</span> is the total number of communities in the network. For example, if you had an SBM random network with four nodes in total, and two total communities, each element <span class="math notranslate nohighlight">\(z_i\)</span> can be either <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(2\)</span>. If the first two nodes were in community <span class="math notranslate nohighlight">\(1\)</span>, and the second two in community <span class="math notranslate nohighlight">\(2\)</span>, you would say that <span class="math notranslate nohighlight">\(z_1 = 1\)</span>, <span class="math notranslate nohighlight">\(z_2 = 1\)</span>, <span class="math notranslate nohighlight">\(z_3 = 2\)</span>, and <span class="math notranslate nohighlight">\(z_4 = 2\)</span>, which means that <span class="math notranslate nohighlight">\(\vec z\)</span> looks like:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -970,7 +562,7 @@ title="Print to PDF"
 \end{align*}\]</div>
 </section>
 <section id="the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">
-<h3><span class="section-number">4.2.1.2. </span>The block matrix defines the edge existence probabilities between communities in the random network<a class="headerlink" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">4.2.1.2. </span>The block matrix defines the edge existence probabilities between communities in the random network<a class="headerlink" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network" title="Permalink to this heading">#</a></h3>
 <p>The other parameter for an SBM random network is called the block matrix, for which we will use the capital letter <span class="math notranslate nohighlight">\(B\)</span>. If there are <span class="math notranslate nohighlight">\(K\)</span> communities in the SBM random network, then <span class="math notranslate nohighlight">\(B\)</span> is a <span class="math notranslate nohighlight">\(K \times K\)</span> matrix, with one entry for each pair of communities. For instance, if <span class="math notranslate nohighlight">\(K\)</span> were two like above, <span class="math notranslate nohighlight">\(B\)</span> would be a <span class="math notranslate nohighlight">\(2 \times 2\)</span> matrix, and would look like this:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -983,11 +575,11 @@ title="Print to PDF"
 <p>If <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an SBM random network with <span class="math notranslate nohighlight">\(n\)</span> nodes, the community vector <span class="math notranslate nohighlight">\(\vec z\)</span>, and the block matrix <span class="math notranslate nohighlight">\(B\)</span>, we say that <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network.</p>
 </section>
 <section id="how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks">
-<h3><span class="section-number">4.2.1.3. </span>How do you simulate samples of <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random networks?<a class="headerlink" href="#how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks" title="Permalink to this headline">#</a></h3>
+<h3><span class="section-number">4.2.1.3. </span>How do you simulate samples of <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random networks?<a class="headerlink" href="#how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks" title="Permalink to this heading">#</a></h3>
 <p>The procedure below will produce for you a network <span class="math notranslate nohighlight">\(A\)</span>, which has nodes and edges, where the underlying random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> is an SBM random network:</p>
 <div class="admonition-simulating-a-sample-from-an-sbm-n-vec-z-b-random-network admonition">
 <p class="admonition-title">Simulating a sample from an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network</p>
-<ol class="simple">
+<ol class="arabic simple">
 <li><p>Choose a community assignment vector, <span class="math notranslate nohighlight">\(\vec z\)</span>, for each of the <span class="math notranslate nohighlight">\(n\)</span> nodes. Each node should be assigned to one of <span class="math notranslate nohighlight">\(K\)</span> communities.</p></li>
 <li><p>Choose a block matrix, <span class="math notranslate nohighlight">\(B\)</span>, for each pair of the <span class="math notranslate nohighlight">\(K\)</span> communities.</p></li>
 <li><p>For each pair of communities <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(l\)</span>, obtain a weighted coin (which we will call the <span class="math notranslate nohighlight">\((k,l)\)</span> coin) which as a <span class="math notranslate nohighlight">\(b_{kl}\)</span> chance of landing on heads, and a <span class="math notranslate nohighlight">\(1 - b_{kl}\)</span> chance of landing on tails.</p></li>
@@ -1007,6 +599,11 @@ title="Print to PDF"
 </div>
 <p>Next, let’s plot what <span class="math notranslate nohighlight">\(\vec z\)</span> look like:</p>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
@@ -1041,8 +638,9 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_6_0.png" src="../../_images/single-network-models_SBM_6_0.png" />
+<img alt="../../_images/434b3865da8ac04d284facbad9da268afc7d2cf4d57add0fe5b2bedc4c1b6b9b.png" src="../../_images/434b3865da8ac04d284facbad9da268afc7d2cf4d57add0fe5b2bedc4c1b6b9b.png" />
 </div>
 </div>
 <p>So as you can see, the first <span class="math notranslate nohighlight">\(50\)</span> students are from the first school, and the second <span class="math notranslate nohighlight">\(50\)</span> students are from second school.</p>
@@ -1063,6 +661,11 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_block</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">blockname</span><span class="o">=</span><span class="s2">&quot;School&quot;</span><span class="p">,</span> <span class="n">blocktix</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span>
                <span class="n">blocklabs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;School 1&quot;</span><span class="p">,</span> <span class="s2">&quot;School 2&quot;</span><span class="p">]):</span>
@@ -1087,8 +690,9 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_9_0.png" src="../../_images/single-network-models_SBM_9_0.png" />
+<img alt="../../_images/a0cd45f530db3e04f4dc736895f4edb4cf04a8574648243f874f00e51023461a.png" src="../../_images/a0cd45f530db3e04f4dc736895f4edb4cf04a8574648243f874f00e51023461a.png" />
 </div>
 </div>
 <p>As you can see, the matrix <span class="math notranslate nohighlight">\(B\)</span> is a symmetric block matrix, since your network is undirected. Finally, let’s sample a single network from the <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> with parameters <span class="math notranslate nohighlight">\(\vec z\)</span> and <span class="math notranslate nohighlight">\(B\)</span>:</p>
@@ -1106,13 +710,13 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_11_0.png" src="../../_images/single-network-models_SBM_11_0.png" />
+<img alt="../../_images/4fede2c264b20c46fa01a796bba2088d5ed9e3030c44a8331446215124b37736.png" src="../../_images/4fede2c264b20c46fa01a796bba2088d5ed9e3030c44a8331446215124b37736.png" />
 </div>
 </div>
 <p>The above network shows students, ordered by the school they are in (first school and the second school, respectively). As you can see in the above network, people from the first school are more connected than people from school <span class="math notranslate nohighlight">\(2\)</span>. Also, the connections between people from different schools (the <em>off-diagonal</em> blocks of the adjacency matrix, the lower left and upper right blocks) appear to be a bit <em>more sparse</em> (fewer edges) than connections betwen schools (the <em>on-diagonal</em> blocks of the adjacency matrix, the upper left and lower right blocks). The above heatmap can be described as <strong>modular</strong>: it has clear communities. Remember that the connections for each node are indicated by a single row, or a single column, of the adjacency matrix. The first half of the rows have strong connections with the first half of the columns, which indicates that the first half of students tend to be better friends with other students in the first half. We can duplicate this argument for the second half of students ot see that it seems reasonable to conclude that there are two communities of students here.</p>
 </section>
 <section id="modularity-is-not-a-pre-requisite-for-sbms">
-<span id="ch5-sbm-modularity"></span><h3><span class="section-number">4.2.1.4. </span>Modularity is not a pre-requisite for SBMs<a class="headerlink" href="#modularity-is-not-a-pre-requisite-for-sbms" title="Permalink to this headline">#</a></h3>
+<span id="ch5-sbm-modularity"></span><h3><span class="section-number">4.2.1.4. </span>Modularity is not a pre-requisite for SBMs<a class="headerlink" href="#modularity-is-not-a-pre-requisite-for-sbms" title="Permalink to this heading">#</a></h3>
 <p>Something easy to mistake about a sample of an SBM is that the samples will <em>not always</em> have the obvious modular structure you can see above when you look at a heatmap. Rather, this modular structure is <em>only</em> made obvious because the students are ordered according to the school in which they are in. What do you think will happen if you look at the students in a random order? Do you think that he structure that exists in this network will be obvious?</p>
 <p>The answer is: <em>No!</em> Let’s see what happens when you reorder the nodes from the network into a random order, and pretend you don’t know the true community labels ahead of time:</p>
 <div class="cell docutils container">
@@ -1129,7 +733,7 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/single-network-models_SBM_13_0.png" src="../../_images/single-network-models_SBM_13_0.png" />
+<img alt="../../_images/b44af9b89f52e383f52945337efc9bf6c16a5e69be290981122cff5aff8ce382.png" src="../../_images/b44af9b89f52e383f52945337efc9bf6c16a5e69be290981122cff5aff8ce382.png" />
 </div>
 </div>
 <p>Now, the students are <em>not</em> organized according to school, because they have been randomly reordered. It becomes pretty tough to figure out whether there are communities just by looking at an adjacency matrix, unless you are looking at a network in which the nodes are <em>already arranged</em> in an order which respects the community structure. By an <em>order that respects the community structure</em>, we mean that the community assignment vector <span class="math notranslate nohighlight">\(\vec z\)</span> is arranged so that all of the nodes in the first community come first, followed by all of the nodes in the second community, followed by all of the nodes in the third community, so on and so forth up to the nodes of the community <span class="math notranslate nohighlight">\(K\)</span>.</p>
@@ -1138,23 +742,24 @@ title="Print to PDF"
 </section>
 </section>
 <section id="er-random-networks-are-special-cases-of-sbm-random-networks">
-<h2><span class="section-number">4.2.2. </span>ER random networks are special cases of SBM random networks<a class="headerlink" href="#er-random-networks-are-special-cases-of-sbm-random-networks" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">4.2.2. </span>ER random networks are special cases of SBM random networks<a class="headerlink" href="#er-random-networks-are-special-cases-of-sbm-random-networks" title="Permalink to this heading">#</a></h2>
 <p>Let’s imagine that you have a random network <span class="math notranslate nohighlight">\(\mathbf A\)</span> which is <span class="math notranslate nohighlight">\(ER_n(p)\)</span>. Could you take this random network and turn it into an SBM? More specifically, does there exist an SBM such that the edge-existence probabilities are the same as the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network, for <em>every</em> edge in the network?</p>
 <p>The answer is <em>always</em> a yes! This is extremely easy. Take the number of edge communities for the corresponding SBM to be <span class="math notranslate nohighlight">\(1\)</span>, and assign every node to the first community. Next, take the block matrix to have a single entry, <span class="math notranslate nohighlight">\(b_{11} = p\)</span>. And you are done! <span class="math notranslate nohighlight">\(\mathbf A\)</span> is also an <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random network, where <span class="math notranslate nohighlight">\(\vec z\)</span> is a vector of ones, and <span class="math notranslate nohighlight">\(B\)</span> is a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix (really, just a scalar) whose only entry is <span class="math notranslate nohighlight">\(p\)</span>.</p>
 <p>We are finished! To see that the edge-existence probabilities are the same, you’ll back up to your coin flips. In the ER random network, you performed a coin flip for each edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> with a coin that landed on heads with probability <span class="math notranslate nohighlight">\(p\)</span>. In the SBM random network, you performed a coin flip for each edge <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> with a coin that landed on heads with probability <span class="math notranslate nohighlight">\(b_{z_i z_j}\)</span>. Here, there is only one possible value that <span class="math notranslate nohighlight">\(z_i\)</span> or <span class="math notranslate nohighlight">\(z_j\)</span> could take; they both must be one, since there is only one community. Therefore you flip a coin that lands on heads with probabaility <span class="math notranslate nohighlight">\(b_{11}\)</span>. But when you built the block matrix, we said that <span class="math notranslate nohighlight">\(b_{11}\)</span> was just <span class="math notranslate nohighlight">\(p\)</span>, so the coin flip is occurring with a coin that lands on heads with probability <span class="math notranslate nohighlight">\(p\)</span>. This is obviously the same procedure you took with the ER random network at all possible edges, so the edge-existence probabilities are all identical. Therefore, the <span class="math notranslate nohighlight">\(ER_n(p)\)</span> random network is also an <span class="math notranslate nohighlight">\(SBM_n([1, 1, ..., 1], B = [p])\)</span> random network.</p>
 </section>
 <section id="references">
-<h2><span class="section-number">4.2.3. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<h2><span class="section-number">4.2.3. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
 <p>If you want a deeper level of technical depth, please see the appendix <a class="reference internal" href="../../appendix/ch12/sbms.html#app-ch12-sbms"><span class="std std-numref">Section 11.5</span></a>.</p>
 <div class="docutils container" id="id3">
-<dl class="citation">
-<dt class="label" id="id42"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Paul W. Holland, Kathryn Blackmond Laskey, and Samuel Leinhardt. Stochastic blockmodels: First steps. <em>Social Networks</em>, 5(2):109–137, June 1983. <a class="reference external" href="https://doi.org/10.1016/0378-8733(83)90021-7">doi:10.1016/0378-8733(83)90021-7</a>.</p>
-</dd>
-<dt class="label" id="id43"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>Emmanuel Abbe. Community Detection and Stochastic Block Models. <em>arXiv</em>, March 2017. <a class="reference external" href="https://arxiv.org/abs/1703.10146">arXiv:1703.10146</a>, <a class="reference external" href="https://doi.org/10.48550/arXiv.1703.10146">doi:10.48550/arXiv.1703.10146</a>.</p>
-</dd>
-</dl>
+<div class="citation" id="id42" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Paul W. Holland, Kathryn Blackmond Laskey, and Samuel Leinhardt. Stochastic blockmodels: First steps. <em>Social Networks</em>, 5(2):109–137, June 1983. <a class="reference external" href="https://doi.org/10.1016/0378-8733(83)90021-7">doi:10.1016/0378-8733(83)90021-7</a>.</p>
+</div>
+<div class="citation" id="id43" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Emmanuel Abbe. Community Detection and Stochastic Block Models. <em>arXiv</em>, March 2017. <a class="reference external" href="https://arxiv.org/abs/1703.10146">arXiv:1703.10146</a>, <a class="reference external" href="https://doi.org/10.48550/arXiv.1703.10146">doi:10.48550/arXiv.1703.10146</a>.</p>
+</div>
+</div>
 </div>
 </section>
 </section>
@@ -1171,7 +776,7 @@ title="Print to PDF"
             mode: "python"
         },
         kernelOptions: {
-            kernelName: "python3",
+            name: "python3",
             path: "./representations/ch5"
         },
         predefinedOutput: true
@@ -1179,50 +784,107 @@ title="Print to PDF"
     </script>
     <script>kernelName = 'python3'</script>
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="single-network-models_ER.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title"><span class="section-number">4.1. </span>Erdös-Rényi (ER) Random Networks</p>
-        </div>
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="single-network-models_ER.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4.1. </span>Erdös-Rényi (ER) Random Networks</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="single-network-models_RDPG.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="single-network-models_RDPG.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title"><span class="section-number">4.3. </span>Random Dot Product Graphs (RDPG)</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-paramaters-of-an-sbm-random-network">4.2.1. Defining the paramaters of an SBM random network</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-community-assignment-vector-assigns-nodes-in-the-random-network-to-communities">4.2.1.1. The community assignment vector assigns nodes in the random network to communities</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-block-matrix-defines-the-edge-existence-probabilities-between-communities-in-the-random-network">4.2.1.2. The block matrix defines the edge existence probabilities between communities in the random network</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-do-you-simulate-samples-of-sbm-n-vec-z-b-random-networks">4.2.1.3. How do you simulate samples of <span class="math notranslate nohighlight">\(SBM_n(\vec z, B)\)</span> random networks?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modularity-is-not-a-pre-requisite-for-sbms">4.2.1.4. Modularity is not a pre-requisite for SBMs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#er-random-networks-are-special-cases-of-sbm-random-networks">4.2.2. ER random networks are special cases of SBM random networks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">4.2.3. References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
   
-    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
-  
-      &copy; Copyright 2022.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
-</div>
+<p class="component-author">
+By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein
+</p>
 
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
 
-      </div>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>

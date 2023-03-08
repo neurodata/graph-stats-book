@@ -1,50 +1,61 @@
 
+
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Finding singular vectors With singular value decomposition &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/proof.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
-    
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
     <script src="../../_static/togglebutton.js"></script>
     <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
-    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script src="../../_static/design-tabs.js"></script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
 const thebe_selector = ".thebe,.cell"
@@ -54,59 +65,91 @@ const thebe_selector_output = ".output, .cell_output"
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'appendix/ch13/lse';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-<!-- Checkboxes to toggle the left sidebar -->
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
-<label class="overlay overlay-navbar" for="__navigation">
-    <div class="visually-hidden">Toggle navigation sidebar</div>
-</label>
-<!-- Checkboxes to toggle the in-page toc -->
-<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
-<label class="overlay overlay-pagetoc" for="__page-toc">
-    <div class="visually-hidden">Toggle in-page Table of Contents</div>
-</label>
-<!-- Headers at the top -->
-<div class="announcement header-item noprint"></div>
-<div class="header header-item noprint"></div>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-
-    <div class="container-xl">
-      <div class="row">
-          
-<!-- Sidebar -->
-<div class="bd-sidebar noprint" id="site-navigation">
-    <div class="bd-sidebar__content">
-        <div class="bd-sidebar__top"><div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="../../index.html">
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
       
-        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+      <div class="bd-sidebar-primary bd-sidebar">
         
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../coverpage.html">
+  
+  
+  
+  
+    
+    
       
-      
-      <img src="../../_static/logo.png" class="logo" alt="logo">
-      
-      
-      <h1 class="site-logo" id="site-title">Hands-on Network Machine Learning with Scikit-Learn and Graspologic</h1>
-      
-    </a>
-</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
-    <div class="bd-toc-item active">
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
@@ -115,866 +158,366 @@ const thebe_selector_output = ".output, .cell_output"
                 </a>
             </li>
         </ul>
-        <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Introduction
- </span>
-</p>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="../../introduction/preface.html">
-   Preface
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../../introduction/terminology.html">
-   Terminology
-  </a>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/terminology.html">Terminology</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Foundations
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Foundations</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../foundations/ch1/ch1.html">
-   1. The Network Machine Learning Landscape
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">
-     1.1. What is network machine learning?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/why-study-networks.html">
-     1.2. Why do we study networks?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">
-     1.3. Types of Network Machine Learning Problems
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
-     1.4. Examples of applications
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
-     1.5. Challenges of Network Machine Learning
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../foundations/ch2/ch2.html">
-   2. End-to-end Biology Network Machine Learning Project
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/big-picture.html">
-     2.1. Look at the big picture
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/get-the-data.html">
-     2.2. Get the Data
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">
-     2.3. Prepare the Data for Network Algorithms
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/select-and-train.html">
-     2.4. Select and Train a Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/fine-tune.html">
-     2.5. Fine-Tune your Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">
-     2.6. Discover and Visualize the Data to Gain Insights
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../foundations/ch1/ch1.html">1. The Network Machine Learning Landscape</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">1.1. What is network machine learning?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/why-study-networks.html">1.2. Why do we study networks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">1.3. Types of Network Machine Learning Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">1.4. Examples of applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">1.5. Challenges of Network Machine Learning</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Representations
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../representations/ch4/ch4.html">
-   3. Properties of Networks as a Statistical Object
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch4/matrix-representations.html">
-     3.1. Matrix Representations Of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch4/properties-of-networks.html">
-     3.2. Properties of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch4/network-representations.html">
-     3.3. Representations of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch4/regularization.html">
-     3.4. Regularization
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../representations/ch5/ch5.html">
-   4. Why Use Statistical Models?
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">
-     4.1. Erdös-Rényi (ER) Random Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">
-     4.2. Stochastic Block Models (SBM)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">
-     4.3. Random Dot Product Graphs (RDPG)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">
-     4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/single-network-models_SIEM.html">
-     4.5. Structured Independent Edge Model (SIEM)
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/multi-network-models.html">
-     4.6. Multiple Network Models
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
-     4.7. Network Models with Network Covariates
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../representations/ch6/ch6.html">
-   5. Learning Network Representations
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-  <label for="toctree-checkbox-5">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">
-     5.1. Estimating Parameters in Network Models via MLE
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch6/why-embed-networks.html">
-     5.2. Why embed networks?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch6/spectral-embedding.html">
-     5.3. Spectral embedding methods
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">
-     5.4. Multiple-Network Representation Learning
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">
-     5.5. Joint Representation Learning
-    </a>
-   </li>
-  </ul>
- </li>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../foundations/ch2/ch2.html">2. End-to-end Biology Network Machine Learning Project</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/big-picture.html">2.1. Look at the big picture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/get-the-data.html">2.2. Get the Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">2.3. Prepare the Data for Network Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/select-and-train.html">2.4. Select and Train a Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/fine-tune.html">2.5. Fine-Tune your Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">2.6. Discover and Visualize the Data to Gain Insights</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Applications
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../applications/ch7/ch7.html">
-   6. Applications When You Have One Network
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-  <label for="toctree-checkbox-6">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/community-detection.html">
-     6.1. Community Detection
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/testing-differences.html">
-     6.2. Testing for Differences between Groups of Edges
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/model-selection.html">
-     6.3. Model Selection
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/vertex-nomination.html">
-     6.4. Single-Network Vertex Nomination
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch7/out-of-sample.html">
-     6.5. Out-of-sample Embedding
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../applications/ch8/ch8.html">
-   7. Applications for Two Networks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
-  <label for="toctree-checkbox-7">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">
-     7.1. Latent Two-Sample Hypothesis Testing
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/significant-communities.html">
-     7.2. Two-sample hypothesis testing in SBMs
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">
-     7.3. Graph Matching
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">
-     7.4. Vertex Nomination For Two Networks
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../applications/ch9/ch9.html">
-   8. Applications for Many Networks
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
-  <label for="toctree-checkbox-8">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch9/anomaly-detection.html">
-     8.1. Anomaly Detection For Timeseries of Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch9/significant-edges.html">
-     8.2. Testing for Significant Edges
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../applications/ch9/significant-vertices.html">
-     8.3. Testing for Significant Vertices
-    </a>
-   </li>
-  </ul>
- </li>
+</li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Next Steps
- </span>
-</p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Representations</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../../next/ch10/ch10.html">
-   9. Where do we go from here?
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
-  <label for="toctree-checkbox-9">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../next/ch10/random-walk-diffusion-methods.html">
-     9.1. Random walk and diffusion-based methods
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../../next/ch10/gnn.html">
-     9.2. Graph Neural Networks
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../representations/ch4/ch4.html">3. Properties of Networks as a Statistical Object</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/matrix-representations.html">3.1. Matrix Representations Of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/properties-of-networks.html">3.2. Properties of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/network-representations.html">3.3. Representations of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/regularization.html">3.4. Regularization</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Appendix
- </span>
-</p>
-<ul class="nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../ch11/ch11.html">
-   10. Representations (Extended)
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
-  <label for="toctree-checkbox-10">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch11/alt-reps.html">
-     10.1. Alternative Network Representations
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../ch12/ch12.html">
-   11. Network Model Theory
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
-  <label for="toctree-checkbox-11">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch12/background.html">
-     11.2. Background
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch12/foundation.html">
-     11.3. Foundation
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch12/ers.html">
-     11.4. Erdös-Rényi (ER) Random Networks
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch12/sbms.html">
-     11.5. Stochastic Block Models
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch12/rdpgs.html">
-     11.6. RDPGs and more general network models
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="ch13.html">
-   12. Learning Representations Theory
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
-  <label for="toctree-checkbox-12">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="mle-theory.html">
-     12.1. Maximum Likelihood Estimate Theory
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="spectral-theory.html">
-     12.2. Spectral Method Theory
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../ch14/ch14.html">
-   13. Applications (Extended)
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
-  <label for="toctree-checkbox-13">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch14/hypothesis.html">
-     13.1. Hypothesis Testing with coin flips
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch14/unsupervised.html">
-     13.2. Unsupervised learning
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../ch14/bayes.html">
-     13.3. Bayes Plugin Classifier
-    </a>
-   </li>
-  </ul>
- </li>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../representations/ch5/ch5.html">4. Why Use Statistical Models?</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">4.1. Erdös-Rényi (ER) Random Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">4.2. Stochastic Block Models (SBM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">4.3. Random Dot Product Graphs (RDPG)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_SIEM.html">4.5. Structured Independent Edge Model (SIEM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/multi-network-models.html">4.6. Multiple Network Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/models-with-covariates.html">4.7. Network Models with Network Covariates</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  Reference
- </span>
-</p>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../representations/ch6/ch6.html">5. Learning Network Representations</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">5.1. Estimating Parameters in Network Models via MLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/why-embed-networks.html">5.2. Why embed networks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/spectral-embedding.html">5.3. Spectral embedding methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">5.4. Multiple-Network Representation Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">5.5. Joint Representation Learning</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">
-   Graspologic Documentation
-  </a>
- </li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch7/ch7.html">6. Applications When You Have One Network</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/community-detection.html">6.1. Community Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/testing-differences.html">6.2. Testing for Differences between Groups of Edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/model-selection.html">6.3. Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/vertex-nomination.html">6.4. Single-Network Vertex Nomination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/out-of-sample.html">6.5. Out-of-sample Embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch8/ch8.html">7. Applications for Two Networks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">7.1. Latent Two-Sample Hypothesis Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/significant-communities.html">7.2. Two-sample hypothesis testing in SBMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">7.3. Graph Matching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">7.4. Vertex Nomination For Two Networks</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch9/ch9.html">8. Applications for Many Networks</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/anomaly-detection.html">8.1. Anomaly Detection For Timeseries of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/significant-edges.html">8.2. Testing for Significant Edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/significant-vertices.html">8.3. Testing for Significant Vertices</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Steps</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../next/ch10/ch10.html">9. Where do we go from here?</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../next/ch10/random-walk-diffusion-methods.html">9.1. Random walk and diffusion-based methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../next/ch10/gnn.html">9.2. Graph Neural Networks</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ch11/ch11.html">10. Representations (Extended)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ch11/alt-reps.html">10.1. Alternative Network Representations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ch12/ch12.html">11. Network Model Theory</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ch12/background.html">11.2. Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch12/foundation.html">11.3. Foundation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch12/ers.html">11.4. Erdös-Rényi (ER) Random Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch12/sbms.html">11.5. Stochastic Block Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch12/rdpgs.html">11.6. RDPGs and more general network models</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="ch13.html">12. Learning Representations Theory</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="mle-theory.html">12.1. Maximum Likelihood Estimate Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectral-theory.html">12.2. Spectral Method Theory</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../ch14/ch14.html">13. Applications (Extended)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ch14/hypothesis.html">13.1. Hypothesis Testing with coin flips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch14/unsupervised.html">13.2. Unsupervised learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ch14/bayes.html">13.3. Bayes Plugin Classifier</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">Graspologic Documentation</a></li>
 </ul>
 
     </div>
 </nav></div>
-        <div class="bd-sidebar__bottom">
-             <!-- To handle the deprecated key -->
-            
-            <div class="navbar_extra_footer">
-            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
-            </div>
-            
-        </div>
     </div>
-    <div id="rtd-footer-container"></div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/appendix/ch13/lse.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fappendix/ch13/lse.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
 </div>
 
 
-          
-
-
-          
-<!-- A tiny helper pixel to detect if we've scrolled -->
-<div class="sbt-scroll-pixel-helper"></div>
-<!-- Main content -->
-<div class="col py-0 content-container">
-    
-    <div class="header-article row sticky-top noprint">
-        
 
 
 
-<div class="col py-1 d-flex header-article-main">
-    <div class="header-article__left">
-        
-        <label for="__navigation"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="right"
-title="Toggle navigation"
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/appendix/ch13/lse.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
-  <i class="fas fa-bars"></i>
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
   </span>
-
-</label>
-
-        
-    </div>
-    <div class="header-article__right">
-<button onclick="toggleFullScreen()"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="bottom"
-title="Fullscreen mode"
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
 >
   
 
-<span class="headerbtn__icon-container">
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
   <i class="fas fa-expand"></i>
   </span>
 
 </button>
 
-<div class="menu-dropdown menu-dropdown-repository-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Source repositories">
-      <i class="fab fa-github"></i>
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="https://github.com/neurodata/graph-stats-book"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Source repository"
->
-  
+`);
+</script>
 
-<span class="headerbtn__icon-container">
-  <i class="fab fa-github"></i>
-  </span>
-<span class="headerbtn__text-container">repository</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fappendix/ch13/lse.html&body=Your%20issue%20content%20here."
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Open an issue"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-lightbulb"></i>
-  </span>
-<span class="headerbtn__text-container">open issue</span>
-</a>
-
-      </li>
-      
-      <li>
-        <a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/appendix/ch13/lse.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Edit this page"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-pencil-alt"></i>
-  </span>
-<span class="headerbtn__text-container">suggest edit</span>
-</a>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-
-<div class="menu-dropdown menu-dropdown-download-buttons">
-  <button class="headerbtn menu-dropdown__trigger"
-      aria-label="Download this page">
-      <i class="fas fa-download"></i>
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
   </button>
-  <div class="menu-dropdown__content">
-    <ul>
-      <li>
-        <a href="../../_sources/appendix/ch13/lse.ipynb"
-   class="headerbtn"
-   data-toggle="tooltip"
-data-placement="left"
-title="Download source file"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file"></i>
-  </span>
-<span class="headerbtn__text-container">.ipynb</span>
-</a>
-
-      </li>
-      
-      <li>
-        
-<button onclick="printPdf(this)"
-  class="headerbtn"
-  data-toggle="tooltip"
-data-placement="left"
-title="Print to PDF"
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-file-pdf"></i>
-  </span>
-<span class="headerbtn__text-container">.pdf</span>
-</button>
-
-      </li>
-      
-    </ul>
-  </div>
-</div>
-<label for="__page-toc"
-  class="headerbtn headerbtn-page-toc"
-  
->
-  
-
-<span class="headerbtn__icon-container">
-  <i class="fas fa-list"></i>
-  </span>
-
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
 </label>
-
+</div></div>
+      
     </div>
+  
 </div>
-
-<!-- Table of contents -->
-<div class="col-md-3 bd-toc show noprint">
-    <div class="tocsection onthispage pt-5 pb-3">
-        <i class="fas fa-list"></i> Contents
-    </div>
-    <nav id="bd-toc-nav" aria-label="Page">
-        <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#applying-the-svd-to-the-laplacian">
-   Applying the svd to the Laplacian
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-svd-as-a-sum-of-rank-1-matrices">
-   The
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     svd
-    </span>
-   </code>
-   as a sum of rank-1 matrices
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-laplacian-as-a-sum-of-rank-1-matrices">
-     The Laplacian as a sum of rank
-     <span class="math notranslate nohighlight">
-      \(1\)
-     </span>
-     matrices
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#critical-properties-of-the-svd">
-   Critical Properties of the
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     svd
-    </span>
-   </code>
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-symmetric-laplacian-left-right-singular-vector-equivalence">
-     The symmetric Laplacian left/right singular vector equivalence
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">
-     You can approximate your symmetric Laplacian by only summing a few of the low-rank matrices
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian">
-     Approximating becomes extremely useful when you have a bigger (now regularized) Laplacian
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-the-svd-to-understand-the-estimated-latent-position-matrix">
-   Using the
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     svd
-    </span>
-   </code>
-   to understand the estimated latent position matrix
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#how-matrix-rank-helps-you-understand-spectral-embedding">
-   How Matrix Rank Helps you Understand Spectral Embedding
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#why-the-dad-laplacian">
-     Why the DAD Laplacian?
-    </a>
-   </li>
-  </ul>
- </li>
-</ul>
-
-    </nav>
 </div>
-    </div>
-    <div class="article row">
-        <div class="col pl-md-3 pl-lg-5 content-container">
-            <!-- Table of contents that is only displayed when printing the page -->
-            <div id="jb-print-docs-body" class="onlyprint">
-                <h1>Finding singular vectors With singular value decomposition</h1>
-                <!-- Table of contents -->
-                <div id="print-main-content">
-                    <div id="jb-print-toc">
-                        
-                        <div>
-                            <h2> Contents </h2>
-                        </div>
-                        <nav aria-label="Page">
-                            <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#applying-the-svd-to-the-laplacian">
-   Applying the svd to the Laplacian
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#the-svd-as-a-sum-of-rank-1-matrices">
-   The
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     svd
-    </span>
-   </code>
-   as a sum of rank-1 matrices
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-laplacian-as-a-sum-of-rank-1-matrices">
-     The Laplacian as a sum of rank
-     <span class="math notranslate nohighlight">
-      \(1\)
-     </span>
-     matrices
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#critical-properties-of-the-svd">
-   Critical Properties of the
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     svd
-    </span>
-   </code>
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#the-symmetric-laplacian-left-right-singular-vector-equivalence">
-     The symmetric Laplacian left/right singular vector equivalence
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">
-     You can approximate your symmetric Laplacian by only summing a few of the low-rank matrices
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian">
-     Approximating becomes extremely useful when you have a bigger (now regularized) Laplacian
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-the-svd-to-understand-the-estimated-latent-position-matrix">
-   Using the
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     svd
-    </span>
-   </code>
-   to understand the estimated latent position matrix
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#how-matrix-rank-helps-you-understand-spectral-embedding">
-   How Matrix Rank Helps you Understand Spectral Embedding
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#why-the-dad-laplacian">
-     Why the DAD Laplacian?
-    </a>
-   </li>
-  </ul>
- </li>
-</ul>
+              
+              
 
-                        </nav>
-                    </div>
-                </div>
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Finding singular vectors With singular value decomposition</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
             </div>
-            <main id="main-content" role="main">
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-svd-to-the-laplacian">Applying the svd to the Laplacian</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-svd-as-a-sum-of-rank-1-matrices">The <code class="docutils literal notranslate"><span class="pre">svd</span></code> as a sum of rank-1 matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-laplacian-as-a-sum-of-rank-1-matrices">The Laplacian as a sum of rank <span class="math notranslate nohighlight">\(1\)</span> matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#critical-properties-of-the-svd">Critical Properties of the <code class="docutils literal notranslate"><span class="pre">svd</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-symmetric-laplacian-left-right-singular-vector-equivalence">The symmetric Laplacian left/right singular vector equivalence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">You can approximate your symmetric Laplacian by only summing a few of the low-rank matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian">Approximating becomes extremely useful when you have a bigger (now regularized) Laplacian</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-svd-to-understand-the-estimated-latent-position-matrix">Using the <code class="docutils literal notranslate"><span class="pre">svd</span></code> to understand the estimated latent position matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-matrix-rank-helps-you-understand-spectral-embedding">How Matrix Rank Helps you Understand Spectral Embedding</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-dad-laplacian">Why the DAD Laplacian?</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
                 
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section class="tex2jax_ignore mathjax_ignore" id="finding-singular-vectors-with-singular-value-decomposition">
-<span id="app-ch13-lse"></span><h1>Finding singular vectors With singular value decomposition<a class="headerlink" href="#finding-singular-vectors-with-singular-value-decomposition" title="Permalink to this headline">#</a></h1>
+<span id="app-ch13-lse"></span><h1>Finding singular vectors With singular value decomposition<a class="headerlink" href="#finding-singular-vectors-with-singular-value-decomposition" title="Permalink to this heading">#</a></h1>
 <p>In this section, we’ll do a more thorough overview of the <code class="docutils literal notranslate"><span class="pre">svd</span></code> as it relates to the Laplacian Spectral Embedding, or <code class="docutils literal notranslate"><span class="pre">LSE</span></code>, that you learned about in <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>. Let’s start off by just obtaining a simulation with <span class="math notranslate nohighlight">\(20\)</span> nodes:</p>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
 
@@ -987,7 +530,12 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.8.16/x64/lib/python3.8/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
 <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
@@ -1004,23 +552,34 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">draw_multiplot</span>
 <span class="n">draw_multiplot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">zs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;A, a sample from an $SBM_n(z, B)$ Simulation&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/lse_3_0.png" src="../../_images/lse_3_0.png" />
+<img alt="../../_images/a6694dad0abf3a8bed2e9441bd1739c81db6cee1be2470f980cef33acc7c3c8e.png" src="../../_images/a6694dad0abf3a8bed2e9441bd1739c81db6cee1be2470f980cef33acc7c3c8e.png" />
 </div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">svd</span></code> is a way to decompose a matrix into three distinct new matrices – in our case, the matrix will be the Laplacian we just built. These three new matrices correspond to the singular vectors and singular values of the original matrix: the algorithm will collect all of the singular vectors as columns of one matrix, and the singular values as the diagonals of another matrix.</p>
 <p>This is pretty similar to another linear algebra concept that will come in handy, called the eigendecomposition. If you remember from linear algebra, the eigenvalue decomposition was the decomposition:</p>
 <p>Unlike the eigendecomposition, which does not <em>necessarily</em> exist for a square matrix <span class="math notranslate nohighlight">\(X\)</span>, the singular value decomposition <em>always</em> exists.</p>
 <section id="applying-the-svd-to-the-laplacian">
-<h2>Applying the svd to the Laplacian<a class="headerlink" href="#applying-the-svd-to-the-laplacian" title="Permalink to this headline">#</a></h2>
+<h2>Applying the svd to the Laplacian<a class="headerlink" href="#applying-the-svd-to-the-laplacian" title="Permalink to this heading">#</a></h2>
 <p>For the Laplacian Spectral Embedding, the reason that we care about this was discussed in <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-numref">Section 5.3</span></a>, the spectral embedding. Let’s take the Laplacian and show its <code class="docutils literal notranslate"><span class="pre">svd</span></code>:</p>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">graspologic.utils</span> <span class="kn">import</span> <span class="n">to_laplacian</span>
@@ -1030,8 +589,14 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+</details>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">graphbook_code</span> <span class="kn">import</span> <span class="n">heatmap</span>
@@ -1074,13 +639,14 @@ title="Print to PDF"
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/lse_6_0.png" src="../../_images/lse_6_0.png" />
+<img alt="../../_images/e6300b02847ef15be7950840505f114dcc68174fe351b7f68d48ad8ebe170af6.png" src="../../_images/e6300b02847ef15be7950840505f114dcc68174fe351b7f68d48ad8ebe170af6.png" />
 </div>
 </div>
 </section>
 <section id="the-svd-as-a-sum-of-rank-1-matrices">
-<h2>The <code class="docutils literal notranslate"><span class="pre">svd</span></code> as a sum of rank-1 matrices<a class="headerlink" href="#the-svd-as-a-sum-of-rank-1-matrices" title="Permalink to this headline">#</a></h2>
+<h2>The <code class="docutils literal notranslate"><span class="pre">svd</span></code> as a sum of rank-1 matrices<a class="headerlink" href="#the-svd-as-a-sum-of-rank-1-matrices" title="Permalink to this heading">#</a></h2>
 <p>This expression <span class="math notranslate nohighlight">\(heatmap U\Sigma V^\top\)</span> is a little bit complicated, so we will simplify it down a little bit here: as it turns out, this “complicated” looking matrix multiplication is actually pretty straightforward because <span class="math notranslate nohighlight">\(\Sigma\)</span> is diagonal. You can write this equation down like this, which is much more understandable:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -1114,7 +680,7 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
     \end{bmatrix}
 \end{align*}\]</div>
 <section id="the-laplacian-as-a-sum-of-rank-1-matrices">
-<h3>The Laplacian as a sum of rank <span class="math notranslate nohighlight">\(1\)</span> matrices<a class="headerlink" href="#the-laplacian-as-a-sum-of-rank-1-matrices" title="Permalink to this headline">#</a></h3>
+<h3>The Laplacian as a sum of rank <span class="math notranslate nohighlight">\(1\)</span> matrices<a class="headerlink" href="#the-laplacian-as-a-sum-of-rank-1-matrices" title="Permalink to this heading">#</a></h3>
 <p>Let’s express this operation using the Laplacian, by looking at the first six rank-1 matrices, and looking at the sum of all of the rank-1 matrices:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1128,6 +694,11 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.gridspec</span> <span class="kn">import</span> <span class="n">GridSpec</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -1164,14 +735,15 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/lse_9_0.png" src="../../_images/lse_9_0.png" />
+<img alt="../../_images/9b1323163420a4e9a739523ffff8be2584c98768f138f830114d21b08ec5b2ff.png" src="../../_images/9b1323163420a4e9a739523ffff8be2584c98768f138f830114d21b08ec5b2ff.png" />
 </div>
 </div>
 </section>
 </section>
 <section id="critical-properties-of-the-svd">
-<h2>Critical Properties of the <code class="docutils literal notranslate"><span class="pre">svd</span></code><a class="headerlink" href="#critical-properties-of-the-svd" title="Permalink to this headline">#</a></h2>
+<h2>Critical Properties of the <code class="docutils literal notranslate"><span class="pre">svd</span></code><a class="headerlink" href="#critical-properties-of-the-svd" title="Permalink to this heading">#</a></h2>
 <p>To get a little deeper in the weeds, we’re also going to repeatedly make use of a property of the Singular Value Decomposition that will be very handy for this section and the next section:</p>
 <p>For more technical and generalized details on how <code class="docutils literal notranslate"><span class="pre">svd</span></code> works, or for explicit proofs, we would recommend a Linear Algebra textbook such as <code class="xref std std-numref docutils literal notranslate"><span class="pre">Axler</span></code> or <code class="xref std std-numref docutils literal notranslate"><span class="pre">Trefethen1997</span></code>. We’ll look at the <code class="docutils literal notranslate"><span class="pre">svd</span></code> with a bit more detail here in the specific case where you start with a matrix which is square, symmetric, and has real singular values. You can see this fact by noting that if <span class="math notranslate nohighlight">\(X\)</span> is symmetric with the eigendecomposition <span class="math notranslate nohighlight">\((Q, \Lambda)\)</span>, then:</p>
 <div class="amsmath math notranslate nohighlight">
@@ -1180,9 +752,14 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 \end{align*}\]</div>
 <p>This looks really similar to the equation we saw above for the singular value decomposition, and in fact it shows us something really interesting: a singular value decomposition <em>almost</em> gives us an eigendecomposition of <span class="math notranslate nohighlight">\(X\)</span>. If we were to take the left singular vectors <span class="math notranslate nohighlight">\(\vec u_i = \vec q_i\)</span>, the singular values <span class="math notranslate nohighlight">\(|\lambda_i|\)</span>, and the right singular vectors <span class="math notranslate nohighlight">\(\vec v_i = \sign(\lambda_i) \vec q_i\)</span>, we have a singular value decomposition of <span class="math notranslate nohighlight">\(X\)</span>. Likewise, (somewhat more interestingly), if we have a singular value decomposition of <span class="math notranslate nohighlight">\(X\)</span> as <span class="math notranslate nohighlight">\((U, \Sigma, V)\)</span>, then the columns of <span class="math notranslate nohighlight">\(U\)</span> are also eigenvectors of <span class="math notranslate nohighlight">\(X\)</span>.</p>
 <section id="the-symmetric-laplacian-left-right-singular-vector-equivalence">
-<h3>The symmetric Laplacian left/right singular vector equivalence<a class="headerlink" href="#the-symmetric-laplacian-left-right-singular-vector-equivalence" title="Permalink to this headline">#</a></h3>
+<h3>The symmetric Laplacian left/right singular vector equivalence<a class="headerlink" href="#the-symmetric-laplacian-left-right-singular-vector-equivalence" title="Permalink to this heading">#</a></h3>
 <p>Next, we’ll see that the left and right singular vectors are equivalent for the Laplacian of the diagonally-augmented adjacency matrix for the non-zero singular values (which in this case, is all of them, as <span class="math notranslate nohighlight">\(L\)</span> is <em>positive definite</em>). We take a look at the columns of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span>, as well as their difference. We will quantify the difference between the first four columns of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> using the <em>Frobenius norm</em> of the difference between them. This quantity, abbreviated <span class="math notranslate nohighlight">\(||U - V||_F\)</span>, has a value greater than <span class="math notranslate nohighlight">\(0\)</span> if the two matrices have any entries not in common:</p>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">U</span> <span class="o">-</span> <span class="n">Vt</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">L</span><span class="p">))</span>
@@ -1190,6 +767,7 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[ 1.          0.67458987  0.21337895  0.18851716  0.15410462  0.11674234
  -0.37030786 -0.35020252 -0.32866122 -0.2711415  -0.24919356 -0.21174216
@@ -1204,6 +782,11 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
@@ -1220,13 +803,14 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
-<img alt="../../_images/lse_12_0.png" src="../../_images/lse_12_0.png" />
+<img alt="../../_images/8feb5b4828ed0be4f744f1db350b975ba55cdcdcd5e47e2641f9458ba1e6ce9c.png" src="../../_images/8feb5b4828ed0be4f744f1db350b975ba55cdcdcd5e47e2641f9458ba1e6ce9c.png" />
 </div>
 </div>
 </section>
 <section id="you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">
-<h3>You can approximate your symmetric Laplacian by only summing a few of the low-rank matrices<a class="headerlink" href="#you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices" title="Permalink to this headline">#</a></h3>
+<h3>You can approximate your symmetric Laplacian by only summing a few of the low-rank matrices<a class="headerlink" href="#you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices" title="Permalink to this heading">#</a></h3>
 <p>Your expression has simplified down a little bit, but we aren’t quite finished. If the Laplacian <span class="math notranslate nohighlight">\(L\)</span> has the singular value decomposition with matrix <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(\Sigma\)</span>, and <span class="math notranslate nohighlight">\(V\)</span>, then you could express <span class="math notranslate nohighlight">\(L\)</span> as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -1271,6 +855,11 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 <p>This tells you something interesting about spectral embedding: the information in the first few singular vectors of a high rank matrix lets you find a more simple approximation to it. You can take a matrix that’s extremely complicated (high-rank) and project it down to something which is much less complicated (low-rank).</p>
 <p>Look below. In each plot, we’re summing more and more of these low-rank matrices. By the time we get to the fourth sum, we’ve totally recreated the original Laplacian, and the remaining terms don’t even matter.</p>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 
@@ -1286,12 +875,13 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </pre></div>
 </div>
 </div>
+</details>
 </div>
 </section>
 <section id="approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian">
-<h3>Approximating becomes extremely useful when you have a bigger (now regularized) Laplacian<a class="headerlink" href="#approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian" title="Permalink to this headline">#</a></h3>
+<h3>Approximating becomes extremely useful when you have a bigger (now regularized) Laplacian<a class="headerlink" href="#approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian" title="Permalink to this heading">#</a></h3>
 <p>This becomes even more useful when you have huge networks with thousands of nodes, but only a few communities. It turns out, especially in this situation, you can usually sum a very small number of low-rank matrices and get to an excellent approximation for your network that uses much less information.</p>
-<p>Take the network below, for example. It’s generated from a <a class="reference external" href="#ch5:sbm">stochastic block model</a> with 50 nodes total (25 in one community, 25 in another):</p>
+<p>Take the network below, for example. It’s generated from a <span class="xref myst">stochastic block model</span> with 50 nodes total (25 in one community, 25 in another):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">graspologic.simulations</span> <span class="kn">import</span> <span class="n">sbm</span>
@@ -1344,7 +934,7 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </section>
 </section>
 <section id="using-the-svd-to-understand-the-estimated-latent-position-matrix">
-<h2>Using the <code class="docutils literal notranslate"><span class="pre">svd</span></code> to understand the estimated latent position matrix<a class="headerlink" href="#using-the-svd-to-understand-the-estimated-latent-position-matrix" title="Permalink to this headline">#</a></h2>
+<h2>Using the <code class="docutils literal notranslate"><span class="pre">svd</span></code> to understand the estimated latent position matrix<a class="headerlink" href="#using-the-svd-to-understand-the-estimated-latent-position-matrix" title="Permalink to this heading">#</a></h2>
 <p>So, now we’ve taken your Laplacian <span class="math notranslate nohighlight">\(L\)</span>, and we’ve reduced it down to the most important <span class="math notranslate nohighlight">\(d\)</span> low-rank matrices. You expressed <span class="math notranslate nohighlight">\(L_d\)</span> as:</p>
 <div class="amsmath math notranslate nohighlight">
 \[\begin{align*}
@@ -1399,7 +989,7 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 <p>It is rank-<span class="math notranslate nohighlight">\(d\)</span> because it has <span class="math notranslate nohighlight">\(d\)</span> unique columns, called the estimates of the latent dimensions of <span class="math notranslate nohighlight">\(L\)</span>. These columns are the unique vectors <span class="math notranslate nohighlight">\(\vec u_i\)</span> that you needed to best describe <span class="math notranslate nohighlight">\(L\)</span>, and then weighted by just how important they were <span class="math notranslate nohighlight">\(\sqrt{\sigma_i}\)</span>.</p>
 </section>
 <section id="how-matrix-rank-helps-you-understand-spectral-embedding">
-<h2>How Matrix Rank Helps you Understand Spectral Embedding<a class="headerlink" href="#how-matrix-rank-helps-you-understand-spectral-embedding" title="Permalink to this headline">#</a></h2>
+<h2>How Matrix Rank Helps you Understand Spectral Embedding<a class="headerlink" href="#how-matrix-rank-helps-you-understand-spectral-embedding" title="Permalink to this heading">#</a></h2>
 <p>Let’s take a closer look at the estimate of the latent positions for for <span class="math notranslate nohighlight">\(50\)</span> node example you just generated. You again embed into two dimensions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1413,6 +1003,11 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </div>
 </div>
 <div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 <span class="n">cmap</span> <span class="o">=</span> <span class="n">cmaps</span><span class="p">[</span><span class="s2">&quot;sequential&quot;</span><span class="p">]</span>
@@ -1429,10 +1024,11 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
 </pre></div>
 </div>
 </div>
+</details>
 </div>
 <p>When you want to study the network, you can look at the estimate of the latent positions of the Laplacian, <span class="math notranslate nohighlight">\(\hat X_d\)</span>. This is called investigating the <strong>Laplacian Spectral Embedding</strong> (or, more succinctly, the <em>LSE</em>) of the network, and is a crucial technique to understanding a network. In particular, the property that you can study here is that the first two dimensions capture the difference between the nodes in community one (the first three nodes) and the nodes in community two (the second three nodes). The nodes in community two all have the first dimension having the same value (light purple) and the nodes in community one all have the second dimension having the same value (also light purple). That the dimensions of the estimated latent positions capture differences between your communities is an important reason the LSE is a crucial technique to understand.</p>
 <section id="why-the-dad-laplacian">
-<h3>Why the DAD Laplacian?<a class="headerlink" href="#why-the-dad-laplacian" title="Permalink to this headline">#</a></h3>
+<h3>Why the DAD Laplacian?<a class="headerlink" href="#why-the-dad-laplacian" title="Permalink to this heading">#</a></h3>
 <p>Remember back in <code class="docutils literal notranslate"><span class="pre">ch4:mat-rep:dad_laplacian</span></code> when we investigated the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian as an alternative to the normalized Laplacian? Why don’t we just use the normalized Laplacian instead?</p>
 <p>As it turns out, the singular vectors for the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian and the normalized Laplacian are identical except for one caveat: they are in <em>reverse</em> order from one another. This means that the singular values/vectors you would want to produce an estimate of the latent position matrix are the first few for the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian, but the <em>last</em> few for the normalized Laplacian. This has to do with a number of theoretical results, which are not ultra critical for you to understand at this point in your learning.</p>
 <p>So then why does this matter to you, as a budding network scientist? As it turns out, the singular value decomposition is pretty computationally intensive to compute – that is, when the number of nodes in the network are big, we might be waiting a <em>while</em> to compute the full singular value decomposition. However, if we know that we only want <span class="math notranslate nohighlight">\(K\)</span> of the singular values/vectors ahead of time, we don’t need to compute them all: we can just compute the first <span class="math notranslate nohighlight">\(K\)</span> singular values/vectors, and then stop. This means that if we know the number of singular values/vectors that we want before using <code class="docutils literal notranslate"><span class="pre">LSE</span></code>, we can get <em>much</em> faster computational performance by using the <code class="docutils literal notranslate"><span class="pre">DAD</span></code> Laplacian and retaining the first few vectors than we can using the normalized Laplacian and the last few vectors.</p>
@@ -1452,7 +1048,7 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
             mode: "python"
         },
         kernelOptions: {
-            kernelName: "python3",
+            name: "python3",
             path: "./appendix/ch13"
         },
         predefinedOutput: true
@@ -1460,36 +1056,96 @@ X &amp;= \sum_{i = 1}^n \sigma_i \vec u_i \vec v_i^\top = \sigma_1\begin{bmatrix
     </script>
     <script>kernelName = 'python3'</script>
 
-              </div>
+                </article>
               
-            </main>
-            <footer class="footer-article noprint">
-                
-    <!-- Previous / next buttons -->
-<div class='prev-next-area'>
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
 </div>
-            </footer>
-        </div>
-    </div>
-    <div class="footer-content row">
-        <footer class="col footer"><p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-svd-to-the-laplacian">Applying the svd to the Laplacian</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-svd-as-a-sum-of-rank-1-matrices">The <code class="docutils literal notranslate"><span class="pre">svd</span></code> as a sum of rank-1 matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-laplacian-as-a-sum-of-rank-1-matrices">The Laplacian as a sum of rank <span class="math notranslate nohighlight">\(1\)</span> matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#critical-properties-of-the-svd">Critical Properties of the <code class="docutils literal notranslate"><span class="pre">svd</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-symmetric-laplacian-left-right-singular-vector-equivalence">The symmetric Laplacian left/right singular vector equivalence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#you-can-approximate-your-symmetric-laplacian-by-only-summing-a-few-of-the-low-rank-matrices">You can approximate your symmetric Laplacian by only summing a few of the low-rank matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#approximating-becomes-extremely-useful-when-you-have-a-bigger-now-regularized-laplacian">Approximating becomes extremely useful when you have a bigger (now regularized) Laplacian</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-svd-to-understand-the-estimated-latent-position-matrix">Using the <code class="docutils literal notranslate"><span class="pre">svd</span></code> to understand the estimated latent position matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-matrix-rank-helps-you-understand-spectral-embedding">How Matrix Rank Helps you Understand Spectral Embedding</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-dad-laplacian">Why the DAD Laplacian?</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
   
-    By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein<br/>
-  
-      &copy; Copyright 2022.<br/>
-</p>
-        </footer>
-    </div>
+  <div class="footer-item">
     
-</div>
+<p class="component-author">
+By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein
+</p>
 
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
 
-      </div>
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
 
-
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
