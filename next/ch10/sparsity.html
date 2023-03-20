@@ -1,0 +1,998 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Network Sparsity &#8212; Hands-on Network Machine Learning with Scikit-Learn and Graspologic</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'next/ch10/sparsity';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../coverpage.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../coverpage.html">
+                    Hands-on Network Machine Learning with Scikit-Learn and Graspologic
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction/terminology.html">Terminology</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Foundations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../foundations/ch1/ch1.html">1. The Network Machine Learning Landscape</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/what-is-a-network.html">1.1. What is network machine learning?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/why-study-networks.html">1.2. Why do we study networks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/types-nml-problems.html">1.3. Types of Network Machine Learning Problems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">1.4. Examples of applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">1.5. Challenges of Network Machine Learning</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../foundations/ch2/ch2.html">2. End-to-end Biology Network Machine Learning Project</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/big-picture.html">2.1. Look at the big picture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/get-the-data.html">2.2. Get the Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/prepare-the-data.html">2.3. Prepare the Data for Network Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/select-and-train.html">2.4. Select and Train a Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/fine-tune.html">2.5. Fine-Tune your Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../foundations/ch2/discover-and-visualize.html">2.6. Discover and Visualize the Data to Gain Insights</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Representations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../representations/ch4/ch4.html">3. Properties of Networks as a Statistical Object</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/matrix-representations.html">3.1. Matrix Representations Of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/properties-of-networks.html">3.2. Properties of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/network-representations.html">3.3. Representations of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch4/regularization.html">3.4. Regularization</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../representations/ch5/ch5.html">4. Why Use Statistical Models?</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_ER.html">4.1. Erdös-Rényi (ER) Random Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_SBM.html">4.2. Stochastic Block Models (SBM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_RDPG.html">4.3. Random Dot Product Graphs (RDPG)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_IER.html">4.4. Inhomogeneous Erdos Renyi (IER) Random Network Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/single-network-models_SIEM.html">4.5. Structured Independent Edge Model (SIEM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/multi-network-models.html">4.6. Multiple Network Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch5/models-with-covariates.html">4.7. Network Models with Network Covariates</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../representations/ch6/ch6.html">5. Learning Network Representations</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/estimating-parameters_mle.html">5.1. Estimating Parameters in Network Models via MLE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/why-embed-networks.html">5.2. Why embed networks?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/spectral-embedding.html">5.3. Spectral embedding methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/multigraph-representation-learning.html">5.4. Multiple-Network Representation Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../representations/ch6/joint-representation-learning.html">5.5. Joint Representation Learning</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch7/ch7.html">6. Applications When You Have One Network</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/community-detection.html">6.1. Community Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/testing-differences.html">6.2. Testing for Differences between Groups of Edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/model-selection.html">6.3. Model Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/vertex-nomination.html">6.4. Single-Network Vertex Nomination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch7/out-of-sample.html">6.5. Out-of-sample Embedding</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch8/ch8.html">7. Applications for Two Networks</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/two-sample-hypothesis.html">7.1. Latent Two-Sample Hypothesis Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/significant-communities.html">7.2. Two-sample hypothesis testing in SBMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/graph-matching-vertex.html">7.3. Graph Matching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch8/multiple-vertex-nomination.html">7.4. Vertex Nomination For Two Networks</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../applications/ch9/ch9.html">8. Applications for Many Networks</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/anomaly-detection.html">8.1. Anomaly Detection For Timeseries of Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/significant-edges.html">8.2. Testing for Significant Edges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../applications/ch9/significant-vertices.html">8.3. Testing for Significant Vertices</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Next Steps</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="ch10.html">9. Where do we go from here?</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="random-walk-diffusion-methods.html">9.1. Random walk and diffusion-based methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gnn.html">9.2. Graph Neural Networks</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch11/ch11.html">10. Representations (Extended)</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch11/alt-reps.html">10.1. Alternative Network Representations</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch12/ch12.html">11. Network Model Theory</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/background.html">11.2. Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/foundation.html">11.3. Foundation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/ers.html">11.4. Erdös-Rényi (ER) Random Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/sbms.html">11.5. Stochastic Block Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch12/rdpgs.html">11.6. RDPGs and more general network models</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch13/ch13.html">12. Learning Representations Theory</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-12"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch13/mle-theory.html">12.1. Maximum Likelihood Estimate Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch13/spectral-theory.html">12.2. Spectral Method Theory</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../appendix/ch14/ch14.html">13. Applications (Extended)</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch14/hypothesis.html">13.1. Hypothesis Testing with coin flips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch14/unsupervised.html">13.2. Unsupervised learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../appendix/ch14/bayes.html">13.3. Bayes Plugin Classifier</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference external" href="https://graspologic.readthedocs.io/en/latest/">Graspologic Documentation</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book/edit/master/network_machine_learning_in_python/next/ch10/sparsity.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/neurodata/graph-stats-book/issues/new?title=Issue%20on%20page%20%2Fnext/ch10/sparsity.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/next/ch10/sparsity.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Network Sparsity</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-sparsity-and-why-does-it-matter">What is sparsity, and why does it matter?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-storage-implications">The storage implications</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-computational-implications">The computational implications</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithmic-implications">The algorithmic implications</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-does-sparsity-interplay-with-networks">How does sparsity interplay with networks?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparsity-as-a-property-of-the-random-network">Sparsity as a property of the random network</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sequences-of-random-variables">Sequences of random variables</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sequences-of-random-networks">Sequences of random networks</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#what-does-this-notion-of-sparsity-have-to-do-with-practical-applications">What does this notion of sparsity have to do with practical applications?</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparsity-as-a-tool-to-use-when-it-makes-sense">Sparsity as a tool to use when it makes sense</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#storage-considerations">Storage considerations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-considerations">Computational considerations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithmic-considerations">Algorithmic considerations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="network-sparsity">
+<span id="ch10-sparse"></span><h1>Network Sparsity<a class="headerlink" href="#network-sparsity" title="Permalink to this heading">#</a></h1>
+<p>In Section <a class="reference internal" href="../../representations/ch4/properties-of-networks.html#ch4-prop-net-density"><span class="std std-ref">The network density indicates the fraction of possible edges which exist</span></a>, you learned about a very important descriptive property of networks, called the <em>network density</em>. An understanding of the network density gives us the ability to describe another extremely ubiquitous property of networks: the <em>network sparsity</em>. First, let’s introduce a few concepts about sparsity, and then we’ll tie in how this comes into play with network data. As a quick forenote, this section is going to assume that you have a working knowledge of the concept of a <em>sequence</em>, that you have taken an introductory course in statistics enough to familiarize yourself with the concept of an expected value, and that you are familiar with some basic concepts from Calculus (L’Hopital’s rule and derivatives).</p>
+<section id="what-is-sparsity-and-why-does-it-matter">
+<span id="ch10-sparse-matrix-sparse"></span><h2>What is sparsity, and why does it matter?<a class="headerlink" href="#what-is-sparsity-and-why-does-it-matter" title="Permalink to this heading">#</a></h2>
+<p>The concept of <em>sparsity</em> has been studied for several decades in matrix theory. Briefly, let’s suppose that we have a matrix <span class="math notranslate nohighlight">\(X\)</span>, which has <span class="math notranslate nohighlight">\(n\)</span> rows and <span class="math notranslate nohighlight">\(m\)</span> columns. The matrix looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    X &amp;= \begin{bmatrix}
+        x_{11} &amp; ... &amp; x_{1m} \\
+        \vdots &amp; \ddots &amp; \vdots \\
+        x_{n1} &amp; ... &amp; x_{nm}.
+    \end{bmatrix}
+\end{align*}\]</div>
+<p>There are a number of suggestions for what it means for a matrix to be <em>sparse</em>. A matrix can be considered to be <em>sparse</em> if most of the elements are zero. Traditionally, there is no agreement on <em>just how many</em> of the possible number of entries (which is <span class="math notranslate nohighlight">\(m \cdot n\)</span>) have to be zero for the matrix to be considered <em>sparse</em>, but a common cutoff is if the number of non-zero elements is at most the number of rows or columns. For a more practical definition, one of the seminal works on sparse matrices <span id="id1">[<a class="reference internal" href="#id12" title="James H. Wilkinson. The Algebraic Eigenvalue Problem. Clarendon Press, Oxford, 1965.">2</a>]</span> gives us a good standard. Wilkinson writes, “The matrix may be sparse, either with the non-zero elements concentrated on a narrow band centred on the diagonal or alternatively they may be distributed in a less systematic manner. We shall refer to a matrix as dense if the percentage of zero elements or its distribution is such as to make it uneconomic to take advantage of their presence.” For all intents and purposes, Wilkinson’s definition provides us with a foundational understanding of what it means to be <em>sparse</em>: a matrix is <strong>sparse</strong> if we can benefit from acknowledging its sparsity with the methods that we choose to store, process, and analyze it. Let’s take a look at what this means in practice.</p>
+<section id="the-storage-implications">
+<h3>The storage implications<a class="headerlink" href="#the-storage-implications" title="Permalink to this heading">#</a></h3>
+<p>One of the more approachable ways that you might come into contact with sparse matrices is in terms of data storage. As you might be aware, numbers are stored on a computer as a sequence of zeros and ones. When storing data in our matrix, notice that we have <span class="math notranslate nohighlight">\(m \cdot n\)</span> elements. For the sake of simplicity, let’s assume we’re dealing with a matrix where each element is a <em>double precision</em> float (you might have seen this before in numpy as <code class="docutils literal notranslate"><span class="pre">float64</span></code>, or a floating point decimal with <span class="math notranslate nohighlight">\(64\)</span> bits per element). This means that for <em>every</em> element of the matrix, we use <span class="math notranslate nohighlight">\(64\)</span> zeros or ones, meaning that we will need around <span class="math notranslate nohighlight">\(64 \cdot (m \cdot n)\)</span> zeros or ones to represent the entire matrix.</p>
+<p>Let’s say that of these <span class="math notranslate nohighlight">\(n\)</span> rows, we know <em>ahead of time</em> that a <em>lot</em> of the rows are sparse. By “row sparse”, what we mean is that <span class="math notranslate nohighlight">\(x_{ij} = 0\)</span> for all of these sparse rows <span class="math notranslate nohighlight">\(i\)</span>. Let’s assume that of the <span class="math notranslate nohighlight">\(n\)</span> total rows, only <span class="math notranslate nohighlight">\(n'\)</span> are not sparse. We could, for instance, store the non-sparse rows in a little set <span class="math notranslate nohighlight">\(\mathcal X\)</span> which has <span class="math notranslate nohighlight">\(n'\)</span> elements telling us which rows are not sparse. For these non-sparse rows, we store all <span class="math notranslate nohighlight">\(m\)</span> pieces of column-wise information, but for the sparse rows, we just ignore them entirely. To store this entire matrix, we will need <span class="math notranslate nohighlight">\(64 \cdot (n' \cdot m)\)</span> (64 bits for each entry of a non-sparse row) <span class="math notranslate nohighlight">\(+ 64 \cdot n'\)</span> (64 bits to store each element of <span class="math notranslate nohighlight">\(\mathcal X\)</span>) <span class="math notranslate nohighlight">\(+ 64\)</span> (to store the total number of rows that the matrix has), for a total of <span class="math notranslate nohighlight">\(64 \cdot (n' \cdot m + n' + 1)\)</span> bits.</p>
+<p>If the rows can be sparse, the columns could be too; let’s assume that we have a matrix where <span class="math notranslate nohighlight">\(m'\)</span> of the columns are sparse. Following a similar approach to the above, if we had a list <span class="math notranslate nohighlight">\(\mathcal Y\)</span> with <span class="math notranslate nohighlight">\(m'\)</span> elements telling us which columns were not sparse, we could just store the <span class="math notranslate nohighlight">\(m'\)</span> non-sparse columns (each of which has <span class="math notranslate nohighlight">\(n\)</span> rows), and then the list of the <span class="math notranslate nohighlight">\(m'\)</span> non-zero elements. Like above, we can store this information with <span class="math notranslate nohighlight">\(64 \cdot (n \cdot m' + m' + 1)\)</span> bits.</p>
+<p>Finally, we might have both row and column sparsity, in which case it might make sense to just paired indices <span class="math notranslate nohighlight">\((i, j)\)</span> telling us each of the columns that are non-zero. Let’s assume this time that the total number of elements of <span class="math notranslate nohighlight">\(X\)</span> are non-zero is represented by some integer <span class="math notranslate nohighlight">\(k\)</span>. To store data with row and column sparsity, We could store <span class="math notranslate nohighlight">\(X\)</span> like this:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Row index</p></th>
+<th class="head"><p>Column Index</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(r_1\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(c_1\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(x_{r_1, c_1}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(r_k\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(c_k\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(x_{r_k, c_k}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p>and then we could store a single tuple <span class="math notranslate nohighlight">\((n, m)\)</span> that indicates the matrix’s total number of dimensions. In this case, we would have <span class="math notranslate nohighlight">\(64 \cdot (3K + 2)\)</span> (<span class="math notranslate nohighlight">\(3K\)</span> because there are <span class="math notranslate nohighlight">\(3\)</span> numbers in each row of the table we arranged above) bits of storage needed. Depending on just how sparse <span class="math notranslate nohighlight">\(X\)</span> is, this might allow us to store <span class="math notranslate nohighlight">\(X\)</span> a <em>lot</em> smaller than its original size!</p>
+<p>For one big application of this implication that you are already familiar with, we can think about popular <em>image compression</em> algorithms. You have probably heard about <em>jpeg</em> images <span id="id2">[<a class="reference internal" href="#id15" title="G. K. Wallace. The JPEG still picture compression standard. IEEE Trans. Consum. Electron., 38(1):xviii–xxxiv, February 1992. doi:10.1109/30.125072.">3</a>]</span> (those files with the <code class="docutils literal notranslate"><span class="pre">.jpg</span></code> or <code class="docutils literal notranslate"><span class="pre">jpeg</span></code> file extension that you might have on your computer). Image compression uses complicated patterns arising in the image to discern the “general idea” of the image, and then “sparsifies” the image by discarding the extraneous information. Usually, with this technique, you can obtain an image that is nearly identical to the original, but might be orders of magnitude smaller in storage size. This goes a bit beyond simple row and column sparsity, but the end-result is the same: you can summarize a very close, but very sparse, approximation of an image using a file that is <em>way</em> smaller than storing the full image data for each pixel of the image individually.</p>
+</section>
+<section id="the-computational-implications">
+<h3>The computational implications<a class="headerlink" href="#the-computational-implications" title="Permalink to this heading">#</a></h3>
+<p>Let’s assume that we have a small task, where for each row in the matrix <span class="math notranslate nohighlight">\(X\)</span>, we want to compute the row-wise sum. Stated another way, for a given row <span class="math notranslate nohighlight">\(i\)</span>, the quantity that you want to compute is <span class="math notranslate nohighlight">\(\sum_{j = 1}^m x_{ij}\)</span>. If you ignore sparsity all-together, you can do this operation pretty easily: there are <span class="math notranslate nohighlight">\(n\)</span> rows, and <span class="math notranslate nohighlight">\(m\)</span> terms that you need to add together for each row, which means that you will have <span class="math notranslate nohighlight">\(n \cdot m\)</span> total operations to perform (for each of <span class="math notranslate nohighlight">\(n\)</span> rows, perform an addition involving <span class="math notranslate nohighlight">\(m\)</span> terms).</p>
+<p>Now’ let’s pretend that we have the same matrix <span class="math notranslate nohighlight">\(X\)</span> that we thought about above. If <span class="math notranslate nohighlight">\(X\)</span> is row-sparse, we can store the non-sparse rows <span class="math notranslate nohighlight">\(i\)</span> in a list <span class="math notranslate nohighlight">\(\mathcal X\)</span> with <span class="math notranslate nohighlight">\(n'\)</span> elements. This time, the sum will be:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \sum_{j = 1}^m x_{ij} &amp;= \begin{cases}
+        \sum_{j = 1}^m x_{ij} &amp; i\text{ is one of the non-sparse rows in }\mathcal X \\
+        0 &amp; i\text{ is a sparse row}
+    \end{cases}
+\end{align*}\]</div>
+<p>To do this, we have <span class="math notranslate nohighlight">\(n'\)</span> elements in <span class="math notranslate nohighlight">\(\mathcal X\)</span>, which means that we need to use <span class="math notranslate nohighlight">\(n' \cdot m\)</span> operations (sum <span class="math notranslate nohighlight">\(m\)</span> elements for each of the <span class="math notranslate nohighlight">\(n'\)</span> non-sparse rows), and then just output <span class="math notranslate nohighlight">\(0\)</span> for the sparse rows.</p>
+<p>Likewise, if <span class="math notranslate nohighlight">\(X\)</span> is column-sparse, we store the non-sparse columns <span class="math notranslate nohighlight">\(j\)</span> in a list <span class="math notranslate nohighlight">\(\mathcal Y\)</span> with <span class="math notranslate nohighlight">\(m'\)</span> elements. This time, the sum is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \sum_{j : j\text{ is a non-sparse column in }\mathcal Y} x_{ij}
+\end{align*}\]</div>
+<p>So now, we have <span class="math notranslate nohighlight">\(n\)</span> rows to compute this quantity for, but we only need to sum <span class="math notranslate nohighlight">\(m'\)</span> elements per row, for a total of <span class="math notranslate nohighlight">\(n \cdot m'\)</span> operations.</p>
+<p>If we have both row and column sparsity, we can combine these two ideas, like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \sum_{j = 1}^m x_{ij} &amp;= \begin{cases}
+        \sum_{j : j \in \mathcal Y} x_{ij} &amp; i \in \mathcal X \\
+        0 &amp; i\text{ is a sparse row}
+        \end{cases}
+\end{align*}\]</div>
+<p>Now, for each of the <span class="math notranslate nohighlight">\(n'\)</span> rows, we are adding <span class="math notranslate nohighlight">\(m'\)</span> terms, which requires <span class="math notranslate nohighlight">\(n' \cdot m'\)</span> operations.</p>
+<p>The computational implications of sparsity are quite substantial. One feature of sparse matrices is that they tend to be <em>really, really big</em>. When we say really big, we mean that <span class="math notranslate nohighlight">\(n\)</span> is extremely large, <span class="math notranslate nohighlight">\(m\)</span> is extremely large, or <em>both</em> are really large. This tends to arise a lot in many fields, so we’ll take a look at two of them:</p>
+<div class="admonition-sparsity-in-natural-language-processing admonition">
+<p class="admonition-title">Sparsity in natural language processing</p>
+<p>Imagine a matrix which stores information for a collection of documents. In this case, each row <span class="math notranslate nohighlight">\(i\)</span> indexes a single document in the collection, and each row <span class="math notranslate nohighlight">\(j\)</span> represents an individual word that could (or could not) appear in a given document. The entries of this matrix <span class="math notranslate nohighlight">\(x_{ij}\)</span> correspond to the count of a given word <span class="math notranslate nohighlight">\(j\)</span> in document <span class="math notranslate nohighlight">\(i\)</span>. If the collection of documents is large enough, there may be many words that do not appear at <em>all</em> in many of the different documents. This arises in the <code class="docutils literal notranslate"><span class="pre">word2vec</span></code> algorithm, which we covered succinctly in Section <a class="reference internal" href="random-walk-diffusion-methods.html#ch10-diffusion"><span class="std std-ref">Random walk and diffusion-based methods</span></a>.</p>
+</div>
+<div class="admonition-sparsity-in-genomics admonition">
+<p class="admonition-title">Sparsity in genomics</p>
+<p>Imagine that for a large group of <span class="math notranslate nohighlight">\(n\)</span> people (the <em>rows</em> of the matrix), you collect data about the person’s genome. The <em>genome</em> is, informally, the collection genetic material unique to each individual. If you remember back from biology, the genome consists of sequences of DNA. For our purposes, we won’t go into too much depth, but you can think about DNA consisting of <em>really, really</em> long sequences of molecules (these moledules are called nucleotides, adenine, thymine, guanine, and cytosine, represented with the letters A, T, G, C) that gives your body all of the instructions it needs to provide all of the functionality to develop and maintain an organism. In a human, for instance, the human genome will typically be a sequence of about three billion of these four nucleotides. As it turns out, we aren’t all identical, and the instructions aren’t either. One thing that genomists study is a phenomena known as a single nucleotide polymorphism, or SNP (pronounced <em>snip</em>). Basically, the idea is <em>most</em> people will have a specific nucleotide at any given location in the genome, but <em>some</em> people will have a different one (for instance, while most people will might have adenosine at a given SNP, some people might have guanine). A common investigation in genomics would be to collect hundreds or thousands of different SNPs (there are over 300 <em>million</em> SNPs identified so far in the human genome, so there are many combinations to study), and encode a matrix <span class="math notranslate nohighlight">\(X\)</span> where the rows correspond to each person being studied, and the columns consist of alternative bases (from the most common one) that people could have at a SNP in the genome. Let’s think about just one of these SNPs, that we’ll call SNP 1, and assume that this SNP is usually an A base, but can also be a G or T base. The first two columns of the data matrix would look like this:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Row number</p></th>
+<th class="head"><p>SNP 1, alternative base G</p></th>
+<th class="head"><p>SNP 1, alternative base T</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Person 1</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Person 2</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p>…</p></td>
+<td><p>…</p></td>
+</tr>
+<tr class="row-odd"><td><p>Person <span class="math notranslate nohighlight">\(n\)</span></p></td>
+<td><p>1</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>We repeat this process for all of the SNPs under study, and end up with a matrix that is going to be extremely large depending on how many SNPs we have. However, somewhat by construction, this matrix is also extremely sparse: each column only represents <em>infreuqent</em> alternative bases that a person could have in a SNP, which means that <em>most</em> people are just going to have a zero for any given SNP.</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In the situation where datasets have an enormous number of “features” (the <em>columns</em> of the matrices that we described above), one of the first things that many researchers will try to do before learning from the data explicitly is to try and make sense of the data in a simpler way than just the data as-given. This problem is known as <em>dimensionality reduction</em>, and in its simplest form, arises in an algorithm known as Principal Component Analysis, which is conceptually very similar to the spectral embedding we explained in Section <a class="reference internal" href="../../representations/ch6/ch6.html#ch6"><span class="std std-ref">Learning Network Representations</span></a> and we touched on briefly in Section <a class="reference internal" href="../../foundations/ch1/types-nml-problems.html#ch1-types-nonmodel"><span class="std std-ref">Non-model-based network learning systems</span></a>. Basically, the idea is this: many of the “rows” of the sparse matrix examples we saw above might contain useful information that is shared across multiple other rows. In the document example, for instance, we could imagine that some documents (say, on a similar set of topics) might have similar word uses for a subset of words. Likewise, we could imagine that in this genomics dataset, people who are “oddballs” (in relation to the population’s “average genome”, they might be totally normal otherwise) might tend to have similarly odd combinations of SNPs.</p>
+<p>If we were to use PCA on these datasets, just like in spectral embeddings, we might be able to “pick up” these informative similarities in the rows, and end up with a datset that succinctly summarizes a large number of features with just a small number of embedded features. However, the key is that PCA also use the <code class="docutils literal notranslate"><span class="pre">svd</span></code>, just like spectral embedding. If we run a full PCA on these datasets and the number of rows or the number of columns (or both) are really large, we might be left waiting a really, really long time. When the dataset is sparse, we can take advantage of this sparsity, and run a sparse version of PCA instead of using a full <code class="docutils literal notranslate"><span class="pre">svd</span></code> like the naive implementation of PCA does. For more details on this, check out <span id="id3">[<a class="reference internal" href="#id13" title="Hui Zou, Trevor Hastie, and Robert Tibshirani. Sparse Principal Component Analysis. J. Comput. Graph. Stat., 15(2):265–286, June 2006. doi:10.1198/106186006X113430.">4</a>]</span>.</p>
+</section>
+<section id="the-algorithmic-implications">
+<h3>The algorithmic implications<a class="headerlink" href="#the-algorithmic-implications" title="Permalink to this heading">#</a></h3>
+<p>Finally, when we have sparse data, computational and storage considerations aside, it can often directly inform which techniques we should (or should <em>not</em>) use. For a common situation that you are already familiar with, let’s rotate back to a discussion we had back in <a class="reference internal" href="../../applications/ch7/testing-differences.html#ch7-testing"><span class="std std-ref">Testing for Differences between Groups of Edges</span></a>, and then repeated in <a class="reference internal" href="../../applications/ch8/significant-communities.html#ch8-twosamplesbm"><span class="std std-ref">Two-sample hypothesis testing in SBMs</span></a> and <a class="reference internal" href="../../applications/ch9/significant-edges.html#ch9-ssn-incoherent"><span class="std std-ref">Testing for Significant Edges</span></a> regarding <em>contingency tables</em>. Let’s relate this to “non-network” data a little more directly.</p>
+<p>Imagine that you are the lead data analyst at a pharmaceutical company, and you are testing whether a new vaccine reduces the rate at which people get flu. You randomly select say, <span class="math notranslate nohighlight">\(100,000\)</span> people to be in your study, and of these people, you randomly provide <span class="math notranslate nohighlight">\(2,000\)</span> of these people your new flu vaccine. You observe that over the course of the year, <span class="math notranslate nohighlight">\(100\)</span> people got the flu, and in the group that did not obtain your vaccine, <span class="math notranslate nohighlight">\(1000\)</span> people got your flu. A good way to organize your data is with the same contingency table that we saw previously:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>Number of people who got the flu</p></th>
+<th class="head"><p>Number of people who did not get the flu</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Received vaccine</p></td>
+<td><p>100</p></td>
+<td><p>1900</p></td>
+</tr>
+<tr class="row-odd"><td><p>Did not receive vaccine</p></td>
+<td><p>10000</p></td>
+<td><p>88000</p></td>
+</tr>
+</tbody>
+</table>
+<p>If we wanted to decide how effective the vaccine was for preventing the flu in the general population, we have a few options. When we have contingency tables, the best option (for obtaining the right answer) is the same <em>Fisher exact test</em> that we discussed previously. This test is <em>exact</em>, in that when we run our analysis, the <span class="math notranslate nohighlight">\(p\)</span>-value that we end up with will faithfully represent the probability of observing the data that we saw (if there were no difference in flu rates between people who received our vaccine or did not receive our vaccine). In this case, it <em>actually</em> looks at all of the possible contingency tables that we could end up with where <span class="math notranslate nohighlight">\(2000\)</span> people obtain the vaccine, and <span class="math notranslate nohighlight">\(98000\)</span> people did not obtain the vaccine, and examines how extreme the table we saw (in terms of the number of people who got the flu) was if the probability of getting the flu is the same across the people who received and did not receive the vaccine (and there are a <em>lot</em> of them!). An extremely key (but enormous) caveat to this actually being the case in our hypothetical analysis is that we randomly selected people to our study, and randomly gave people our flu vaccine, which rarely holds in practice, but for now let’s just assume that such an experiment was conducted.</p>
+<p>Unfortunately, Fisher’s exact test has a slight caveat: it can be extremely computationally intensive to compute, especially when the number of data observations that we have (in this case, <span class="math notranslate nohighlight">\(200,000\)</span>) is really big (it could be even bigger than <span class="math notranslate nohighlight">\(200,000\)</span>). Another statistic that people will use for these situations often is known as the <em>chi-squared test</em>. Basically, the idea is that, if you look at enough people, you actually <em>don’t</em> need to look at the exact distribution of these contingency tables, like you did for the Fisher’s exact test. When you sample enough people, patterns in these tables will emerge that you can pick up on (and exploit) in terms of what they would look like if there were no difference between the vaccinated and unvaccinated groups. Instead of comparing the table we saw to all possible tables, you can compute a summary function from the table and compare that summary function to compute the <span class="math notranslate nohighlight">\(p\)</span>-value in closed form (in that, you just execute a particular equation, and get your answer). For more details on the chi-squared test, and how it relates to contingency tables, check out <span class="xref std std-ref">Kateri</span>.</p>
+<p>There is a big reason that this “summary” function is reasonable: if we have enough data, and the outcome (getting the flu) isn’t too rare, the chi-squared test and the Fisher’s exact test will give you <em>just about</em> the same answer, but the chi-squared test will take a small fraction of the computation time. If you have to run many of these contingency tables (like we did for the case of  the signal subnetwork in Section <a class="reference internal" href="../../applications/ch9/significant-edges.html#ch9-ssn-incoherent"><span class="std std-ref">Testing for Significant Edges</span></a>), this might turn into a bottleneck for your analysis (from a computation standpoint), and it might situationally make sense to use the chi-squared test (even though it isn’t quite exact).</p>
+<p>However, situationally, this <em>approximation</em> can vary from not great to completely misleading. For instance, if our vaccine was for meningitis instead of the flu, which is a much more rare viral condition, we might have only seen <span class="math notranslate nohighlight">\(1\)</span> person who received the vaccine actually get the condition we were investigating, and maybe <span class="math notranslate nohighlight">\(10\)</span> or <span class="math notranslate nohighlight">\(20\)</span> people in our unvaccinated population actually get the condition. When the data is this <em>sparse</em> (in that, the outcome is quite rare) the chi-squared test is in all actuality a completely inappropriate thing to do. In this case, the “foot” that the chi-squared test stands on (the patterns that emerge in summary statistics of all possible contingency tables that we could have observed if there were no difference between the vaccinated and unvaccinated groups) does not apply, and the chi-squared test is unreasonable.</p>
+<p>In this sense, the sparsity of the data can actually drive you away from strategies that might situationally be reasonable (such as the chi-squared test) and towards strategies that are more robust to sparsity (such as the Fisher’s exact test).</p>
+</section>
+</section>
+<section id="how-does-sparsity-interplay-with-networks">
+<h2>How does sparsity interplay with networks?<a class="headerlink" href="#how-does-sparsity-interplay-with-networks" title="Permalink to this heading">#</a></h2>
+<p>So, now we have the big question: what does this have to do with networks? As with matrices, we have two interplaying (and in some cases, complementary) ways that we conceptualize sparsity in network data.</p>
+<section id="sparsity-as-a-property-of-the-random-network">
+<h3>Sparsity as a property of the random network<a class="headerlink" href="#sparsity-as-a-property-of-the-random-network" title="Permalink to this heading">#</a></h3>
+<p>In matrices, we had the first way to conceptualize a sparse matrix being a matrix: a matrix where most of the entries are <span class="math notranslate nohighlight">\(0\)</span>. With networks, however, this tends to work out a little bit differently. To ease into this section, we’ll first introduce the concept of a sequence of random variables, and expected values of functions of sequences of random variables.</p>
+<section id="sequences-of-random-variables">
+<h4>Sequences of random variables<a class="headerlink" href="#sequences-of-random-variables" title="Permalink to this heading">#</a></h4>
+<p>The next building block to conceptualize sparsity of random networks is going to involve some information about sequences of random networks, which might be a lot to wrap your head around. Fortunately, we can conceptualize this a lot like a sequence of coin flips, like you are probably used to by this point.</p>
+<p>Imagine that we have a coin, and its output can either be a <span class="math notranslate nohighlight">\(1\)</span> (the coin lands on heads) or a <span class="math notranslate nohighlight">\(0\)</span> (the coin lands on tails). The coin lands on heads with probability <span class="math notranslate nohighlight">\(p\)</span>. We can use this coin to produce a sequence <span class="math notranslate nohighlight">\(\vec{\mathbf x}^{(n)}\)</span> which is the outcome of <span class="math notranslate nohighlight">\(n\)</span> random flips of this coin, where <span class="math notranslate nohighlight">\(n\)</span> (like in the network case) just indexes the number of coin flips that we made. These coin flips are all performed independently and identically (the outcome of one coin flip does not effect the outcome of other coin flips, and all of the coin flips have the same probability of landing on heads, <span class="math notranslate nohighlight">\(p\)</span>).</p>
+<p>The element <span class="math notranslate nohighlight">\(\mathbf x^{(n)}_i\)</span> is a random variable which represents the outcome of the coin itself. So, a possible realization of <span class="math notranslate nohighlight">\(\vec{\mathbf x}^{(5)}\)</span> could be something like <span class="math notranslate nohighlight">\(\vec{ x}^{(5)}\)</span>, where <span class="math notranslate nohighlight">\(\vec{x}^{(5)} = \begin{bmatrix}0 &amp; 0 &amp; 1&amp; 0 &amp; 0\end{bmatrix}^\top\)</span>. This would correspond to flipping the coin <span class="math notranslate nohighlight">\(5\)</span> times, and getting <span class="math notranslate nohighlight">\(2\)</span> tails, followed by <span class="math notranslate nohighlight">\(1\)</span> heads, followed by <span class="math notranslate nohighlight">\(2\)</span> more tails. Let’s say that we are interested in the following: what is the sum of all of the elements of <span class="math notranslate nohighlight">\(\vec{\mathbf x}^{(n)}\)</span>? In other words, can we describe <span class="math notranslate nohighlight">\(\sum_{i = 1}^n \mathbf x_i^{(n)}\)</span>?</p>
+<p>If you aren’t too familiar with statistics, basically the idea is this: since <span class="math notranslate nohighlight">\(\sum_{i = 1}^n \mathbf x_i^{(n)}\)</span> is a sum of random quantities (the outcomes of unrealized coin flips), we can’t quite describe <span class="math notranslate nohighlight">\(\sum_{i = 1}^n \mathbf x_i^{(n)}\)</span> <em>exactly</em>, in that, we can’t say <em>for sure</em> what value it is going to take. However, we can describe <em>how it will be distributed</em>, and perhaps more interesting for our case, we can describe what value we would <em>expect</em> to see.</p>
+<p>In statistics, we define this operation, called the <em>expected value</em>, with the notation <span class="math notranslate nohighlight">\(\mathbb E[\cdot]\)</span>. So, in this case where we want to describe the expected value of <span class="math notranslate nohighlight">\(\sum_{i = 1}^n \mathbf x_i^{(n)}\)</span>, we would write:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E \left[\sum_{i = 1}^n \mathbf x_i^{(n)}\right].
+\end{align*}\]</div>
+<p>If you are not too familiar with statistics, some basic rules can help us to simplify this down a good deal. If you want more background as to <em>exactly</em> how this works, we would recommend checking out an introductory book in statistics, such as <span id="id4">[<a class="reference internal" href="#id101" title="George Casella and Roger L. Berger. Statistical Inference. Cengage Learning, Boston, MA, USA, June 2001. ISBN 978-0-53424312-8.">1</a>]</span>. In this case, since <span class="math notranslate nohighlight">\(\mathbf x_i^{(n)}\)</span> is a <em>finite</em> random quantity (all realizations of it would just be <span class="math notranslate nohighlight">\(1\)</span> with probability <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(0\)</span> with probability <span class="math notranslate nohighlight">\(1-p\)</span>, and both <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(0\)</span> are finite numbers) we can use something called the <em>linearity of expectation</em>, which basically just tells us that the expected value of a sum of random variables is the sum of the expected values of those random variables, so it simplifies like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\sum_{i = 1}^n \mathbf x_i^{(n)}\right] &amp;= 
+    \sum_{i = 1}^n\mathbb E\left[ \mathbf x_i^{(n)}\right].
+\end{align*}\]</div>
+<p>This expression looks a bit easier to deal with: the only thing we are left to think about is the terms <span class="math notranslate nohighlight">\(\mathbb E\left[ \mathbf x_i^{(n)}\right]\)</span>. First, we know that these terms are all <em>identically distributed</em>. One consequence of terms being <em>identically distributed</em> is that their expected values will all be the same, which means we only need to actually compute this quantity once for all of the elements of <span class="math notranslate nohighlight">\(\vec{\mathbf x}^{(n)}\)</span>.</p>
+<p>The final thing that we need to use is something which is commonly referred to as the Law of the Unconscious Statistician (LoTUS). Basically, what LoTUS tells us is that if <span class="math notranslate nohighlight">\(\mathbf y\)</span> is a discrete quantity (the possible numerical values it could take can be counted), then we can compute the expected value using a very simple relationship:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\mathbf y\right] &amp;= \sum_{y_i \in \mathcal Y} y_i Pr.(\mathbf y = y_i).
+\end{align*}\]</div>
+<p>Conceptually, what this formula tells us is that the expected value of <span class="math notranslate nohighlight">\(\mathbf y\)</span> is a <em>weighted average</em> of the possible values that it could be realized as, <em>weighted</em> by the probability that a particular value is realized. Let’s see what this looks like for our coin flips:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[ \mathbf x_i^{(n)}\right] &amp;= 1 \cdot Pr.( \mathbf x_i^{(n)} = 1) + 0 \cdot Pr.( \mathbf x_i^{(n)} = 0) \\
+    &amp;= 1 \cdot p + 0 \cdot (1 - p) = p.
+\end{align*}\]</div>
+<p>Here, the random variable <span class="math notranslate nohighlight">\(\mathbf x_i^{(n)}\)</span> could either be a <span class="math notranslate nohighlight">\(1\)</span> (the coin lands on heads) or a <span class="math notranslate nohighlight">\(0\)</span> (the coin lands on tails). We see the value <span class="math notranslate nohighlight">\(1\)</span> with probability <span class="math notranslate nohighlight">\(p\)</span>, and the value <span class="math notranslate nohighlight">\(0\)</span> with probability <span class="math notranslate nohighlight">\(1 - p\)</span>. When we take the <em>weighted sum</em>, this turns out to just be <span class="math notranslate nohighlight">\(p\)</span>. Now, for the quantity that we were interested in:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\sum_{i = 1}^n \mathbf x_i^{(n)}\right] &amp;= \sum_{i = 1}^n p.
+\end{align*}\]</div>
+<p>And a sum of <span class="math notranslate nohighlight">\(n\)</span> <span class="math notranslate nohighlight">\(p\)</span>s is just <span class="math notranslate nohighlight">\(n \cdot p\)</span>.</p>
+<p>Now, let’s consider a similar question: what portion of the coin flips do we expect to be heads? To conceptualize this quantity, for a single <span class="math notranslate nohighlight">\(\vec{\mathbf x}^{(n)}\)</span>, this quantity could be written:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\frac{1}{n} \sum_{i = 1}^n \mathbb x_i^{(n)}\right].
+\end{align*}\]</div>
+<p>As it turns out, if <span class="math notranslate nohighlight">\(\mathbf y\)</span> is a random variable, another useful result is that for <em>any</em> constant <span class="math notranslate nohighlight">\(c\)</span>, that <span class="math notranslate nohighlight">\(\mathbb E[c\mathbf y] = c\mathbb E[\mathbf y]\)</span>. Since <span class="math notranslate nohighlight">\(\frac{1}{n}\)</span> is just a constant, we end up with:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\frac{1}{n} \sum_{i = 1}^n \mathbb x_i^{(n)}\right] &amp;= \frac{1}{n} \mathbb E\left[\sum_{i = 1}^n \mathbb x_i^{(n)}\right] \\
+    &amp;= \frac{1}{n} n \cdot p = p.
+\end{align*}\]</div>
+<p>Where in the last line, we used the result that we just calculated to simplify the expression down.</p>
+</section>
+<section id="sequences-of-random-networks">
+<h4>Sequences of random networks<a class="headerlink" href="#sequences-of-random-networks" title="Permalink to this heading">#</a></h4>
+<p>Now that we have that under our belt, let’s pivot back to networks.</p>
+<p>Let’s assume that <span class="math notranslate nohighlight">\(\mathbf A^{(n)}\)</span> is the adjacency matrix of a random network which has <span class="math notranslate nohighlight">\(n\)</span> nodes, with entries <span class="math notranslate nohighlight">\(\mathbf a_{ij}\)</span> (which are zero or one). For each node in a simple network, remember that the total number of edges in the network is given by <span class="math notranslate nohighlight">\(\sum_{i &gt; j}a_{ij}\)</span>. Likewise, the total number of nodes in the random network with <span class="math notranslate nohighlight">\(n\)</span> nodes can be written the same way, except instead of actually summing <em>realized</em> edges, we are summing up <em>random</em> edges, with <span class="math notranslate nohighlight">\(\sum_{i &gt; j}\mathbf a_{ij}^{(n)}\)</span>. All that the superscript <span class="math notranslate nohighlight">\((n)\)</span> is doing here is telling us that this refers to the network with <span class="math notranslate nohighlight">\(n\)</span> nodes.</p>
+<p>So, in this case, we have a sequence of random networks, <span class="math notranslate nohighlight">\(\left\{\mathbf A^{(1)}, \mathbf A^{(2)}, ...\right\}\)</span> for different numbers of nodes. For each of these networks, we can’t <em>quite</em> talk about the <em>actual</em> edge sum itself (directly) since they are random, like the above problem with discussing the <em>actual</em> coin outcomes. However, like the above, we <em>can</em> talk about the expected edge sum in the network, like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\sum_{i &gt; j}\mathbf a_{ij}^{(n)}\right].
+\end{align*}\]</div>
+<p>Likewise, remember back to <a class="reference internal" href="../../representations/ch4/properties-of-networks.html#ch4-prop-net-density"><span class="std std-ref">The network density indicates the fraction of possible edges which exist</span></a> that the total number of potential edges was given by <span class="math notranslate nohighlight">\(\binom n 2\)</span>. We could also talk about the expected network density, which is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\frac{\sum_{i &gt; j}\mathbf a_{ij}^{(n)}}{\binom n 2}\right].
+\end{align*}\]</div>
+<p>Remembering that like above, we can “remove constants” from the expected value term, and we get that the expected network density is:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \frac{\mathbb E\left[\sum_{i &gt; j}\mathbf a_{ij}^{(n)}\right]}{\binom n 2}.
+\end{align*}\]</div>
+<p>This should look extremely familiar to you by this point, as it is (virtually) the same quantity that we saw above. Just like the above, we could derive a similar relationship using the <em>linearity of expectation</em>, since the edge adjacencies are still finite (they are either <span class="math notranslate nohighlight">\(0\)</span> or <span class="math notranslate nohighlight">\(1\)</span>):</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbb E\left[\sum_{i &gt; j}\mathbf a_{ij}^{(n)}\right] &amp;= \sum_{i &gt; j}\mathbb E\left[\mathbf a_{ij}^{(n)}\right].
+\end{align*}\]</div>
+<p>Now that we have this under our belts, we are ready to define a <em>sparse sequence of random networks</em>. A sequence <span class="math notranslate nohighlight">\(\{\mathbf A^{(1)}, A^{(2)}, ...\}\)</span> of random networks is <strong>sparse</strong> if:</p>
+<div class="math notranslate nohighlight" id="equation-ch10-sparsity-sparse-rn">
+<span class="eqno">()<a class="headerlink" href="#equation-ch10-sparsity-sparse-rn" title="Permalink to this equation">#</a></span>\[\lim_{n \rightarrow \infty}\frac{\mathbb E\left[\sum_{i &gt; j}\mathbf a_{ij}^{(n)}\right]}{\binom n 2} = 0.\]</div>
+<p>Conceptually, what this means is that as the network grows, tne expected network density goes to <span class="math notranslate nohighlight">\(0\)</span>. This contrasts from what we saw above in the coinflip example, where the expected portion of coin flips that were heads was a constant value, <span class="math notranslate nohighlight">\(p\)</span>.</p>
+<p>Another way to conceptualize this would be to use <em>L’Hopital’s rule</em>, from calculus. In essence, what L’Hopital’s rule asserts is that for two functions <span class="math notranslate nohighlight">\(f(x)\)</span> and <span class="math notranslate nohighlight">\(g(x)\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \lim_{x \rightarrow c} \frac{f(x)}{g(x)} = \lim_{x \rightarrow c} \frac{\frac{d}{dx}f(x)}{\frac{d}{dx}g(x)}.
+\end{align*}\]</div>
+<p>Remember from calculus that a derivative <span class="math notranslate nohighlight">\(\frac{d}{dx}f(x)\)</span> can be conceptualized as the <em>rate</em> at which <span class="math notranslate nohighlight">\(f(x)\)</span> changes as <span class="math notranslate nohighlight">\(x\)</span> increases for a particular value of <span class="math notranslate nohighlight">\(x\)</span>, this means that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \lim_{n \rightarrow \infty}\frac{\mathbb E\left[\sum_{i &gt; j}\mathbf a_{ij}\right]}{\binom n 2} &amp;= 
+    \lim_{n \rightarrow \infty}\frac{\frac{d}{dn}\mathbb E\left[\sum_{i &gt; j}\mathbf a_{ij}\right]}{\frac{d}{dn}\binom n 2},
+\end{align*}\]</div>
+<p>so basically, the sequence of random networks are sparse if the <em>expected number of edges</em> is increasing at a <em>much slower rate</em> than the number of potential edges is increasing as <span class="math notranslate nohighlight">\(n\)</span> grows, because this ratio goes to zero.</p>
+<p>Conceptually, we can equivalently write the sum <span class="math notranslate nohighlight">\(\sum_{i &gt; j}a_{ij}\)</span> for a simple network as <span class="math notranslate nohighlight">\(\frac{1}{2} \sum_{i, j = 1}^n a_{ij} = \frac{1}{2}\sum_{i = 1}^n \sum_{j = 1}^n a_{ij}\)</span> (convince yourself of it by writing it down! Hint: it is because simple networks are symmetric and loopless). Remember, though, that the node degree from <a class="reference internal" href="../../representations/ch4/properties-of-networks.html#ch4-prop-net-degree"><span class="std std-ref">Node degree quantifies the number of edges</span></a> was <span class="math notranslate nohighlight">\(d_i = \sum_{j = 1}^n a_{ij}\)</span>, and similarly, the random node degree is <span class="math notranslate nohighlight">\(\mathbf d_i = \sum_{j = 1}^n \mathbf a_{ij}\)</span>. This means that we could rewrite the expression in Equation <code class="xref eq docutils literal notranslate"><span class="pre">sparse_rn</span></code> as:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\lim_{n \rightarrow \infty}\frac{\frac{1}{2}\mathbb E\left[\sum_{i =1}^n \mathbf d_i^{(n)}\right]}{\binom n 2},
+\end{align*}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf d_i^{(n)}\)</span> is the random node degree for node <span class="math notranslate nohighlight">\(i\)</span> in the random network <span class="math notranslate nohighlight">\(\mathbf A^{(n)}\)</span> with <span class="math notranslate nohighlight">\(n\)</span> nodes. Let’s introduce a new random variable, <span class="math notranslate nohighlight">\(\mathbf d^{(n)}\)</span>, and let <span class="math notranslate nohighlight">\(\mathbf d^{(n)}\)</span> be the average node degree in the network with <span class="math notranslate nohighlight">\(n\)</span> nodes. In words, we’ll let <span class="math notranslate nohighlight">\(\mathbf d^{(n)}\)</span> be:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \mathbf d^{(n)} = \frac{1}{n}\sum_{i = 1}^n \mathbf d_i^{(n)},
+\end{align*}\]</div>
+<p>and therefore by multiplying both sides by <span class="math notranslate nohighlight">\(n\)</span>:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \sum_{i = 1}^n \mathbf d_i^{(n)} = n\mathbf d^{(n)}.
+\end{align*}\]</div>
+<p>By expanding the term <span class="math notranslate nohighlight">\(\binom n 2 = \frac{1}{2} n (n - 1)\)</span>, cancelling out the factor of <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span>, and applying this new result, we get:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{\mathbb E\left[\sum_{i =1}^n \mathbf d_i^{(n)}\right]}{n(n - 1)} &amp;= 
+\frac{\mathbb E\left[n\mathbf d^{(n)}\right]}{n(n - 1)} = \frac{n\mathbb E\left[\mathbf d^{(n)}\right]}{n(n - 1)}.
+\end{align*}\]</div>
+<p>By cancelling out the <span class="math notranslate nohighlight">\(n\)</span> in the numerator and the denominator on the right-hand side of the expression:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+\frac{\mathbb E\left[\sum_{i =1}^n \mathbf d_i^{(n)}\right]}{n(n - 1)} &amp;= 
+\frac{\mathbb E\left[\mathbf d^{(n)}\right]}{n - 1}.
+\end{align*}\]</div>
+<p>For the network to be sparse, therefore we need that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \lim_{n \rightarrow \infty}\frac{\mathbb E\left[\mathbf d^{(n)}\right]}{n - 1} = 0.
+\end{align*}\]</div>
+<p>Again, using L’Hopital’s rule and that <span class="math notranslate nohighlight">\(\frac{d}{dn}(n - 1) = 1\)</span>, we see that:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    \lim_{n \rightarrow \infty}\frac{\mathbb E\left[\mathbf d^{(n)}\right]}{n - 1} &amp;= \lim_{n \rightarrow \infty}\frac{d}{dn}\mathbb E\left[d^{(n)}\right] = 0.
+\end{align*}\]</div>
+<p>What this shows us is that, as <span class="math notranslate nohighlight">\(n\)</span> is increasing, the expected average node degree of a sparse sequence of random networks, <span class="math notranslate nohighlight">\(\mathbb E\left[\mathbf d^{(n)}\right]\)</span>, grows at a <em>rate</em> (with respect to <span class="math notranslate nohighlight">\(n\)</span>) which is decreasing (to <span class="math notranslate nohighlight">\(0\)</span>) as <span class="math notranslate nohighlight">\(n\)</span> grows.</p>
+</section>
+<section id="what-does-this-notion-of-sparsity-have-to-do-with-practical-applications">
+<h4>What does this notion of sparsity have to do with practical applications?<a class="headerlink" href="#what-does-this-notion-of-sparsity-have-to-do-with-practical-applications" title="Permalink to this heading">#</a></h4>
+<p>In the strictest sense, this notion of “sparsity” as, in effect, a property of the average expected node degree in a sequence of random networks seems a bit overly theoretical to be practical. In practice, you observe a network; you don’t obtain an infinite sequence of network <span class="math notranslate nohighlight">\(A^{(n)}\)</span> with an arbitrarily large number of nodes <span class="math notranslate nohighlight">\(n\)</span>. However, this concept has a number of theoretical applications, in particular since we can easily conceptualize real networks having attributes which are <em>like</em> sparse networks. Let’s see how.</p>
+<p>Consider, for instance, a social network. Let’s imagine one that’s really, really big, like facebook for instance. When a new person joins facebook (<span class="math notranslate nohighlight">\(n\)</span> is growing), it would that this person is probably not going to become friends with the entire network. Realistically, they will have a fixed subset of friends that they connect with, and people with similar interests that they connect with, and the average degree of the network is probably going to scale by a lot less than the number of people who were added to the network (<span class="math notranslate nohighlight">\(1\)</span> person). As more and more people are added to the network, this rate of change is probably going to converge to <span class="math notranslate nohighlight">\(0\)</span>, like we saw above. In this sense, social networks can usually be reasoned to behave like sparse networks.</p>
+<p>Likewise, let’s consider another practical application of sparsity. Many algorithms for ranking search pages (especially in the early days of the internet) conceptualized the internet as an interconnected network of web pages. Nodes were individual pages on the web, and an edge exists between page <span class="math notranslate nohighlight">\(i\)</span> and page <span class="math notranslate nohighlight">\(j\)</span> if page <span class="math notranslate nohighlight">\(i\)</span> has a hyperlink to page <span class="math notranslate nohighlight">\(j\)</span>. Early search query engines, such as Google’s Page Rank <span id="id5">[<a class="reference internal" href="#id95" title="Sergey Brin and Lawrence Page. The anatomy of a large-scale hypertextual Web search engine. Computer Networks and ISDN Systems, 30(1):107–117, April 1998. doi:10.1016/S0169-7552(98)00110-X.">5</a>]</span>, up-rank a web page <span class="math notranslate nohighlight">\(i\)</span> in search results based on the number of other web pages that link to page <span class="math notranslate nohighlight">\(i\)</span> (the logic being that better pages are linked to more often, and hence, are desirable to return to searchers). As more and more web pages are indexed by google, it is likely that other pages that are similar in content might end up cross-linking to a given web page, but it is unlikely that the increase in the average number of web page links will scale with the number of web pages.</p>
+<p>As another application of sparse networks, let’s imagine that you are a planner for a highway system. The nodes of the network are cities that have a highway that passes through them, and the edges are whether a pair of cities are connected directly by a highway (that goes from one straight to the other). As nodes are added to the network (linked by new highways), you would probably just put a highway to the nearest city that is already in the highway system, rather than build direct highways to all of the other cities in the system. In this sense, highway systems can be conceptualized to be sparse.</p>
+<p>For these and many other reasons, this theoretical notion of sparsity becomes important when determining the expected behavior for algorithms or analysis methods designed for networks which can be conceptualized as sparse.</p>
+</section>
+</section>
+<section id="sparsity-as-a-tool-to-use-when-it-makes-sense">
+<h3>Sparsity as a tool to use when it makes sense<a class="headerlink" href="#sparsity-as-a-tool-to-use-when-it-makes-sense" title="Permalink to this heading">#</a></h3>
+<p>There are much more direct reasons that we might need to think about sparsity, too. When we have an adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> which has <span class="math notranslate nohighlight">\(n\)</span> nodes (the network is <em>realized</em>, and not a conceptualized sequence of random networks, like above), <em>all</em> of the considerations that we gave above for matrices in Section <a class="reference internal" href="#ch10-sparse-matrix-sparse"><span class="std std-ref">What is sparsity, and why does it matter?</span></a> (storage, computation, and algorithmic) considerations come into play.</p>
+<section id="storage-considerations">
+<h4>Storage considerations<a class="headerlink" href="#storage-considerations" title="Permalink to this heading">#</a></h4>
+<p>For instance, if a network doesn’t have all that many edges, we might be able to store it more efficiently as an edge list. An edge list basically “flattens” the adjacency matrix, and just stores a list of the node pairs <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> where <span class="math notranslate nohighlight">\(a_{ij} \neq 0\)</span>. Let’s conceptualize a simple network <span class="math notranslate nohighlight">\(A\)</span> that has an adjacency matrix that looks like this:</p>
+<div class="amsmath math notranslate nohighlight">
+\[\begin{align*}
+    A &amp;= \begin{bmatrix}
+        0 &amp; 1 &amp; 0 &amp; 0 \\
+        1 &amp; 0 &amp; 1 &amp; 0 \\
+        0 &amp; 1 &amp; 0 &amp; 0 \\
+        0 &amp; 0 &amp; 0 &amp; 0
+    \end{bmatrix}.
+\end{align*}\]</div>
+<p>An edge list for this network would look like this (note that the below list encodes <em>all</em> of the information about the adjacency matrix, due to the fact that the network is <em>simple</em>, and hence the adjacency matrix is symmetric). The rows of the edgelist are just the node pairings for all of the edges in the network:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Node <span class="math notranslate nohighlight">\(i\)</span></p></th>
+<th class="head"><p>Node <span class="math notranslate nohighlight">\(j\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>3</p></td>
+</tr>
+</tbody>
+</table>
+<p>One caveat with edge lists is that they can, occassionally, be a little bit confusing to deal with. Particularly, if you don’t know ahead of time that the network is simple, you might not know that it is undirected. When you reconstruct the adjacency matrix <span class="math notranslate nohighlight">\(A\)</span> from the edge list, it might be ambiguous to you whether since <span class="math notranslate nohighlight">\(a_{12} = 1\)</span> you should also reflect that <span class="math notranslate nohighlight">\(a_{21} = 1\)</span> (should you induce symmetry?). Likewise, any nodes that are disconnected will not show up at all in the edge list, and it might not be obvious that the node is part of the network (just disconnected). For this reason, when you analyze network data that is stored as an edge list, it is imperative that you understand what properties you expect the network to have <em>ahead of time</em>. For instance, if you read a network using the <code class="docutils literal notranslate"><span class="pre">networkx</span></code> function <code class="docutils literal notranslate"><span class="pre">read_edgelist()</span></code> or <code class="docutils literal notranslate"><span class="pre">read_weighted_edgelist()</span></code> and then attempt to convert it to a <code class="docutils literal notranslate"><span class="pre">numpy</span></code> adjacency matrix using the <code class="docutils literal notranslate"><span class="pre">to_numpy_array()</span></code> or <code class="docutils literal notranslate"><span class="pre">to_numpy_matrix()</span></code> functions, that you take care to first convert the <code class="docutils literal notranslate"><span class="pre">graph</span></code> object returned by <code class="docutils literal notranslate"><span class="pre">networkx</span></code>’s read functions to a loopless, undirected, unweighted matrix (if applicable), and then convert the network to a <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array/matrix with a pre-specified <code class="docutils literal notranslate"><span class="pre">nodelist</span></code> option. You can do these things with the <code class="docutils literal notranslate"><span class="pre">to_undirected()</span></code> utility.</p>
+</section>
+<section id="computational-considerations">
+<h4>Computational considerations<a class="headerlink" href="#computational-considerations" title="Permalink to this heading">#</a></h4>
+<p>The computational considerations about an adjacency matrix which is sparse are virtually identical to those we noted above. We might be able to make significant use of an adjacency matrix’s sparsity to radically alter the computational techniques that we choose to employ.</p>
+</section>
+<section id="algorithmic-considerations">
+<h4>Algorithmic considerations<a class="headerlink" href="#algorithmic-considerations" title="Permalink to this heading">#</a></h4>
+<p>For a singificant implication of sparsity, we’ll turn to a well-known problem in the sparse network literature: the “EigenSpokes” problem <span id="id6">[<a class="reference internal" href="#id96" title="B. Aditya Prakash, Ashwin Sridharan, Mukund Seshadri, Sridhar Machiraju, and Christos Faloutsos. EigenSpokes: Surprising Patterns and Scalable Community Chipping in Large Graphs. In Advances in Knowledge Discovery and Data Mining, pages 435–448. Springer, Berlin, Germany, 2010. doi:10.1007/978-3-642-13672-6_42.">6</a>]</span>. The basic idea is that, when dealing with networks that have a very low edge-density, a very large number of nodes, and with a high degree of community-specific connectivity (that is, the within-community connectivity greatly exceeds the between-community connectivity), individual nodes do not tend to be “split up” into nice little “blobs” when we perform an adjacency spectral embedding, like in <a class="reference internal" href="../../representations/ch6/spectral-embedding.html#ch6-spectral"><span class="std std-ref">Spectral embedding methods</span></a>.</p>
+<p>In these situations, the latent positions tend to form a “spoke-like” pattern (called, “Eigen spokes”). The name “eigen” comes from a relationship between the singular vectors and the eigenvectors in the singular value decomposition when the matrix being decomposed is symmetric, such as a symmetric adjacency matrix for an undirected network. The latent positions will have a value of <span class="math notranslate nohighlight">\(0\)</span> in some latent dimensions, and then “project” along other latent dimensions (the “spokes”). All of the community structure is not found in the “blob-like” structure a particular node is in, but rather, which projections it has (or does not have) a value of <span class="math notranslate nohighlight">\(0\)</span> in. In this sense, it would be particularly unreasonable to use something like adjacency spectral embedding followed by community detection like we did in <span class="xref std std-ref">ch8:comm_detect</span>; rather, we might need to exploit other patterns to find community structure, like the authors did for several extremely large and extremely large networks in their paper.</p>
+</section>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
+<div class="docutils container" id="id7">
+<div class="citation" id="id101" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">1</a><span class="fn-bracket">]</span></span>
+<p>George Casella and Roger L. Berger. <em>Statistical Inference</em>. Cengage Learning, Boston, MA, USA, June 2001. ISBN 978-0-53424312-8.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">2</a><span class="fn-bracket">]</span></span>
+<p>James H. Wilkinson. <em>The Algebraic Eigenvalue Problem</em>. Clarendon Press, Oxford, 1965.</p>
+</div>
+<div class="citation" id="id15" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">3</a><span class="fn-bracket">]</span></span>
+<p>G. K. Wallace. The JPEG still picture compression standard. <em>IEEE Trans. Consum. Electron.</em>, 38(1):xviii–xxxiv, February 1992. <a class="reference external" href="https://doi.org/10.1109/30.125072">doi:10.1109/30.125072</a>.</p>
+</div>
+<div class="citation" id="id13" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">4</a><span class="fn-bracket">]</span></span>
+<p>Hui Zou, Trevor Hastie, and Robert Tibshirani. Sparse Principal Component Analysis. <em>J. Comput. Graph. Stat.</em>, 15(2):265–286, June 2006. <a class="reference external" href="https://doi.org/10.1198/106186006X113430">doi:10.1198/106186006X113430</a>.</p>
+</div>
+<div class="citation" id="id95" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p>Sergey Brin and Lawrence Page. The anatomy of a large-scale hypertextual Web search engine. <em>Computer Networks and ISDN Systems</em>, 30(1):107–117, April 1998. <a class="reference external" href="https://doi.org/10.1016/S0169-7552(98)00110-X">doi:10.1016/S0169-7552(98)00110-X</a>.</p>
+</div>
+<div class="citation" id="id96" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p>B. Aditya Prakash, Ashwin Sridharan, Mukund Seshadri, Sridhar Machiraju, and Christos Faloutsos. EigenSpokes: Surprising Patterns and Scalable Community Chipping in Large Graphs. In <em>Advances in Knowledge Discovery and Data Mining</em>, pages 435–448. Springer, Berlin, Germany, 2010. <a class="reference external" href="https://doi.org/10.1007/978-3-642-13672-6_42">doi:10.1007/978-3-642-13672-6_42</a>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "graph-book-build"
+        },
+        kernelOptions: {
+            name: "graph-book-build",
+            path: "./next/ch10"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'graph-book-build'</script>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-sparsity-and-why-does-it-matter">What is sparsity, and why does it matter?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-storage-implications">The storage implications</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-computational-implications">The computational implications</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithmic-implications">The algorithmic implications</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-does-sparsity-interplay-with-networks">How does sparsity interplay with networks?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparsity-as-a-property-of-the-random-network">Sparsity as a property of the random network</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sequences-of-random-variables">Sequences of random variables</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sequences-of-random-networks">Sequences of random networks</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#what-does-this-notion-of-sparsity-have-to-do-with-practical-applications">What does this notion of sparsity have to do with practical applications?</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparsity-as-a-tool-to-use-when-it-makes-sense">Sparsity as a tool to use when it makes sense</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#storage-considerations">Storage considerations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-considerations">Computational considerations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithmic-considerations">Algorithmic considerations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Bridgeford, Alex Loftus, and Joshua Vogelstein
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -523,13 +523,13 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="spectral-embedding-methods">
 <span id="ch6-spectral"></span><h1><span class="section-number">5.3. </span>Spectral embedding methods<a class="headerlink" href="#spectral-embedding-methods" title="Permalink to this heading">#</a></h1>
-<p>Now that we know some of the basics of <em>why</em> we embed networks, it’s time to learn some about the <em>spectral embedding</em> <span id="id1">von Luxburg [<a class="reference internal" href="#id14" title="Ulrike von Luxburg. A tutorial on spectral clustering. Statistics and Computing, 2007.">4</a>]</span>. You’ll see spectral embedding and variations on it repeatedly, both throughout this section and when you get into applications, so it’s worth taking the time to understand spectral embedding deeply. If you’re familiar with Principal Component Analysis (PCA) <span id="id2">[<a class="reference internal" href="#id58" title="Ian T. Jolliffe and Jorge Cadima. Principal component analysis: a review and recent developments. Philos. Trans. Royal Soc. A, 374(2065):20150202, April 2016. doi:10.1098/rsta.2015.0202.">5</a>]</span>, this method has a lot of similarities. If you want to learn a bit about PCA, we’d recommend you check out the Geron book <span id="id3">[<a class="reference internal" href="#id15" title="Aurélien Géron. Hands-On Machine Learning with Scikit-Learn and TensorFlow. O'Reilly Media, Inc., Sebastopol, CA, USA, March 2017. ISBN 978-1-49196229-9. URL: https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282.">2</a>]</span>. We’ll need to get into a bit of linear algebra to understand how it works.</p>
+<p>Now that we know some of the basics of <em>why</em> we embed networks, it’s time to learn some about the <em>spectral embedding</em> <span id="id1">von Luxburg [<a class="reference internal" href="#id14" title="Ulrike von Luxburg. A tutorial on spectral clustering. Statistics and Computing, 2007.">4</a>]</span>. You’ll see spectral embedding and variations on it repeatedly, both throughout this section and when you get into applications, so it’s worth taking the time to understand spectral embedding deeply. If you’re familiar with Principal Component Analysis (PCA) <span id="id2">[<a class="reference internal" href="#id63" title="Ian T. Jolliffe and Jorge Cadima. Principal component analysis: a review and recent developments. Philos. Trans. Royal Soc. A, 374(2065):20150202, April 2016. doi:10.1098/rsta.2015.0202.">5</a>]</span>, this method has a lot of similarities. If you want to learn a bit about PCA, we’d recommend you check out the Geron book <span id="id3">[<a class="reference internal" href="#id15" title="Aurélien Géron. Hands-On Machine Learning with Scikit-Learn and TensorFlow. O'Reilly Media, Inc., Sebastopol, CA, USA, March 2017. ISBN 978-1-49196229-9. URL: https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282.">2</a>]</span>. We’ll need to get into a bit of linear algebra to understand how it works.</p>
 <p>Remember that the basic idea behind any network embedding method is to take the network and put it into Euclidean space - meaning, a nice data table with rows as observations and columns as features (or dimensions), which you can then plot on an x-y axis. In this section, you’ll see the linear algebra-centric approach that spectral embedding uses to do this.</p>
-<p>Spectral methods are based on a bit of linear algebra, but hopefully a small enough amount to still be understandable. The overall idea has to do with taking a function of the adjacency matrix, and finding a simpler representation of it. This simpler representation is computed by identifying the singular values and vectors of a function of the adjacency matrix, which is a process known as the <em>singular value decomposition</em>, covered in <span id="id4">[<a class="reference internal" href="#id33" title="Sheldon Axler. Linear Algebra Done Right. Springer International Publishing, Cham, Switzerland, 2015. ISBN 978-3-319-11080-6. URL: https://link.springer.com/book/10.1007/978-3-319-11080-6.">6</a>]</span> or <span id="id5">[<a class="reference internal" href="#id34" title="Lloyd Nicholas Trefethen and David Bau. Numerical Linear Algebra. Society for Industrial and Applied Mathematics, 1997. ISBN 978-0-89871487-6. URL: https://books.google.com/books/about/Numerical_Linear_Algebra.html?id=5Y1TPgAACAAJ.">1</a>]</span>. In essence, the singular values and singular vectors allow you to take a matrix, and represent it as a sum of “simple” matrices (in linear algebra speak, they are <em>rank-1</em> matrices). For our purposes, what this does is it makes patterns in the adjacency matrix “jump out” at us. Remember the example we gave back in <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm-modularity"><span class="std std-numref">Section 4.2.1.4</span></a> at the bottom? To recap, when a sample of an SBM was ordered by community label, the modularity, and hence the communities of the nodes, were apparent. But, when we shuffled around the adjacency matrix, this nice pattern disappeared. While the adjacency matrix itself won’t have this nice pattern anymore, simple ways of reorganizing the singular values and vectors, called the <em>spectrum</em> of the function of the adjacency matrix that you pick, just might! Because we’re finding a structure that is “hidden” in the adjacency matrix and uncovered by looking at the matrix’s <em>spectrum</em>, we’ll call this procedure a spectral embedding.</p>
+<p>Spectral methods are based on a bit of linear algebra, but hopefully a small enough amount to still be understandable. The overall idea has to do with taking a function of the adjacency matrix, and finding a simpler representation of it. This simpler representation is computed by identifying the singular values and vectors of a function of the adjacency matrix, which is a process known as the <em>singular value decomposition</em>, covered in <span id="id4">[<a class="reference internal" href="#id38" title="Sheldon Axler. Linear Algebra Done Right. Springer International Publishing, Cham, Switzerland, 2015. ISBN 978-3-319-11080-6. URL: https://link.springer.com/book/10.1007/978-3-319-11080-6.">6</a>]</span> or <span id="id5">[<a class="reference internal" href="#id39" title="Lloyd Nicholas Trefethen and David Bau. Numerical Linear Algebra. Society for Industrial and Applied Mathematics, 1997. ISBN 978-0-89871487-6. URL: https://books.google.com/books/about/Numerical_Linear_Algebra.html?id=5Y1TPgAACAAJ.">1</a>]</span>. In essence, the singular values and singular vectors allow you to take a matrix, and represent it as a sum of “simple” matrices (in linear algebra speak, they are <em>rank-1</em> matrices). For our purposes, what this does is it makes patterns in the adjacency matrix “jump out” at us. Remember the example we gave back in <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm-modularity"><span class="std std-numref">Section 4.2.1.4</span></a> at the bottom? To recap, when a sample of an SBM was ordered by community label, the modularity, and hence the communities of the nodes, were apparent. But, when we shuffled around the adjacency matrix, this nice pattern disappeared. While the adjacency matrix itself won’t have this nice pattern anymore, simple ways of reorganizing the singular values and vectors, called the <em>spectrum</em> of the function of the adjacency matrix that you pick, just might! Because we’re finding a structure that is “hidden” in the adjacency matrix and uncovered by looking at the matrix’s <em>spectrum</em>, we’ll call this procedure a spectral embedding.</p>
 <div class="admonition-singular-values-and-singular-vectors admonition">
 <p class="admonition-title">Singular Values and Singular Vectors</p>
 <p>If you don’t know what singular values and singular vectors are, don’t worry about it. You can think of them as a generalization of eigenvalues/vectors (it’s also ok if you don’t know what those are): all matrices have singular values and singular vectors, but not all matrices have eigenvalues and eigenvectors. In the case of square, symmetric matrices with positive eigenvalues, a singular value decomposition is <em>also</em> an eigendecomposition of the matrix.</p>
-<p>If you want some more background information on the eigenvalue or singular value decompositions, there are some decent explanations in numerous undergraduate linear algebra textbooks, of which the books <span id="id6">[<a class="reference internal" href="#id34" title="Lloyd Nicholas Trefethen and David Bau. Numerical Linear Algebra. Society for Industrial and Applied Mathematics, 1997. ISBN 978-0-89871487-6. URL: https://books.google.com/books/about/Numerical_Linear_Algebra.html?id=5Y1TPgAACAAJ.">1</a>]</span> or <span id="id7">[<a class="reference internal" href="#id33" title="Sheldon Axler. Linear Algebra Done Right. Springer International Publishing, Cham, Switzerland, 2015. ISBN 978-3-319-11080-6. URL: https://link.springer.com/book/10.1007/978-3-319-11080-6.">6</a>]</span> are our favorite. The singular vectors an important set of vectors associated with matrices with a bunch of interesting properties. A lot of linear algebra is built around exploring those properties.</p>
+<p>If you want some more background information on the eigenvalue or singular value decompositions, there are some decent explanations in numerous undergraduate linear algebra textbooks, of which the books <span id="id6">[<a class="reference internal" href="#id39" title="Lloyd Nicholas Trefethen and David Bau. Numerical Linear Algebra. Society for Industrial and Applied Mathematics, 1997. ISBN 978-0-89871487-6. URL: https://books.google.com/books/about/Numerical_Linear_Algebra.html?id=5Y1TPgAACAAJ.">1</a>]</span> or <span id="id7">[<a class="reference internal" href="#id38" title="Sheldon Axler. Linear Algebra Done Right. Springer International Publishing, Cham, Switzerland, 2015. ISBN 978-3-319-11080-6. URL: https://link.springer.com/book/10.1007/978-3-319-11080-6.">6</a>]</span> are our favorite. The singular vectors an important set of vectors associated with matrices with a bunch of interesting properties. A lot of linear algebra is built around exploring those properties.</p>
 </div>
 <p>You can see visually how spectral embedding works below. We start with a 20-node Stochastic Block Model with two communities, and then found its singular values and vectors. It turns out that because there are only two communities, only the first two singular vectors contain information – the rest are just noise! (you can see this if you look carefully at the first two columns of the singular vector matrix). So, you took these two columns and scaled them by the first two singular vectors of the singular value matrix <span class="math notranslate nohighlight">\(D\)</span>. The final embedding is that scaled matrix, and the plot you see takes the rows of that matrix and puts them into Euclidean space (an x-y axis) as points. This matrix is called the <em>estimated latent position matrix</em>, and the embeddings for the nodes are called the <em>estimated latent positions</em>. Underneath the figure is a list that explains how the algorithm works, step-by-step.</p>
 <div class="cell tag_hide-input docutils container">
@@ -624,7 +624,7 @@ document.write(`
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div>
 </div>
-<img alt="../../_images/eb8ea2d7cc9f0161a2de29680019a99052cc3da060db993ad3086ceb9a49ac8e.png" src="../../_images/eb8ea2d7cc9f0161a2de29680019a99052cc3da060db993ad3086ceb9a49ac8e.png" />
+<img alt="../../_images/328ba492abbc8161871a8da073f288fd56812b8041eb8f3adca5f964d808da0e.png" src="../../_images/328ba492abbc8161871a8da073f288fd56812b8041eb8f3adca5f964d808da0e.png" />
 </div>
 </div>
 <div class="admonition-the-spectral-embedding-algorithm admonition">
@@ -677,7 +677,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/861ff2f7057fa9b219759cbb8fce97eec0b3ea83784b663fe0b2a4c313cac8e5.png" src="../../_images/861ff2f7057fa9b219759cbb8fce97eec0b3ea83784b663fe0b2a4c313cac8e5.png" />
+<img alt="../../_images/d65ad5d22dffa46e399044353d968a683da2c1b42ff9100ff4b9bccae3b66cf7.png" src="../../_images/d65ad5d22dffa46e399044353d968a683da2c1b42ff9100ff4b9bccae3b66cf7.png" />
 </div>
 </div>
 </section>
@@ -709,7 +709,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/06dd7ee46bf4fdc8a9b785bb8729d6873151fa650d2117ed52ff080fbb4e5882.png" src="../../_images/06dd7ee46bf4fdc8a9b785bb8729d6873151fa650d2117ed52ff080fbb4e5882.png" />
+<img alt="../../_images/296d367421ae9251ef6bb0a39d16dcb3ff4fd68a5103bec8fdcb2a0a2d73ea94.png" src="../../_images/296d367421ae9251ef6bb0a39d16dcb3ff4fd68a5103bec8fdcb2a0a2d73ea94.png" />
 </div>
 </div>
 </section>
@@ -802,7 +802,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/47e805764f29f62b876a650fb27db69f4e08842d2f1220309d6a7a59f649d90d.png" src="../../_images/47e805764f29f62b876a650fb27db69f4e08842d2f1220309d6a7a59f649d90d.png" />
+<img alt="../../_images/bb357fd0bebd47b06fb7080d92c859159444a073a041b26730fed53c8ea91e19.png" src="../../_images/bb357fd0bebd47b06fb7080d92c859159444a073a041b26730fed53c8ea91e19.png" />
 </div>
 </div>
 <p>The first property you will notice is that the singular values are non-increasing: the singular value can never go up as the dimension index increases. This is because by definition of the <code class="docutils literal notranslate"><span class="pre">svd</span></code>, <span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2 \geq ... \geq \sigma_n \geq 0\)</span>.</p>
@@ -853,13 +853,13 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/8034c6eccdaee9a9feeb1c1fffdfcce48afaa94de744ae8e856646382d302cdb.png" src="../../_images/8034c6eccdaee9a9feeb1c1fffdfcce48afaa94de744ae8e856646382d302cdb.png" />
+<img alt="../../_images/bdd31ee29d7c4a934da6e5194421ac1c95c58df31f742f6832abc6c194ac8ec9.png" src="../../_images/bdd31ee29d7c4a934da6e5194421ac1c95c58df31f742f6832abc6c194ac8ec9.png" />
 </div>
 </div>
 <p>You’ll notice that there’s a marked area called the “elbow”. This is an area where singular values stop changing in magnitude as much when they get smaller: before the elbow, singular values change rapidly, and after the elbow, singular values barely change at all. (It’s called an elbow because the plot kind of looks like an arm, viewed from the side!)</p>
 <p>The location of this elbow gives you a rough indication for how many “true” dimensions your latent representation has. The singular values after the elbow are quite close to each other and have singular vectors which are largely noise, and don’t tell you very much about your data. It looks from the scree plot that you should be embedding down to two dimensions, as the smaller dimensions tend to be more “noisy” than the first few. The first few will tend to do a good job of describing the overall structure of the matrix that you have embedded, whereas successive dimensions tend to</p>
 <p>One drawback to this method is that a lot of the time, the elbow location is pretty subjective - real data will rarely have a nice, pretty elbow like the one you see above. The advantage is that it still generally works pretty well; embedding into a few more dimensions than you need isn’t too bad, since you’ll only have a few noise dimensions and there still may be <em>some</em> signal there.</p>
-<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2000 by Dr. Thomas Minka at MIT (called <code class="docutils literal notranslate"><span class="pre">minka</span></code>, from <span id="id8">[<a class="reference internal" href="#id59" title="Thomas Minka. Automatic Choice of Dimensionality for PCA. Advances in Neural Information Processing Systems, 2000. URL: https://papers.nips.cc/paper/2000/hash/7503cfacd12053d309b6bed5c89de212-Abstract.html.">7</a>]</span>). We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
+<p>In any case, Graspologic automates the process of finding an elbow using a popular method developed in 2000 by Dr. Thomas Minka at MIT (called <code class="docutils literal notranslate"><span class="pre">minka</span></code>, from <span id="id8">[<a class="reference internal" href="#id64" title="Thomas Minka. Automatic Choice of Dimensionality for PCA. Advances in Neural Information Processing Systems, 2000. URL: https://papers.nips.cc/paper/2000/hash/7503cfacd12053d309b6bed5c89de212-Abstract.html.">7</a>]</span>). We won’t get into the specifics of how it works here, but you can usually find fairly good elbows automatically.</p>
 </section>
 </section>
 </section>
@@ -941,7 +941,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/2d6534b61711d44263533405dc4836d23ee8b2e8ce4c4622bdf4590f3feba974.png" src="../../_images/2d6534b61711d44263533405dc4836d23ee8b2e8ce4c4622bdf4590f3feba974.png" />
+<img alt="../../_images/67a2776b657ae01d8a264377057e97192b2b9b6be9f60980738b9193f9c3c45d.png" src="../../_images/67a2776b657ae01d8a264377057e97192b2b9b6be9f60980738b9193f9c3c45d.png" />
 </div>
 </div>
 <p>What you can see is that the nodes corresponding to the first <span class="math notranslate nohighlight">\(50\)</span> students tend to have a high value in estimated latent dimension <span class="math notranslate nohighlight">\(2\)</span>, and the second <span class="math notranslate nohighlight">\(50\)</span> students tend to have a lower value in estimated latent dimension <span class="math notranslate nohighlight">\(2\)</span>.</p>
@@ -978,7 +978,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/81be26887b790759444def5805a7e136068035972d20c69cf686bea3ecb6a146.png" src="../../_images/81be26887b790759444def5805a7e136068035972d20c69cf686bea3ecb6a146.png" />
+<img alt="../../_images/f664a7181a6b3b0ddc5c09ed119ef1c77374aad9e652cf769a3eb5f3d8500043.png" src="../../_images/f664a7181a6b3b0ddc5c09ed119ef1c77374aad9e652cf769a3eb5f3d8500043.png" />
 </div>
 </div>
 <p>How can you overcome this new hurdle?</p>
@@ -996,7 +996,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/3f44e5062ecfc6e415e48c75a6cbe3289132b89387a2183cf0b95612dd4928eb.png" src="../../_images/3f44e5062ecfc6e415e48c75a6cbe3289132b89387a2183cf0b95612dd4928eb.png" />
+<img alt="../../_images/f1ede093be8f9fb9603956981cec057c2c979cbf188650f6c1b0b71a9d1942c9.png" src="../../_images/f1ede093be8f9fb9603956981cec057c2c979cbf188650f6c1b0b71a9d1942c9.png" />
 </div>
 </div>
 <p>As you can see, the pairs plot is a <code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">x</span> <span class="pre">d</span></code> matrix of plots, where <code class="docutils literal notranslate"><span class="pre">d</span></code> is the total number of features of the matrix for which a pairs plot is being produced. The plot is called a “pairs” plot because it plots “pairs” of dimensions.</p>
@@ -1012,7 +1012,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/b264ab2d6164e0ffe17e47745b7bcf26fbfa5baa4055fc40365c27fb3a575449.png" src="../../_images/b264ab2d6164e0ffe17e47745b7bcf26fbfa5baa4055fc40365c27fb3a575449.png" />
+<img alt="../../_images/ac8e770c55a6bfe7551ca91ae2ff7ffaa4f12a240f4da9cedcdcd1ad65963621.png" src="../../_images/ac8e770c55a6bfe7551ca91ae2ff7ffaa4f12a240f4da9cedcdcd1ad65963621.png" />
 </div>
 </div>
 <p>Now we’re getting somewhere! It looks like there are different “blobs” of latent positions, and each blob corresponds to a single community in the underlying SBM. This will be extremely useful to us in <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-numref">Section 6.1</span></a> when we attempt to guess the underlying community structure from an SBM.</p>
@@ -1113,7 +1113,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../_images/f620882ff1fd9df5e3038a5eb9797b34af7986cf22613702e5f41e69c1cf1693.png" src="../../_images/f620882ff1fd9df5e3038a5eb9797b34af7986cf22613702e5f41e69c1cf1693.png" />
+<img alt="../../_images/39021f4ec326e9a68b2451a6556e9339fdf1fecab99f59096629aa5555def3b0.png" src="../../_images/39021f4ec326e9a68b2451a6556e9339fdf1fecab99f59096629aa5555def3b0.png" />
 </div>
 </div>
 <p>As you can see above, the latent positions are <em>basically</em> the same, except they are rotated by <span class="math notranslate nohighlight">\(90\)</span> degrees for the rotated points, in orange. This is one particular example of a rotation, but there are infinitely many rotations we could make for our <span class="math notranslate nohighlight">\(2\)</span>-dimensional latent position matrix.</p>
@@ -1161,7 +1161,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/092820ad3c09d6efec4f374fc2b40854b30950ab69da25787bee414553d88647.png" src="../../_images/092820ad3c09d6efec4f374fc2b40854b30950ab69da25787bee414553d88647.png" />
+<img alt="../../_images/92e0289d901bbc5850d558db8d6e98b2558083892149b654dd366cf71a0e0cf6.png" src="../../_images/92e0289d901bbc5850d558db8d6e98b2558083892149b654dd366cf71a0e0cf6.png" />
 </div>
 </div>
 <p>We then embed the reordered adjacency matrix, using either adjacency spectral embedding or Laplacian spectral embedding.</p>
@@ -1196,7 +1196,7 @@ document.write(`
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Estimated number of latent dimensions: 2
 </pre></div>
 </div>
-<img alt="../../_images/99015c1f064f9134cad090b893978307af226f81eb9c5a440f8ba0600a83d613.png" src="../../_images/99015c1f064f9134cad090b893978307af226f81eb9c5a440f8ba0600a83d613.png" />
+<img alt="../../_images/c1443eb0859a7454dc4076ddfa12e0778ce18bcd78db9133b7cfe7dfd645c752.png" src="../../_images/c1443eb0859a7454dc4076ddfa12e0778ce18bcd78db9133b7cfe7dfd645c752.png" />
 </div>
 </div>
 </section>
@@ -1226,7 +1226,7 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../../_images/ae63815c3d1043fb8eb47755a8cbd1716bf986a9fb80da5c8f13e20b1fc75575.png" src="../../_images/ae63815c3d1043fb8eb47755a8cbd1716bf986a9fb80da5c8f13e20b1fc75575.png" />
+<img alt="../../_images/4f37278210bb12a46b71a8f044b035d7c26dba214e4f16a9fecd8ab2b89e2e1c.png" src="../../_images/4f37278210bb12a46b71a8f044b035d7c26dba214e4f16a9fecd8ab2b89e2e1c.png" />
 </div>
 </div>
 <p>In both cases, we can see that we have two pretty easily discernable blobs in the estimates of the latent positions. These blobs will be useful when we try to learn community assignments for the nodes in <a class="reference internal" href="../../applications/ch7/community-detection.html#ch7-comm-detect"><span class="std std-numref">Section 6.1</span></a>.</p>
@@ -1234,12 +1234,12 @@ document.write(`
 </section>
 <section id="want-more-linear-algebra">
 <h2><span class="section-number">5.3.8. </span>Want more linear algebra?<a class="headerlink" href="#want-more-linear-algebra" title="Permalink to this heading">#</a></h2>
-<p>Now that’s a question that is rarely asked! For network embeddings, however, if you have a more robust mathematical background, we would encourage you to check out the appendix sections for the results we have here. They can be found in <a class="reference internal" href="../../appendix/ch13/spectral-theory.html#app-ch13-spectral"><span class="std std-numref">Section 12.2</span></a>. While a bit more cumbersome mathematically, we think that some of this mathematical burden goes a long way to reinforcing the intuition of the processes and approaches chosen. The appendix reflects a brief overview of the survey paper <span id="id10">[<a class="reference internal" href="#id53" title="Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. J. Mach. Learn. Res., 18(1):8393–8484, January 2017. doi:10.5555/3122009.3242083.">3</a>]</span> as they concern this book.</p>
+<p>Now that’s a question that is rarely asked! For network embeddings, however, if you have a more robust mathematical background, we would encourage you to check out the appendix sections for the results we have here. They can be found in <a class="reference internal" href="../../appendix/ch13/spectral-theory.html#app-ch13-spectral"><span class="std std-numref">Section 12.2</span></a>. While a bit more cumbersome mathematically, we think that some of this mathematical burden goes a long way to reinforcing the intuition of the processes and approaches chosen. The appendix reflects a brief overview of the survey paper <span id="id10">[<a class="reference internal" href="#id58" title="Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. J. Mach. Learn. Res., 18(1):8393–8484, January 2017. doi:10.5555/3122009.3242083.">3</a>]</span> as they concern this book.</p>
 </section>
 <section id="references">
 <h2><span class="section-number">5.3.9. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
 <div class="docutils container" id="id11">
-<div class="citation" id="id34" role="doc-biblioentry">
+<div class="citation" id="id39" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id5">1</a>,<a role="doc-backlink" href="#id6">2</a>)</span>
 <p>Lloyd Nicholas Trefethen and David Bau. <em>Numerical Linear Algebra</em>. Society for Industrial and Applied Mathematics, 1997. ISBN 978-0-89871487-6. URL: <a class="reference external" href="https://books.google.com/books/about/Numerical_Linear_Algebra.html?id=5Y1TPgAACAAJ">https://books.google.com/books/about/Numerical_Linear_Algebra.html?id=5Y1TPgAACAAJ</a>.</p>
@@ -1248,7 +1248,7 @@ document.write(`
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
 <p>Aurélien Géron. <em>Hands-On Machine Learning with Scikit-Learn and TensorFlow</em>. O'Reilly Media, Inc., Sebastopol, CA, USA, March 2017. ISBN 978-1-49196229-9. URL: <a class="reference external" href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282">https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282</a>.</p>
 </div>
-<div class="citation" id="id53" role="doc-biblioentry">
+<div class="citation" id="id58" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">3</a><span class="fn-bracket">]</span></span>
 <p>Avanti Athreya, Donniell E. Fishkind, Minh Tang, Carey E. Priebe, Youngser Park, Joshua T. Vogelstein, Keith Levin, Vince Lyzinski, and Yichen Qin. Statistical inference on random dot product graphs: a survey. <em>J. Mach. Learn. Res.</em>, 18(1):8393–8484, January 2017. <a class="reference external" href="https://doi.org/10.5555/3122009.3242083">doi:10.5555/3122009.3242083</a>.</p>
 </div>
@@ -1256,16 +1256,16 @@ document.write(`
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">4</a><span class="fn-bracket">]</span></span>
 <p>Ulrike von Luxburg. A tutorial on spectral clustering. <em>Statistics and Computing</em>, 2007.</p>
 </div>
-<div class="citation" id="id58" role="doc-biblioentry">
+<div class="citation" id="id63" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">5</a><span class="fn-bracket">]</span></span>
 <p>Ian T. Jolliffe and Jorge Cadima. Principal component analysis: a review and recent developments. <em>Philos. Trans. Royal Soc. A</em>, 374(2065):20150202, April 2016. <a class="reference external" href="https://doi.org/10.1098/rsta.2015.0202">doi:10.1098/rsta.2015.0202</a>.</p>
 </div>
-<div class="citation" id="id33" role="doc-biblioentry">
+<div class="citation" id="id38" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></span>
 <span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id7">2</a>)</span>
 <p>Sheldon Axler. <em>Linear Algebra Done Right</em>. Springer International Publishing, Cham, Switzerland, 2015. ISBN 978-3-319-11080-6. URL: <a class="reference external" href="https://link.springer.com/book/10.1007/978-3-319-11080-6">https://link.springer.com/book/10.1007/978-3-319-11080-6</a>.</p>
 </div>
-<div class="citation" id="id59" role="doc-biblioentry">
+<div class="citation" id="id64" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">7</a><span class="fn-bracket">]</span></span>
 <p>Thomas Minka. Automatic Choice of Dimensionality for PCA. <em>Advances in Neural Information Processing Systems</em>, 2000. URL: <a class="reference external" href="https://papers.nips.cc/paper/2000/hash/7503cfacd12053d309b6bed5c89de212-Abstract.html">https://papers.nips.cc/paper/2000/hash/7503cfacd12053d309b6bed5c89de212-Abstract.html</a>.</p>
 </div>
