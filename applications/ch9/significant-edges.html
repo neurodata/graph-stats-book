@@ -166,13 +166,8 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
-     1.4. Examples of applications
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
-     1.5. Challenges of Network Machine Learning
+     1.4. Challenges of Network Machine Learning
     </a>
    </li>
   </ul>
@@ -289,18 +284,23 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../../representations/ch5/single-network-models_DCSBM.html">
+     4.5. Degree-Corrected Stochastic Block Model (DCSBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../../representations/ch5/single-network-models_SIEM.html">
-     4.5. Structured Independent Edge Model (SIEM)
+     4.6. Structured Independent Edge Model (SIEM)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../representations/ch5/multi-network-models.html">
-     4.6. Multiple Network Models
+     4.7. Multiple Network Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../../representations/ch5/models-with-covariates.html">
-     4.7. Network Models with Network Covariates
+     4.8. Network Models with Network Covariates
     </a>
    </li>
   </ul>
@@ -919,7 +919,7 @@ title="Print to PDF"
                 
   <section class="tex2jax_ignore mathjax_ignore" id="testing-for-significant-edges">
 <span id="ch9-ssn-incoherent"></span><h1><span class="section-number">8.2. </span>Testing for Significant Edges<a class="headerlink" href="#testing-for-significant-edges" title="Permalink to this headline">#</a></h1>
-<p>For the next two sections, we will turn back to an example we came across back when we discussed the Signal Subnetwork model in <a class="reference internal" href="../../representations/ch5/models-with-covariates.html#ch5-multicovar-ssn"><span class="std std-numref">Section 4.7.1</span></a>. If you recall, we had <span class="math notranslate nohighlight">\(200\)</span> networks, which were either earthlings or aliens. The networks each had <span class="math notranslate nohighlight">\(5\)</span> nodes, which represented different sensory modalities: an area responsible for sight, language, hearing/emotional expression, thinking/movement, and basic survival functions (heartbeat and breathing). Edges existed if two areas of the brain could pass information to one another.</p>
+<p>For the next two sections, we will turn back to an example we came across back when we discussed the Signal Subnetwork model in <a class="reference internal" href="../../representations/ch5/models-with-covariates.html#ch5-multicovar-ssn"><span class="std std-numref">Section 4.8.1</span></a>. If you recall, we had <span class="math notranslate nohighlight">\(200\)</span> networks, which were either earthlings or aliens. The networks each had <span class="math notranslate nohighlight">\(5\)</span> nodes, which represented different sensory modalities: an area responsible for sight, language, hearing/emotional expression, thinking/movement, and basic survival functions (heartbeat and breathing). Edges existed if two areas of the brain could pass information to one another.</p>
 <p>The aliens are humans who were forced to live for several hundred thousand years on a planet in which their eyesight was challenged, and over time, evolution selected the aliens who had a higher probability of connections between the sight area and other areas of the brain. Our question of interest was as follows: if we are shown a network, how do we decide whether that network is from an earthling or an alien? Can we come up with a way to parse out the signal from the non-signal; that is, identify the subnetworks from <a class="reference internal" href="../../representations/ch4/properties-of-networks.html#ch4-prop-net-subnetwork"><span class="std std-numref">Section 3.2.4</span></a> that have been altered?</p>
 <p>To begin to address this question, we came up with the signal subnetwork model. What we established with the signal subnetwork model was that all of the edges in each network could be broken up into one of two groups: either the signal edges or the non-signal edges. We collected these signal edges into a set called the “signal subnetwork”, which was a parameter for the signal subnetwork model. For these signal edges, the probability of an edge existing (or not) was different for two (or more) classes in our problem. What this means is that, in our problem above, the edges which had a node which was responsible for sight had a different connection probability for the aliens than the earthlings. On the other hand, the non-signal edges did not have a different connection probability for the aliens than the earthlings.</p>
 <p>To start this section off, let’s first sample some example networks from the signal subnetwork model. Let’s assume that we have a total of <span class="math notranslate nohighlight">\(200\)</span> people, each of whom are either aliens (with probability <span class="math notranslate nohighlight">\(\pi_{alien} = 0.45\)</span>) or earthlings (with probability <span class="math notranslate nohighlight">\(\pi_{earth} = 0.55\)</span>). First, we’ll roll our 2-sided die <span class="math notranslate nohighlight">\(200\)</span> times, where side 1 (class 1) corresponds to aliens, and side 2 (class 2) corresponds to earthlings. We will then create the class assignment vector <span class="math notranslate nohighlight">\(\vec y\)</span> using the number of times the die lands on each class:</p>
@@ -1268,7 +1268,7 @@ Number of individuals who are earthlings: 113
 <section id="building-a-classifier-using-the-estimated-signal-subnetwork">
 <h2><span class="section-number">8.2.3. </span>Building a classifier using the estimated signal subnetwork<a class="headerlink" href="#building-a-classifier-using-the-estimated-signal-subnetwork" title="Permalink to this headline">#</a></h2>
 <p>Finally, we can use the estimated signal subnetwork that we have constructed to devise a classifier. The objective of a classifier is to take new pieces of data (in this case, new networks), and assign them to the class which they are most likely from. How do we determine which class a network is most likely from?</p>
-<p>At the moment, we have our estimate of the signal subnetwork, <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>, and have a bunch of networks from one of two classes: alien (class 1) or alien (class 2). The edges of the network are binary, and we want to use the edges which are in the signal subnetwork to classify points as either alien or alien. A natural classifier choice for this situation is known as the Naive Bayes classifier. We have all the ingredients we need to construct a Naive Bayes classifier, so we’ll try to piece this together. For details on the intuition and background of this algorithm, check out the appendix section on the Naive Bayes classifier in <a class="reference internal" href="../../appendix/ch14/bayes.html#app-ch14-bayes"><span class="std std-numref">Section 13.3</span></a> and the original paper <span id="id1">[<a class="reference internal" href="../../representations/ch5/models-with-covariates.html#id50" title="Joshua T. Vogelstein, William Gray Roncal, R. Jacob Vogelstein, and Carey E. Priebe. Graph classification using signal-subgraphs: applications in statistical connectomics. IEEE Trans. Pattern Anal. Mach. Intell., 35(7):1539–1551, July 2013. arXiv:23681985, doi:10.1109/TPAMI.2012.235.">1</a>]</span>.</p>
+<p>At the moment, we have our estimate of the signal subnetwork, <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span>, and have a bunch of networks from one of two classes: alien (class 1) or alien (class 2). The edges of the network are binary, and we want to use the edges which are in the signal subnetwork to classify points as either alien or alien. A natural classifier choice for this situation is known as the Naive Bayes classifier. We have all the ingredients we need to construct a Naive Bayes classifier, so we’ll try to piece this together. For details on the intuition and background of this algorithm, check out the appendix section on the Naive Bayes classifier in <a class="reference internal" href="../../appendix/ch14/bayes.html#app-ch14-bayes"><span class="std std-numref">Section 13.3</span></a> and the original paper <span id="id1">[<a class="reference internal" href="../../representations/ch5/models-with-covariates.html#id60" title="Joshua T. Vogelstein, William Gray Roncal, R. Jacob Vogelstein, and Carey E. Priebe. Graph classification using signal-subgraphs: applications in statistical connectomics. IEEE Trans. Pattern Anal. Mach. Intell., 35(7):1539–1551, July 2013. arXiv:23681985, doi:10.1109/TPAMI.2012.235.">1</a>]</span>.</p>
 <section id="network-classification">
 <h3><span class="section-number">8.2.3.1. </span>Network classification<a class="headerlink" href="#network-classification" title="Permalink to this headline">#</a></h3>
 <p>So, how do we actually use the estimated signal subnetwork <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span> to classify new networks? Quite simply, we can just use sklearn’s <code class="docutils literal notranslate"><span class="pre">BernoulliNB</span></code> from <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>, which is the Naive Bayes classifier for data where the features take values of <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span> (such as our network). We need to reorganize our data a little bit to get it into the format we want. Our estimated signal subnetwork <span class="math notranslate nohighlight">\(\hat{\mathcal S}\)</span> is returned to us by <code class="docutils literal notranslate"><span class="pre">graspologic</span></code> in the format of a <code class="docutils literal notranslate"><span class="pre">[2</span> <span class="pre">x</span> <span class="pre">K]</span></code> matrix, where <span class="math notranslate nohighlight">\(K\)</span> is the number of edges in the signal subnetwork. The first row is the row index of the entry of the signal subnetwork, and the second row is the column index of the entry in the signal subnetwork. We need to coerce this into an <code class="docutils literal notranslate"><span class="pre">[M</span> <span class="pre">x</span> <span class="pre">K]</span></code> matrix which we will call <span class="math notranslate nohighlight">\(D\)</span>, where <span class="math notranslate nohighlight">\(M\)</span> is the total number of networks, and <span class="math notranslate nohighlight">\(K\)</span> is the number of edges in the signal subnetwork. Each entry of this matrix <span class="math notranslate nohighlight">\(d_{mk}\)</span> represents the adjacency value of the <span class="math notranslate nohighlight">\(m^{th}\)</span> individual for the <span class="math notranslate nohighlight">\(k^{th}\)</span> element of the signal subnetwork:</p>
@@ -1435,7 +1435,7 @@ Classifier Accuracy: 0.630
 <h2><span class="section-number">8.2.5. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
 <div class="docutils container" id="id2">
 <dl class="citation">
-<dt class="label" id="id50"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id60"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Joshua T. Vogelstein, William Gray Roncal, R. Jacob Vogelstein, and Carey E. Priebe. Graph classification using signal-subgraphs: applications in statistical connectomics. <em>IEEE Trans. Pattern Anal. Mach. Intell.</em>, 35(7):1539–1551, July 2013. <a class="reference external" href="https://arxiv.org/abs/23681985">arXiv:23681985</a>, <a class="reference external" href="https://doi.org/10.1109/TPAMI.2012.235">doi:10.1109/TPAMI.2012.235</a>.</p>
 </dd>
 </dl>

@@ -166,13 +166,8 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="../../foundations/ch1/examples-of-applications.html">
-     1.4. Examples of applications
-    </a>
-   </li>
-   <li class="toctree-l2">
     <a class="reference internal" href="../../foundations/ch1/challenges-of-nml.html">
-     1.5. Challenges of Network Machine Learning
+     1.4. Challenges of Network Machine Learning
     </a>
    </li>
   </ul>
@@ -289,18 +284,23 @@ const thebe_selector_output = ".output, .cell_output"
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="../ch5/single-network-models_DCSBM.html">
+     4.5. Degree-Corrected Stochastic Block Model (DCSBM)
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="../ch5/single-network-models_SIEM.html">
-     4.5. Structured Independent Edge Model (SIEM)
+     4.6. Structured Independent Edge Model (SIEM)
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch5/multi-network-models.html">
-     4.6. Multiple Network Models
+     4.7. Multiple Network Models
     </a>
    </li>
    <li class="toctree-l2">
     <a class="reference internal" href="../ch5/models-with-covariates.html">
-     4.7. Network Models with Network Covariates
+     4.8. Network Models with Network Covariates
     </a>
    </li>
   </ul>
@@ -951,7 +951,7 @@ title="Print to PDF"
 <span id="ch6-joint"></span><h1><span class="section-number">5.5. </span>Joint Representation Learning<a class="headerlink" href="#joint-representation-learning" title="Permalink to this headline">#</a></h1>
 <p>In many problems, your network might be more than just the information contained in its adjacency matrix (called its <strong>network topology</strong>, or its collection of nodes and edges). If you were investigating a social network, you might have access to extra information about each person – their gender, for instance, or their age. If you were investigating a brain network, you might have information about the physical location of neurons, or some notion of how big a brain region is. When you embed a network, it seems like you should be able to use these extra bits of information - called the “features” or “covariates” of a network - to somehow improve your analysis. The techniques and tools that you’ll explore in this section use both the covariates and the topology of a network to create and learn from new representations of the network. Because they jointly use both the topology of the network and its extra covariate information, these techniques and tools are called joint representation learning.</p>
 <p>There are two primary reasons that you might want to explore using node covariates in addition to topological structure. First, they might improve your standard embedding algorithms, like Laplacian and Adjacency Spectral Embedding. For example, if the latent structure of the covariates of a network lines up with the latent structure of its topology, then you might be able to reduce noise when you embed, even if the communities in your network don’t overlap perfectly with the communities in your covariates. Second, figuring out what the clusters of an embedding actually mean can sometimes be difficult and covariates create a natural structure in your network that you can explore. Covariate information in brain networks telling you where in the brain each node is, for instance, might let us better understand the types of characteristics that distinguish between different brain regions.</p>
-<p>In this section, you’ll explore different ways to learn from your data when you have access to the covariates of a network in addition to its topological structure. You’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding developed by <span id="id1">[<a class="reference internal" href="#id57" title="N. Binkiewicz, J. T. Vogelstein, and K. Rohe. Covariate-assisted spectral clustering. Biometrika, 104(2):361–377, June 2017. doi:10.1093/biomet/asx008.">1</a>]</span>. In CASE, instead of embedding just the adjacency matrix or its Laplacian, you’ll combine the Laplacian and your covariates into a new matrix and embed that.</p>
+<p>In this section, you’ll explore different ways to learn from your data when you have access to the covariates of a network in addition to its topological structure. You’ll explore <em>Covariate-Assisted Spectral Embedding</em> (CASE), a variation on Spectral Embedding developed by <span id="id1">[<a class="reference internal" href="#id67" title="N. Binkiewicz, J. T. Vogelstein, and K. Rohe. Covariate-assisted spectral clustering. Biometrika, 104(2):361–377, June 2017. doi:10.1093/biomet/asx008.">1</a>]</span>. In CASE, instead of embedding just the adjacency matrix or its Laplacian, you’ll combine the Laplacian and your covariates into a new matrix and embed that.</p>
 <p>A good way to illustrate how using covariates might help us is to use a model in which some of your community information is in the covariates and some is in your topology. Using the Stochastic Block Model from <a class="reference internal" href="../ch5/single-network-models_SBM.html#ch5-sbm"><span class="std std-numref">Section 4.2</span></a>, we’ll create a simulation using three communities: the first and second community will be indistinguishable in the topological structure of a network, and the second and third community will be indistinguishable in the covariates. By combining the topology and the covariates, you’ll get a nice embedding that lets you find three distinct community clusters.</p>
 <section id="stochastic-block-model">
 <h2><span class="section-number">5.5.1. </span>Stochastic Block Model<a class="headerlink" href="#stochastic-block-model" title="Permalink to this headline">#</a></h2>
@@ -1111,8 +1111,8 @@ title="Print to PDF"
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Suppose that <span class="math notranslate nohighlight">\(Y\)</span> only contains 0’s and 1’s. To interpret <span class="math notranslate nohighlight">\(YY^top\)</span>, notice you’re effectively taking the the dot product of each row of <span class="math notranslate nohighlight">\(Y\)</span> with each other row, because the transpose operation turns rows into columns. Now, look at what happens below when you take the dot product of two example vectors with only 0’s and 1’s in them:</p>
-<div class="amsmath math notranslate nohighlight" id="equation-a9ce18cd-3160-4d3e-b145-4414ba6eea27">
-<span class="eqno">(5.2)<a class="headerlink" href="#equation-a9ce18cd-3160-4d3e-b145-4414ba6eea27" title="Permalink to this equation">#</a></span>\[\begin{align}
+<div class="amsmath math notranslate nohighlight" id="equation-1f83407a-2b24-4901-a2ca-89de38012a2f">
+<span class="eqno">(5.2)<a class="headerlink" href="#equation-1f83407a-2b24-4901-a2ca-89de38012a2f" title="Permalink to this equation">#</a></span>\[\begin{align}
 \begin{bmatrix}
 1 &amp; 1 &amp; 1
 \end{bmatrix} \cdot 
@@ -1408,7 +1408,7 @@ Mean of A: 0.20
 <h2><span class="section-number">5.5.6. </span>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
 <div class="docutils container" id="id2">
 <dl class="citation">
-<dt class="label" id="id57"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id67"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>N. Binkiewicz, J. T. Vogelstein, and K. Rohe. Covariate-assisted spectral clustering. <em>Biometrika</em>, 104(2):361–377, June 2017. <a class="reference external" href="https://doi.org/10.1093/biomet/asx008">doi:10.1093/biomet/asx008</a>.</p>
 </dd>
 </dl>
