@@ -38,11 +38,24 @@ RUN apt update
 RUN apt install -y google-chrome-stable
 RUN pip install seaborn==0.11.2
 
-COPY . ${HOME}
 RUN apt install -y gfortran
+
+RUN mkdir -p ${HOME}
+
+RUN pip install git+https://github.com/neurodata/graphbook-code.git
+RUN git clone https://github.com/neurodata/bilateral-connectome.git /bilateral-connectome
+RUN cd /bilateral-connectome/pkg && \
+    python setup.py install
+COPY requirements.txt ${HOME}/requirements.txt
+RUN pip install graspologic==3.0.0
+
 RUN cd ${HOME} && \
    pip install -r requirements.txt
+RUN pip install tqdm
 
+COPY ./textbook_data/ ${HOME}
+RUN pip install scipy==1.10.1
+RUN pip install --upgrade numba
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
