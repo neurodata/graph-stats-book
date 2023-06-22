@@ -47,7 +47,7 @@ RUN git clone https://github.com/neurodata/bilateral-connectome.git /bilateral-c
 RUN cd /bilateral-connectome/pkg && \
     python setup.py install
 COPY requirements.txt ${HOME}/requirements.txt
-RUN pip install graspologic==3.0.0
+RUN pip install graspologic==3.2.0
 
 RUN cd ${HOME} && \
    pip install -r requirements.txt
